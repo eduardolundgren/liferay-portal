@@ -1070,7 +1070,7 @@ public class DLFileEntryLocalServiceImpl
 
 		dlFileVersionPersistence.update(dlFileVersion, false);
 
-		if (fileEntryTypeId > 0) {
+		if ((fileEntryTypeId > 0) && (fieldsMap != null)) {
 			dlFileEntryMetadataLocalService.updateFileEntryMetadata(
 				fileEntryTypeId, dlFileEntry.getFileEntryId(), fileVersionId,
 				fieldsMap, serviceContext);
@@ -1426,7 +1426,7 @@ public class DLFileEntryLocalServiceImpl
 			assetEntry.getEntryId());
 
 		long[] assetLinkIds = StringUtil.split(
-			ListUtil.toString(assetLinks, "linkId"), 0L);
+			ListUtil.toString(assetLinks, AssetLink.LINK_ID_ACCESSOR), 0L);
 
 		return updateAsset(
 			userId, dlFileEntry, dlFileVersion, assetCategoryIds, assetTagNames,

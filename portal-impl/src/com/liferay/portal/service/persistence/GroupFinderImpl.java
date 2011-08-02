@@ -284,7 +284,7 @@ public class GroupFinderImpl
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(FIND_BY_SYSTEM);
+			String sql = CustomSQLUtil.get(FIND_BY_NO_LAYOUTS);
 
 			SQLQuery q = session.createSQLQuery(sql);
 
