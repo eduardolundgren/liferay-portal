@@ -883,13 +883,6 @@
 				<description></description>
 			</attribute>
 			<attribute>
-				<name>helpMessage</name>
-				<inputType>java.lang.String</inputType>
-				<outputType>java.lang.String</outputType>
-				<defaultValue>a-new-version-will-be-created-automatically-if-this-content-is-modified</defaultValue>
-				<description></description>
-			</attribute>
-			<attribute>
 				<name>id</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
@@ -905,6 +898,13 @@
 				<inputType>java.lang.Object</inputType>
 				<outputType>java.lang.Object</outputType>
 				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>helpMessage</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue>a-new-version-will-be-created-automatically-if-this-content-is-modified</defaultValue>
 				<description></description>
 			</attribute>
 			<attribute>
