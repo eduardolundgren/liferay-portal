@@ -7,12 +7,19 @@
 		<author>Nathan Cavanaugh</author>
 		<author>Julio Camarero</author>
 	</authors>
-	<!--<component name="A" bodyContent="true" alloyComponent="false">
+	<component name="A" bodyContent="true" writeJSP="false">
 		<attributes>
 			<attribute>
 				<name>cssClass</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>data</name>
+				<inputType><![CDATA[java.util.Map<java.lang.String,java.lang.Object>]]></inputType>
+				<outputType><![CDATA[java.util.Map<java.lang.String,java.lang.Object>]]></outputType>
 				<defaultValue></defaultValue>
 				<description></description>
 			</attribute>
@@ -45,14 +52,28 @@
 				<description></description>
 			</attribute>
 			<attribute>
+				<name>onClick</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
 				<name>target</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 				<defaultValue></defaultValue>
 				<description></description>
 			</attribute>
+			<attribute>
+				<name>title</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
 		</attributes>
-	</component>-->
+	</component>
 	<component name="Button" alloyComponent="false">
 		<attributes>
 			<attribute>
