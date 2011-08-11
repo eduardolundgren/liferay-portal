@@ -690,7 +690,7 @@
 			</attribute>
 		</attributes>
 	</component>
-	<!--<component name="Script">
+	<component name="Script" parentClass="com.liferay.taglib.util.PositionTagSupport" writeJSP="false">
 		<attributes>
 			<attribute>
 				<name>position</name>
@@ -707,7 +707,7 @@
 				<description></description>
 			</attribute>
 		</attributes>
-	</component>-->
+	</component>
 	<component name="Select" bodyContent="true">
 		<attributes>
 			<attribute>
