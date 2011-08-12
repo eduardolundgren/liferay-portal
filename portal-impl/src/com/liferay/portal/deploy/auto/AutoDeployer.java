@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
  */
 public interface AutoDeployer {
 
-	public void autoDeploy(String file) throws AutoDeployException;
+	public void autoDeploy(String fileName, String context)
+		throws AutoDeployException;
 
 }

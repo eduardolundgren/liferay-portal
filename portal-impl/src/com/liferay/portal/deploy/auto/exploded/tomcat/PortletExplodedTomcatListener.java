@@ -31,7 +31,7 @@ public class PortletExplodedTomcatListener extends BaseExplodedTomcatListener {
 		_deployer = new PortletExplodedTomcatDeployer();
 	}
 
-	public void deploy(File file) throws AutoDeployException {
+	protected void deploy(File file) throws AutoDeployException {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Invoking deploy for " + file.getPath());
 		}

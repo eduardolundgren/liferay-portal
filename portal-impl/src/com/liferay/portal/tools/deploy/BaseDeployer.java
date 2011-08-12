@@ -121,8 +121,10 @@ public class BaseDeployer implements Deployer {
 
 		checkArguments();
 
+		String context = System.getProperty("deployer.context");
+
 		try {
-			deploy();
+			deploy(context);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -235,7 +237,8 @@ public class BaseDeployer implements Deployer {
 			boolean overwrite)
 		throws Exception {
 
-		DeployUtil.copyDependencyXml(fileName, targetDir, filterMap, overwrite);
+		DeployUtil.copyDependencyXml(
+			fileName, targetDir, fileName, filterMap, overwrite);
 	}
 
 	public void copyJars(File srcFile, PluginPackage pluginPackage)
@@ -427,7 +430,7 @@ public class BaseDeployer implements Deployer {
 		copyDependencyXml("web.xml", srcFile + "/WEB-INF");
 	}
 
-	public void deploy() throws Exception {
+	public void deploy(String context) throws Exception {
 		try {
 			File baseDirFile = new File(baseDir);
 
@@ -464,7 +467,7 @@ public class BaseDeployer implements Deployer {
 				}
 
 				if (deploy) {
-					deployFile(srcFile);
+					deployFile(srcFile, context);
 				}
 			}
 		}
@@ -658,6 +661,10 @@ public class BaseDeployer implements Deployer {
 					System.currentTimeMillis() + (Time.SECOND * 6));
 			}
 		}
+
+		if (appServerType.equals(ServerDetector.JETTY_ID)) {
+			DeployUtil.redeployJetty(displayName);
+		}
 	}
 
 	public void deployDirectory(
@@ -667,10 +674,6 @@ public class BaseDeployer implements Deployer {
 
 		deployDirectory(
 			srcFile, null, null, displayName, override, pluginPackage);
-	}
-
-	public void deployFile(File srcFile) throws Exception {
-		deployFile(srcFile, null);
 	}
 
 	public void deployFile(File srcFile, String specifiedContext)

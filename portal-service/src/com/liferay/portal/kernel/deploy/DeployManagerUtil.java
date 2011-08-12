@@ -14,7 +14,11 @@
 
 package com.liferay.portal.kernel.deploy;
 
+import com.liferay.portal.kernel.plugin.PluginPackage;
+
 import java.io.File;
+
+import java.util.List;
 
 /**
  * @author Jonathan Potter
@@ -23,12 +27,12 @@ import java.io.File;
  */
 public class DeployManagerUtil {
 
-	public static void deploy(File source) throws Exception {
-		getDeployManager().deploy(source);
+	public static void deploy(File file) throws Exception {
+		getDeployManager().deploy(file);
 	}
 
-	public static void deploy(File source, String context) throws Exception {
-		getDeployManager().deploy(source, context);
+	public static void deploy(File file, String context) throws Exception {
+		getDeployManager().deploy(file, context);
 	}
 
 	public static String getDeployDir() throws Exception {
@@ -37,6 +41,10 @@ public class DeployManagerUtil {
 
 	public static DeployManager getDeployManager() {
 		return _deployManager;
+	}
+
+	public static List<PluginPackage> getInstalledPlugins() {
+		return getDeployManager().getInstalledPlugins();
 	}
 
 	public static boolean isDeployed(String context) {

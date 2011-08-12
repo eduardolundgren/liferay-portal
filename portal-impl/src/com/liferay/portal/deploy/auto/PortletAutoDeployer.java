@@ -81,15 +81,17 @@ public class PortletAutoDeployer
 		}
 	}
 
-	public void autoDeploy(String file) throws AutoDeployException {
+	public void autoDeploy(String fileName, String context)
+		throws AutoDeployException {
+
 		List<String> wars = new ArrayList<String>();
 
-		wars.add(file);
+		wars.add(fileName);
 
 		this.wars = wars;
 
 		try {
-			deploy();
+			deploy(context);
 		}
 		catch (Exception e) {
 			throw new AutoDeployException(e);
