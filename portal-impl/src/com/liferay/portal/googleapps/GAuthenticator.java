@@ -90,13 +90,19 @@ public class GAuthenticator {
 
 		Properties properties = PropertiesUtil.load(content);
 
+		String error = properties.getProperty("Error");
+
+		if (error != null) {
+			_log.info("Unable to initialize authentication token: " + error);
+		}
+
 		_authenticationToken = properties.getProperty("Auth");
 
 		_initTime = System.currentTimeMillis();
 	}
 
 	private boolean isStale() {
-		if ((_initTime + (Time.HOUR * 23)) > System.currentTimeMillis()) {
+		if ((_initTime + Time.HOUR) > System.currentTimeMillis()) {
 			return false;
 		}
 		else {
