@@ -17,9 +17,6 @@
 <%@ include file="/html/taglib/ui/asset_categories_navigation/init.jsp" %>
 
 <%
-boolean hidePortletWhenEmpty = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:asset-tags-navigation:hidePortletWhenEmpty"));
-long[] vocabularyIds = (long[])request.getAttribute("liferay-ui:asset-tags-navigation:vocabularyIds");
-
 long categoryId = ParamUtil.getLong(request, "categoryId");
 
 List<AssetVocabulary> vocabularies = null;

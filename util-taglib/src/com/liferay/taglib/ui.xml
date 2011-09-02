@@ -8,4 +8,22 @@
 		<author>Julio Camarero</author>
 	</authors>
 	<component name="AssetCategoriesError" bodyContent="false" />
+	<component name="AssetCategoriesNavigation" bodyContent="false">
+		<attributes>
+			<attribute>
+				<name>hidePortletWhenEmpty</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>vocabularyIds</name>
+				<inputType>long[]</inputType>
+				<outputType>long[]</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+		</attributes>
+	</component>
 </taglibs>
