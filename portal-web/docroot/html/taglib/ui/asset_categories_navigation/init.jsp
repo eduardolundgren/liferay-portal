@@ -12,14 +12,36 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+
+@generated
 --%>
 
-<%@ include file="/html/taglib/init.jsp" %>
+<%@ include file="/html/taglib/taglib-init.jsp" %>
 
-<%@ page import="com.liferay.portlet.asset.NoSuchVocabularyException" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetCategory" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetVocabulary" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetCategoryServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetVocabularyServiceUtil" %>
+<%
+Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("ui:asset-categories-navigation:dynamicAttributes");
+Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("ui:asset-categories-navigation:scopedAttributes");
+CustomAttributes customAttributes = (CustomAttributes)request.getAttribute("ui:asset-categories-navigation:customAttributes");
 
-<portlet:defineObjects />
+Map<String, Object> _options = new HashMap<String, Object>();
+
+if ((scopedAttributes != null) && !scopedAttributes.isEmpty()) {
+	_options.putAll(scopedAttributes);
+}
+
+if ((dynamicAttributes != null) && !dynamicAttributes.isEmpty()) {
+	_options.putAll(dynamicAttributes);
+}
+
+boolean hidePortletWhenEmpty = GetterUtil.getBoolean(String.valueOf(request.getAttribute("ui:asset-categories-navigation:hidePortletWhenEmpty")));
+long[] vocabularyIds = (long[])request.getAttribute("ui:asset-categories-navigation:vocabularyIds");
+
+_updateOptions(_options, "hidePortletWhenEmpty", hidePortletWhenEmpty);
+_updateOptions(_options, "vocabularyIds", vocabularyIds);
+%>
+
+<%@ include file="/html/taglib/ui/asset_categories_navigation/init-ext.jspf" %>
+
+<%!
+private static final String _NAMESPACE = "ui:asset-categories-navigation:";
+%>
