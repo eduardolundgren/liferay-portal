@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<taglibs short-name="ui" uri="http://alloy.liferay.com/tld/ui" tlib-version="1.0">
+	<authors>
+		<author>Eduardo Lundgren</author>
+		<author>Bruno Basto</author>
+		<author>Nathan Cavanaugh</author>
+		<author>Julio Camarero</author>
+	</authors>
+	<component name="AssetCategoriesError" bodyContent="false" />
+</taglibs>
