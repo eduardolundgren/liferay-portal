@@ -26,4 +26,36 @@
 			</attribute>
 		</attributes>
 	</component>
+	<component name="AssetCategoriesSummary" bodyContent="false">
+		<attributes>
+			<attribute>
+				<name>className</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>classPK</name>
+				<inputType>long</inputType>
+				<outputType>long</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>message</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>portletURL</name>
+				<inputType>javax.portlet.PortletURL</inputType>
+				<outputType>javax.portlet.PortletURL</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+		</attributes>
+	</component>
 </taglibs>
