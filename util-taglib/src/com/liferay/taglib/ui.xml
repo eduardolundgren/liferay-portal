@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<taglibs short-name="ui" uri="http://alloy.liferay.com/tld/ui" tlib-version="1.0">
+	<authors>
+		<author>Eduardo Lundgren</author>
+		<author>Bruno Basto</author>
+		<author>Nathan Cavanaugh</author>
+		<author>Julio Camarero</author>
+	</authors>
+	<component name="AssetCategoriesError" bodyContent="false" />
+	<component name="AssetCategoriesNavigation" bodyContent="false">
+		<attributes>
+			<attribute>
+				<name>hidePortletWhenEmpty</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>vocabularyIds</name>
+				<inputType>long[]</inputType>
+				<outputType>long[]</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+		</attributes>
+	</component>
+	<component name="AssetCategoriesSummary" bodyContent="false">
+		<attributes>
+			<attribute>
+				<name>className</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>classPK</name>
+				<inputType>long</inputType>
+				<outputType>long</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>message</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+			<attribute>
+				<name>portletURL</name>
+				<inputType>javax.portlet.PortletURL</inputType>
+				<outputType>javax.portlet.PortletURL</outputType>
+				<defaultValue></defaultValue>
+				<description></description>
+			</attribute>
+		</attributes>
+	</component>
+</taglibs>

@@ -19,9 +19,9 @@
 <%@ include file="/html/taglib/taglib-init.jsp" %>
 
 <%
-Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("ui:asset-categories-navigation:dynamicAttributes");
-Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("ui:asset-categories-navigation:scopedAttributes");
-CustomAttributes customAttributes = (CustomAttributes)request.getAttribute("ui:asset-categories-navigation:customAttributes");
+Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("ui:asset-categories-error:dynamicAttributes");
+Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("ui:asset-categories-error:scopedAttributes");
+CustomAttributes customAttributes = (CustomAttributes)request.getAttribute("ui:asset-categories-error:customAttributes");
 
 Map<String, Object> _options = new HashMap<String, Object>();
 
@@ -33,15 +33,12 @@ if ((dynamicAttributes != null) && !dynamicAttributes.isEmpty()) {
 	_options.putAll(dynamicAttributes);
 }
 
-boolean hidePortletWhenEmpty = GetterUtil.getBoolean(String.valueOf(request.getAttribute("ui:asset-categories-navigation:hidePortletWhenEmpty")));
-long[] vocabularyIds = (long[])request.getAttribute("ui:asset-categories-navigation:vocabularyIds");
 
-_updateOptions(_options, "hidePortletWhenEmpty", hidePortletWhenEmpty);
-_updateOptions(_options, "vocabularyIds", vocabularyIds);
+
 %>
 
-<%@ include file="/html/taglib/ui/asset_categories_navigation/init-ext.jspf" %>
+<%@ include file="/html/taglib/ui/asset_categories_error/init-ext.jspf" %>
 
 <%!
-private static final String _NAMESPACE = "ui:asset-categories-navigation:";
+private static final String _NAMESPACE = "ui:asset-categories-error:";
 %>

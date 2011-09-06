@@ -14,19 +14,11 @@
 
 package com.liferay.taglib.ui;
 
-import com.liferay.taglib.util.IncludeTag;
+import com.liferay.taglib.ui.base.BaseAssetCategoriesErrorTag;
 
 /**
  * @author Juan Fernández
  */
-public class AssetCategoriesErrorTag extends IncludeTag {
-
-	@Override
-	protected String getPage() {
-		return _PAGE;
-	}
-
-	private static final String _PAGE =
-		"/html/taglib/ui/asset_categories_error/page.jsp";
+public class AssetCategoriesErrorTag extends BaseAssetCategoriesErrorTag {
 
 }

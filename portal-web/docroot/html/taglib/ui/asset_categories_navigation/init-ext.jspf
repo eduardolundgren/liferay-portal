@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
  *
@@ -11,19 +12,12 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
 
-package com.liferay.taglib.ui;
+<%@ page import="com.liferay.portlet.asset.NoSuchVocabularyException" %>
+<%@ page import="com.liferay.portlet.asset.model.AssetCategory" %>
+<%@ page import="com.liferay.portlet.asset.model.AssetVocabulary" %>
+<%@ page import="com.liferay.portlet.asset.service.AssetCategoryServiceUtil" %>
+<%@ page import="com.liferay.portlet.asset.service.AssetVocabularyServiceUtil" %>
 
-import com.liferay.taglib.ui.base.BaseAssetCategoriesSummaryTag;
-
-import javax.portlet.PortletURL;
-
-import javax.servlet.http.HttpServletRequest;
-
-/**
- * @author Brian Wing Shun Chan
- * @author Jorge Ferrer
- */
-public class AssetCategoriesSummaryTag extends BaseAssetCategoriesSummaryTag {
-
-}
+<portlet:defineObjects />
