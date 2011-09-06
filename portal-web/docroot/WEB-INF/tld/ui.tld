@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+	<tlib-version>1.0</tlib-version>
+	<short-name>ui</short-name>
+	<uri>http://alloy.liferay.com/tld/ui</uri>
+	<tag>
+		<name>asset-categories-error</name>
+		<tag-class>com.liferay.taglib.ui.AssetCategoriesErrorTag</tag-class>
+		<body-content>JSP</body-content>
+		<dynamic-attributes>true</dynamic-attributes>
+	</tag>
+	<tag>
+		<name>asset-categories-navigation</name>
+		<tag-class>com.liferay.taglib.ui.AssetCategoriesNavigationTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description><![CDATA[]]></description>
+			<name>hidePortletWhenEmpty</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[]]></description>
+			<name>vocabularyIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.Object</type>
+		</attribute>
+		<dynamic-attributes>true</dynamic-attributes>
+	</tag>
+</taglib>
