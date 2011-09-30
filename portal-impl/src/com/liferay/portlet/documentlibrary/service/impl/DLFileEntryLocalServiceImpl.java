@@ -516,13 +516,15 @@ public class DLFileEntryLocalServiceImpl
 			ddmStructures = dlFileEntryType.getDDMStructures();
 
 			for (DDMStructure ddmStructure : ddmStructures) {
+				long ddmStructureId = ddmStructure.getStructureId();
+
 				try {
 					DLFileEntryMetadata dlFileEntryMetadata =
 						dlFileEntryMetadataLocalService.getFileEntryMetadata(
-							ddmStructure.getStructureId(), fromFileVersionId);
+							ddmStructureId, fromFileVersionId);
 
 					Fields fields = StorageEngineUtil.getFields(
-						dlFileEntryMetadata.getDDMStorageId());
+						ddmStructureId, dlFileEntryMetadata.getDDMStorageId());
 
 					fieldsMap.put(ddmStructure.getStructureKey(), fields);
 				}
@@ -541,13 +543,15 @@ public class DLFileEntryLocalServiceImpl
 			classNameId);
 
 		for (DDMStructure ddmStructure : ddmStructures) {
+			long ddmStructureId = ddmStructure.getStructureId();
+
 			try {
 				DLFileEntryMetadata fileEntryMetadata =
 					dlFileEntryMetadataLocalService.getFileEntryMetadata(
-						ddmStructure.getStructureId(), fromFileVersionId);
+						ddmStructureId, fromFileVersionId);
 
 				Fields fields = StorageEngineUtil.getFields(
-					fileEntryMetadata.getDDMStorageId());
+					ddmStructureId, fileEntryMetadata.getDDMStorageId());
 
 				fieldsMap.put(ddmStructure.getStructureKey(), fields);
 			}
