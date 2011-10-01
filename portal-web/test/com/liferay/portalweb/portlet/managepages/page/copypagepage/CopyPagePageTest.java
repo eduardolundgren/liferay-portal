@@ -66,7 +66,8 @@ public class CopyPagePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (selenium.isElementPresent("//div[4]/div/ul/li[1]/a")) {
+						if (selenium.isElementPresent(
+									"//li[contains(@class,'manage-page')]/a")) {
 							break;
 						}
 					}
@@ -77,7 +78,7 @@ public class CopyPagePageTest extends BaseTestCase {
 				}
 
 				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[4]/div/ul/li[1]/a",
+				selenium.clickAt("//li[contains(@class,'manage-page')]/a",
 					RuntimeVariables.replace("Manage Pages"));
 
 				for (int second = 0;; second++) {

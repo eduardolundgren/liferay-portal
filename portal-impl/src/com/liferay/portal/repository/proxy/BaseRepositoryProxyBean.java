@@ -32,6 +32,7 @@ import com.liferay.portal.model.Lock;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalService;
+import com.liferay.portlet.asset.service.AssetEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService;
 
 import java.io.File;
@@ -283,12 +284,35 @@ public class BaseRepositoryProxyBean
 		return toObjectProxyBeans(objects);
 	}
 
+	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+			long folderId, int status, String[] mimeTypes,
+			boolean includeMountFolders, int start, int end,
+			OrderByComparator obc)
+		throws SystemException {
+
+		List<Object> objects =
+			_baseRepository.getFoldersAndFileEntriesAndFileShortcuts(
+				folderId, status, mimeTypes, includeMountFolders, start, end,
+				obc);
+
+		return toObjectProxyBeans(objects);
+	}
+
 	public int getFoldersAndFileEntriesAndFileShortcutsCount(
 			long folderId, int status, boolean includeMountFolders)
 		throws SystemException {
 
 		return _baseRepository.getFoldersAndFileEntriesAndFileShortcutsCount(
 			folderId, status, includeMountFolders);
+	}
+
+	public int getFoldersAndFileEntriesAndFileShortcutsCount(
+			long folderId, int status, String[] mimeTypes,
+			boolean includeMountFolders)
+		throws SystemException {
+
+		return _baseRepository.getFoldersAndFileEntriesAndFileShortcutsCount(
+			folderId, status, mimeTypes, includeMountFolders);
 	}
 
 	public int getFoldersCount(long parentFolderId, boolean includeMountfolders)
@@ -352,16 +376,16 @@ public class BaseRepositoryProxyBean
 		return _baseRepository.getRepositoryId();
 	}
 
-	public List<Long> getSubfolderIds(long folderId, boolean recurse)
-		throws SystemException {
-
-		return _baseRepository.getSubfolderIds(folderId, recurse);
-	}
-
 	public void getSubfolderIds(List<Long> folderIds, long folderId)
 		throws SystemException {
 
 		_baseRepository.getSubfolderIds(folderIds, folderId);
+	}
+
+	public List<Long> getSubfolderIds(long folderId, boolean recurse)
+		throws SystemException {
+
+		return _baseRepository.getSubfolderIds(folderId, recurse);
 	}
 
 	public String[] getSupportedConfigurations() {
@@ -440,10 +464,20 @@ public class BaseRepositoryProxyBean
 		_baseRepository.revertFileEntry(fileEntryId, version, serviceContext);
 	}
 
+	public Hits search(SearchContext searchContext) throws SearchException {
+		return _baseRepository.search(searchContext);
+	}
+
 	public Hits search(SearchContext searchContext, Query query)
 		throws SearchException {
 
 		return _baseRepository.search(searchContext, query);
+	}
+
+	public void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+
+		_baseRepository.setAssetEntryLocalService(assetEntryLocalService);
 	}
 
 	public void setCompanyId(long companyId) {

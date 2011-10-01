@@ -189,7 +189,8 @@ public class AddOrganizationPageTest extends BaseTestCase {
 					}
 
 					try {
-						if (selenium.isVisible("//div[4]/div/ul/li[1]/a")) {
+						if (selenium.isVisible(
+									"//li[contains(@class,'manage-page')]/a")) {
 							break;
 						}
 					}
@@ -200,7 +201,7 @@ public class AddOrganizationPageTest extends BaseTestCase {
 				}
 
 				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[4]/div/ul/li[1]/a",
+				selenium.clickAt("//li[contains(@class,'manage-page')]/a",
 					RuntimeVariables.replace("Page"));
 				Thread.sleep(10000);
 

@@ -37,7 +37,8 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (selenium.isElementPresent("//div[4]/div/ul/li[1]/a")) {
+						if (selenium.isElementPresent(
+									"//li[contains(@class,'manage-page')]/a")) {
 							break;
 						}
 					}
@@ -48,7 +49,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 				}
 
 				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[4]/div/ul/li[1]/a",
+				selenium.clickAt("//li[contains(@class,'manage-page')]/a",
 					RuntimeVariables.replace("Manage Pages"));
 
 				for (int second = 0;; second++) {
@@ -57,9 +58,9 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (RuntimeVariables.replace("Private Pages")
+						if (RuntimeVariables.replace("Public Pages")
 												.equals(selenium.getText(
-										"//li/div/div[3]/a"))) {
+										"//a[@class='layout-tree']"))) {
 							break;
 						}
 					}
@@ -91,7 +92,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (RuntimeVariables.replace("Home")
+						if (RuntimeVariables.replace("Welcome")
 												.equals(selenium.getText(
 										"//li/ul/li[1]/div/div[3]/a"))) {
 							break;
@@ -136,6 +137,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 				}
 
 				selenium.saveScreenShotAndSource();
+				Thread.sleep(5000);
 
 				for (int second = 0;; second++) {
 					if (second >= 60) {
@@ -170,7 +172,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (RuntimeVariables.replace("Home")
+						if (RuntimeVariables.replace("Welcome")
 												.equals(selenium.getText(
 										"//li/ul/li[1]/div/div[3]/a"))) {
 							break;
@@ -250,7 +252,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (RuntimeVariables.replace("Home")
+						if (RuntimeVariables.replace("Welcome")
 												.equals(selenium.getText(
 										"//li/ul/li[1]/div/div[3]/a"))) {
 							break;
@@ -330,7 +332,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (RuntimeVariables.replace("Home")
+						if (RuntimeVariables.replace("Welcome")
 												.equals(selenium.getText(
 										"//li/ul/li[1]/div/div[3]/a"))) {
 							break;
@@ -410,7 +412,7 @@ public class TearDownMyCommunityPrivatePageTest extends BaseTestCase {
 					}
 
 					try {
-						if (RuntimeVariables.replace("Home")
+						if (RuntimeVariables.replace("Welcome")
 												.equals(selenium.getText(
 										"//li/ul/li[1]/div/div[3]/a"))) {
 							break;

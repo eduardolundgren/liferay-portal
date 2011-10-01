@@ -1,8 +1,10 @@
 *~
+*.ant-*
 *.bak
 *.iml
 *.swp
 
+/*.ant-*
 /*.ipr
 /*.iws
 /*.patch

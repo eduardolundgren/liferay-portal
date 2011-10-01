@@ -72,7 +72,8 @@ public class CopyPageChildPageTest extends BaseTestCase {
 					}
 
 					try {
-						if (selenium.isElementPresent("//div[4]/div/ul/li[1]/a")) {
+						if (selenium.isElementPresent(
+									"//li[contains(@class,'manage-page')]/a")) {
 							break;
 						}
 					}
@@ -83,7 +84,7 @@ public class CopyPageChildPageTest extends BaseTestCase {
 				}
 
 				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[4]/div/ul/li[1]/a",
+				selenium.clickAt("//li[contains(@class,'manage-page')]/a",
 					RuntimeVariables.replace("Manage Pages"));
 
 				for (int second = 0;; second++) {
@@ -211,7 +212,7 @@ public class CopyPageChildPageTest extends BaseTestCase {
 					}
 
 					try {
-						if (selenium.isVisible("//div/span/button[4]")) {
+						if (selenium.isVisible("//button[5]")) {
 							break;
 						}
 					}
@@ -222,7 +223,9 @@ public class CopyPageChildPageTest extends BaseTestCase {
 				}
 
 				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div/span/button[4]",
+				assertEquals(RuntimeVariables.replace("Copy Portlets from Page"),
+					selenium.getText("//button[5]"));
+				selenium.clickAt("//button[5]",
 					RuntimeVariables.replace("Copy Portlets from Page"));
 
 				for (int second = 0;; second++) {

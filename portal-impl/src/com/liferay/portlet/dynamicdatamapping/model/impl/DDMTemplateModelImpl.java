@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -96,6 +95,14 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"),
+			true);
+	public static long GROUPID_COLUMN_BITMASK = 1L;
+	public static long LANGUAGE_COLUMN_BITMASK = 2L;
+	public static long STRUCTUREID_COLUMN_BITMASK = 4L;
+	public static long TYPE_COLUMN_BITMASK = 8L;
+	public static long UUID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -140,14 +147,6 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return DDMTemplate.class;
-	}
-
-	public String getModelClassName() {
-		return DDMTemplate.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"));
 
@@ -168,6 +167,14 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return DDMTemplate.class;
+	}
+
+	public String getModelClassName() {
+		return DDMTemplate.class.getName();
 	}
 
 	@JSON
@@ -207,6 +214,8 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -284,7 +293,19 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setStructureId(long structureId) {
+		_columnBitmask |= STRUCTUREID_COLUMN_BITMASK;
+
+		if (!_setOriginalStructureId) {
+			_setOriginalStructureId = true;
+
+			_originalStructureId = _structureId;
+		}
+
 		_structureId = structureId;
+	}
+
+	public long getOriginalStructureId() {
+		return _originalStructureId;
 	}
 
 	@JSON
@@ -310,26 +331,22 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public String getName(String languageId) {
-		String value = LocalizationUtil.getLocalization(getName(), languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getName(), languageId);
 	}
 
 	public String getName(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getName(), languageId,
-				useDefault);
+		return LocalizationUtil.getLocalization(getName(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getNameCurrentLanguageId() {
+		return _nameCurrentLanguageId;
+	}
+
+	public String getNameCurrentValue() {
+		Locale locale = getLocale(_nameCurrentLanguageId);
+
+		return getName(locale);
 	}
 
 	public Map<Locale, String> getNameMap() {
@@ -356,6 +373,10 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			setName(LocalizationUtil.removeLocalization(getName(), "Name",
 					languageId));
 		}
+	}
+
+	public void setNameCurrentLanguageId(String languageId) {
+		_nameCurrentLanguageId = languageId;
 	}
 
 	public void setNameMap(Map<Locale, String> nameMap) {
@@ -399,27 +420,22 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public String getDescription(String languageId) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	public String getDescription(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getDescription(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getDescriptionCurrentLanguageId() {
+		return _descriptionCurrentLanguageId;
+	}
+
+	public String getDescriptionCurrentValue() {
+		Locale locale = getLocale(_descriptionCurrentLanguageId);
+
+		return getDescription(locale);
 	}
 
 	public Map<Locale, String> getDescriptionMap() {
@@ -448,6 +464,10 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			setDescription(LocalizationUtil.removeLocalization(
 					getDescription(), "Description", languageId));
 		}
+	}
+
+	public void setDescriptionCurrentLanguageId(String languageId) {
+		_descriptionCurrentLanguageId = languageId;
 	}
 
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
@@ -480,7 +500,17 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setType(String type) {
+		_columnBitmask |= TYPE_COLUMN_BITMASK;
+
+		if (_originalType == null) {
+			_originalType = _type;
+		}
+
 		_type = type;
+	}
+
+	public String getOriginalType() {
+		return GetterUtil.getString(_originalType);
 	}
 
 	@JSON
@@ -494,7 +524,17 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setLanguage(String language) {
+		_columnBitmask |= LANGUAGE_COLUMN_BITMASK;
+
+		if (_originalLanguage == null) {
+			_originalLanguage = _language;
+		}
+
 		_language = language;
+	}
+
+	public String getOriginalLanguage() {
+		return GetterUtil.getString(_originalLanguage);
 	}
 
 	@JSON
@@ -511,20 +551,19 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		_script = script;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DDMTemplate toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DDMTemplate)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DDMTemplate)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DDMTemplate)ProxyUtil.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
@@ -619,6 +658,16 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		ddmTemplateModelImpl._originalGroupId = ddmTemplateModelImpl._groupId;
 
 		ddmTemplateModelImpl._setOriginalGroupId = false;
+
+		ddmTemplateModelImpl._originalStructureId = ddmTemplateModelImpl._structureId;
+
+		ddmTemplateModelImpl._setOriginalStructureId = false;
+
+		ddmTemplateModelImpl._originalType = ddmTemplateModelImpl._type;
+
+		ddmTemplateModelImpl._originalLanguage = ddmTemplateModelImpl._language;
+
+		ddmTemplateModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -835,11 +884,18 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _structureId;
+	private long _originalStructureId;
+	private boolean _setOriginalStructureId;
 	private String _name;
+	private String _nameCurrentLanguageId;
 	private String _description;
+	private String _descriptionCurrentLanguageId;
 	private String _type;
+	private String _originalType;
 	private String _language;
+	private String _originalLanguage;
 	private String _script;
 	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private DDMTemplate _escapedModelProxy;
 }

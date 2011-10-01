@@ -104,6 +104,12 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.documentlibrary.model.DLFileVersion"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.documentlibrary.model.DLFileVersion"),
+			true);
+	public static long FILEENTRYID_COLUMN_BITMASK = 1L;
+	public static long STATUS_COLUMN_BITMASK = 2L;
+	public static long VERSION_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -159,14 +165,6 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return DLFileVersion.class;
-	}
-
-	public String getModelClassName() {
-		return DLFileVersion.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.documentlibrary.model.DLFileVersion"));
 
@@ -187,6 +185,14 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return DLFileVersion.class;
+	}
+
+	public String getModelClassName() {
+		return DLFileVersion.class.getName();
 	}
 
 	@JSON
@@ -271,6 +277,8 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setFileEntryId(long fileEntryId) {
+		_columnBitmask |= FILEENTRYID_COLUMN_BITMASK;
+
 		if (!_setOriginalFileEntryId) {
 			_setOriginalFileEntryId = true;
 
@@ -388,6 +396,8 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setVersion(String version) {
+		_columnBitmask |= VERSION_COLUMN_BITMASK;
+
 		if (_originalVersion == null) {
 			_originalVersion = _version;
 		}
@@ -450,7 +460,19 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	@JSON
@@ -537,20 +559,19 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		}
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DLFileVersion toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DLFileVersion)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DLFileVersion)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DLFileVersion)ProxyUtil.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
@@ -673,6 +694,12 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		dlFileVersionModelImpl._setOriginalFileEntryId = false;
 
 		dlFileVersionModelImpl._originalVersion = dlFileVersionModelImpl._version;
+
+		dlFileVersionModelImpl._originalStatus = dlFileVersionModelImpl._status;
+
+		dlFileVersionModelImpl._setOriginalStatus = false;
+
+		dlFileVersionModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1002,10 +1029,13 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	private long _custom1ImageId;
 	private long _custom2ImageId;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private long _statusByUserId;
 	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
 	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private DLFileVersion _escapedModelProxy;
 }
