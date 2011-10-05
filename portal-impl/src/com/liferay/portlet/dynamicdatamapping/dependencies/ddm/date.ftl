@@ -31,7 +31,7 @@
 				],
 				on: {
 					select: function(event) {
-						A.one('#${portletNamespace}${namespacedFieldName}').val(A.DataType.Date.parse(event.date.formatted).getTime());
+						A.one('#${portletNamespace}${namespacedFieldName}').val(A.DataType.Date.parse(event.date.formatted.toString()).getTime());
 					}
 				},
 			},
