@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
  *
@@ -12,20 +11,18 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/html/portlet/dynamic_data_lists/init.jsp" %>
+package com.liferay.portlet.dynamicdatamapping.storage;
 
-<%
-DDLRecordVersion recordVersion = (DDLRecordVersion)request.getAttribute(WebKeys.DYNAMIC_DATA_LISTS_RECORD_VERSION);
+import com.liferay.portal.theme.ThemeDisplay;
 
-DDLRecord record = (DDLRecord)request.getAttribute(WebKeys.DYNAMIC_DATA_LISTS_RECORD);
+import java.io.Serializable;
 
-DDLRecordSet recordSet = record.getRecordSet();
+/**
+ * @author Bruno Basto
+ */
+public interface FieldRenderer {
 
-DDMStructure ddmStructure = recordSet.getDDMStructure();
+	public String render(ThemeDisplay themeDisplay, Serializable value);
 
-Fields fields = StorageEngineUtil.getFields(ddmStructure.getStructureId(), recordVersion.getDDMStorageId());
-%>
-
-<%= DDMXSDUtil.getHTML(pageContext, ddmStructure.getXsd(), fields, "", true, locale) %>
+}

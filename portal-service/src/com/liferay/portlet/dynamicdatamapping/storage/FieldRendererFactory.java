@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
  *
@@ -12,20 +11,30 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/html/portlet/dynamic_data_lists/init.jsp" %>
+package com.liferay.portlet.dynamicdatamapping.storage;
 
-<%
-DDLRecordVersion recordVersion = (DDLRecordVersion)request.getAttribute(WebKeys.DYNAMIC_DATA_LISTS_RECORD_VERSION);
+import java.util.Map;
 
-DDLRecord record = (DDLRecord)request.getAttribute(WebKeys.DYNAMIC_DATA_LISTS_RECORD);
+/**
+ * @author Bruno Basto
+ */
+public class FieldRendererFactory {
 
-DDLRecordSet recordSet = record.getRecordSet();
+	public static FieldRenderer getFieldRenderer(String dataType) {
+		FieldRenderer fieldRenderer = _fieldRenderers.get(dataType);
 
-DDMStructure ddmStructure = recordSet.getDDMStructure();
+		if (fieldRenderer == null) {
+			fieldRenderer = _fieldRenderers.get(FieldConstants.STRING);
+		}
 
-Fields fields = StorageEngineUtil.getFields(ddmStructure.getStructureId(), recordVersion.getDDMStorageId());
-%>
+		return fieldRenderer;
+	}
 
-<%= DDMXSDUtil.getHTML(pageContext, ddmStructure.getXsd(), fields, "", true, locale) %>
+	public void setFieldRenderers(Map<String, FieldRenderer> fieldRenderers) {
+		_fieldRenderers = fieldRenderers;
+	}
+
+	public static Map<String, FieldRenderer> _fieldRenderers;
+
+}

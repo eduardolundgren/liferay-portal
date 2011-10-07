@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
  *
@@ -12,20 +11,28 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/html/portlet/dynamic_data_lists/init.jsp" %>
+package com.liferay.portlet.dynamicdatamapping.storage;
 
-<%
-DDLRecordVersion recordVersion = (DDLRecordVersion)request.getAttribute(WebKeys.DYNAMIC_DATA_LISTS_RECORD_VERSION);
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.theme.ThemeDisplay;
 
-DDLRecord record = (DDLRecord)request.getAttribute(WebKeys.DYNAMIC_DATA_LISTS_RECORD);
+import java.io.Serializable;
 
-DDLRecordSet recordSet = record.getRecordSet();
+import java.text.Format;
 
-DDMStructure ddmStructure = recordSet.getDDMStructure();
+/**
+ * @author Bruno Basto
+ */
+public class DateFieldRenderer extends BaseFieldRenderer {
 
-Fields fields = StorageEngineUtil.getFields(ddmStructure.getStructureId(), recordVersion.getDDMStorageId());
-%>
+	protected String doRender(
+		ThemeDisplay themeDisplay, Serializable fieldValue) {
 
-<%= DDMXSDUtil.getHTML(pageContext, ddmStructure.getXsd(), fields, "", true, locale) %>
+		Format dateFormat = FastDateFormatFactoryUtil.getDate(
+			themeDisplay.getLocale());
+
+		return dateFormat.format(fieldValue);
+	}
+
+}
