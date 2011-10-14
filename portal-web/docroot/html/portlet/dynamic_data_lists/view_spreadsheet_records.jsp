@@ -61,14 +61,20 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 	var columnset = Liferay.SpreadSheet.buildDataTableColumnset(<%= DDLUtil.getRecordSetJSONArray(recordSet) %>, structure, <%= editable %>);
 
 	var ignoreEmptyRecordsSort = function(recA, recB, field, desc) {
-		var sorted = -1;
+		var valueA = recA.getValue(field);
+		var valueB = recB.getValue(field);
 
-		if (recB.getValue(field) !== '') {
-			sorted = A.ArraySort.compare(recA.getValue(field), recB.getValue(field), desc);
+		var sorted = 0;
+
+		if (valueA !== '' && valueB !== '') {
+			sorted = A.ArraySort.compare(valueA, valueB, desc);
 
 			if (sorted === 0) {
 				sorted = A.ArraySort.compare(recA.get("id"), recB.get("id"), desc);
 			}
+		}
+		else {
+			sorted = ((valueA === '') && (valueB !== '')) ? 1 : -1;
 		}
 
 		return sorted;
