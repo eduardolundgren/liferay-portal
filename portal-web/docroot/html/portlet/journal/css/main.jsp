@@ -91,10 +91,9 @@
 		}
 
 		.add-translations-menu {
-			display: inline;
 			float: none;
 			margin-left: 2em;
-			padding: 0.4em 0;
+			padding: 0.2em 0;
 
 			li {
 				display: inline;
@@ -131,6 +130,10 @@
 			img {
 				margin-right: 0.3em;
 			}
+		}
+
+		.lfr-translation-manager-add-menu {
+			margin: 0;
 		}
 	}
 

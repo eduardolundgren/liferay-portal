@@ -183,9 +183,8 @@ if (Validator.isNotNull(content)) {
 		<liferay-ui:error exception="<%= ArticleVersionException.class %>" message="another-user-has-made-changes-since-you-started-editing-please-copy-your-changes-and-try-again" />
 		<liferay-ui:error exception="<%= DuplicateArticleIdException.class %>" message="please-enter-a-unique-id" />
 
-		<table class="lfr-table journal-article-header-edit" id="<portlet:namespace />articleHeaderEdit">
-		<tr>
-			<td>
+		<div class="lfr-table journal-article-header-edit" id="<portlet:namespace />articleHeaderEdit">
+			<div>
 				<c:if test="<%= (article == null) || article.isNew() %>">
 					<c:choose>
 						<c:when test="<%= PropsValues.JOURNAL_ARTICLE_FORCE_AUTOGENERATE_ID %>">
@@ -199,12 +198,10 @@ if (Validator.isNotNull(content)) {
 						</c:otherwise>
 					</c:choose>
 				</c:if>
-			</td>
-		</tr>
+			</div>
 
-		<c:if test="<%= Validator.isNull(toLanguageId) %>">
-			<tr>
-				<td class="article-structure-template-toolbar journal-metadata">
+			<c:if test="<%= Validator.isNull(toLanguageId) %>">
+				<div class="article-structure-template-toolbar journal-metadata">
 					<span id="<portlet:namespace />structureMessage" class="portlet-msg-alert structure-message aui-helper-hidden">
 						<liferay-ui:message key="this-structure-has-not-been-saved" />
 
@@ -335,12 +332,10 @@ if (Validator.isNotNull(content)) {
 							</aui:fieldset>
 						</aui:column>
 					</aui:layout>
-				</td>
-			</tr>
-		</c:if>
+				</div>
+			</c:if>
 
-		<tr>
-			<td class="article-translation-toolbar journal-metadata">
+			<div class="article-translation-toolbar journal-metadata">
 				<div class="portlet-msg-info aui-helper-hidden" id="<portlet:namespace />translationsMessage">
 					<liferay-ui:message key="the-changes-in-your-translations-will-be-available-once-the-content-is-published" />
 				</div>
@@ -469,9 +464,8 @@ if (Validator.isNotNull(content)) {
 						</c:choose>
 					</div>
 				</c:if>
-			</td>
-		</tr>
-		</table>
+			</div>
+		</div>
 
 		<div class="journal-article-general-fields">
 			<aui:input languageId="<%= Validator.isNotNull(toLanguageId) ? toLanguageId : defaultLanguageId %>" name="title" />
