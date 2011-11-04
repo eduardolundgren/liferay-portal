@@ -17,7 +17,7 @@
 <%@ include file="/html/portlet/image_gallery_display/init.jsp" %>
 
 <%
-String topLink = ParamUtil.getString(request, "topLink", "images-home");
+String topLink = ParamUtil.getString(request, "topLink", "home");
 
 Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
@@ -138,7 +138,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 		%>
 
 	</c:when>
-	<c:when test='<%= topLink.equals("images-home") %>'>
+	<c:when test='<%= topLink.equals("home") %>'>
 		<aui:layout>
 			<c:if test="<%= folder != null %>">
 				<liferay-ui:header
@@ -181,11 +181,13 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 					<%
 					SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
-					int total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, status, mimeTypes, false);
+					String[] mediaGalleryMimeTypes = DLUtil.getMediaGalleryMimeTypes(preferences, renderRequest);
+
+					int total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, status, mediaGalleryMimeTypes, false);
 
 					searchContainer.setTotal(total);
 
-					List results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, mimeTypes, false, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+					List results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, mediaGalleryMimeTypes, false, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 
 					searchContainer.setResults(results);
 
@@ -203,11 +205,11 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 						<liferay-ui:icon
 							cssClass="lfr-asset-avatar"
 							image='<%= "../file_system/large/" + (((foldersCount + imagesCount) > 0) ? "folder_full_image" : "folder_empty") %>'
-							message='<%= (folder != null) ? folder.getName() : LanguageUtil.get(pageContext, "images-home") %>'
+							message='<%= (folder != null) ? folder.getName() : LanguageUtil.get(pageContext, "home") %>'
 						/>
 
 						<div class="lfr-asset-name">
-							<h4><%= (folder != null) ? folder.getName() : LanguageUtil.get(pageContext, "images-home") %></h4>
+							<h4><%= (folder != null) ? folder.getName() : LanguageUtil.get(pageContext, "home") %></h4>
 						</div>
 					</div>
 
@@ -232,12 +234,12 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 		%>
 
 	</c:when>
-	<c:when test='<%= topLink.equals("my-images") || topLink.equals("recent-images") %>'>
+	<c:when test='<%= topLink.equals("mine") || topLink.equals("recent") %>'>
 
 		<%
 		long groupImagesUserId = 0;
 
-		if (topLink.equals("my-images") && themeDisplay.isSignedIn()) {
+		if (topLink.equals("mine") && themeDisplay.isSignedIn()) {
 			groupImagesUserId = user.getUserId();
 		}
 

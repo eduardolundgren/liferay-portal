@@ -12,41 +12,29 @@
  * details.
  */
 
-package com.liferay.mail.model;
+package com.liferay.portlet.documentlibrary;
 
-import java.io.File;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Barrie Selack
  * @author Brian Wing Shun Chan
  */
-public class Attachment {
+public class FileMimeTypeException extends PortalException {
 
-	public Attachment() {
+	public FileMimeTypeException() {
+		super();
 	}
 
-	public Attachment(File file, String fileName) {
-		_file = file;
-		_fileName = fileName;
+	public FileMimeTypeException(String msg) {
+		super(msg);
 	}
 
-	public File getFile() {
-		return _file;
+	public FileMimeTypeException(String msg, Throwable cause) {
+		super(msg, cause);
 	}
 
-	public String getFileName() {
-		return _fileName;
+	public FileMimeTypeException(Throwable cause) {
+		super(cause);
 	}
-
-	public void setFile(File file) {
-		_file = file;
-	}
-
-	public void setFileName(String fileName) {
-		_fileName = fileName;
-	}
-
-	private File _file;
-	private String _fileName;
 
 }
