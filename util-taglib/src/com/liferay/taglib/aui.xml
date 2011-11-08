@@ -74,6 +74,10 @@
 			</attribute>
 		</attributes>
 	</component>
+ 	<component name="A.io" module="aui-io" bodyContent="false">
+	    <attributes/>
+	    <events/>
+  	</component>
 	<component name="Button" alloyComponent="false">
 		<attributes>
 			<attribute>
