@@ -537,6 +537,8 @@ public interface PropsKeys {
 
 	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES = "dl.file.entry.preview.video.mime.types";
 
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_THUMBNAIL_PERCENTAGE = "dl.file.entry.preview.video.thumbnail.percentage";
+
 	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH = "dl.file.entry.preview.video.width";
 
 	public static final String DL_FILE_ENTRY_PROCESSORS = "dl.file.entry.processors";
@@ -840,6 +842,8 @@ public interface PropsKeys {
 	public static final String JCR_NODE_DOCUMENTLIBRARY = "jcr.node.documentlibrary";
 
 	public static final String JCR_WORKSPACE_NAME = "jcr.workspace.name";
+
+	public static final String JCR_WRAP_SESSION = "jcr.wrap.session";
 
 	public static final String JDBC_DEFAULT_DRIVER_CLASS_NAME = "jdbc.default.driverClassName";
 
@@ -1455,6 +1459,8 @@ public interface PropsKeys {
 
 	public static final String ORGANIZATIONS_FORM_UPDATE_MISCELLANEOUS = "organizations.form.update.miscellaneous";
 
+	public static final String ORGANIZATIONS_INDEXER_ENABLED = "organizations.indexer.enabled";
+
 	public static final String ORGANIZATIONS_MEMBERSHIP_STRICT = "organizations.membership.strict";
 
 	public static final String ORGANIZATIONS_ROOTABLE = "organizations.rootable";
@@ -1464,6 +1470,8 @@ public interface PropsKeys {
 	public static final String ORGANIZATIONS_TYPES = "organizations.types";
 
 	public static final String ORGANIZATIONS_USER_GROUP_MEMBERSHIP_ENABLED = "organizations.user.group.membership.enabled";
+
+	public static final String OSGI_ENABLED = "osgi.enabled";
 
 	public static final String OSGI_FRAMEWORK_BEGINNING_START_LEVEL = "osgi.framework.beginning.start.level";
 
@@ -1561,7 +1569,7 @@ public interface PropsKeys {
 
 	public static final String PORTAL_PROXY_PATH = "portal.proxy.path";
 
-	public static final String PORTAL_SECURITY_MANAGER_ENABLE = "portal.security.manager.enable";
+	public static final String PORTAL_SECURITY_MANAGER_STRATEGY = "portal.security.manager.strategy";
 
 	public static final String PORTLET_ADD_DEFAULT_RESOURCE_CHECK_ENABLED = "portlet.add.default.resource.check.enabled";
 
@@ -1582,6 +1590,8 @@ public interface PropsKeys {
 	public static final String PORTLET_URL_APPEND_PARAMETERS = "portlet.url.append.parameters";
 
 	public static final String PORTLET_URL_ESCAPE_XML = "portlet.url.escape.xml";
+
+	public static final String PORTLET_URL_REFRESH_URL_RESERVED_PARAMETERS = "portlet.url.refresh.url.reserved.parameters";
 
 	public static final String PORTLET_VIRTUAL_PATH = "portlet.virtual.path";
 
@@ -1813,7 +1823,15 @@ public interface PropsKeys {
 
 	public static final String SITES_FORM_UPDATE_SEO = "sites.form.update.seo";
 
+	public static final String SOCIAL_ACTIVITY_CONTRIBUTION_INCREMENTS = "social.activity.contribution.increments";
+
+	public static final String SOCIAL_ACTIVITY_CONTRIBUTION_LIMIT_VALUES = "social.activity.contribution.limit.values";
+
 	public static final String SOCIAL_ACTIVITY_COUNTER_PERIOD_LENGTH = "social.activity.counter.period.length";
+
+	public static final String SOCIAL_ACTIVITY_PARTICIPATION_INCREMENTS = "social.activity.participation.increments";
+
+	public static final String SOCIAL_ACTIVITY_PARTICIPATION_LIMIT_VALUES = "social.activity.participation.limit.values";
 
 	public static final String SOCIAL_BOOKMARK_JSP = "social.bookmark.jsp";
 
@@ -1965,6 +1983,8 @@ public interface PropsKeys {
 
 	public static final String USERS_IMAGE_MAX_WIDTH = "users.image.max.width";
 
+	public static final String USERS_INDEXER_ENABLED = "users.indexer.enabled";
+
 	public static final String USERS_LAST_NAME_REQUIRED = "users.last.name.required";
 
 	public static final String USERS_LIST_VIEWS = "users.list.views";
@@ -2044,6 +2064,8 @@ public interface PropsKeys {
 	public static final String WEB_SERVER_PROTOCOL = "web.server.protocol";
 
 	public static final String WEB_SERVER_PROXY_LEGACY_MODE = "web.server.proxy.legacy.mode";
+
+	public static final String WEB_SERVER_SERVLET_DIRECTORY_INDEXING_ENABLED = "web.server.servlet.directory.indexing.enabled";
 
 	public static final String WEBDAV_IGNORE = "webdav.ignore";
 
