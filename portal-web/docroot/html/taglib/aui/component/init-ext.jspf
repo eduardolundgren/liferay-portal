@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ page import="com.liferay.alloy.util.json.StringTransformer"%>
+<%@ page import="com.liferay.alloy.util.json.StringTransformer" %>
 
 <%
 HashMap<String, Object> optionsJSON = (HashMap<String, Object>)request.getAttribute("aui:component:optionsJSON");
@@ -48,6 +48,6 @@ public String _serialize(Object value, String javaScriptAttributes) {
 	stringTransformer.setJavaScriptAttributes(
 		Arrays.asList(StringUtil.split(javaScriptAttributes)));
 
-	return JSONFactoryUtil.looseSerialize(value, stringTransformer, String.class);
+	return JSONFactoryUtil.looseSerializeDeep(value, stringTransformer, String.class);
 }
 %>
