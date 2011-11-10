@@ -14,6 +14,10 @@
 
 package com.liferay.taglib.aui;
 
+import com.liferay.alloy.util.ReservedAttributeUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.taglib.aui.base.BaseComponentTag;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,10 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.liferay.alloy.util.ReservedAttributeUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.taglib.aui.base.BaseComponentTag;
-
 /**
  * @author Eduardo Lundgren
  * @author Bruno Basto
@@ -37,11 +37,11 @@ import com.liferay.taglib.aui.base.BaseComponentTag;
  * @author Julio Camarero
  */
 public class ComponentTag extends BaseComponentTag {
-	
+
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		super.setAttributes(request);
-		
+
 		Map<String, Object> options = getOptions();
 		HashMap<String, Object> optionsJSON = new HashMap<String, Object>();
 
@@ -52,7 +52,7 @@ public class ComponentTag extends BaseComponentTag {
 		setNamespacedAttribute(request, "options", options);
 		setNamespacedAttribute(request, "optionsJSON", optionsJSON);
 	}
-	
+
 	private boolean _isEventAttribute(String key) {
 		Matcher afterMatcher = _EVENT_AFTER_REGEX.matcher(key);
 		Matcher onMatcher = _EVENT_ON_REGEX.matcher(key);
