@@ -43,6 +43,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.time.StopWatch;
+
 /**
  * @author Raymond Augé
  * @author Sergio Sánchez
@@ -70,6 +72,14 @@ public class DynamicCSSUtil {
 			return content;
 		}
 
+		StopWatch stopWatch = null;
+
+		if (_log.isDebugEnabled()) {
+			stopWatch = new StopWatch();
+
+			stopWatch.start();
+		}
+
 		Map<String, Object> inputObjects = new HashMap<String, Object>();
 
 		inputObjects.put("content", content);
@@ -90,6 +100,12 @@ public class DynamicCSSUtil {
 		unsyncPrintWriter.flush();
 
 		String parsedContent = unsyncByteArrayOutputStream.toString();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Parsing SASS for " + cssRealPath + " takes " +
+					stopWatch.getTime() + " ms");
+		}
 
 		if (Validator.isNotNull(parsedContent)) {
 			return parsedContent;
