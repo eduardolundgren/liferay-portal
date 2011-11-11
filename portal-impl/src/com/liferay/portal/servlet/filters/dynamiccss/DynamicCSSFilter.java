@@ -97,8 +97,6 @@ public class DynamicCSSFilter extends BasePortalFilter {
 			return null;
 		}
 
-		request.setAttribute(WebKeys.CSS_REAL_PATH, realPath);
-
 		StringBundler sb = new StringBundler(4);
 
 		sb.append(_tempDir);
@@ -133,9 +131,6 @@ public class DynamicCSSFilter extends BasePortalFilter {
 
 		String content = null;
 
-		String cssRealPath = (String)request.getAttribute(
-			WebKeys.CSS_REAL_PATH);
-
 		try {
 			if (realPath.endsWith(_CSS_EXTENSION)) {
 				if (_log.isInfoEnabled()) {
@@ -145,7 +140,7 @@ public class DynamicCSSFilter extends BasePortalFilter {
 				content = FileUtil.read(file);
 
 				dynamicContent = DynamicCSSUtil.parseSass(
-					request, cssRealPath, content);
+					request, realPath, content);
 
 				response.setContentType(ContentTypes.TEXT_CSS);
 
@@ -171,7 +166,7 @@ public class DynamicCSSFilter extends BasePortalFilter {
 				content = stringResponse.getString();
 
 				dynamicContent = DynamicCSSUtil.parseSass(
-					request, cssRealPath, content);
+					request, realPath, content);
 
 				FileUtil.write(
 					cacheContentTypeFile, stringResponse.getContentType());
@@ -181,7 +176,7 @@ public class DynamicCSSFilter extends BasePortalFilter {
 			}
 		}
 		catch (Exception e) {
-			_log.error("Unable to parse SASS on CSS " + cssRealPath, e);
+			_log.error("Unable to parse SASS on CSS " + realPath, e);
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(content);
