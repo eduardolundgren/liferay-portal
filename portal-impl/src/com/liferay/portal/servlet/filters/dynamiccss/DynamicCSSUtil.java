@@ -34,7 +34,6 @@ import com.liferay.portal.scripting.ruby.RubyExecutor;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.ContentUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class DynamicCSSUtil {
 
 	public static void init() {
 		try {
-			_rubyScript = ContentUtil.get(
+			_rubyScript = StringUtil.read(
 				PortalClassLoaderUtil.getClassLoader(),
 				"com/liferay/portal/servlet/filters/dynamiccss/main.rb");
 		}
