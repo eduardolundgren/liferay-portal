@@ -752,7 +752,7 @@ public class ServicePreAction extends Action {
 		themeDisplay.setI18nLanguageId(i18nLanguageId);
 		themeDisplay.setI18nPath(i18nPath);
 		themeDisplay.setTimeZone(timeZone);
-		themeDisplay.setLookAndFeel(contextPath, theme, colorScheme);
+		themeDisplay.setLookAndFeel(theme, colorScheme);
 		themeDisplay.setThemeCssFastLoad(themeCssFastLoad);
 		themeDisplay.setThemeImagesFastLoad(themeImagesFastLoad);
 		themeDisplay.setThemeJsBarebone(themeJsBarebone);
