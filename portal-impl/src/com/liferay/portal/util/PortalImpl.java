@@ -1003,6 +1003,23 @@ public class PortalImpl implements Portal {
 		}
 	}
 
+	public String getCDNHost(HttpServletRequest request)
+		throws PortalException, SystemException {
+
+		String cdnHost = null;
+
+		Company company = getCompany(request);
+
+		if (request.isSecure()) {
+			cdnHost = getCDNHostHttps(company.getCompanyId());
+		}
+		else {
+			cdnHost = getCDNHostHttp(company.getCompanyId());
+		}
+
+		return ParamUtil.getString(request, "cdn_host", cdnHost);
+	}
+
 	public String getCDNHostHttp(long companyId) {
 		String cdnHostHttp = _cdnHostHttpMap.get(companyId);
 

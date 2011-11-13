@@ -147,16 +147,7 @@ public class ServicePreAction extends Action {
 
 		// CDN host
 
-		String cdnHost = null;
-
-		if (request.isSecure()) {
-			cdnHost = PortalUtil.getCDNHostHttps(companyId);
-		}
-		else {
-			cdnHost = PortalUtil.getCDNHostHttp(companyId);
-		}
-
-		cdnHost = ParamUtil.getString(request, "cdn_host", cdnHost);
+		String cdnHost = PortalUtil.getCDNHost(request);
 
 		// Portal URL
 
