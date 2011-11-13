@@ -123,8 +123,7 @@ public class CopyStructureAction extends PortletAction {
 
 		return mapping.findForward(
 			getForward(
-				renderRequest,
-				"portlet.dynamic_data_mapping.copy_structure"));
+				renderRequest, "portlet.dynamic_data_mapping.copy_structure"));
 	}
 
 	protected DDMStructure copyStructure(ActionRequest actionRequest)

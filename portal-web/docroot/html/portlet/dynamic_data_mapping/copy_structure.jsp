@@ -17,15 +17,14 @@
 <%@ include file="/html/portlet/dynamic_data_mapping/init.jsp" %>
 
 <%
+String closeRedirect = ParamUtil.getString(request, "closeRedirect");
+
 DDMStructure structure = (DDMStructure)request.getAttribute(WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE);
 
 long structureId = BeanParamUtil.getLong(structure, request, "structureId");
 
 boolean copyDetailTemplates = ParamUtil.getBoolean(request, "copyDetailTemplates");
-
 boolean copyListTemplates = ParamUtil.getBoolean(request, "copyListTemplates");
-
-String closeRedirect = ParamUtil.getString(request, "closeRedirect");
 %>
 
 <portlet:actionURL var="copyStructureURL">

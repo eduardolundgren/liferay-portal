@@ -123,14 +123,15 @@ public class DDMTemplateLocalServiceImpl
 
 		List<DDMTemplate> newTemplates = new ArrayList<DDMTemplate>();
 
-		List<DDMTemplate> templates = getTemplates(structureId, type);
+		List<DDMTemplate> oldTemplates = getTemplates(structureId, type);
 
-		for (DDMTemplate template : templates) {
+		for (DDMTemplate oldTemplate : oldTemplates) {
 			DDMTemplate newTemplate = addTemplate(
-				userId, template.getGroupId(), newStructureId,
-				template.getNameMap(), template.getDescriptionMap(),
-				template.getType(), template.getMode(), template.getLanguage(),
-				template.getScript(), serviceContext);
+				userId, oldTemplate.getGroupId(), newStructureId,
+				oldTemplate.getNameMap(), oldTemplate.getDescriptionMap(),
+				oldTemplate.getType(), oldTemplate.getMode(),
+				oldTemplate.getLanguage(), oldTemplate.getScript(),
+				serviceContext);
 
 			newTemplates.add(newTemplate);
 		}
