@@ -168,7 +168,6 @@ public class DLAppServiceTest extends BaseServiceTestCase {
 
 	public void testAddNullFileEntry() throws Exception {
 		long folderId = _folder.getFolderId();
-
 		String description = StringPool.BLANK;
 		String changeLog = StringPool.BLANK;
 
@@ -283,7 +282,7 @@ public class DLAppServiceTest extends BaseServiceTestCase {
 
 	public void testVersionLabel() throws Exception {
 		long folderId = _folder.getFolderId();
-
+		String name = "TestVersion.txt";
 		String description = StringPool.BLANK;
 		String changeLog = StringPool.BLANK;
 		byte[] bytes = _CONTENT.getBytes();
@@ -292,8 +291,6 @@ public class DLAppServiceTest extends BaseServiceTestCase {
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
-
-		String name = "TestVersion.txt";
 
 		FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
 			TestPropsValues.getGroupId(), folderId, name,
