@@ -91,10 +91,9 @@
 		}
 
 		.add-translations-menu {
-			display: inline;
 			float: none;
 			margin-left: 2em;
-			padding: 0.4em 0;
+			padding: 0.2em 0;
 
 			li {
 				display: inline;
@@ -107,6 +106,34 @@
 
 		.contains-translations {
 			margin-top: 1em;
+		}
+
+		.journal-article-default-translation {
+			background-color: #B3DAEF;
+			font-weight: bold;
+			padding: 0.3em 0.5em 0.3em;
+			margin: 0 0.2em;
+		}
+
+		.journal-article-translation {
+			background-color: #B3DAEF;
+			border: 1px solid #5FA8FF;
+			color: #444;
+			padding: 0.3em 0.5em 0.3em;
+			margin: 0 0.2em;
+			text-decoration: none;
+
+			&:hover {
+				background-color: #D1E5EF;
+			}
+
+			img {
+				margin-right: 0.3em;
+			}
+		}
+
+		.lfr-translation-manager-add-menu {
+			margin: 0;
 		}
 	}
 
