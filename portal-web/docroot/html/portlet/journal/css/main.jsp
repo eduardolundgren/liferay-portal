@@ -84,7 +84,7 @@
 		color: #34404F;
 		display: block;
 		margin: 0 auto;
-		padding: 0.5em;
+		padding: 1em;
 
 		label {
 			font-weight: bold;
@@ -554,6 +554,14 @@
 
 	.taglib-form-navigator .form-navigator, .lfr-table .article-translation-toolbar, .journal-article-general-fields, .article-toolbar {
 		display: none;
+	}
+}
+
+.lfr-translation-manager-add-menu 
+	display: inline;
+
+	.lfr-component li img {
+		vertical-align: text-bottom;
 	}
 }
 
