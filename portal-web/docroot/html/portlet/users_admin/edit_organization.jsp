@@ -92,6 +92,7 @@ String[][] categorySections = {mainSections, identificationSections, miscellaneo
 		categorySections="<%= categorySections %>"
 		htmlTop="<%= htmlTop %>"
 		jspPath="/html/portlet/users_admin/organization/"
+		backURL="<%= backURL %>"
 	/>
 </aui:form>
 
