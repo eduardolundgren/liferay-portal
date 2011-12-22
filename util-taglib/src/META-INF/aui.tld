@@ -2392,7 +2392,7 @@
 			<name>useJavaScript</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-			<type>java.io.Serializable</type>
+			<type>boolean</type>
 		</attribute>
 		<attribute>
 			<name>var</name>
