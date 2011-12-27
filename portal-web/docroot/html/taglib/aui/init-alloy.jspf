@@ -14,6 +14,8 @@
  */
 --%>
 
+<%@ page import="com.liferay.alloy.util.MarkupUtil" %>
+
 <%
 boolean useMarkup = GetterUtil.getBoolean((Serializable)_options.get("useMarkup"), true);
 
