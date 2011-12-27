@@ -14,13 +14,15 @@
  */
 --%>
 
-<%
-String iconTypeClass = null;
+<%@ include file="/html/taglib/aui/color_picker/init.jsp" %>
 
-if (Validator.isNull(label) && Validator.isNotNull(icon)) {
-	iconTypeClass = "aui-buttonitem-icon-only";
-}
-else if (Validator.isNotNull(label) && Validator.isNull(icon)) {
-	iconTypeClass = "aui-buttonitem-label-only";
-}
-%>
+<aui:component
+	excludeAttributes="javaScriptAttributes,useJavaScript,useMarkup,var"
+	module="aui-color-picker"
+	name="ColorPicker"
+	options="<%= _options %>"
+	scriptPosition='<%= GetterUtil.getString(_options.get("scriptPosition")) %>'
+	tagPageContext="<%= pageContext %>"
+	useJavaScript='<%= GetterUtil.getBoolean(_options.get("useJavaScript"), true) %>'
+	var='<%= GetterUtil.getString(_options.get("var")) %>'
+/>
