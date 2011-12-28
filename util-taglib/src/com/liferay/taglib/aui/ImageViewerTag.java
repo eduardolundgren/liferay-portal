@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
@@ -12,15 +11,17 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%
-String iconTypeClass = null;
+package com.liferay.taglib.aui;
 
-if (Validator.isNull(label) && Validator.isNotNull(icon)) {
-	iconTypeClass = "aui-buttonitem-icon-only";
+import com.liferay.taglib.aui.base.BaseImageViewerTag;
+
+/**
+ * @author Eduardo Lundgren
+ * @author Bruno Basto
+ * @author Nathan Cavanaugh
+ * @author Julio Camarero
+ * @author Antonio Junior
+ */
+public class ImageViewerTag extends BaseImageViewerTag {
 }
-else if (Validator.isNotNull(label) && Validator.isNull(icon)) {
-	iconTypeClass = "aui-buttonitem-label-only";
-}
-%>
