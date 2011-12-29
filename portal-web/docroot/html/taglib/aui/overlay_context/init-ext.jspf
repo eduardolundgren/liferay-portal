@@ -14,13 +14,8 @@
  */
 --%>
 
-<%
-String iconTypeClass = null;
+<%@ page import="javax.servlet.jsp.tagext.BodyContent" %>
 
-if (Validator.isNull(label) && Validator.isNotNull(icon)) {
-	iconTypeClass = "aui-buttonitem-icon-only";
-}
-else if (Validator.isNotNull(label) && Validator.isNull(icon)) {
-	iconTypeClass = "aui-buttonitem-label-only";
-}
+<%
+BodyContent bodyContent = (BodyContent)request.getAttribute("aui:overlay-context:bodyContent");
 %>
