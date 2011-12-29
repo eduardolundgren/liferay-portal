@@ -13,14 +13,3 @@
  * details.
  */
 --%>
-
-<%
-String iconTypeClass = null;
-
-if (Validator.isNull(label) && Validator.isNotNull(icon)) {
-	iconTypeClass = "aui-buttonitem-icon-only";
-}
-else if (Validator.isNotNull(label) && Validator.isNull(icon)) {
-	iconTypeClass = "aui-buttonitem-label-only";
-}
-%>
