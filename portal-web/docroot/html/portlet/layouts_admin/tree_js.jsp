@@ -37,7 +37,7 @@ if (!selectableTree) {
 	modules += ",liferay-history-manager";
 }
 %>
-
+<div class="aui-helper-hidden" id="<portlet:namespace />msgStatus"></div>
 <aui:script use="<%= modules %>">
 	var Lang = A.Lang;
 
@@ -194,12 +194,35 @@ if (!selectableTree) {
 		},
 
 		updateLayout: function(data) {
+			var msgStatus = A.one('#<portlet:namespace />msgStatus');
+
 			var updateURL = themeDisplay.getPathMain() + '/layouts_admin/update_page';
 
 			A.io.request(
 				updateURL,
 				{
-					data: data
+					data: data,
+					on: {
+						success: function(json) {
+							var response = JSON.parse(json.details[1].response);
+
+							var layoutErrorType = response.layoutErrorType;
+
+							if (layoutErrorType) {
+								msgStatus.set('className', 'portlet-msg-error');
+								msgStatus.html(getMessage('<liferay-ui:message key="the-first-page-cannot-be-of-type-x" />', layoutErrorType));
+	   							var children = lastDragNode.get('parentNode').getChildren();
+
+	   							treeview.insert(
+									lastDragNode,
+									children[dragIndex],
+   									dragIndex == 0 ? 'before' : 'after');
+							}
+							else {
+								msgStatus.set('className', 'aui-helper-hidden');
+							}
+						}
+					}
 				}
 			);
 		},
@@ -239,6 +262,8 @@ if (!selectableTree) {
 	var rootId = TreeUtil.createId(TreeUtil.DEFAULT_PARENT_LAYOUT_ID, 0);
 	var rootLabel = '<%= HtmlUtil.escapeJS(rootNodeName) %>';
 	var treeElId = '<portlet:namespace /><%= HtmlUtil.escape(treeId) %>Output';
+	var lastDragNode = { };
+	var dragIndex = 0;
 
 	var RootNodeType = A.TreeNodeTask;
 	var TreeViewType = A.TreeView;
@@ -327,6 +352,12 @@ if (!selectableTree) {
 					TreeUtil.restoreNodeState(event.tree.node);
 				},
 				</c:if>
+				'drag:start': function(event) {
+					var drag = event.target;
+					var dragNode = drag.get('node').get('parentNode');
+					lastDragNode = A.Widget.getByNode(dragNode);
+					dragIndex = lastDragNode.get('parentNode').indexOf(lastDragNode);
+				},
 				dropAppend: function(event) {
 					var tree = event.tree;
 
@@ -357,6 +388,10 @@ if (!selectableTree) {
 			type: 'pages'
 		}
 	).render();
+
+	function getMessage (message, layoutErrorType) {
+		return message.replace('{0}', layoutErrorType)
+	}
 
 	<c:if test="<%= !saveState && checkContentDisplayPage %>">
 		treeview.on(
