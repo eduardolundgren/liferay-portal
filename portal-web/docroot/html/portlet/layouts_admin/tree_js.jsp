@@ -236,7 +236,7 @@ if (!selectableTree) {
 						on: 
 						{
 							complete: function(){
-								if(nodeArray.length > 0){
+								if(nodeArray.length){
 									ioRequest.set('data', nodeArray.shift());
 									ioRequest.start();
 								}
@@ -250,7 +250,7 @@ if (!selectableTree) {
 
 			var transaction = ioRequest.get('transaction');
 
-			if((nodeArray.length > 0) && (!transaction || !transaction.isInProgress())){
+			if((nodeArray.length && (!transaction || !transaction.isInProgress())){
 				ioRequest.set('data', nodeArray.shift());
 				ioRequest.start();
 			}
