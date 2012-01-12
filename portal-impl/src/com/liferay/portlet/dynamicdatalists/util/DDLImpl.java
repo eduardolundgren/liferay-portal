@@ -20,10 +20,12 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.templateparser.Transformer;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -39,6 +41,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.DuplicateDirectoryException;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordConstants;
@@ -211,6 +214,11 @@ public class DDLImpl implements DDL {
 
 			if (fieldValue instanceof Date) {
 				jsonObject.put(fieldName, ((Date)fieldValue).getTime());
+			}
+			else if (fieldType.equals("ddm-documentlibrary") &&
+					 Validator.isNotNull(fieldValue)) {
+
+				jsonObject.put(fieldName, getDLJSONObject(fieldValue));
 			}
 			else if ((fieldType.equals("radio") ||
 					  fieldType.equals("select")) &&
@@ -562,6 +570,34 @@ public class DDLImpl implements DDL {
 					record, fieldName, uploadPortletRequest, serviceContext);
 			}
 		}
+	}
+
+	protected JSONObject getDLJSONObject(Object fieldValue) throws Exception {
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			String.valueOf(fieldValue));
+
+		String title = null;
+
+		try {
+			long groupId = jsonObject.getLong("groupId");
+
+			String uuid = jsonObject.getString("uuid");
+
+			FileEntry fileEntry =
+				DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+					uuid, groupId);
+
+			title = fileEntry.getTitle();
+		}
+		catch (Exception e) {
+			title = LanguageUtil.format(
+				LocaleUtil.getDefault(), "is-temporarily-unavailable",
+				"content");
+		}
+
+		jsonObject.put("title", title);
+
+		return jsonObject;
 	}
 
 	private Transformer _transformer = new DDLTransformer();
