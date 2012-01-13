@@ -218,7 +218,9 @@ if (!selectableTree) {
 		}
 
 		<c:if test="<%= saveState %>">
-		, updateSessionTreeClick: function(id, open, treeId) {
+		,
+
+		updateSessionTreeClick: function(id, open, treeId) {
 			var instance = this;
 
 			nodeArray.push({
