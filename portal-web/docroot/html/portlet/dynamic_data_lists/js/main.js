@@ -448,8 +448,8 @@ AUI.add(
 									var label = STR_EMPTY;
 									var value = data[name];
 
-									if (value !== STR_EMPTY) {
-										label = '(' + Liferay.Language.get('file') + ')';
+									if (value !== STR_EMPTY && value.title) {
+										label = value.title;
 									}
 
 									return label;
@@ -623,8 +623,6 @@ AUI.add(
 		SpreadSheet.Util = {
 			getFileEntry: function(fileJSON, callback) {
 				var instance = this;
-
-				fileJSON = instance.parseJSON(fileJSON);
 
 				DLApp.getFileEntryByUuidAndGroupId(
 					{
