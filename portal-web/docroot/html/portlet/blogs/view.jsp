@@ -63,6 +63,8 @@ portletURL.setParameter("struts_action", "/blogs/view");
 
 	if ((assetCategoryId != 0) || Validator.isNotNull(assetTagName)) {
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery(BlogsEntry.class.getName(), searchContainer);
+		assetEntryQuery.setStart(0);
+		assetEntryQuery.setEnd(Integer.MAX_VALUE);
 
 		assetEntryQuery.setExcludeZeroViewCount(false);
 
@@ -70,8 +72,9 @@ portletURL.setParameter("struts_action", "/blogs/view");
 			assetEntryQuery.setVisible(Boolean.TRUE);
 		}
 
-		total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
-		results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
+		List entries = AssetEntryServiceUtil.getEntries(assetEntryQuery);
+		total = entries.size();
+		results = ListUtil.subList(entries, searchContainer.getStart(), searchContainer.getEnd());
 	}
 	else {
 		int status = WorkflowConstants.STATUS_APPROVED;
