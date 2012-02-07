@@ -45,7 +45,7 @@ public class BaseOptionTag extends com.liferay.taglib.util.IncludeTag {
 		return _disabled;
 	}
 
-	public java.lang.Object getLabel() {
+	public java.lang.String getLabel() {
 		return _label;
 	}
 
@@ -79,7 +79,7 @@ public class BaseOptionTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("disabled", disabled);
 	}
 
-	public void setLabel(java.lang.Object label) {
+	public void setLabel(java.lang.String label) {
 		_label = label;
 
 		setScopedAttribute("label", label);
@@ -146,7 +146,7 @@ public class BaseOptionTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _cssClass = null;
 	private java.util.Map<java.lang.String, java.lang.Object> _data = null;
 	private boolean _disabled = false;
-	private java.lang.Object _label = null;
+	private java.lang.String _label = null;
 	private boolean _selected = false;
 	private java.lang.String _style = null;
 	private java.lang.Object _value = null;
