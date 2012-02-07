@@ -42,6 +42,10 @@ public class OptionTag extends BaseOptionTag {
 		return EVAL_PAGE;
 	}
 
+	public void setLabel(Object label) {
+		setLabel(String.valueOf(label));
+	}
+
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		super.setAttributes(request);
