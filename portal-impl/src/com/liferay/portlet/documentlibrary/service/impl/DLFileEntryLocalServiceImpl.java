@@ -1629,8 +1629,9 @@ public class DLFileEntryLocalServiceImpl
 					userId, fileEntryId, majorVersion, changeLog,
 					serviceContext);
 			}
-			else if (serviceContext.getWorkflowAction() ==
-						WorkflowConstants.ACTION_PUBLISH) {
+			else if (!checkedOut &&
+					 (serviceContext.getWorkflowAction() ==
+						WorkflowConstants.ACTION_PUBLISH)) {
 
 				String syncEvent = DLSyncConstants.EVENT_UPDATE;
 
