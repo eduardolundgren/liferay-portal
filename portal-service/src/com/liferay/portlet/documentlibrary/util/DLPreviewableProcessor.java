@@ -112,6 +112,25 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		deleteFiles(fileVersion, getThumbnailType());
 	}
 
+	public void exportGeneratedFiles(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			Element fileEntryElement)
+		throws Exception {
+
+		doExportGeneratedFiles(portletDataContext, fileEntry, fileEntryElement);
+	}
+
+	public void importGeneratedFiles(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			FileEntry importedFileEntry, Element fileEntryElement)
+		throws Exception {
+
+		cleanUp(importedFileEntry.getFileVersion());
+
+		doImportGeneratedFiles(
+			portletDataContext, fileEntry, importedFileEntry, fileEntryElement);
+	}
+
 	public boolean isSupported(FileVersion fileVersion) {
 		if (fileVersion == null) {
 			return false;
@@ -211,6 +230,11 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		DLStoreUtil.addFile(companyId, REPOSITORY_ID, filePath, is);
 	}
 
+	protected abstract void doExportGeneratedFiles(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			Element fileEntryElement)
+		throws Exception;
+
 	protected InputStream doGetPreviewAsStream(
 			FileVersion fileVersion, int index, String type)
 		throws PortalException, SystemException {
@@ -284,6 +308,11 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 			fileVersion.getCompanyId(), CompanyConstants.SYSTEM,
 			getThumbnailFilePath(fileVersion, type, index));
 	}
+
+	protected abstract void doImportGeneratedFiles(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			FileEntry importedFileEntry, Element fileEntryElement)
+		throws Exception;
 
 	protected void exportBinary(
 			PortletDataContext portletDataContext, Element fileEntryElement,
@@ -650,6 +679,40 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 	}
 
 	protected abstract String getThumbnailType(FileVersion fileVersion);
+
+	protected boolean hasPreview(FileVersion fileVersion, String type)
+		throws Exception {
+
+		String previewFilePath = getPreviewFilePath(fileVersion, type);
+
+		if (DLStoreUtil.hasFile(
+				fileVersion.getCompanyId(), REPOSITORY_ID, previewFilePath)) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	protected boolean hasPreviews(FileVersion fileVersion) throws Exception {
+		int count = 0;
+
+		String[] previewTypes = getPreviewTypes();
+
+		for (String previewType : previewTypes) {
+			if (hasPreview(fileVersion, previewType)) {
+				count++;
+			}
+		}
+
+		if (count == previewTypes.length) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
 	protected boolean hasThumbnail(FileVersion fileVersion, int index) {
 		try {

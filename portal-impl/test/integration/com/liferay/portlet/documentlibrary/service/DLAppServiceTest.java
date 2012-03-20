@@ -33,11 +33,16 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.DoAsUserThread;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.test.EnvironmentConfigTestListener;
+import com.liferay.portal.test.ExecutionTestListeners;
+import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.assertion.AssertUtils;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -45,19 +50,26 @@ import java.io.InputStream;
 
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @author Alexander Chow
  */
+@ExecutionTestListeners(listeners = {EnvironmentConfigTestListener.class})
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DLAppServiceTest extends BaseDLAppTestCase {
 
+	@Before
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();
+		_userIds = new long[ServiceTestUtil.THREAD_COUNT];
 
-		_userIds = new long[THREAD_COUNT];
-
-		for (int i = 0 ; i < THREAD_COUNT; i++) {
-			User user = addUser(
+		for (int i = 0 ; i < ServiceTestUtil.THREAD_COUNT; i++) {
+			User user = ServiceTestUtil.addUser(
 				"DLAppServiceTest" + (i + 1), false,
 				new long[] {TestPropsValues.getGroupId()});
 
@@ -65,6 +77,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		}
 	}
 
+	@After
 	@Override
 	public void tearDown() throws Exception {
 		if (_fileEntry != null) {
@@ -74,10 +87,12 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		super.tearDown();
 	}
 
+	@Test
 	public void testAddFileEntriesConcurrently() throws Exception {
-		DoAsUserThread[] doAsUserThreads = new DoAsUserThread[THREAD_COUNT];
+		DoAsUserThread[] doAsUserThreads =
+			new DoAsUserThread[ServiceTestUtil.THREAD_COUNT];
 
-		_fileEntryIds = new long[THREAD_COUNT];
+		_fileEntryIds = new long[ServiceTestUtil.THREAD_COUNT];
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < doAsUserThreads.length; j++) {
@@ -105,7 +120,9 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 				}
 			}
 
-			String message = "Only " + successCount + " out of " + THREAD_COUNT;
+			String message =
+				"Only " + successCount + " out of " +
+					ServiceTestUtil.THREAD_COUNT;
 
 			if (i == 0) {
 				message += " threads added file entries successfully";
@@ -114,17 +131,19 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 				message += " threads retrieved file entries successfully";
 			}
 
-			assertTrue(message, successCount == THREAD_COUNT);
+			Assert.assertTrue(
+				message, successCount == ServiceTestUtil.THREAD_COUNT);
 		}
 	}
 
+	@Test
 	public void testAddFileEntryWithDuplicateName() throws Exception {
 		addFileEntry(false);
 
 		try {
 			addFileEntry(false);
 
-			fail("Able to add two files of the same name");
+			Assert.fail("Able to add two files of the same name");
 		}
 		catch (DuplicateFileException dfe) {
 		}
@@ -135,7 +154,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 			DLAppServiceUtil.deleteFileEntry(_fileEntry.getFileEntryId());
 		}
 		catch (DuplicateFileException dfe) {
-			fail(
+			Assert.fail(
 				"Unable to add two files of the same name in different " +
 					"folders");
 		}
@@ -143,6 +162,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		_fileEntry = null;
 	}
 
+	@Test
 	public void testAddFileEntryWithInvalidMimeType() throws Exception {
 		long folderId = folder.getFolderId();
 		String description = StringPool.BLANK;
@@ -162,7 +182,8 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 				ContentTypes.APPLICATION_OCTET_STREAM, name, description,
 				changeLog, bytes, serviceContext);
 
-			assertEquals(ContentTypes.TEXT_PLAIN, fileEntry.getMimeType());
+			Assert.assertEquals(
+				ContentTypes.TEXT_PLAIN, fileEntry.getMimeType());
 
 			name = "InvalidMime";
 
@@ -170,15 +191,17 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 				fileEntry.getFileEntryId(), name, null, name, description,
 				changeLog, true, bytes, serviceContext);
 
-			assertEquals(ContentTypes.TEXT_PLAIN, fileEntry.getMimeType());
+			Assert.assertEquals(
+				ContentTypes.TEXT_PLAIN, fileEntry.getMimeType());
 		}
 		catch (Exception e) {
-			fail(
+			Assert.fail(
 				"Unable to add file with invalid mime type " +
 					StackTraceUtil.getStackTrace(e));
 		}
 	}
 
+	@Test
 	public void testAddNullFileEntry() throws Exception {
 		long folderId = folder.getFolderId();
 		String description = StringPool.BLANK;
@@ -211,7 +234,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 				newName, description, changeLog, true, bytes, serviceContext);
 		}
 		catch (Exception e) {
-			fail(
+			Assert.fail(
 				"Unable to pass null byte[] " +
 					StackTraceUtil.getStackTrace(e));
 		}
@@ -244,7 +267,8 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 			}
 		}
 		catch (Exception e) {
-			fail("Unable to pass null File " + StackTraceUtil.getStackTrace(e));
+			Assert.fail(
+				"Unable to pass null File " + StackTraceUtil.getStackTrace(e));
 		}
 
 		try {
@@ -277,12 +301,13 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 			}
 		}
 		catch (Exception e) {
-			fail(
+			Assert.fail(
 				"Unable to pass null InputStream " +
 					StackTraceUtil.getStackTrace(e));
 		}
 	}
 
+	@Test
 	public void testAsstTags() throws Exception {
 		long folderId = folder.getFolderId();
 		String name = "TestTags.txt";
@@ -305,9 +330,9 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 			serviceContext);
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
+			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
 
-		assertEqualsSorted(assetTagNames, assetEntry.getTagNames());
+		AssertUtils.assertEqualsSorted(assetTagNames, assetEntry.getTagNames());
 
 		Thread.sleep(1000);
 
@@ -326,9 +351,9 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 			description, changeLog, false, bytes, serviceContext);
 
 		assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
+			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
 
-		assertEqualsSorted(assetTagNames, assetEntry.getTagNames());
+		AssertUtils.assertEqualsSorted(assetTagNames, assetEntry.getTagNames());
 
 		Thread.sleep(1000);
 
@@ -343,32 +368,35 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		_fileEntry = null;
 	}
 
+	@Test
 	public void testSearchFileInRootFolder() throws Exception {
 		testSearchFile(true);
 	}
 
+	@Test
 	public void testSearchFileInSubFolder() throws Exception {
 		testSearchFile(false);
 	}
 
+	@Test
 	public void testVersionLabel() throws Exception {
 		String fileName = "TestVersion.txt";
 
 		FileEntry fileEntry = addFileEntry(false, fileName);
 
-		assertEquals(
+		Assert.assertEquals(
 			"Version label incorrect after add", "1.0", fileEntry.getVersion());
 
 		fileEntry = updateFileEntry(
 			fileEntry.getFileEntryId(), fileName, false);
 
-		assertEquals(
+		Assert.assertEquals(
 			"Version label incorrect after minor update", "1.1",
 			fileEntry.getVersion());
 
 		fileEntry = updateFileEntry(fileEntry.getFileEntryId(), fileName, true);
 
-		assertEquals(
+		Assert.assertEquals(
 			"Version label incorrect after major update", "2.0",
 			fileEntry.getVersion());
 	}
@@ -397,7 +425,8 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 		searchContext.setQueryConfig(queryConfig);
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(DLFileEntry.class);
+		Indexer indexer = IndexerRegistryUtil.getIndexer(
+			DLFileEntryConstants.getClassName());
 
 		Hits hits = indexer.search(searchContext);
 
@@ -428,10 +457,10 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		message += " using query " + hits.getQuery();
 
 		if (assertTrue) {
-			assertTrue(message, found);
+			Assert.assertTrue(message, found);
 		}
 		else {
-			assertFalse(message, found);
+			Assert.assertFalse(message, found);
 		}
 	}
 

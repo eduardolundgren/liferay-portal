@@ -419,8 +419,11 @@ public class DLUtil {
 
 		StringBundler sb = new StringBundler(15);
 
-		if (absoluteURL) {
-			sb.append(themeDisplay.getPortalURL());
+		if (themeDisplay != null) {
+			if (absoluteURL) {
+				sb.append(themeDisplay.getPortalURL());
+			}
+
 			sb.append(themeDisplay.getPathContext());
 		}
 

@@ -139,6 +139,8 @@ public class SearchContainerRowTag<R>
 		SearchContainer<R> searchContainer =
 			searchContainerTag.getSearchContainer();
 
+		searchContainer.setClassName(_className);
+
 		_resultRows = searchContainer.getResultRows();
 		_results = searchContainer.getResults();
 

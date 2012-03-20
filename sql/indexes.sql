@@ -168,7 +168,11 @@ create index IX_D43E4208 on DDMStructureLink (classNameId);
 create unique index IX_C803899D on DDMStructureLink (classPK);
 create index IX_17692B58 on DDMStructureLink (structureId);
 
+create index IX_32F83D16 on DDMTemplate (classPK);
+create index IX_304767FF on DDMTemplate (classPK, type_);
+create index IX_6561A5ED on DDMTemplate (classPK, type_, mode_);
 create index IX_DB24DDDD on DDMTemplate (groupId);
+create index IX_824ADC72 on DDMTemplate (groupId, classNameId, classPK);
 create index IX_33BEF579 on DDMTemplate (language);
 create index IX_C9757A51 on DDMTemplate (structureId);
 create index IX_5BC0E264 on DDMTemplate (structureId, type_);
@@ -567,6 +571,7 @@ create unique index IX_A6E99284 on RatingsStats (classNameId, classPK);
 create index IX_2D9A426F on Region (active_);
 create index IX_16D87CA7 on Region (countryId);
 create index IX_11FB3E42 on Region (countryId, active_);
+create unique index IX_A2635F5C on Region (countryId, regionCode);
 
 create index IX_8BD6BCA7 on Release_ (servletContextName);
 
