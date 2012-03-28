@@ -12,14 +12,25 @@
  * details.
  */
 
-package com.liferay.portlet.dynamicdatamapping.model.impl;
+package com.liferay.portal.upgrade;
+
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.upgrade.v6_2_0.UpgradeDDMTemplate;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Juan Fernández
  */
-public class DDMTemplateImpl extends DDMTemplateBaseImpl {
+public class UpgradeProcess_6_2_0 extends UpgradeProcess {
 
-	public DDMTemplateImpl() {
+	@Override
+	public int getThreshold() {
+		return ReleaseInfo.RELEASE_6_2_0_BUILD_NUMBER;
+	}
+
+	@Override
+	protected void doUpgrade() throws Exception {
+		upgrade(UpgradeDDMTemplate.class);
 	}
 
 }
