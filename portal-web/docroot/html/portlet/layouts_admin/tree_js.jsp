@@ -36,6 +36,8 @@ String modules = "aui-io-request,aui-tree-view,dataschema-xml,datatype-xml";
 if (!selectableTree) {
 	modules += ",liferay-history-manager";
 }
+
+String openNodes = SessionTreeJSClicks.getOpenNodes(request, treeId);
 %>
 
 <aui:script use="<%= modules %>">
@@ -47,7 +49,7 @@ if (!selectableTree) {
 
 	var TreeUtil = {
 		DEFAULT_PARENT_LAYOUT_ID: <%= LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>,
-		OPEN_NODES: '<%= SessionTreeJSClicks.getOpenNodes(request, treeId) %>'.split(','),
+		OPEN_NODES: '<%= openNodes %>'.split(','),
 		PREFIX_LAYOUT: '_layout_',
 		PREFIX_LAYOUT_ID: '_layoutId_',
 		PREFIX_PLID: '_plid_',
@@ -139,17 +141,23 @@ if (!selectableTree) {
 						<c:if test="<%= saveState %>">
 							after: {
 								checkedChange: function(event) {
-									var plid = TreeUtil.extractPlid(event.target);
-
 									if (this === event.originalTarget) {
-										TreeUtil.updateSessionTreeClick(plid, event.newVal, '<%= HtmlUtil.escape(treeId) %>SelectedNode');
+										var plid = TreeUtil.extractPlid(event.target);
+
+										TreeUtil.updateSessionTreeCheckedState('<%= HtmlUtil.escape(treeId) %>SelectedNode', plid, event.newVal);
 									}
+								},
+								expandedChange: function(event) {
+									var layoutId = TreeUtil.extractLayoutId(event.target);
+
+									TreeUtil.updateSessionTreeOpenedState('<%= HtmlUtil.escape(treeId) %>', layoutId, event.newVal);
 								}
 							},
 						</c:if>
 						alwaysShowHitArea: node.hasChildren,
+						children: TreeUtil.formatJSONResults(node.children),
 						draggable: node.updateable,
-						expanded : node.selLayoutAncestor,
+						expanded: !!(node.children && node.children.length),
 						id: TreeUtil.createListItemId(node.layoutId, node.plid),
 						type: '<%= selectableTree ? "task" : "io" %>'
 					};
@@ -209,10 +217,6 @@ if (!selectableTree) {
 				node.select();
 			}
 
-			if (A.Array.indexOf(TreeUtil.OPEN_NODES, id) > -1) {
-				node.expand();
-			}
-
 			if (A.Array.indexOf(TreeUtil.SELECTED_NODES, plid) > -1) {
 				if (node.check) {
 					var tree = node.get('ownerTree');
@@ -220,6 +224,13 @@ if (!selectableTree) {
 					node.check(tree);
 				}
 			}
+
+			A.Array.each(
+				node.get('children'),
+				function(item, index, collection) {
+					TreeUtil.restoreNodeState(item);
+				}
+			);
 		},
 
 		updateLayout: function(data) {
@@ -245,16 +256,35 @@ if (!selectableTree) {
 		}
 
 		<c:if test="<%= saveState %>">
-			, updateSessionTreeClick: function(plid, check, treeId) {
+			, updateSessionTreeCheckedState: function(treeId, nodeId, state) {
+				var data = {
+					cmd: state ? 'layoutCheck' : 'layoutUncheck',
+					plid: nodeId
+				};
+
+				TreeUtil.updateSessionTreeClick(treeId, data);
+			},
+
+			updateSessionTreeOpenedState: function(treeId, nodeId, state) {
+				var data = {
+					nodeId: nodeId,
+					openNode: state,
+				};
+
+				TreeUtil.updateSessionTreeClick(treeId, data);
+			},
+
+			updateSessionTreeClick: function(treeId, data) {
 				var sessionClickURL = themeDisplay.getPathMain() + '/portal/session_tree_js_click';
 
-				var data = {
-					cmd: check ? 'layoutCheck' : 'layoutUncheck',
-					groupId: <%= groupId %>,
-					plid: plid,
-					privateLayout: <%= privateLayout %>,
-					treeId: treeId
-				};
+				var data = A.merge(
+					{
+						groupId: <%= groupId %>,
+						privateLayout: <%= privateLayout %>,
+						treeId: treeId
+					},
+					data
+				);
 
 				A.io.request(
 					sessionClickURL,
@@ -292,7 +322,7 @@ if (!selectableTree) {
 		{
 			after: {
 				checkedChange: function(event) {
-					TreeUtil.updateSessionTreeClick(<%= LayoutConstants.DEFAULT_PLID %>, event.newVal, '<%= HtmlUtil.escape(treeId) %>SelectedNode');
+					TreeUtil.updateSessionTreeCheckedState('<%= HtmlUtil.escape(treeId) %>SelectedNode', <%= LayoutConstants.DEFAULT_PLID %>, event.newVal);
 				},
 				expandedChange: function(event) {
 					var sessionClickURL = themeDisplay.getPathMain() + '/portal/session_click';
@@ -308,6 +338,7 @@ if (!selectableTree) {
 				}
 			},
 			alwaysShowHitArea: true,
+			children: TreeUtil.formatJSONResults(<%= LayoutsTreeUtil.getJSON(request, groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, StringUtil.split(openNodes, 0L)) %>),
 			draggable: false,
 			expanded: <%= rootNodeExpanded %>,
 			id: rootId,
@@ -321,18 +352,6 @@ if (!selectableTree) {
 	var treeview = new TreeViewType(
 		{
 			after: {
-				<c:if test="<%= saveState %>">
-				collapse: function(event) {
-					var id = event.tree.node.get('id');
-
-					TreeUtil.updateSessionTreeClick(id, false, '<%= HtmlUtil.escape(treeId) %>');
-				},
-				expand: function(event) {
-					var id = event.tree.node.get('id');
-
-					TreeUtil.updateSessionTreeClick(id, true, '<%= HtmlUtil.escape(treeId) %>');
-				},
-				</c:if>
 				render: TreeUtil.afterRenderTree
 			},
 			boundingBox: '#' + treeElId,
