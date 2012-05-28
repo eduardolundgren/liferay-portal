@@ -372,7 +372,11 @@ if (!selectableTree) {
 
 			id: rootId,
 			label: rootLabel,
-			leaf: false
+			leaf: false,
+			paginator: {
+				limit: <%= PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN %>,
+				offsetParam: 'start'
+			}
 		}
 	);
 
@@ -432,10 +436,6 @@ if (!selectableTree) {
 						index
 					);
 				}
-			},
-			paginator: {
-				limit: <%= PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN %>,
-				offsetParam: 'start'
 			},
 			type: 'pages'
 		}
