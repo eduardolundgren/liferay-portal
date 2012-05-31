@@ -31,7 +31,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 
 	<aui:fieldset>
-	    <aui:select label="maximum-items-to-display" name="preferences--pageDelta--">
+		<aui:select label="maximum-items-to-display" name="preferences--pageDelta--">
 
 			<%
 			for (int pageDeltaValue : PropsValues.ANNOUNCEMENTS_ENTRY_PAGE_DELTA_VALUES) {
@@ -43,7 +43,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 			}
 			%>
 
-	    </aui:select>
+		</aui:select>
 	</aui:fieldset>
 
 	<aui:button-row>

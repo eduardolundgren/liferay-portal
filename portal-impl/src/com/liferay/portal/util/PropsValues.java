@@ -62,7 +62,7 @@ public class PropsValues {
 
 	public static final int ANNOUNCEMENTS_ENTRY_CHECK_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.ANNOUNCEMENTS_ENTRY_CHECK_INTERVAL));
 
-	public static final String[] ANNOUNCEMENTS_ENTRY_PAGE_DELTA_VALUES = PropsUtil.getArray(PropsKeys.ANNOUNCEMENTS_ENTRY_PAGE_DELTA_VALUES);
+	public static final int[] ANNOUNCEMENTS_ENTRY_PAGE_DELTA_VALUES = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.ANNOUNCEMENTS_ENTRY_PAGE_DELTA_VALUES));
 
 	public static final String[] APPLICATION_SHUTDOWN_EVENTS = PropsUtil.getArray(PropsKeys.APPLICATION_SHUTDOWN_EVENTS);
 

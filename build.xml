@@ -799,13 +799,30 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 
 				<echo>Installing liferay-portal.war.</echo>
 
-				<echo file="wsadmin.py">print AdminApp.list()
+				<echo file="wsadmin.py">
+def uninstallApp(appName):
+	app = ''
+	appList = AdminApp.list()
 
-print AdminApp.uninstall('DefaultApplication')
+	if len(appList) > 0:
+		for item in appList.split('\n'):
+			item = item.rstrip()
 
-print AdminConfig.save()
+			if item.find(appName) >= 0:
+				app = item
 
-print AdminApp.install('${app.server.websphere.instance.dir}/wsadmin-deploy/liferay-portal.war', '[-appname liferay-portal -contextroot /]')
+				break
+
+	if app != '':
+		print AdminApp.uninstall(appName)
+
+		print AdminConfig.save()
+
+print AdminApp.list()
+
+uninstallApp('DefaultApplication')
+
+print AdminApp.install('${app.server.websphere.instance.dir.unix}/wsadmin-deploy/liferay-portal.war', '[-appname liferay-portal -contextroot /]')
 
 print AdminConfig.save()
 

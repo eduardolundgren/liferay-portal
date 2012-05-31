@@ -1152,20 +1152,6 @@ release was successful.</echo>
 	</target>
 
 	<target name="unzip-weblogic">
-		<property name="app.server.weblogic.dir.abs" location="${app.server.weblogic.dir}" />
-
-		<property name="app.server.weblogic.instance.dir.abs" location="${app.server.weblogic.instance.dir}" />
-
-		<pathconvert property="app.server.weblogic.instance.dir.unix" targetos="unix">
-			<path location="${app.server.weblogic.instance.dir.abs}" />
-		</pathconvert>
-
-		<var name="app.server.weblogic.wlserver.dir" value="${app.server.weblogic.dir.abs}/wlserver" />
-
-		<pathconvert property="app.server.weblogic.wlserver.dir.unix" targetos="unix">
-			<path location="${app.server.weblogic.wlserver.dir}" />
-		</pathconvert>
-
 		<if>
 			<not>
 				<available file="${app.server.parent.dir}/${app.server.weblogic.zip.name}" />
@@ -1216,8 +1202,8 @@ closeTemplate()</echo>
 		<if>
 			<os family="windows" />
 			<then>
-				<exec dir="${app.server.weblogic.dir.abs}" executable="cmd">
-					<env key="MW_HOME" value="${app.server.weblogic.dir.abs}" />
+				<exec dir="${app.server.weblogic.dir}" executable="cmd">
+					<env key="MW_HOME" value="${app.server.weblogic.dir}" />
 					<arg value="/c" />
 					<arg value="configure.cmd" />
 				</exec>
@@ -1226,7 +1212,7 @@ closeTemplate()</echo>
 
 set "USER_MEM_ARGS=-Xmx1024m -XX:PermSize=256m"
 
-set "MW_HOME=${app.server.weblogic.dir.abs}"
+set "MW_HOME=${app.server.weblogic.dir}"
 
 set "WL_HOME=${app.server.weblogic.wlserver.dir}"
 
@@ -1245,7 +1231,7 @@ set "CLASSPATH=%FMWCONFIG_CLASSPATH%"
 
 set "USER_MEM_ARGS=-Xmx1024m -XX:PermSize=512m"
 
-set "MW_HOME=${app.server.weblogic.dir.abs}"
+set "MW_HOME=${app.server.weblogic.dir}"
 
 call startWebLogic.cmd</echo>
 			</then>
@@ -1339,6 +1325,7 @@ them in ${app.server.parent.dir}. Then rerun this task.
 		/>
 
 		<echo file="${tstamp.value}/was/WAS/liferay-responsefile.txt">
+			-OPT disableOSPrereqChecking="true"
 			-OPT feature="noFeature"
 			-OPT installLocation="${app.server.websphere.dir}"
 			-OPT installType="installNew"
