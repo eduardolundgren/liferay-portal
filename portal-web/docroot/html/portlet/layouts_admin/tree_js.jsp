@@ -263,7 +263,12 @@ if (!selectableTree) {
 			A.io.request(
 				updateURL,
 				{
-					data: data
+					data: A.mix(
+						data,
+						{
+							p_auth: Liferay.authToken
+						}
+					)
 				}
 			);
 		},
