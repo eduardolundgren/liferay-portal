@@ -1240,10 +1240,12 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @param priority the layout's new priority
 	* @return the updated layout
 	* @throws SystemException if a system exception occurred
+	* @throws PortalException
 	*/
 	public com.liferay.portal.model.Layout updatePriority(
 		com.liferay.portal.model.Layout layout, int priority)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Updates the priority of the layout matching the group, layout ID, and
