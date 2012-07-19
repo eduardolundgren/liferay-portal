@@ -1,5 +1,9 @@
 <#include "../init.ftl">
 
+<#if !(fields?? && fields.get(fieldName)??) && (fieldRawValue == "")>
+	<#assign fieldRawValue = predefinedValue?date("MM/dd/yyyy")>
+</#if>
+
 <#if (fieldRawValue?is_date)>
 	<#assign fieldDateValue = fieldRawValue>
 <#else>
