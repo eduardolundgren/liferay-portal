@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.layoutsadmin.action;
 
+import com.liferay.portal.LayoutTypeException;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -97,29 +98,38 @@ public class UpdateLayoutAction extends JSONAction {
 		String cmd = ParamUtil.getString(request, Constants.CMD);
 
 		JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
+		try {
+			if (cmd.equals("add")) {
+				String[] array = addPage(themeDisplay, request, response);
 
-		if (cmd.equals("add")) {
-			String[] array = addPage(themeDisplay, request, response);
-
-			jsonObj.put("deletable", Boolean.valueOf(array[2]));
-			jsonObj.put("layoutId", array[0]);
-			jsonObj.put("updateable", Boolean.valueOf(array[3]));
-			jsonObj.put("url", array[1]);
+				jsonObj.put("deletable", Boolean.valueOf(array[2]));
+				jsonObj.put("layoutId", array[0]);
+				jsonObj.put("updateable", Boolean.valueOf(array[3]));
+				jsonObj.put("url", array[1]);
+			}
+			else if (cmd.equals("delete")) {
+				SitesUtil.deleteLayout(request, response);
+			}
+			else if (cmd.equals("display_order")) {
+				updateDisplayOrder(request);
+			}
+			else if (cmd.equals("name")) {
+				updateName(request);
+			}
+			else if (cmd.equals("parent_layout_id")) {
+				updateParentLayoutId(request);
+			}
+			else if (cmd.equals("priority")) {
+				updatePriority(request);
+			}
 		}
-		else if (cmd.equals("delete")) {
-			SitesUtil.deleteLayout(request, response);
-		}
-		else if (cmd.equals("display_order")) {
-			updateDisplayOrder(request);
-		}
-		else if (cmd.equals("name")) {
-			updateName(request);
-		}
-		else if (cmd.equals("parent_layout_id")) {
-			updateParentLayoutId(request);
-		}
-		else if (cmd.equals("priority")) {
-			updatePriority(request);
+		catch (Exception e) {
+			if (e instanceof LayoutTypeException) {
+				jsonObj.put("layoutErrorType",
+					((LayoutTypeException) e).getLayoutType());
+			} else {
+				throw e;
+			}
 		}
 
 		return jsonObj.toString();

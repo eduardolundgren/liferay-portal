@@ -2049,9 +2049,10 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @param  priority the layout's new priority
 	 * @return the updated layout
 	 * @throws SystemException if a system exception occurred
+	 * @throws PortalException
 	 */
 	public Layout updatePriority(Layout layout, int priority)
-		throws SystemException {
+		throws SystemException, PortalException {
 
 		if (layout.getPriority() == priority) {
 			return layout;
@@ -2063,6 +2064,27 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		int oldPriority = layout.getPriority();
 
+		List<Layout> layouts = layoutPersistence.findByG_P_P(
+			layout.getGroupId(), layout.isPrivateLayout(),
+			layout.getParentLayoutId());
+
+		if (layout.getParentLayoutId() ==
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
+
+			Layout validateLayout = null;
+
+			if (priority == 0) {
+				validateLayout = layout;
+			}
+			else if (layout.getPriority() == 0 && layouts.size() > 0) {
+				validateLayout = layouts.get(1);
+			}
+
+			if (validateLayout != null) {
+				validateFirstLayout(validateLayout.getType());
+			}
+		}
+
 		int nextPriority = getNextPriority(
 			layout.getGroupId(), layout.isPrivateLayout(),
 			layout.getParentLayoutId(), layout.getSourcePrototypeLayoutUuid(),
@@ -2071,10 +2093,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setPriority(nextPriority);
 
 		layoutPersistence.update(layout, false);
-
-		List<Layout> layouts = layoutPersistence.findByG_P_P(
-			layout.getGroupId(), layout.isPrivateLayout(),
-			layout.getParentLayoutId());
 
 		boolean lessThan = false;
 

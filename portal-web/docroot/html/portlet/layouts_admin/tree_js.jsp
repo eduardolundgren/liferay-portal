@@ -282,7 +282,29 @@ if (!selectableTree) {
 						{
 							p_auth: Liferay.authToken
 						}
-					)
+					),
+					on: {
+						success: function(json) {
+							var response = JSON.parse(json.details[1].response);
+
+							var layoutErrorType = response.layoutErrorType;
+
+							var msgStatus = A.one('#<portlet:namespace />msgStatus');
+							if (layoutErrorType) {
+								msgStatus.set('className', 'portlet-msg-error');
+								msgStatus.html(getMessage('<liferay-ui:message key="the-first-page-cannot-be-of-type-x" />', layoutErrorType));
+	   							var children = lastDragNode.get('parentNode').getChildren();
+
+	   							treeview.insert(
+									lastDragNode,
+									children[dragIndex],
+   									dragIndex == 0 ? 'before' : 'after');
+							}
+							else {
+								msgStatus.set('className', 'aui-helper-hidden');
+							}
+						}
+					}
 				}
 			);
 		},
@@ -415,6 +437,8 @@ if (!selectableTree) {
 
 	var RootNodeType = A.TreeNodeTask;
 	var TreeViewType = A.TreeView;
+	var lastDragNode = { };
+	var dragIndex = 0;
 
 	<c:if test="<%= !selectableTree %>">
 		RootNodeType = A.TreeNodeIO;
@@ -429,6 +453,10 @@ if (!selectableTree) {
 		);
 		</c:if>
 	</c:if>
+
+	function getMessage (message, layoutErrorType) {
+		return message.replace('{0}', layoutErrorType);
+	}
 
 	var rootNode = new RootNodeType(
 		{
@@ -537,6 +565,12 @@ if (!selectableTree) {
 				<c:if test="<%= saveState %>">
 				append: function(event) {
 					TreeUtil.restoreNodeState(event.tree.node);
+				},
+				'drag:start': function(event) {
+					var drag = event.target;
+					var dragNode = drag.get('node').get('parentNode');
+					lastDragNode = A.Widget.getByNode(dragNode);
+					dragIndex = lastDragNode.get('parentNode').indexOf(lastDragNode);
 				},
 				</c:if>
 				dropAppend: function(event) {
@@ -684,7 +718,7 @@ if (!selectableTree) {
 		);
 	</c:if>
 </aui:script>
-
+<div class="aui-helper-hidden" id="<portlet:namespace />msgStatus"></div>
 <div class="lfr-tree-loading" id="<portlet:namespace />treeLoading<%= treeLoading %>">
 	<span class="aui-icon aui-icon-loading lfr-tree-loading-icon"></span>
 </div>
