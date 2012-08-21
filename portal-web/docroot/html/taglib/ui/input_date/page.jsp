@@ -174,16 +174,6 @@ else if (yearNullable) {
 					appendOrder: '<%= dateFormatOrder %>',
 					boundingBox: displayDateNode,
 					calendar: {
-						dates: [
-							<c:if test="<%= !monthEmpty && !dayEmpty && !yearEmpty %>">
-								new Date(
-									<%= cal.get(Calendar.YEAR) %>,
-									<%= cal.get(Calendar.MONTH) %>,
-									<%= cal.get(Calendar.DATE) %>
-								)
-							</c:if>
-						],
-
 						<c:choose>
 							<c:when test="<%= dateFormatOrder.equals(_DATE_FORMAT_ORDER_MDY) %>">
 								dateFormat: '%m/%d/%y',
@@ -204,6 +194,15 @@ else if (yearNullable) {
 							previous: '<liferay-ui:message key="previous" />',
 							today: '<liferay-ui:message key="today" />'
 						}
+					},
+					datePickerConfig: {
+						<c:if test="<%= !monthEmpty && !dayEmpty && !yearEmpty %>">
+							selectedDates: new Date(
+								<%= cal.get(Calendar.YEAR) %>,
+								<%= cal.get(Calendar.MONTH) %>,
+								<%= cal.get(Calendar.DATE) %>
+							)
+						</c:if>
 					},
 					dayNode: '#<%= dayParam %>',
 					disabled: <%= disabled %>,
