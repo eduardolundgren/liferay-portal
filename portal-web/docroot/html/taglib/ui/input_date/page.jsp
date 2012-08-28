@@ -186,6 +186,14 @@ else if (yearNullable) {
 							</c:otherwise>
 						</c:choose>
 
+						<c:if test="<%= !monthEmpty && !dayEmpty && !yearEmpty %>">
+							selectedDates: new Date(
+								<%= cal.get(Calendar.YEAR) %>,
+								<%= cal.get(Calendar.MONTH) %>,
+								<%= cal.get(Calendar.DATE) %>
+							),
+						</c:if>
+
 						firstDayOfWeek: <%= firstDayOfWeek %>,
 						locale: '<%= LanguageUtil.getLanguageId(request) %>',
 						strings: {
@@ -195,15 +203,7 @@ else if (yearNullable) {
 							today: '<liferay-ui:message key="today" />'
 						}
 					},
-					datePickerConfig: {
-						<c:if test="<%= !monthEmpty && !dayEmpty && !yearEmpty %>">
-							selectedDates: new Date(
-								<%= cal.get(Calendar.YEAR) %>,
-								<%= cal.get(Calendar.MONTH) %>,
-								<%= cal.get(Calendar.DATE) %>
-							)
-						</c:if>
-					},
+					datePickerConfig: {},
 					dayNode: '#<%= dayParam %>',
 					disabled: <%= disabled %>,
 					monthNode: '#<%= monthParam %>',
