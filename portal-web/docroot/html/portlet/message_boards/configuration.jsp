@@ -66,7 +66,7 @@ else if (tabs2.equals("message-updated-email")) {
 	<%
 	String tabs2Names = "general,email-from,message-added-email,message-updated-email,thread-priorities,user-ranks";
 
-	if (PropsValues.RSS_FEEDS_ENABLED) {
+	if (PortalUtil.isRSSFeedsEnabled()) {
 		tabs2Names += ",rss";
 	}
 	%>

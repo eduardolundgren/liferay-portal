@@ -89,7 +89,7 @@
 			taglibURL = "javascript:" + renderResponse.getNamespace() + "openFeedsView()";
 			%>
 
-			<c:if test="<%= PropsValues.RSS_FEEDS_ENABLED %>">
+			<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
 				<liferay-ui:icon
 					message="feeds"
 					url="<%= taglibURL %>"
@@ -100,7 +100,7 @@
 </span>
 
 <aui:script>
-	<c:if test="<%= PropsValues.RSS_FEEDS_ENABLED %>">
+	<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
 		function <portlet:namespace />openFeedsView() {
 			Liferay.Util.openWindow(
 				{

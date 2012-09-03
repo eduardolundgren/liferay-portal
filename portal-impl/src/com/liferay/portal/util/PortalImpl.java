@@ -172,6 +172,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.expando.ValueDataException;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
+import com.liferay.portlet.journal.NoSuchFeedException;
 import com.liferay.portlet.journal.asset.JournalArticleAssetRendererFactory;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
@@ -5019,6 +5020,10 @@ public class PortalImpl implements Portal {
 		return _reservedParams.contains(name);
 	}
 
+	public boolean isRSSFeedsEnabled() {
+		return PropsValues.RSS_FEEDS_ENABLED;
+	}
+
 	public boolean isSecure(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 
@@ -5299,6 +5304,27 @@ public class PortalImpl implements Portal {
 				response.sendError(status);
 			}
 		}
+	}
+
+	public void sendRSSFeedsDisabledError(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException, ServletException {
+
+		PortalUtil.sendError(
+			HttpServletResponse.SC_NOT_FOUND, new NoSuchFeedException(),
+			request, response);
+	}
+
+	public void sendRSSFeedsDisabledError(
+			PortletRequest portletRequest, PortletResponse portletResponse)
+		throws IOException, ServletException {
+
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			portletRequest);
+		HttpServletResponse response = PortalUtil.getHttpServletResponse(
+			portletResponse);
+
+		sendRSSFeedsDisabledError(request, response);
 	}
 
 	public void setPageDescription(

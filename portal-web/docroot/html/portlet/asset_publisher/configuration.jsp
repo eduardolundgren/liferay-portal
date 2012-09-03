@@ -657,7 +657,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 						<%@ include file="/html/portlet/asset_publisher/display_settings.jspf" %>
 					</liferay-ui:panel>
 
-					<c:if test="<%= PropsValues.RSS_FEEDS_ENABLED %>">
+					<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
 						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="assetPublisherRssPanel" persistState="<%= true %>" title="rss">
 							<aui:fieldset>
 								<aui:input label="enable-rss-subscription" name="preferences--enableRss--" type="checkbox" value="<%= enableRSS %>" />

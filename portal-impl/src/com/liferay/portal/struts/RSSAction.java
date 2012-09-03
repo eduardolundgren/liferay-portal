@@ -17,8 +17,6 @@ package com.liferay.portal.struts;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.journal.NoSuchFeedException;
 
 import java.io.OutputStream;
 
@@ -46,10 +44,8 @@ public class RSSAction extends PortletAction {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		if (!PropsValues.RSS_FEEDS_ENABLED) {
-			PortalUtil.sendError(
-				HttpServletResponse.SC_NOT_FOUND, new NoSuchFeedException(),
-				actionRequest, actionResponse);
+		if (!PortalUtil.isRSSFeedsEnabled()) {
+			PortalUtil.sendRSSFeedsDisabledError(actionRequest, actionResponse);
 
 			return;
 		}
@@ -77,15 +73,9 @@ public class RSSAction extends PortletAction {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		if (!PropsValues.RSS_FEEDS_ENABLED) {
-			HttpServletRequest request = PortalUtil.getHttpServletRequest(
-				resourceRequest);
-			HttpServletResponse response = PortalUtil.getHttpServletResponse(
-				resourceResponse);
-
-			PortalUtil.sendError(
-				HttpServletResponse.SC_NOT_FOUND, new NoSuchFeedException(),
-				request, response);
+		if (!PortalUtil.isRSSFeedsEnabled()) {
+			PortalUtil.sendRSSFeedsDisabledError(
+				resourceRequest, resourceResponse);
 
 			return;
 		}
@@ -110,10 +100,8 @@ public class RSSAction extends PortletAction {
 			HttpServletResponse response)
 		throws Exception {
 
-		if (!PropsValues.RSS_FEEDS_ENABLED) {
-			PortalUtil.sendError(
-				HttpServletResponse.SC_NOT_FOUND, new NoSuchFeedException(),
-				request, response);
+		if (!PortalUtil.isRSSFeedsEnabled()) {
+			PortalUtil.sendRSSFeedsDisabledError(request, response);
 
 			return null;
 		}

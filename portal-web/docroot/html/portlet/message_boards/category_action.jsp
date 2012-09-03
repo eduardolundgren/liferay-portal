@@ -54,7 +54,7 @@ Set<Long> categorySubscriptionClassPKs = (Set<Long>)row.getParameter("categorySu
 
 	<c:if test="<%= portletName.equals(PortletKeys.MESSAGE_BOARDS) %>">
 
-		<c:if test="<%= PropsValues.RSS_FEEDS_ENABLED %>">
+		<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
 
 			<%
 			rssURL.setParameter("p_l_id", String.valueOf(plid));

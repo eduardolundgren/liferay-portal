@@ -65,7 +65,7 @@ String[] socialBookmarksTypesArray = StringUtil.split(preferences.getValue("soci
 	<%
 	String tabs2Names = "display-settings,email-from,entry-added-email,entry-updated-email";
 
-	if (PropsValues.RSS_FEEDS_ENABLED) {
+	if (PortalUtil.isRSSFeedsEnabled()) {
 		tabs2Names += ",rss";
 	}
 	%>

@@ -1097,6 +1097,8 @@ public interface Portal {
 
 	public boolean isReservedParameter(String name);
 
+	public boolean isRSSFeedsEnabled();
+
 	public boolean isSecure(HttpServletRequest request);
 
 	public boolean isSystemGroup(String groupName);
@@ -1134,6 +1136,14 @@ public interface Portal {
 	public void sendError(
 			int status, Exception e, HttpServletRequest request,
 			HttpServletResponse response)
+		throws IOException, ServletException;
+
+	public void sendRSSFeedsDisabledError(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException, ServletException;
+
+	public void sendRSSFeedsDisabledError(
+			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws IOException, ServletException;
 
 	/**

@@ -1390,7 +1390,7 @@ public class PropsValues {
 
 	public static final int RSS_CONNECTION_TIMEOUT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.RSS_CONNECTION_TIMEOUT));
 
-	public static final boolean RSS_FEEDS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.RSS_FEEDS_ENABLED));
+	public static boolean RSS_FEEDS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.RSS_FEEDS_ENABLED));
 
 	public static final String SANDBOX_DEPLOY_DIR = PropsUtil.get(PropsKeys.SANDBOX_DEPLOY_DIR);
 
