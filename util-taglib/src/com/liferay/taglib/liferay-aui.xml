@@ -196,7 +196,7 @@
 			</attribute>
 			<attribute>
 				<name>useJavaScript</name>
-				<inputType>java.io.Serializable</inputType>
+				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
 				<defaultValue>true</defaultValue>
 			</attribute>

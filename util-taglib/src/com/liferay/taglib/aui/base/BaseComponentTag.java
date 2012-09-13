@@ -65,7 +65,7 @@ public class BaseComponentTag extends com.liferay.taglib.util.IncludeTag {
 		return _tagPageContext;
 	}
 
-	public java.io.Serializable getUseJavaScript() {
+	public boolean getUseJavaScript() {
 		return _useJavaScript;
 	}
 
@@ -121,7 +121,7 @@ public class BaseComponentTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("tagPageContext", tagPageContext);
 	}
 
-	public void setUseJavaScript(java.io.Serializable useJavaScript) {
+	public void setUseJavaScript(boolean useJavaScript) {
 		_useJavaScript = useJavaScript;
 
 		setScopedAttribute("useJavaScript", useJavaScript);
@@ -179,7 +179,7 @@ public class BaseComponentTag extends com.liferay.taglib.util.IncludeTag {
 	private java.util.Map<java.lang.String, java.lang.Object> _options = null;
 	private java.lang.String _scriptPosition = null;
 	private javax.servlet.jsp.JspContext _tagPageContext = null;
-	private java.io.Serializable _useJavaScript = true;
+	private boolean _useJavaScript = true;
 	private java.lang.String _var = null;
 
 }
