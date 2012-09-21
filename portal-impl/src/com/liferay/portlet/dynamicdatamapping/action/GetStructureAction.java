@@ -46,11 +46,11 @@ public class GetStructureAction extends Action {
 			DDMStructure structure = DDMStructureServiceUtil.getStructure(
 				structureId);
 
-			String fileName = null;
-			byte[] bytes = structure.getXsd().getBytes();
+			String xsd = structure.getXsd();
 
 			ServletResponseUtil.sendFile(
-				request, response, fileName, bytes, ContentTypes.TEXT_XML_UTF8);
+				request, response, null, xsd.getBytes(),
+				ContentTypes.TEXT_XML_UTF8);
 
 			return null;
 		}

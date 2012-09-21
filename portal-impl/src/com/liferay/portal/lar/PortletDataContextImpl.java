@@ -16,6 +16,7 @@ package com.liferay.portal.lar;
 
 import com.liferay.portal.NoSuchRoleException;
 import com.liferay.portal.NoSuchTeamException;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
+import com.liferay.portal.model.AttachedModel;
 import com.liferay.portal.model.AuditedModel;
 import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Group;
@@ -115,6 +117,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jodd.bean.BeanUtil;
 
 /**
  * <p>
@@ -283,6 +287,20 @@ public class PortletDataContextImpl implements PortletDataContext {
 		throws PortalException, SystemException {
 
 		element.addAttribute("path", path);
+
+		if (classedModel instanceof AttachedModel) {
+			AttachedModel attachedModel = (AttachedModel)classedModel;
+
+			element.addAttribute("class-name", attachedModel.getClassName());
+		}
+		else if (BeanUtil.hasProperty(classedModel, "className")) {
+			String className = BeanPropertiesUtil.getStringSilent(
+				classedModel, "className");
+
+			if (className != null) {
+				element.addAttribute("class-name", className);
+			}
+		}
 
 		if (classedModel instanceof AuditedModel) {
 			AuditedModel auditedModel = (AuditedModel)classedModel;
@@ -824,6 +842,19 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return getZipReader().getEntryAsInputStream(path);
+	}
+
+	public Object getZipEntryAsObject(Element element, String path) {
+		Object object = fromXML(getZipEntryAsString(path));
+
+		Element classNameElement = element.element("class-name");
+
+		if (classNameElement != null) {
+			BeanPropertiesUtil.setProperty(
+				object, "className", classNameElement.getText());
+		}
+
+		return object;
 	}
 
 	public Object getZipEntryAsObject(String path) {

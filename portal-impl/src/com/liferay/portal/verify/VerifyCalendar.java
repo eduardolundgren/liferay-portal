@@ -71,8 +71,8 @@ public class VerifyCalendar extends VerifyProcess {
 	protected void verifyEndDate() throws Exception {
 		runSQL(
 			"update CalEvent set endDate = null where endDate is not null " +
-				"and (recurrence like '%\"until\":null%' or recurrence = " +
-					"'null')");
+				"and (recurrence like '%\"until\":null%' or " +
+					"CAST_TEXT(recurrence) = 'null')");
 	}
 
 	protected void verifyNoAssets() throws Exception {

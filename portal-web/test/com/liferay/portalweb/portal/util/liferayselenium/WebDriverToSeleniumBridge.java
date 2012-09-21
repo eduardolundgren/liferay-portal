@@ -538,7 +538,9 @@ public class WebDriverToSeleniumBridge
 	}
 
 	public void goBack() {
-		throw new UnsupportedOperationException();
+		WebDriver.Navigation navigation = navigate();
+
+		navigation.back();
 	}
 
 	public void highlight(String locator) {

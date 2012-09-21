@@ -1,0 +1,23 @@
+<%@ page import="javax.servlet.jsp.tagext.BodyContent" %>
+
+<%
+if (!useNamespace) {
+	namespace = StringPool.BLANK;
+}
+
+boolean buildForm = false;
+String formName = null;
+
+if (Validator.isNotNull(formAction)) {
+	buildForm = true;
+
+	StringBundler sb = new StringBundler(2);
+
+	sb.append(name);
+	sb.append("SearchForm");
+
+	formName = sb.toString();
+
+	heading = Validator.isNotNull(heading) ? heading : StringPool.BLANK;
+}
+%>
