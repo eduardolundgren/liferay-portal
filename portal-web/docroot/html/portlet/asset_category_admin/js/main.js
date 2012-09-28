@@ -9,6 +9,8 @@ AUI.add(
 		var Widget = A.Widget;
 		var Util = Liferay.Util;
 
+		var emptyFn = Lang.emptyFn;
+
 		var owns = AObject.owns;
 
 		var ACTION_ADD = 0;
@@ -2615,6 +2617,10 @@ AUI.add(
 
 						return result;
 					},
+
+					_goingUpState: emptyFn,
+
+					_goingDownState: emptyFn,
 
 					_onDropHit: function(event) {
 						var instance = this;

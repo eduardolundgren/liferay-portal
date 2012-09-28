@@ -693,6 +693,10 @@ public interface PropsKeys {
 
 	public static final String DL_STORE_S3_SECRET_KEY = "dl.store.s3.secret.key";
 
+	public static final String DL_STORE_S3_TEMP_DIR_CLEAN_UP_EXPUNGE = "dl.store.s3.temp.dir.clean.up.expunge";
+
+	public static final String DL_STORE_S3_TEMP_DIR_CLEAN_UP_FREQUENCY = "dl.store.s3.temp.dir.clean.up.frequency";
+
 	public static final String DOCKBAR_ADD_PORTLETS = "dockbar.add.portlets";
 
 	public static final String DYNAMIC_DATA_LISTS_ERROR_TEMPLATE_FREEMARKER = "dynamic.data.lists.error.template.freemarker";
@@ -2038,6 +2042,8 @@ public interface PropsKeys {
 	public static final String SITEMINDER_USER_HEADER = "siteminder.user.header";
 
 	public static final String SITES_CONTROL_PANEL_MEMBERS_VISIBLE = "sites.control.panel.members.visible";
+
+	public static final String SITES_DIRECTORY_DISPLAY_STYLE_OPTIONS = "sites.directory.display.style.options";
 
 	public static final String SITES_EMAIL_FROM_ADDRESS = "sites.email.from.address";
 
