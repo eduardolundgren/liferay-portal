@@ -156,6 +156,8 @@ public class DDMStructureCacheModel implements CacheModel<DDMStructure>,
 
 		ddmStructureImpl.setLocalizedFieldsMap(_localizedFieldsMap);
 
+		ddmStructureImpl.setLocalizedQueryMap(_localizedQueryMap);
+
 		return ddmStructureImpl;
 	}
 
@@ -177,4 +179,5 @@ public class DDMStructureCacheModel implements CacheModel<DDMStructure>,
 	public int type;
 	public com.liferay.portal.kernel.xml.Document _document;
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> _localizedFieldsMap;
+	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> _localizedQueryMap;
 }
