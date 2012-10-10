@@ -12,25 +12,29 @@
  * details.
  */
 
-package com.liferay.portal.messaging.proxy;
+package com.liferay.portal.dao.db;
 
-import com.liferay.portal.kernel.util.AutoResetThreadLocal;
+import com.liferay.portal.kernel.dao.db.DB;
+
+import java.io.IOException;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * @author Shuyang Zhou
+ * @author Miguel Pastor
  */
-public class ProxyModeThreadLocal {
+public class FirebirdDBTest extends BaseDBTestCase {
 
-	public static boolean isForceSync() {
-		return _forceSync.get();
+	@Test
+	public void testRewordRenameTable() throws IOException {
+		Assert.assertEquals(
+			"alter_table_name a b\n", buildSQL(RENAME_TABLE_QUERY));
 	}
 
-	public static void setForceSync(boolean forceSync) {
-		_forceSync.set(forceSync);
+	@Override
+	protected DB getDB() {
+		return FirebirdDB.getInstance();
 	}
-
-	private static ThreadLocal<Boolean> _forceSync =
-		new AutoResetThreadLocal<Boolean>(
-			ProxyModeThreadLocal.class + "_forceSync", Boolean.FALSE);
 
 }
