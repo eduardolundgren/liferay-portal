@@ -249,7 +249,13 @@ AUI.add(
 						instance._addCategoryButton = addCategoryButton;
 
 						A.one(idPrefix + 'addVocabularyButton').on(EVENT_CLICK, instance._onShowVocabularyPanel, instance, ACTION_ADD);
-						A.one(idPrefix + 'categoryPermissionsButton').on(EVENT_CLICK, instance._onChangePermissions, instance);
+
+						var permissionButton = A.one(idPrefix + 'categoryPermissionsButton');
+
+						if (permissionButton) {
+							permissionButton.on(EVENT_CLICK, instance._onChangePermissions, instance);
+						}
+
 						A.one(idPrefix + 'deleteSelectedItems').on(EVENT_CLICK, instance._deleteSelected, instance);
 
 						var checkAllVocabulariesCheckbox = A.one(idPrefix + 'checkAllVocabulariesCheckbox');
@@ -437,7 +443,7 @@ AUI.add(
 										var toCategoryId = instance._getCategoryId(tree.dropNode);
 										var fromCategoryId = instance._getCategoryId(dragParentNode);
 
-										if (instance.dropAction != 'append') {
+										if (tree.instance.dropAction != 'append') {
 											toCategoryId = instance._getCategoryId(parentNode);
 										}
 
