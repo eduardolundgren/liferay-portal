@@ -234,6 +234,12 @@ update Country set name = 'zimbabwe' where name = 'Zimbabwe';
 
 alter table DDMStructure add parentStructureId LONG;
 
+alter table DDMTemplate add cacheable BOOLEAN;
+alter table DDMTemplate add smallImage BOOLEAN;
+alter table DDMTemplate add smallImageId LONG;
+alter table DDMTemplate add smallImageURL STRING;
+
+
 alter table DLFileEntry add manualCheckInRequired BOOLEAN;
 
 alter table DLFileRank add active_ BOOLEAN;

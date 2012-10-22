@@ -330,14 +330,12 @@ public class DLUtil {
 		for (int i = dlFolders.size() - 1; i >= 0; i--) {
 			DLFolder curDLFolder = dlFolders.get(i);
 
-			sb.append(StringPool.GREATER_THAN);
-			sb.append(StringPool.GREATER_THAN);
+			sb.append(StringPool.RAQUO);
 			sb.append(StringPool.SPACE);
 			sb.append(curDLFolder.getName());
 		}
 
-		sb.append(StringPool.GREATER_THAN);
-		sb.append(StringPool.GREATER_THAN);
+		sb.append(StringPool.RAQUO);
 		sb.append(StringPool.SPACE);
 		sb.append(dlFolder.getName());
 
