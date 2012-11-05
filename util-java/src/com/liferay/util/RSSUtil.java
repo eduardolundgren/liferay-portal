@@ -82,9 +82,7 @@ public class RSSUtil {
 	}
 
 	public static String getFormat(String type, double version) {
-		String feedType = getFeedType(type, version);
-
-		return feedType.replaceAll("[_\\.]", StringPool.BLANK);
+		return type.concat(String.valueOf(version));
 	}
 
 	public static String getFormatType(String format) {
