@@ -37,7 +37,119 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 		<portlet:param name="backURL" value="<%= viewDefinitionsURL %>" />
 	</portlet:renderURL>
 
-	<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>">
-		<a href="<%= addWorkflowDefinitionURL %>"><liferay-ui:message key="add" /></a>
+	<c:if test='<%= DeployManagerUtil.isDeployed("kaleo-designer-portlet") %>'>
+		<%
+		String kaleoDesignerURL = "javascript:Liferay.Util.getOpener()." + renderResponse.getNamespace() + "openKaleoDesigner('', '0', '', Liferay.Util.getWindowName());";
+		%>
+		<span class="lfr-toolbar-button add-button">
+			<a href="<%= kaleoDesignerURL %>"><liferay-ui:message key="add-definition" /></a>
+		</span>
+	</c:if>
+
+	<span class="lfr-toolbar-button upload-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>">
+		<a href="<%= addWorkflowDefinitionURL %>"><liferay-ui:message key="file-upload" /></a>
 	</span>
 </div>
+
+<c:if test='<%= DeployManagerUtil.isDeployed("kaleo-designer-portlet") %>'>
+	<aui:script>
+		Liferay.provide(
+			window,
+			'<portlet:namespace />openKaleoDesigner',
+			function(workflowDefinitionName, workflowDefinitionVersion, saveCallback, openerWindowName) {
+				var A = AUI();
+				console.log('openerWindowName: ', openerWindowName);
+				Liferay.Util.openKaleoDesignerPortlet(
+					{
+						availablePropertyModels: 'Liferay.KaleoDesigner.AVAILABLE_PROPERTY_MODELS.KALEO_FORMS_EDIT',
+						name: workflowDefinitionName,
+						openerWindowName: openerWindowName,
+						portletResourceNamespace: '<%= renderResponse.getNamespace() %>',
+						saveCallback: saveCallback,
+						version: workflowDefinitionVersion,
+						versionLabel: '<liferay-ui:message key="version" />',
+						dialog: {
+							id: '<portlet:namespace />kaleoDesignerDialog',
+							modal: true,
+							width: A.one(Liferay.Util.getOpener()).get('region').width * 0.85,
+							on: {
+								close: function(event) { 
+									event.preventDefault();
+									console.log('opa');
+									Liferay.fire(
+										'closeWindow',
+										{
+											id: '<portlet:namespace />kaleoDesignerDialog'
+										}
+									);
+								} 
+							}
+						}
+					}
+				);
+			},
+			['aui-base']
+		);
+	</aui:script>
+</c:if>
+
+<aui:script>
+	Liferay.provide(
+		Liferay.Util,
+		'openKaleoDesignerPortlet',
+		function(config) {
+			var A = AUI();
+
+			var kaleoURL = Liferay.PortletURL.createRenderURL();
+
+			kaleoURL.setParameter('availableFields', config.availableFields);
+			kaleoURL.setParameter('availablePropertyModels', config.availablePropertyModels);
+			kaleoURL.setParameter('ddmStructureId', config.ddmStructureId);
+			kaleoURL.setParameter('draftVersion', config.draftVersion);
+			kaleoURL.setParameter('kaleoProcessId', config.kaleoProcessId);
+			kaleoURL.setParameter('name', config.name);
+			kaleoURL.setParameter('openerWindowName', config.openerWindowName);
+			kaleoURL.setParameter('portletResourceNamespace', config.portletResourceNamespace);
+			kaleoURL.setParameter('propertiesSaveCallback', config.propertiesSaveCallback);
+			kaleoURL.setParameter('saveCallback', config.saveCallback);
+			kaleoURL.setParameter('uiScope', config.uiScope);
+			kaleoURL.setParameter('version', config.version);
+
+			kaleoURL.setPortletId('2_WAR_kaleodesignerportlet');
+			kaleoURL.setWindowState('pop_up');
+
+			config.uri = kaleoURL.toString();
+
+			var dialogConfig = config.dialog;
+
+			if (!dialogConfig) {
+				var region = A.one(Liferay.Util.getOpener()).get('region');
+
+				dialogConfig = {
+					modal: true,
+					title: config.name,
+					width: region.width * 0.85
+				};
+
+				config.dialog = dialogConfig;
+			}
+
+			if (!('align' in dialogConfig)) {
+				dialogConfig.align = Liferay.Util.Window.ALIGN_CENTER;
+			}
+
+			var dialogIframeConfig = config.dialogIframe;
+
+			if (!dialogIframeConfig) {
+				dialogIframeConfig = {
+					closeOnEscape: false
+				};
+
+				config.dialogIframe = dialogIframeConfig;
+			}
+
+			Liferay.Util.openWindow(config);
+		},
+		['liferay-portlet-url']
+	);
+</aui:script>
