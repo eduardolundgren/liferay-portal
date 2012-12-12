@@ -639,17 +639,17 @@ public class LuceneHelperImpl implements LuceneHelper {
 
 			InetAddress inetAddress = clusterNode.getInetAddress();
 
-			String luceneDumpURI = PortalUtil.getPathContext();
+			String fileName = PortalUtil.getPathContext();
 
-			if (!luceneDumpURI.endsWith(StringPool.SLASH)) {
-				luceneDumpURI = luceneDumpURI.concat(StringPool.SLASH);
+			if (!fileName.endsWith(StringPool.SLASH)) {
+				fileName = fileName.concat(StringPool.SLASH);
 			}
 
-			luceneDumpURI = luceneDumpURI.concat("lucene/dump");
+			fileName = fileName.concat("lucene/dump");
 
 			URL url = new URL(
 				"http", inetAddress.getHostAddress(), clusterNode.getPort(),
-				luceneDumpURI);
+				fileName);
 
 			return new ObjectValuePair<String, URL>(transientToken, url);
 		}
