@@ -5084,6 +5084,10 @@ public class PortalImpl implements Portal {
 	public boolean isSecure(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 
+		if (session == null) {
+			return request.isSecure();
+		}
+
 		Boolean httpsInitial = (Boolean)session.getAttribute(
 			WebKeys.HTTPS_INITIAL);
 
