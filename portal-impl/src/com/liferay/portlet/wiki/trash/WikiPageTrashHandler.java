@@ -113,10 +113,12 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 		return CLASS_NAME;
 	}
 
+	@Override
 	public String getContainerModelClassName() {
 		return WikiNode.class.getName();
 	}
 
+	@Override
 	public String getContainerModelName() {
 		return "wiki-node";
 	}
