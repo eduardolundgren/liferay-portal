@@ -71,16 +71,16 @@ public class MBThreadTrashHandler extends BaseTrashHandler {
 			long classPK, long parentContainerModelId, int start, int end)
 		throws PortalException, SystemException {
 
+		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
+
 		MBThread thread = MBThreadLocalServiceUtil.getThread(classPK);
 
 		List<MBCategory> categories = MBCategoryLocalServiceUtil.getCategories(
 			thread.getGroupId(), parentContainerModelId,
 			WorkflowConstants.STATUS_APPROVED, start, end);
 
-		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
-
-		for (MBCategory curCategory : categories) {
-			containerModels.add(curCategory);
+		for (MBCategory category : categories) {
+			containerModels.add(category);
 		}
 
 		return containerModels;

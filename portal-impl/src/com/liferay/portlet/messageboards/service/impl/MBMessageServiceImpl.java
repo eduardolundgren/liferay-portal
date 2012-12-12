@@ -147,15 +147,13 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryService.getCategory(categoryId);
-
-		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
-				Collections.emptyList();
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		return addMessage(
 			category.getGroupId(), categoryId, subject, body,
-			MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs, false, 0.0,
-			false, serviceContext);
+			MBMessageConstants.DEFAULT_FORMAT, Collections.emptyList(), false,
+			0.0, false, serviceContext);
 	}
 
 	public MBMessage addMessage(

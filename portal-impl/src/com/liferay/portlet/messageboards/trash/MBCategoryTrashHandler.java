@@ -45,7 +45,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 /**
- * Implements trash handling for the category entity.
+ * Implements trash handling for the message boards category entity.
  *
  * @author Eduardo Garcia
  */
@@ -200,13 +200,13 @@ public class MBCategoryTrashHandler extends BaseTrashHandler {
 			long classPK, int start, int end)
 		throws PortalException, SystemException {
 
+		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
+
 		MBCategory category = MBCategoryLocalServiceUtil.getCategory(classPK);
 
 		List<MBThread> threads = MBThreadLocalServiceUtil.getThreads(
 			category.getGroupId(), classPK, WorkflowConstants.STATUS_APPROVED,
 			start, end);
-
-		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
 
 		for (MBThread thread : threads) {
 			TrashHandler trashHandler =
@@ -242,13 +242,13 @@ public class MBCategoryTrashHandler extends BaseTrashHandler {
 			long classPK, int start, int end)
 		throws PortalException, SystemException {
 
+		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
+
 		MBCategory category = MBCategoryLocalServiceUtil.getCategory(classPK);
 
 		List<MBCategory> categories = MBCategoryLocalServiceUtil.getCategories(
 			category.getGroupId(), classPK, WorkflowConstants.STATUS_APPROVED,
 			start, end);
-
-		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
 
 		for (MBCategory curCategory : categories) {
 			TrashHandler trashHandler =

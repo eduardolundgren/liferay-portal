@@ -279,7 +279,7 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 	public Lock lockThread(long threadId)
 		throws PortalException, SystemException {
 
-		MBThread thread = mbThreadLocalService.getThread(threadId);
+		MBThread thread = mbThreadPersistence.findByPrimaryKey(threadId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), thread.getGroupId(), thread.getCategoryId(),

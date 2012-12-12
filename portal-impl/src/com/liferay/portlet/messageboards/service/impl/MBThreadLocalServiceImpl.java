@@ -856,7 +856,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			if (oldStatus == WorkflowConstants.STATUS_PENDING) {
 				MBMessage rootMessage = mbMessageLocalService.getMBMessage(
-						thread.getRootMessageId());
+					thread.getRootMessageId());
 
 				rootMessage.setStatus(WorkflowConstants.STATUS_DRAFT);
 

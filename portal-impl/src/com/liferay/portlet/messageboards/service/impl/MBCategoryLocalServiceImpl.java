@@ -333,16 +333,17 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 	public List<Object> getCategoriesAndThreads(long groupId, long categoryId)
 		throws SystemException {
 
+		List<Object> categoriesAndThreads = new ArrayList<Object>();
+
 		List<MBCategory> categories = getCategories(
 			groupId, categoryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		categoriesAndThreads.addAll(categories);
 
 		List<MBThread> threads = mbThreadLocalService.getThreads(
 			groupId, categoryId, WorkflowConstants.STATUS_ANY,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-		List<Object> categoriesAndThreads = new ArrayList<Object>();
-
-		categoriesAndThreads.addAll(categories);
 		categoriesAndThreads.addAll(threads);
 
 		return categoriesAndThreads;
@@ -658,7 +659,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		mbCategoryPersistence.update(category);
 
-		// Categories, threads and messages
+		// Categories and threads
 
 		List<Object> categoriesAndThreads = getCategoriesAndThreads(
 			category.getGroupId(), categoryId);
@@ -677,10 +678,10 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 	}
 
 	public void updateStatuses(
-			User user, List<Object> mbCategoriesAndThreads, int status)
+			User user, List<Object> categoriesAndThreads, int status)
 		throws PortalException, SystemException {
 
-		for (Object object : mbCategoriesAndThreads) {
+		for (Object object : categoriesAndThreads) {
 			if (object instanceof MBThread) {
 				MBThread thread = (MBThread)object;
 
@@ -700,11 +701,11 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 					continue;
 				}
 
-				List<Object> categoriesAndThreads =
+				updateStatuses(
+					user,
 					getCategoriesAndThreads(
-						category.getGroupId(), category.getCategoryId());
-
-				updateStatuses(user, categoriesAndThreads, status);
+						category.getGroupId(), category.getCategoryId()),
+					status);
 			}
 		}
 	}

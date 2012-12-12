@@ -130,13 +130,13 @@ public abstract class DLBaseTrashHandler extends BaseTrashHandler {
 			long classPK, int start, int end)
 		throws PortalException, SystemException {
 
+		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
+
 		Repository repository = getRepository(classPK);
 
 		List<Object> fileEntriesAndFileShortcuts =
 			repository.getFileEntriesAndFileShortcuts(
 				classPK, WorkflowConstants.STATUS_ANY, start, end);
-
-		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
 
 		for (Object fileEntryOrFileShortcut : fileEntriesAndFileShortcuts) {
 			String curClassName = StringPool.BLANK;
@@ -190,12 +190,12 @@ public abstract class DLBaseTrashHandler extends BaseTrashHandler {
 			long classPK, int start, int end)
 		throws PortalException, SystemException {
 
+		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
+
 		Repository repository = getRepository(classPK);
 
 		List<Folder> folders = repository.getFolders(
 			classPK, false, start, end, null);
-
-		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
 
 		for (Folder folder : folders) {
 			TrashHandler trashHandler =

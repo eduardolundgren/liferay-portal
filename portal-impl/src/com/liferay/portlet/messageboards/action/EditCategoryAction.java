@@ -147,6 +147,9 @@ public class EditCategoryAction extends PortletAction {
 			ActionRequest actionRequest, boolean moveToTrash)
 		throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		long[] deleteCategoryIds = null;
 
 		long categoryId = ParamUtil.getLong(actionRequest, "mbCategoryId");
@@ -158,9 +161,6 @@ public class EditCategoryAction extends PortletAction {
 			deleteCategoryIds = StringUtil.split(
 				ParamUtil.getString(actionRequest, "deleteCategoryIds"), 0L);
 		}
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
 
 		for (long deleteCategoryId : deleteCategoryIds) {
 			if (moveToTrash) {

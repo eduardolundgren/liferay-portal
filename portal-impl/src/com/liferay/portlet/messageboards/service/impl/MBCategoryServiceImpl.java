@@ -73,7 +73,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 	public void deleteCategory(long categoryId, boolean includeTrashedEntries)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.DELETE);
@@ -186,7 +187,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 	public MBCategory getCategory(long categoryId)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.VIEW);
@@ -260,7 +262,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			boolean mergeWithParentCategory)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.UPDATE);
@@ -272,7 +275,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 	public MBCategory moveCategoryFromTrash(long categoryId, long newCategoryId)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.UPDATE);
@@ -284,7 +288,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 	public MBCategory moveCategoryToTrash(long categoryId)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.DELETE);
@@ -296,7 +301,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 	public void restoreCategoryFromTrash(long categoryId)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.DELETE);
@@ -337,7 +343,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.UPDATE);
