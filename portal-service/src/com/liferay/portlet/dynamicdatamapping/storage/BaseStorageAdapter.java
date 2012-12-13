@@ -30,6 +30,7 @@ import com.liferay.portlet.dynamicdatamapping.storage.query.Condition;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -272,6 +273,27 @@ public abstract class BaseStorageAdapter implements StorageAdapter {
 			long classPK, Fields fields, boolean mergeFields,
 			ServiceContext serviceContext)
 		throws Exception;
+
+	protected Fields mergeFields(Fields newFields, Fields existingFields) {
+		Iterator<Field> it = newFields.iterator();
+
+		while (it.hasNext()) {
+			Field newField = it.next();
+
+			Field existingField = existingFields.get(newField.getName());
+
+			if (existingField == null) {
+				existingFields.put(newField);
+			}
+			else {
+				for (Locale locale : newField.getAvailableLocales()) {
+					existingField.setValues(locale, newField.getValues(locale));
+				}
+			}
+		}
+
+		return existingFields;
+	}
 
 	protected void validateClassFields(long classPK, Fields fields)
 		throws PortalException, SystemException {
