@@ -151,7 +151,7 @@ else {
 								'/ddlrecord/delete-record-locale',
 								{
 									recordId: <%= recordId %>,
-							        locale: locale,
+									locale: locale,
 									serviceContext: JSON.stringify(
 										{
 											scopeGroupId: themeDisplay.getScopeGroupId(),
