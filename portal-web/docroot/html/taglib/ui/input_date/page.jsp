@@ -206,9 +206,9 @@ else if (yearNullable) {
 						}
 					},
 					datePickerConfig: {},
-					dayNode: '#<%= dayParam %>',
+					dayNode: '#<%= randomNamespace %>day',
 					disabled: <%= disabled %>,
-					monthNode: '#<%= monthParam %>',
+					monthNode: '#<%= randomNamespace %>month',
 					nullableDay: <%= dayNullable %>,
 					nullableMonth: <%= monthNullable %>,
 					nullableYear: <%= yearNullable %>,
@@ -220,7 +220,7 @@ else if (yearNullable) {
 						}
 					},
 					srcNode: '#<%= randomNamespace %>displayDateContent',
-					yearNode: '#<%= yearParam %>',
+					yearNode: '#<%= randomNamespace %>year',
 					yearRange: [<%= yearRangeStart %>, <%= yearRangeEnd %>]
 				}
 			).render();
