@@ -1,0 +1,231 @@
+/**
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.portlet.journal.util;
+
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
+import com.liferay.util.PwdGenerator;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+/**
+ * @author Bruno Basto
+ */
+public class JournalConverterUtil {
+
+	public static String journalStructureToDDMStructure(String xsd)
+		throws SystemException {
+
+		Document document = null;
+
+		try {
+			document = SAXReaderUtil.read(xsd);
+		}
+		catch (DocumentException de) {
+			de.printStackTrace();
+
+			return xsd;
+		}
+
+		Element contentRoot = document.getRootElement();
+
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		contentRoot.addAttribute("available-locales", defaultLocale.toString());
+		contentRoot.addAttribute("default-locale", defaultLocale.toString());
+
+		List<Element> elements = contentRoot.elements();
+
+		initMaps();
+
+		for (Element element : elements) {
+			journalStructureFieldToDDMStructureField(element);
+		}
+
+		return DDMXMLUtil.formatXML(document);
+	}
+
+	private static void addMetaDataAttribute(
+		Element metaDataElement, String name, String value) {
+
+		Element entryElement = metaDataElement.addElement("entry");
+
+		entryElement.addAttribute("name", name);
+		entryElement.addCDATA(value);
+	}
+
+	private static void initMaps() {
+
+		// init ddm types map
+
+		ddmTypes.put("text", "text");
+		ddmTypes.put("text_box", "textarea");
+		ddmTypes.put("text_area", "ddm-text-html");
+		ddmTypes.put("image", "ddm-documentlibrary");
+		ddmTypes.put("document_library", "ddm-documentlibrary");
+		ddmTypes.put("boolean", "checkbox");
+		ddmTypes.put("list", "select");
+		ddmTypes.put("multi-list", "select");
+		ddmTypes.put("link_to_layout", "ddm-link-to-page");
+
+		// init ddm data types map
+
+		ddmDataTypes.put("text", "string");
+		ddmDataTypes.put("text_box", "string");
+		ddmDataTypes.put("text_area", "html");
+		ddmDataTypes.put("image", "document-library");
+		ddmDataTypes.put("document_library", "document-library");
+		ddmDataTypes.put("boolean", "boolean");
+		ddmDataTypes.put("list", "string");
+		ddmDataTypes.put("multi-list", "string");
+		ddmDataTypes.put("link_to_layout", "link-to-page");
+
+		// init ddm meta-data attributes map
+
+		ddmMetaDataAttributes.put("instructions", "tip");
+		ddmMetaDataAttributes.put("label", "label");
+		ddmMetaDataAttributes.put("multiple", "multiple");
+		ddmMetaDataAttributes.put("predefinedValue", "predefinedValue");
+		ddmMetaDataAttributes.put("required", "required");
+	}
+
+	private static void journalStructureFieldToDDMStructureField(
+		Element element) {
+
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		String name = element.attributeValue("name");
+		String type = element.attributeValue("type");
+		String indexType = element.attributeValue("index-type");
+		String repeatable = element.attributeValue("repeatable");
+
+		// meta-data
+
+		Element metaDataElement = element.element("meta-data");
+
+		if (metaDataElement == null) {
+			metaDataElement = element.addElement("meta-data");
+		}
+
+		if (type.equals("selection_break")) {
+			Element parentElement = element.getParent();
+
+			parentElement.remove(element);
+
+			return;
+		}
+		else if (type.equals("multi-list")) {
+			addMetaDataAttribute(metaDataElement, "multiple", "true");
+		}
+		else {
+			Element parentElement = element.getParent();
+
+			String parentType = parentElement.attributeValue("type");
+
+			if ((parentType != null) && parentType.equals("select")) {
+				metaDataElement.addAttribute(
+					"locale", defaultLocale.toString());
+
+				addMetaDataAttribute(metaDataElement, "label", name);
+
+				element.addAttribute(
+					"name", "option" + PwdGenerator.getPassword(4));
+				element.addAttribute("type", "option");
+				element.addAttribute("value", type);
+
+				return;
+			}
+		}
+
+		element.remove(element.attribute("index-type"));
+		element.remove(element.attribute("repeatable"));
+		element.remove(element.attribute("type"));
+
+		element.addAttribute("autoGeneratedName", "false");
+		element.addAttribute("dataType", ddmDataTypes.get(type));
+		element.addAttribute("indexType", indexType);
+
+		String newType = ddmTypes.get(type);
+
+		element.addAttribute("type", newType);
+
+		if (newType.startsWith("ddm")) {
+			element.addAttribute("fieldNamespace", "ddm");
+		}
+
+		metaDataElement.addAttribute("locale", defaultLocale.toString());
+
+		List<Element> entries = metaDataElement.elements();
+
+		if (entries.size() == 0) {
+			addMetaDataAttribute(metaDataElement, "label", name);
+		}
+		else {
+			for (Element entry : entries) {
+				String oldEntryName = entry.attributeValue("name");
+				String newEntryName = ddmMetaDataAttributes.get(oldEntryName);
+
+				if (newEntryName == null) {
+					metaDataElement.remove(entry);
+				}
+				else {
+					entry.addAttribute("name", newEntryName);
+				}
+			}
+		}
+
+		if (newType.equals("ddm-date") ||
+			newType.equals("ddm-decimal") ||
+			newType.equals("ddm-integer") ||
+			newType.equals("ddm-link-to-page") ||
+			newType.equals("ddm-number") ||
+			newType.equals("ddm-text-html") ||
+			newType.equals("textarea") ||
+			newType.equals("text")) {
+
+			addMetaDataAttribute(metaDataElement, "fieldCssClass", "aui-w25");
+			addMetaDataAttribute(metaDataElement, "width", "25");
+		}
+
+		if (newType.equals("ddm-fileupload")) {
+			addMetaDataAttribute(metaDataElement, "acceptFiles", "*");
+			addMetaDataAttribute(metaDataElement, "readOnly", "false");
+		}
+
+		addMetaDataAttribute(metaDataElement, "repeatable", repeatable);
+		addMetaDataAttribute(metaDataElement, "showLabel", "true");
+
+		List<Element> children = element.elements("dynamic-element");
+
+		for (Element child : children) {
+			journalStructureFieldToDDMStructureField(child);
+		}
+	}
+
+	private static Map<String, String> ddmDataTypes =
+		new HashMap<String, String>();
+	private static Map<String, String> ddmMetaDataAttributes =
+		new HashMap<String, String>();
+	private static Map<String, String> ddmTypes = new HashMap<String, String>();
+
+}
