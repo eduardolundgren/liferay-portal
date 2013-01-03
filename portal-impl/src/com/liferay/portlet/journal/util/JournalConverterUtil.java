@@ -16,7 +16,6 @@ package com.liferay.portlet.journal.util;
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -34,7 +33,9 @@ import java.util.Map;
  */
 public class JournalConverterUtil {
 
-	public static String journalStructureToDDMStructure(String xsd) {
+	public static String journalStructureToDDMStructure(String xsd)
+		throws SystemException {
+
 		Document document = null;
 
 		try {
@@ -61,12 +62,7 @@ public class JournalConverterUtil {
 			journalStructureFieldToDDMStructureField(element);
 		}
 
-		try {
-			return DDMXMLUtil.formatXML(document);
-		}
-		catch (SystemException e) {
-			return StringPool.BLANK;
-		}
+		return DDMXMLUtil.formatXML(document);
 	}
 
 	private static void addMetaDataAttribute(
