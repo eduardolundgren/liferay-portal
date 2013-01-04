@@ -26,6 +26,26 @@ SearchContainer searchContainer = new SearchContainer(renderRequest, null, null,
 
 List results = CalEventServiceUtil.getEvents(scopeGroupId, selCal, eventType);
 
+Calendar prevCal = (Calendar)selCal.clone();
+
+prevCal.add(Calendar.DAY_OF_MONTH, -1);
+
+List<CalEvent> prevResults = CalEventServiceUtil.getEvents(scopeGroupId, prevCal, eventType);
+
+for (CalEvent event : prevResults) {
+	Date startDate = event.getStartDate();
+
+	if (event.isTimeZoneSensitive()) {
+		startDate = Time.getDate(event.getStartDate(), timeZone);
+	}
+
+	int overlap = ((startDate.getHours() * 60) + startDate.getMinutes() + (event.getDurationHour() * 60) + event.getDurationMinute()) - 1440;
+
+	if (!event.isAllDay() && (overlap > 0)) {
+		results.add(event);
+	}
+}
+
 results = ListUtil.sort(results, new EventTimeComparator(timeZone, locale));
 
 searchContainer.setTotal(results.size());

@@ -123,6 +123,36 @@ for (CalEvent event : results) {
 	}
 }
 
+Map<Long, Date> origStartDates = new HashMap<Long, Date>();
+
+Calendar prevCal = (Calendar)selCal.clone();
+
+prevCal.add(Calendar.DAY_OF_MONTH, -1);
+
+List<CalEvent> prevResults = CalEventServiceUtil.getEvents(scopeGroupId, prevCal, eventType);
+
+for (CalEvent event : prevResults) {
+	Date startDate = event.getStartDate();
+
+	if (event.isTimeZoneSensitive()) {
+		startDate = Time.getDate(event.getStartDate(), timeZone);
+	}
+
+	int overlap = ((startDate.getHours() * 60) + startDate.getMinutes() + (event.getDurationHour() * 60) + event.getDurationMinute()) - 1440;
+
+	if (!event.isAllDay() && (overlap > 0)) {
+		CalEvent overLapEvent = (CalEvent)event.clone();
+
+		overLapEvent.setStartDate(CalendarUtil.getGTDate(selCal));
+		overLapEvent.setDurationHour((int)(overlap / 60));
+		overLapEvent.setDurationMinute(overlap % 60);
+
+		partDayResults.add(overLapEvent);
+
+		origStartDates.put(event.getEventId(), startDate);
+	}
+}
+
 partDayResults = ListUtil.sort(partDayResults, new EventTimeComparator(timeZone, locale));
 
 List<List<CalEvent>> sortedResults = new ArrayList<List<CalEvent>>();
@@ -245,9 +275,11 @@ if (!partDayResults.isEmpty()) {
 			event = event.toEscapedModel();
 
 			Date startDate = Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault());
+			Date endDate = Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault());
 
 			if (event.isTimeZoneSensitive()) {
 				startDate = Time.getDate(event.getStartDate(), timeZone);
+				endDate = Time.getDate(CalUtil.getEndTime(event), timeZone);
 			}
 
 			int eventStartPos = (int)(((((startDate.getHours() * 60) + (float)startDate.getMinutes() ) / 60) * 50) - 2);
@@ -258,6 +290,10 @@ if (!partDayResults.isEmpty()) {
 
 			if ((eventBoxLength + eventStartPos) > 1186) {
 				eventBoxLength -= (eventBoxLength + eventStartPos) - 1186; // = (24 * 50) - 4
+			}
+
+			if (origStartDates.containsKey(event.getEventId())) {
+				startDate = origStartDates.get(event.getEventId());
 			}
 		%>
 
@@ -280,18 +316,9 @@ if (!partDayResults.isEmpty()) {
 					</div>
 
 					<div class="event-time">
-						<c:choose>
-							<c:when test="<%= event.isTimeZoneSensitive() %>">
-								<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
-								-
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), timeZone)) %>
-							</c:when>
-							<c:otherwise>
-								<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
-								-
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())) %>
-							</c:otherwise>
-						</c:choose>
+						<%= dateFormatTime.format(startDate) %>
+						-
+						<%= dateFormatTime.format(endDate) %>
 					</div>
 
 					<div class="event-title">
