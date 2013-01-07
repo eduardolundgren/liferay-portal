@@ -136,6 +136,38 @@ public class CalEventServiceSoap {
 		}
 	}
 
+	public static com.liferay.portlet.calendar.model.CalEventSoap[] getCalendarEvents(
+		long groupId, java.util.Calendar cal, java.lang.String type)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.calendar.model.CalEvent> returnValue =
+				CalEventServiceUtil.getCalendarEvents(groupId, cal, type);
+
+			return com.liferay.portlet.calendar.model.CalEventSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.calendar.model.CalEventSoap[] getCalendarEvents(
+		long groupId, java.util.Calendar cal, java.lang.String[] types)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.calendar.model.CalEvent> returnValue =
+				CalEventServiceUtil.getCalendarEvents(groupId, cal, types);
+
+			return com.liferay.portlet.calendar.model.CalEventSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.portlet.calendar.model.CalEventSoap getEvent(
 		long eventId) throws RemoteException {
 		try {
@@ -232,6 +264,53 @@ public class CalEventServiceSoap {
 		throws RemoteException {
 		try {
 			int returnValue = CalEventServiceUtil.getEventsCount(groupId, types);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static boolean hasCalendarEvents(long groupId, java.util.Calendar cal)
+		throws RemoteException {
+		try {
+			boolean returnValue = CalEventServiceUtil.hasCalendarEvents(groupId,
+					cal);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static boolean hasCalendarEvents(long groupId,
+		java.util.Calendar cal, java.lang.String type)
+		throws RemoteException {
+		try {
+			boolean returnValue = CalEventServiceUtil.hasCalendarEvents(groupId,
+					cal, type);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static boolean hasCalendarEvents(long groupId,
+		java.util.Calendar cal, java.lang.String[] types)
+		throws RemoteException {
+		try {
+			boolean returnValue = CalEventServiceUtil.hasCalendarEvents(groupId,
+					cal, types);
 
 			return returnValue;
 		}

@@ -393,6 +393,18 @@ public class CalEventLocalServiceUtil {
 		return getService().exportGroupEvents(userId, groupId, fileName);
 	}
 
+	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getCalendarEvents(
+		long groupId, java.util.Calendar cal, java.lang.String type)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCalendarEvents(groupId, cal, type);
+	}
+
+	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getCalendarEvents(
+		long groupId, java.util.Calendar cal, java.lang.String[] types)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCalendarEvents(groupId, cal, types);
+	}
+
 	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getCompanyEvents(
 		long companyId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -466,6 +478,23 @@ public class CalEventLocalServiceUtil {
 		long groupId, java.util.Calendar cal, java.lang.String[] types)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getRepeatingEvents(groupId, cal, types);
+	}
+
+	public static boolean hasCalendarEvents(long groupId, java.util.Calendar cal)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().hasCalendarEvents(groupId, cal);
+	}
+
+	public static boolean hasCalendarEvents(long groupId,
+		java.util.Calendar cal, java.lang.String type)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().hasCalendarEvents(groupId, cal, type);
+	}
+
+	public static boolean hasCalendarEvents(long groupId,
+		java.util.Calendar cal, java.lang.String[] types)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().hasCalendarEvents(groupId, cal, types);
 	}
 
 	public static boolean hasEvents(long groupId, java.util.Calendar cal)

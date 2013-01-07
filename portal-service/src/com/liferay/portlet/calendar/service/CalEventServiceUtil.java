@@ -126,6 +126,20 @@ public class CalEventServiceUtil {
 		return getService().exportGroupEvents(groupId, fileName);
 	}
 
+	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getCalendarEvents(
+		long groupId, java.util.Calendar cal, java.lang.String type)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCalendarEvents(groupId, cal, type);
+	}
+
+	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getCalendarEvents(
+		long groupId, java.util.Calendar cal, java.lang.String[] types)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCalendarEvents(groupId, cal, types);
+	}
+
 	public static com.liferay.portlet.calendar.model.CalEvent getEvent(
 		long eventId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -167,6 +181,26 @@ public class CalEventServiceUtil {
 	public static int getEventsCount(long groupId, java.lang.String[] types)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getEventsCount(groupId, types);
+	}
+
+	public static boolean hasCalendarEvents(long groupId, java.util.Calendar cal)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().hasCalendarEvents(groupId, cal);
+	}
+
+	public static boolean hasCalendarEvents(long groupId,
+		java.util.Calendar cal, java.lang.String type)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().hasCalendarEvents(groupId, cal, type);
+	}
+
+	public static boolean hasCalendarEvents(long groupId,
+		java.util.Calendar cal, java.lang.String[] types)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().hasCalendarEvents(groupId, cal, types);
 	}
 
 	public static boolean hasEvents(long groupId, java.util.Calendar cal)
