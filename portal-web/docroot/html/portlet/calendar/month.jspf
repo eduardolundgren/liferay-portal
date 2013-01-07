@@ -203,12 +203,20 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 				</tr>
 
 				<%
-				List events = CalEventServiceUtil.getEvents(scopeGroupId, tempCal, eventType);
+				List events = CalEventServiceUtil.getCalendarEvents(scopeGroupId, tempCal, eventType);
 
 				events = ListUtil.sort(events, new EventTimeComparator(timeZone, locale));
 
+				Date tempDateMidnight = CalendarUtil.getGTDate(tempCal);
+
 				for (int j = 0; j < events.size(); j++) {
 					CalEvent event = (CalEvent)events.get(j);
+
+					boolean isOverlapping = false;
+
+					if (event.getStartDate().before(tempDateMidnight)) {
+						isOverlapping = true;
+					}
 
 					event = event.toEscapedModel();
 
@@ -226,9 +234,17 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 							<c:if test="<%= !allDay %>">
 								<c:choose>
 									<c:when test="<%= event.isTimeZoneSensitive() %>">
+										<c:if test="<%= isOverlapping %>">
+											<%= dateFormatDate.format(Time.getDate(event.getStartDate(), timeZone)) %>
+										</c:if>
+
 										<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
 									</c:when>
 									<c:otherwise>
+										<c:if test="<%= isOverlapping %>">
+											<%= dateFormatDate.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
+										</c:if>
+
 										<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
 									</c:otherwise>
 								</c:choose>

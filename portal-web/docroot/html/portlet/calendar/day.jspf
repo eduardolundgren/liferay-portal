@@ -109,7 +109,7 @@ dateFormatDate = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMMM d, yyyy", 
 <br />
 
 <%
-List<CalEvent> results = CalEventServiceUtil.getEvents(scopeGroupId, selCal, eventType);
+List<CalEvent> results = CalEventServiceUtil.getCalendarEvents(scopeGroupId, selCal, eventType);
 
 List<CalEvent> allDayResults = new ArrayList<CalEvent>();
 List<CalEvent> partDayResults = new ArrayList<CalEvent>();
@@ -120,36 +120,6 @@ for (CalEvent event : results) {
 	}
 	else {
 		partDayResults.add(event);
-	}
-}
-
-Map<Long, Date> origStartDates = new HashMap<Long, Date>();
-
-Calendar prevCal = (Calendar)selCal.clone();
-
-prevCal.add(Calendar.DAY_OF_MONTH, -1);
-
-List<CalEvent> prevResults = CalEventServiceUtil.getEvents(scopeGroupId, prevCal, eventType);
-
-for (CalEvent event : prevResults) {
-	Date startDate = event.getStartDate();
-
-	if (event.isTimeZoneSensitive()) {
-		startDate = Time.getDate(event.getStartDate(), timeZone);
-	}
-
-	int overlap = ((startDate.getHours() * 60) + startDate.getMinutes() + (event.getDurationHour() * 60) + event.getDurationMinute()) - 1440;
-
-	if (!event.isAllDay() && (overlap > 0)) {
-		CalEvent overLapEvent = (CalEvent)event.clone();
-
-		overLapEvent.setStartDate(CalendarUtil.getGTDate(selCal));
-		overLapEvent.setDurationHour((int)(overlap / 60));
-		overLapEvent.setDurationMinute(overlap % 60);
-
-		partDayResults.add(overLapEvent);
-
-		origStartDates.put(event.getEventId(), startDate);
 	}
 }
 
@@ -268,6 +238,8 @@ if (!partDayResults.isEmpty()) {
 	<%
 	int eventWidth = 90 / (sortedResults.isEmpty() ? 1 : sortedResults.size());
 
+	Date selDateMidnight = CalendarUtil.getGTDate(selCal);
+
 	for (int i = 0; i < sortedResults.size(); i++) {
 		List<CalEvent> displayResults = sortedResults.get(i);
 
@@ -286,14 +258,22 @@ if (!partDayResults.isEmpty()) {
 
 			int eventDisplayDuration = Math.max(50, (event.getDurationHour() * 60) + event.getDurationMinute());
 
+			boolean isOverlapping = false;
+
+			if (startDate.before(selDateMidnight)) {
+				isOverlapping = true;
+
+				eventStartPos = -2;
+
+				long overlapping = startDate.getTime() + (event.getDurationHour() * Time.HOUR) + (event.getDurationMinute() * Time.MINUTE) - selDateMidnight.getTime();
+
+				eventDisplayDuration = (int)Math.max(50, (overlapping / Time.MINUTE));
+			}
+
 			int eventBoxLength = (int)(((eventDisplayDuration / 60) * 50) - 12);
 
 			if ((eventBoxLength + eventStartPos) > 1186) {
 				eventBoxLength -= (eventBoxLength + eventStartPos) - 1186; // = (24 * 50) - 4
-			}
-
-			if (origStartDates.containsKey(event.getEventId())) {
-				startDate = origStartDates.get(event.getEventId());
 			}
 		%>
 
@@ -316,6 +296,10 @@ if (!partDayResults.isEmpty()) {
 					</div>
 
 					<div class="event-time">
+						<c:if test="<%= isOverlapping %>">
+							<%= dateFormatDate.format(startDate) %>
+						</c:if>
+
 						<%= dateFormatTime.format(startDate) %>
 						-
 						<%= dateFormatTime.format(endDate) %>
