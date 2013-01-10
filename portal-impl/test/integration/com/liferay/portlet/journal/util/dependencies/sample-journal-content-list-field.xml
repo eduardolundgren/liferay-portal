@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<root available-locales="en_US" default-locale="en_US">
+	<dynamic-element instance-id="pcm9WPVX" name="select" type="list" index-type="keyword">
+		<dynamic-content language-id="en_US"><![CDATA[a]]></dynamic-content>
+	</dynamic-element>
+	<dynamic-element name="_fieldsDisplay">
+		<dynamic-content language-id="en_US"><![CDATA[select_INSTANCE_pcm9WPVX]]></dynamic-content>
+	</dynamic-element>
+</root>
