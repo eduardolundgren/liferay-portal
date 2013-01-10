@@ -89,7 +89,9 @@
 				for (int i = 0; i < results.getDocs().length; i++) {
 					Document doc = results.doc(i);
 
-					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, portletURL);
+					PortletURL summaryURL = PortletURLUtil.clone(portletURL, renderResponse);
+
+					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, summaryURL);
 
 					ResultRow row = new ResultRow(new Object[] {queryTerms, doc, summary}, i, i);
 
@@ -150,7 +152,11 @@
 		</c:if>
 	</c:when>
 	<c:otherwise>
-		<liferay-ui:journal-content-search />
+		<liferay-ui:journal-content-search
+			showListed="<%= showListed %>"
+			targetPortletId="<%= targetPortletId %>"
+			type="<%= type %>"
+		/>
 	</c:otherwise>
 </c:choose>
 

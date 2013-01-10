@@ -472,6 +472,7 @@ public class SourceFormatter {
 					languageKey.endsWith(StringPool.PERIOD) ||
 					languageKey.endsWith(StringPool.UNDERLINE) ||
 					languageKey.startsWith(StringPool.DASH) ||
+					languageKey.startsWith(StringPool.OPEN_BRACKET) ||
 					languageKey.startsWith(StringPool.PERIOD) ||
 					languageKey.startsWith(StringPool.UNDERLINE)) {
 
@@ -1449,6 +1450,11 @@ public class SourceFormatter {
 			}
 
 			if (line.startsWith("import ")) {
+				if (line.endsWith(".*;")) {
+					_sourceFormatterHelper.printError(
+						fileName, "import: " + fileName + " " + lineCount);
+				}
+
 				int pos = line.lastIndexOf(StringPool.PERIOD);
 
 				if (pos != -1) {
@@ -1877,6 +1883,13 @@ public class SourceFormatter {
 									"line break: " + fileName + " " +
 										lineCount);
 							}
+						}
+
+						if (trimmedLine.startsWith("throws ") &&
+							(lineTabCount == previousLineTabCount)) {
+
+							_sourceFormatterHelper.printError(
+								fileName, "tab: " + fileName + " " + lineCount);
 						}
 
 						combinedLines = _getCombinedLines(

@@ -354,7 +354,9 @@ public class PortletImporter {
 				if (!ArrayUtil.contains(
 						targetAvailableLocales, sourceAvailableLocale)) {
 
-					LocaleException le = new LocaleException();
+					LocaleException le = new LocaleException(
+						"Locale " + sourceAvailableLocale + " is not " +
+							"available in company " + layout.getCompanyId());
 
 					le.setSourceAvailableLocales(sourceAvailableLocales);
 					le.setTargetAvailableLocales(targetAvailableLocales);

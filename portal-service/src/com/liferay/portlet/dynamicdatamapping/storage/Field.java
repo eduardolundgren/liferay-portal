@@ -84,6 +84,17 @@ public class Field implements Serializable {
 		values.add(value);
 	}
 
+	public void addValues(Locale locale, List<Serializable> values) {
+		List<Serializable> existingValues = _valuesMap.get(locale);
+
+		if (existingValues == null) {
+			_valuesMap.put(locale, values);
+		}
+		else {
+			existingValues.addAll(values);
+		}
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Field)) {
@@ -173,7 +184,7 @@ public class Field implements Serializable {
 			boolean repeatable = isRepeatable();
 
 			if (repeatable) {
-				return FieldConstants.getSerializable(getType(), values);
+				return FieldConstants.getSerializable(getDataType(), values);
 			}
 
 			return values.get(0);
@@ -197,6 +208,17 @@ public class Field implements Serializable {
 
 	public Map<Locale, List<Serializable>> getValuesMap() {
 		return _valuesMap;
+	}
+
+	public boolean isPrivate() {
+		try {
+			DDMStructure ddmStructure = getDDMStructure();
+
+			return ddmStructure.isFieldPrivate(_name);
+		}
+		catch (Exception e) {
+			return false;
+		}
 	}
 
 	public boolean isRepeatable() throws PortalException, SystemException {
@@ -265,6 +287,10 @@ public class Field implements Serializable {
 
 		if (!availableLocales.contains(locale)) {
 			locale = getDefaultLocale();
+		}
+
+		if (locale == null) {
+			locale = LocaleUtil.getDefault();
 		}
 
 		return _valuesMap.get(locale);

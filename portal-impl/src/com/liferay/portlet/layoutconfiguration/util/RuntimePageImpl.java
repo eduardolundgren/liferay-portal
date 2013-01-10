@@ -234,21 +234,23 @@ public class RuntimePageImpl implements RuntimePage {
 			TemplateResource templateResource, boolean processTemplate)
 		throws Exception {
 
+		ClassLoader pluginClassLoader = null;
+
 		LayoutTemplate layoutTemplate = getLayoutTemplate(
 			templateResource.getTemplateId());
 
-		String pluginServletContextName = GetterUtil.getString(
-			layoutTemplate.getServletContextName());
+		if (layoutTemplate != null) {
+			String pluginServletContextName = GetterUtil.getString(
+				layoutTemplate.getServletContextName());
 
-		ServletContext pluginServletContext = ServletContextPool.get(
-			pluginServletContextName);
+			ServletContext pluginServletContext = ServletContextPool.get(
+				pluginServletContextName);
 
-		ClassLoader pluginClassLoader = null;
-
-		if (pluginServletContext != null) {
-			pluginClassLoader =
-				(ClassLoader)pluginServletContext.getAttribute(
-					PluginContextListener.PLUGIN_CLASS_LOADER);
+			if (pluginServletContext != null) {
+				pluginClassLoader =
+					(ClassLoader)pluginServletContext.getAttribute(
+						PluginContextListener.PLUGIN_CLASS_LOADER);
+			}
 		}
 
 		ClassLoader contextClassLoader =

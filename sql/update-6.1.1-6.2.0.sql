@@ -325,6 +325,9 @@ create table JournalFolder (
 	description STRING null
 );
 
+drop index IX_228562AD on Lock_;
+drop index IX_DD635956 on Lock_;
+
 alter table MBCategory add status INTEGER;
 alter table MBCategory add statusByUserId LONG;
 alter table MBCategory add statusByUserName VARCHAR(75) null;
@@ -343,6 +346,9 @@ alter table MBMessage drop column attachments;
 
 drop table OrgGroupPermission;
 
+drop index IX_C3A17327 on PasswordPolicyRel;
+drop index IX_ED7CF243 on PasswordPolicyRel;
+
 drop table Permission_;
 
 alter table RepositoryEntry add manualCheckInRequired BOOLEAN;
@@ -350,6 +356,11 @@ alter table RepositoryEntry add manualCheckInRequired BOOLEAN;
 drop table Resource_;
 
 drop table ResourceCode;
+
+drop index IX_88705859 on ResourcePermission;
+drop index IX_C94C7708 on ResourcePermission;
+drop index IX_4A1F4402 on ResourcePermission;
+drop index IX_8DB864A9 on ResourcePermission;
 
 drop table Roles_Permissions;
 

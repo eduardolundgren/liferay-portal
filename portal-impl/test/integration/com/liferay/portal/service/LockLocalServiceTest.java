@@ -142,17 +142,13 @@ public class LockLocalServiceTest {
 						// to unlock many times because some databases like SQL
 						// Server may randomly choke and rollback an unlock.
 
-						boolean reacquireLock = false;
-
 						while (true) {
 							try {
 								LockLocalServiceUtil.unlock(
 									_className, _key, _owner, false);
 
 								if (++count >= _requiredSuccessCount) {
-									reacquireLock = true;
-
-									break;
+									return;
 								}
 
 								break;
@@ -164,12 +160,8 @@ public class LockLocalServiceTest {
 
 								_systemException = se;
 
-								break;
+								return;
 							}
-						}
-
-						if (reacquireLock) {
-							continue;
 						}
 					}
 				}

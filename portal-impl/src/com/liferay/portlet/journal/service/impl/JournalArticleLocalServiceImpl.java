@@ -3541,7 +3541,9 @@ public class JournalArticleLocalServiceImpl
 		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
 
 		if (!ArrayUtil.contains(availableLocales, articleDefaultLocale)) {
-			LocaleException le = new LocaleException();
+			LocaleException le = new LocaleException(
+				"The locale " + articleDefaultLocale +
+					" is not available in company " + companyId);
 
 			Locale[] sourceAvailableLocales = {articleDefaultLocale};
 

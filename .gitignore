@@ -1,9 +1,11 @@
 *~
-*.ant-*
 *.bak
 *.iml
+*.ipr
+*.iws
 *.swp
 .ant_targets
+.ant-targets-build.xml
 .sass-cache/
 .sass_cache_*.css
 _sass_cache_*.css
