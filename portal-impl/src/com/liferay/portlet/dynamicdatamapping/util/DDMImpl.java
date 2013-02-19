@@ -32,11 +32,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeFormatter;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.DuplicateDirectoryException;
@@ -317,13 +315,10 @@ public class DDMImpl implements DDM {
 			return;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		DDMStructure structure = field.getDDMStructure();
 
 		Serializable fieldValue = field.getValue(
-			themeDisplay.getLocale(), valueIndex);
+			LocaleUtil.getDefault(), valueIndex);
 
 		JSONObject fileJSONObject = JSONFactoryUtil.createJSONObject(
 			String.valueOf(fieldValue));
@@ -370,43 +365,38 @@ public class DDMImpl implements DDM {
 		List<String> fieldNames = getFieldNames(
 			fieldNamespace, fieldName, serviceContext);
 
-		List<Serializable> fieldValues = new ArrayList<Serializable>(
-			fieldNames.size());
+		List<Serializable> fieldValues = new ArrayList<Serializable>(1);
 
-		for (String fieldNameValue : fieldNames) {
-			InputStream inputStream = null;
+		InputStream inputStream = null;
 
-			try {
-				String fileName = uploadRequest.getFileName(fieldNameValue);
+		try {
+			String fieldNameValue = fieldNames.get(0);
 
-				inputStream = uploadRequest.getFileAsStream(fieldName, true);
+			String fileName = uploadRequest.getFileName(fieldNameValue);
 
-				if (inputStream != null) {
-					String filePath = storeFieldFile(
-						baseModel, fieldName, inputStream, serviceContext);
+			inputStream = uploadRequest.getFileAsStream(fieldNameValue, true);
 
-					JSONObject recordFileJSONObject =
-						JSONFactoryUtil.createJSONObject();
+			if (inputStream != null) {
+				String filePath = storeFieldFile(
+					baseModel, fieldName, inputStream, serviceContext);
 
-					recordFileJSONObject.put("name", fileName);
-					recordFileJSONObject.put("path", filePath);
-					recordFileJSONObject.put(
-						"className", baseModel.getModelClassName());
-					recordFileJSONObject.put(
-						"classPK",
-						String.valueOf(baseModel.getPrimaryKeyObj()));
+				JSONObject recordFileJSONObject =
+					JSONFactoryUtil.createJSONObject();
 
-					String fieldValue = recordFileJSONObject.toString();
+				recordFileJSONObject.put("name", fileName);
+				recordFileJSONObject.put("path", filePath);
+				recordFileJSONObject.put(
+					"className", baseModel.getModelClassName());
+				recordFileJSONObject.put(
+					"classPK", String.valueOf(baseModel.getPrimaryKeyObj()));
 
-					fieldValues.add(fieldValue);
-				}
-				else if (fields.contains(fieldName)) {
-					continue;
-				}
+				String fieldValue = recordFileJSONObject.toString();
+
+				fieldValues.add(fieldValue);
 			}
-			finally {
-				StreamUtil.cleanUp(inputStream);
-			}
+		}
+		finally {
+			StreamUtil.cleanUp(inputStream);
 		}
 
 		Field field = new Field(
