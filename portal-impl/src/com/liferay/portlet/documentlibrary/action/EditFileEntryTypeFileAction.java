@@ -50,9 +50,9 @@ public class EditFileEntryTypeFileAction extends PortletAction {
 
 	@Override
 	public void processAction(
-		ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
-		ActionRequest actionRequest, ActionResponse actionResponse)
-			throws Exception {
+			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
@@ -65,22 +65,20 @@ public class EditFileEntryTypeFileAction extends PortletAction {
 
 	@Override
 	public ActionForward render(
-		ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
-		RenderRequest renderRequest, RenderResponse renderResponse)
-			throws Exception {
+			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws Exception {
 
 		return mapping.findForward("portlet.document_library.view");
 	}
 
 	protected void deleteFileEntryFieldFile(PortletRequest portletRequest)
-			throws PortalException, SystemException {
+		throws PortalException, SystemException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		long classPK = ParamUtil.getLong(portletRequest, "classPK");
-
-		String fieldName = ParamUtil.getString(portletRequest, "fieldName");
 
 		DLFileEntryMetadata dlFileEntryMetadata =
 			DLFileEntryMetadataLocalServiceUtil.getDLFileEntryMetadata(classPK);
@@ -89,9 +87,9 @@ public class EditFileEntryTypeFileAction extends PortletAction {
 
 		Fields fields = StorageEngineUtil.getFields(storageId);
 
-		if (fields.contains(fieldName)) {
-			fields.remove(fieldName);
-		}
+		String fieldName = ParamUtil.getString(portletRequest, "fieldName");
+
+		fields.remove(fieldName);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			portletRequest);
