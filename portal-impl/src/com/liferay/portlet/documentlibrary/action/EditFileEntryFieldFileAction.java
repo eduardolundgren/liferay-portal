@@ -46,7 +46,7 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @author Dale Shan
  */
-public class EditFileEntryTypeFileAction extends PortletAction {
+public class EditFileEntryFieldFileAction extends PortletAction {
 
 	@Override
 	public void processAction(

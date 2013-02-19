@@ -491,7 +491,7 @@
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
-		<action path="/document_library/edit_file_entry_type_file" type="com.liferay.portlet.documentlibrary.action.EditFileEntryTypeFileAction">
+		<action path="/document_library/edit_file_entry_field_file" type="com.liferay.portlet.documentlibrary.action.EditFileEntryFieldFileAction">
 			<forward name="portlet.document_library.view" path="portlet.document_library.view" />
 		</action>
 

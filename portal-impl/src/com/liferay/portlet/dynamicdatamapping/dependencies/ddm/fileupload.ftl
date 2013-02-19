@@ -25,7 +25,7 @@
 			<#if className == "com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata">
 				<a href="javascript:submitForm(document.hrefFm,
 					'<@liferay_portlet.actionURL>
-						<@liferay_portlet.param name="struts_action" value="/document_library/edit_file_entry_type_file" />
+						<@liferay_portlet.param name="struts_action" value="/document_library/edit_file_entry_field_file" />
 						<@liferay_portlet.param name="cmd" value="delete" />
 						<@liferay_portlet.param name="classPK" value=classPK />
 						<@liferay_portlet.param name="fieldName" value=fieldName />
