@@ -32,19 +32,16 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeFormatter;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.DuplicateDirectoryException;
-import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadataModel;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
+import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordModel;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
@@ -317,13 +314,10 @@ public class DDMImpl implements DDM {
 			return;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		DDMStructure structure = field.getDDMStructure();
 
 		Serializable fieldValue = field.getValue(
-			themeDisplay.getLocale(), valueIndex);
+			LocaleUtil.getDefault(), valueIndex);
 
 		JSONObject fileJSONObject = JSONFactoryUtil.createJSONObject(
 			String.valueOf(fieldValue));
@@ -370,43 +364,38 @@ public class DDMImpl implements DDM {
 		List<String> fieldNames = getFieldNames(
 			fieldNamespace, fieldName, serviceContext);
 
-		List<Serializable> fieldValues = new ArrayList<Serializable>(
-			fieldNames.size());
+		List<Serializable> fieldValues = new ArrayList<Serializable>(1);
 
-		for (String fieldNameValue : fieldNames) {
-			InputStream inputStream = null;
+		InputStream inputStream = null;
 
-			try {
-				String fileName = uploadRequest.getFileName(fieldNameValue);
+		try {
+			String fieldNameValue = fieldNames.get(0);
 
-				inputStream = uploadRequest.getFileAsStream(fieldName, true);
+			String fileName = uploadRequest.getFileName(fieldNameValue);
 
-				if (inputStream != null) {
-					String filePath = storeFieldFile(
-						baseModel, fieldName, inputStream, serviceContext);
+			inputStream = uploadRequest.getFileAsStream(fieldNameValue, true);
 
-					JSONObject recordFileJSONObject =
-						JSONFactoryUtil.createJSONObject();
+			if (inputStream != null) {
+				String filePath = storeFieldFile(
+					baseModel, fieldName, inputStream, serviceContext);
 
-					recordFileJSONObject.put("name", fileName);
-					recordFileJSONObject.put("path", filePath);
-					recordFileJSONObject.put(
-						"className", baseModel.getModelClassName());
-					recordFileJSONObject.put(
-						"classPK",
-						String.valueOf(baseModel.getPrimaryKeyObj()));
+				JSONObject recordFileJSONObject =
+					JSONFactoryUtil.createJSONObject();
 
-					String fieldValue = recordFileJSONObject.toString();
+				recordFileJSONObject.put("name", fileName);
+				recordFileJSONObject.put("path", filePath);
+				recordFileJSONObject.put(
+					"className", baseModel.getModelClassName());
+				recordFileJSONObject.put(
+					"classPK", String.valueOf(baseModel.getPrimaryKeyObj()));
 
-					fieldValues.add(fieldValue);
-				}
-				else if (fields.contains(fieldName)) {
-					continue;
-				}
+				String fieldValue = recordFileJSONObject.toString();
+
+				fieldValues.add(fieldValue);
 			}
-			finally {
-				StreamUtil.cleanUp(inputStream);
-			}
+		}
+		finally {
+			StreamUtil.cleanUp(inputStream);
 		}
 
 		Field field = new Field(
@@ -559,27 +548,36 @@ public class DDMImpl implements DDM {
 	protected String storeFieldFile(
 			BaseModel<?> baseModel, String fieldName, InputStream inputStream,
 			ServiceContext serviceContext)
-		throws Exception {
+		throws PortalException, SystemException {
+
+		long companyId = serviceContext.getCompanyId();
+
+		// Add directory
 
 		String dirName = getFileUploadPath(baseModel);
 
-		try {
+		if (!DLStoreUtil.hasDirectory(
+			companyId, CompanyConstants.SYSTEM, dirName)) {
+
 			DLStoreUtil.addDirectory(
-				serviceContext.getCompanyId(), CompanyConstants.SYSTEM,
-				dirName);
+				companyId, CompanyConstants.SYSTEM, dirName);
 		}
-		catch (DuplicateDirectoryException dde) {
-		}
+
+		// Add file
 
 		String fileName = dirName + StringPool.SLASH + fieldName;
 
-		try {
-			DLStoreUtil.addFile(
-				serviceContext.getCompanyId(), CompanyConstants.SYSTEM,
-				fileName, inputStream);
+		if (DLStoreUtil.hasFile(
+			companyId, CompanyConstants.SYSTEM, fileName,
+			Store.VERSION_DEFAULT)) {
+
+			DLStoreUtil.deleteFile(
+				companyId, CompanyConstants.SYSTEM, fileName,
+				Store.VERSION_DEFAULT);
 		}
-		catch (DuplicateFileException dfe) {
-		}
+
+		DLStoreUtil.addFile(
+			companyId, CompanyConstants.SYSTEM, fileName, inputStream);
 
 		return fileName;
 	}
