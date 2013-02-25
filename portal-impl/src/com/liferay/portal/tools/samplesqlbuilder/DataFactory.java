@@ -120,16 +120,12 @@ public class DataFactory {
 
 	public DataFactory(
 		String baseDir, int maxGroupsCount, int maxJournalArticleSize,
-		int maxMBCategoryCount, int maxMBThreadCount, int maxMBMessageCount,
 		int maxUserToGroupCount) {
 
 		try {
 			_baseDir = baseDir;
 			_maxGroupsCount = maxGroupsCount;
 			_maxUserToGroupCount = maxUserToGroupCount;
-			_maxMBCategoryCount = maxMBCategoryCount;
-			_maxMBThreadCount = maxMBThreadCount;
-			_maxMBMessageCount = maxMBMessageCount;
 
 			initSimpleCounters();
 
@@ -1148,9 +1144,6 @@ public class DataFactory {
 	private String _journalArticleContent;
 	private List<String> _lastNames;
 	private int _maxGroupsCount;
-	private int _maxMBCategoryCount;
-	private int _maxMBMessageCount;
-	private int _maxMBThreadCount;
 	private int _maxUserToGroupCount;
 	private long _mbMessageClassNameId;
 	private Role _organizationAdministratorRole;
