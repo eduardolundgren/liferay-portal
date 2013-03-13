@@ -379,13 +379,12 @@ public class DDMImpl implements DDM {
 				inputStream = uploadRequest.getFileAsStream(
 					fieldNameValue, true);
 
-				if (Validator.isNull(fileName) && (inputStream == null)) {
+				if ((inputStream == null) && Validator.isNull(fileName)) {
 					Field field = fields.get(fieldName);
 
 					if (field != null) {
-						Locale locale = PortalUtil.getLocale(request);
-
-						Serializable fieldValue = field.getValue(locale);
+						Serializable fieldValue = field.getValue(
+							serviceContext.getLocale());
 
 						JSONObject fileJSONObject =
 							JSONFactoryUtil.createJSONObject(
