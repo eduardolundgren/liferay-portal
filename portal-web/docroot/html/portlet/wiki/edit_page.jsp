@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -280,9 +280,21 @@ if (Validator.isNull(redirect)) {
 			<c:if test="<%= wikiPage != null %>">
 				<liferay-ui:custom-attributes-available className="<%= WikiPage.class.getName() %>">
 					<aui:fieldset>
+
+						<%
+						long classPK = 0;
+
+						if (templatePage != null) {
+							classPK = templatePage.getPrimaryKey();
+						}
+						else if (page != null) {
+							classPK = wikiPage.getPrimaryKey();
+						}
+						%>
+
 						<liferay-ui:custom-attribute-list
 							className="<%= WikiPage.class.getName() %>"
-							classPK="<%= (page != null) ? wikiPage.getPrimaryKey() : 0 %>"
+							classPK="<%= classPK %>"
 							editable="<%= true %>"
 							label="<%= true %>"
 						/>

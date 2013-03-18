@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,7 +44,6 @@ import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 
 import java.io.File;
@@ -110,6 +109,8 @@ public class SampleSQLBuilder {
 			arguments.get("sample.sql.max.journal.article.count"));
 		_maxJournalArticleSize = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.journal.article.size"));
+		_maxJournalArticleVersionCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.journal.article.version.count"));
 		_maxMBCategoryCount = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.mb.category.count"));
 		_maxMBMessageCount = GetterUtil.getInteger(
@@ -133,8 +134,9 @@ public class SampleSQLBuilder {
 			arguments.get("sample.sql.output.merge"));
 
 		_dataFactory = new DataFactory(
-			baseDir, _maxGroupCount, _maxJournalArticleSize,
-			_maxUserToGroupCount);
+			baseDir, _maxBlogsEntryCount, _maxGroupCount,
+			_maxJournalArticleSize, _maxMBCategoryCount, _maxMBThreadCount,
+			_maxMBMessageCount, _maxUserToGroupCount);
 
 		_db = DBFactoryUtil.getDB(_dbType);
 
@@ -224,51 +226,58 @@ public class SampleSQLBuilder {
 		processTemplate(_tplDLFolders, context);
 	}
 
-	public void insertDLFileEntry(
-			DLFileEntry dlFileEntry, DDMStructure ddmStructure)
+	public void insertDLFileEntry(DLFileEntry dlFileEntry, long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFileEntry", dlFileEntry);
 
 		processTemplate(_tplDLFileEntry, context);
 	}
 
-	public void insertDLFolder(DLFolder dlFolder, DDMStructure ddmStructure)
+	public void insertDLFolder(DLFolder dlFolder, long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFolder", dlFolder);
 
 		processTemplate(_tplDLFolder, context);
 	}
 
 	public void insertDLFolders(
-			long parentDLFolderId, int dlFolderDepth, DDMStructure ddmStructure)
+			long groupId, long parentDLFolderId, int dlFolderDepth,
+			long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFolderDepth", dlFolderDepth);
+		put(context, "groupId", groupId);
 		put(context, "parentDLFolderId", parentDLFolderId);
 
 		processTemplate(_tplDLFolders, context);
 	}
 
-	public void insertGroup(Group group, List<Layout> publicLayouts)
-		throws Exception {
-
+	public void insertGroup(Group group, int publicPageCount) throws Exception {
 		Map<String, Object> context = getContext();
 
 		put(context, "group", group);
-		put(context, "publicLayouts", publicLayouts);
+		put(context, "publicPageCount", publicPageCount);
 
 		processTemplate(_tplGroup, context);
+	}
+
+	public void insertLayout(Layout layout) throws Exception {
+		Map<String, Object> context = getContext();
+
+		put(context, "layout", layout);
+
+		processTemplate(_tplLayout, context);
 	}
 
 	public void insertMBCategory(MBCategory mbCategory) throws Exception {
@@ -280,14 +289,13 @@ public class SampleSQLBuilder {
 	}
 
 	public void insertMBDiscussion(
-			long groupId, long userId, long classNameId, long classPK,
-			long mbThreadId, long mbRootMessageId, int maxCommentCount)
+			long groupId, long classNameId, long classPK, long mbThreadId,
+			long mbRootMessageId, int maxCommentCount)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
 		put(context, "groupId", groupId);
-		put(context, "userId", userId);
 		put(context, "classNameId", classNameId);
 		put(context, "classPK", classPK);
 		put(context, "mbThreadId", mbThreadId);
@@ -328,12 +336,9 @@ public class SampleSQLBuilder {
 		processTemplate(_tplUser, context);
 	}
 
-	public void insertWikiPage(WikiNode wikiNode, WikiPage wikiPage)
-		throws Exception {
-
+	public void insertWikiPage(WikiPage wikiPage) throws Exception {
 		Map<String, Object> context = getContext();
 
-		put(context, "wikiNode", wikiNode);
 		put(context, "wikiPage", wikiPage);
 
 		processTemplate(_tplWikiPage, context);
@@ -486,7 +491,6 @@ public class SampleSQLBuilder {
 		put(context, "counter", _dataFactory.getCounter());
 		put(context, "dataFactory", _dataFactory);
 		put(context, "dateUtil", DateUtil_IW.getInstance());
-		put(context, "defaultUserId", _dataFactory.getDefaultUserId());
 		put(context, "maxDLFileEntrySize", _maxDLFileEntrySize);
 		put(context, "maxBlogsEntryCommentCount", _maxBlogsEntryCommentCount);
 		put(context, "maxBlogsEntryCount", _maxBlogsEntryCount);
@@ -497,6 +501,9 @@ public class SampleSQLBuilder {
 		put(context, "maxDLFolderDepth", _maxDLFolderDepth);
 		put(context, "maxGroupCount", _maxGroupCount);
 		put(context, "maxJournalArticleCount", _maxJournalArticleCount);
+		put(
+			context, "maxJournalArticleVersionCount",
+			_maxJournalArticleVersionCount);
 		put(context, "maxMBCategoryCount", _maxMBCategoryCount);
 		put(context, "maxMBMessageCount", _maxMBMessageCount);
 		put(context, "maxMBThreadCount", _maxMBThreadCount);
@@ -649,6 +656,7 @@ public class SampleSQLBuilder {
 	private int _maxGroupCount;
 	private int _maxJournalArticleCount;
 	private int _maxJournalArticleSize;
+	private int _maxJournalArticleVersionCount;
 	private int _maxMBCategoryCount;
 	private int _maxMBMessageCount;
 	private int _maxMBThreadCount;
@@ -668,6 +676,7 @@ public class SampleSQLBuilder {
 	private String _tplDLFolder = _TPL_ROOT + "dl_folder.ftl";
 	private String _tplDLFolders = _TPL_ROOT + "dl_folders.ftl";
 	private String _tplGroup = _TPL_ROOT + "group.ftl";
+	private String _tplLayout = _TPL_ROOT + "layout.ftl";
 	private String _tplMBCategory = _TPL_ROOT + "mb_category.ftl";
 	private String _tplMBDiscussion = _TPL_ROOT + "mb_discussion.ftl";
 	private String _tplMBMessage = _TPL_ROOT + "mb_message.ftl";;

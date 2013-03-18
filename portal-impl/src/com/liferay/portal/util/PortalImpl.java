@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.cluster.ClusterInvokeThreadLocal;
+import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.HttpMethods;
+import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.PersistentHttpServletRequestWrapper;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
@@ -72,6 +74,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringComparator;
@@ -1140,7 +1143,7 @@ public class PortalImpl implements Portal {
 	}
 
 	/**
-	 * @deprecated {@link #getCDNHost(boolean)}
+	 * @deprecated As of 6.1.0, replaced by {@link #getCDNHost(boolean)}
 	 */
 	public String getCDNHost() {
 		long companyId = CompanyThreadLocal.getCompanyId();
@@ -3070,7 +3073,7 @@ public class PortalImpl implements Portal {
 	}
 
 	/**
-	 * @deprecated {@link #getPortalPort(boolean)}
+	 * @deprecated As of 6.1.0, replaced by {@link #getPortalPort(boolean)}
 	 */
 	public int getPortalPort() {
 		return _portalPort.get();
@@ -3212,7 +3215,8 @@ public class PortalImpl implements Portal {
 	}
 
 	/**
-	 * @deprecated {@link #getPortletBreadcrumbs(HttpServletRequest)}
+	 * @deprecated As of 6.1.0, replaced by {@link
+	 *             #getPortletBreadcrumbs(HttpServletRequest)}
 	 */
 	public List<BreadcrumbEntry> getPortletBreadcrumbList(
 		HttpServletRequest request) {
@@ -4216,6 +4220,11 @@ public class PortalImpl implements Portal {
 					// This block should never be reached unless this method is
 					// called from a hot deployable portlet. See LayoutAction.
 
+					if (ServerDetector.isWebLogic()) {
+						parentRequest = new NonSerializableObjectRequestWrapper(
+							parentRequest);
+					}
+
 					uploadServletRequest = new UploadServletRequestImpl(
 						parentRequest);
 
@@ -4314,9 +4323,11 @@ public class PortalImpl implements Portal {
 			userId = GetterUtil.getLong(remoteUser);
 		}
 
-		user = UserLocalServiceUtil.getUserById(userId);
+		if (userId > 0) {
+			user = UserLocalServiceUtil.getUserById(userId);
 
-		request.setAttribute(WebKeys.USER, user);
+			request.setAttribute(WebKeys.USER, user);
+		}
 
 		return user;
 	}
@@ -5548,6 +5559,10 @@ public class PortalImpl implements Portal {
 		}
 
 		return StringUtil.replace(sql, _customSqlKeys, _customSqlValues);
+	}
+
+	public String transformSQL(String sql) {
+		return SQLTransformer.transform(sql);
 	}
 
 	public PortletMode updatePortletMode(

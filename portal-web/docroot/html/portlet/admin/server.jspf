@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -887,6 +887,14 @@ serverURL.setParameter("tabs3", tabs3);
 							</td>
 							<td>
 								<input onClick="<portlet:namespace />saveServer('verifyPluginTables');" type="button" value="<liferay-ui:message key="execute" />" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<liferay-ui:message key="verify-membership-policies" />
+							</td>
+							<td>
+								<input onClick="<portlet:namespace />saveServer('verifyMembershipPolicies');" type="button" value="<liferay-ui:message key="execute" />" />
 							</td>
 						</tr>
 						<tr>

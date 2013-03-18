@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.captcha.Captcha;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
 import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
-import com.liferay.portal.kernel.cluster.ClusterLinkUtil;
+import com.liferay.portal.kernel.cluster.ClusterLink;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.dao.shard.ShardUtil;
@@ -76,6 +76,14 @@ import com.liferay.portal.search.lucene.LuceneHelperUtil;
 import com.liferay.portal.search.lucene.LuceneIndexer;
 import com.liferay.portal.search.lucene.cluster.LuceneClusterUtil;
 import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.security.membershippolicy.OrganizationMembershipPolicy;
+import com.liferay.portal.security.membershippolicy.OrganizationMembershipPolicyFactoryUtil;
+import com.liferay.portal.security.membershippolicy.RoleMembershipPolicy;
+import com.liferay.portal.security.membershippolicy.RoleMembershipPolicyFactoryUtil;
+import com.liferay.portal.security.membershippolicy.SiteMembershipPolicy;
+import com.liferay.portal.security.membershippolicy.SiteMembershipPolicyFactoryUtil;
+import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicy;
+import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyFactoryUtil;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ServiceComponentLocalServiceUtil;
@@ -213,6 +221,9 @@ public class EditServerAction extends PortletAction {
 		}
 		else if (cmd.equals("updateMail")) {
 			updateMail(actionRequest, preferences);
+		}
+		else if (cmd.equals("verifyMembershipPolicies")) {
+			verifyMembershipPolicies();
 		}
 		else if (cmd.equals("verifyPluginTables")) {
 			verifyPluginTables();
@@ -360,7 +371,7 @@ public class EditServerAction extends PortletAction {
 
 		if (LuceneHelperUtil.isLoadIndexFromClusterEnabled()) {
 			MessageValuesThreadLocal.setValue(
-				ClusterLinkUtil.CLUSTER_FORWARD_MESSAGE, true);
+				ClusterLink.CLUSTER_FORWARD_MESSAGE, true);
 		}
 
 		Set<String> usedSearchEngineIds = new HashSet<String>();
@@ -867,6 +878,29 @@ public class EditServerAction extends PortletAction {
 		else if (Validator.isNull(reCaptchaPrivateKey)) {
 			SessionErrors.add(actionRequest, "reCaptchaPrivateKey");
 		}
+	}
+
+	protected void verifyMembershipPolicies() throws Exception {
+		OrganizationMembershipPolicy organizationMembershipPolicy =
+			OrganizationMembershipPolicyFactoryUtil.
+				getOrganizationMembershipPolicy();
+
+		organizationMembershipPolicy.verifyPolicy();
+
+		RoleMembershipPolicy roleMembershipPolicy =
+			RoleMembershipPolicyFactoryUtil.getRoleMembershipPolicy();
+
+		roleMembershipPolicy.verifyPolicy();
+
+		SiteMembershipPolicy siteMembershipPolicy =
+			SiteMembershipPolicyFactoryUtil.getSiteMembershipPolicy();
+
+		siteMembershipPolicy.verifyPolicy();
+
+		UserGroupMembershipPolicy userGroupMembershipPolicy =
+			UserGroupMembershipPolicyFactoryUtil.getUserGroupMembershipPolicy();
+
+		userGroupMembershipPolicy.verifyPolicy();
 	}
 
 	protected void verifyPluginTables() throws Exception {

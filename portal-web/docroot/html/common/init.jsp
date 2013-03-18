@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,7 +91,6 @@ page import="com.liferay.portal.kernel.staging.LayoutStagingUtil" %><%@
 page import="com.liferay.portal.kernel.template.StringTemplateResource" %><%@
 page import="com.liferay.portal.kernel.upload.UploadException" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
-page import="com.liferay.portal.kernel.util.BooleanWrapper" %><%@
 page import="com.liferay.portal.kernel.util.CalendarFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.CalendarUtil" %><%@
 page import="com.liferay.portal.kernel.util.CharPool" %><%@
@@ -100,7 +99,6 @@ page import="com.liferay.portal.kernel.util.ContentTypes" %><%@
 page import="com.liferay.portal.kernel.util.CookieKeys" %><%@
 page import="com.liferay.portal.kernel.util.DateUtil" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
-page import="com.liferay.portal.kernel.util.FileUtil" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.Http" %><%@
@@ -189,6 +187,7 @@ page import="com.liferay.portlet.RenderRequestImpl" %><%@
 page import="com.liferay.portlet.RenderResponseFactory" %><%@
 page import="com.liferay.portlet.RenderResponseImpl" %><%@
 page import="com.liferay.portlet.portletconfiguration.util.PortletConfigurationUtil" %><%@
+page import="com.liferay.portlet.sites.util.Sites" %><%@
 page import="com.liferay.portlet.sites.util.SitesUtil" %><%@
 page import="com.liferay.taglib.util.OutputTag" %><%@
 page import="com.liferay.util.ContentUtil" %><%@

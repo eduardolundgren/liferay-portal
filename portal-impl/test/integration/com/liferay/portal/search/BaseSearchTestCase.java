@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.model.BaseModel;
@@ -69,6 +70,11 @@ public abstract class BaseSearchTestCase {
 	}
 
 	@Test
+	public void testSearchByDDMStructureField() throws Exception {
+		searchByDDMStructureField();
+	}
+
+	@Test
 	public void testSearchByKeywords() throws Exception {
 		searchByKeywords();
 	}
@@ -77,6 +83,35 @@ public abstract class BaseSearchTestCase {
 	@Transactional
 	public void testSearchComments() throws Exception {
 		searchComments();
+	}
+
+	@Test
+	@Transactional
+	public void testSearchExpireAllVersions() throws Exception {
+		searchExpireVersions(false);
+	}
+
+	@Test
+	@Transactional
+	public void testSearchExpireLatestVersion() throws Exception {
+		searchExpireVersions(true);
+	}
+
+	@Test
+	@Transactional
+	public void testSearchStatus() throws Exception {
+		searchStatus();
+	}
+
+	@Test
+	@Transactional
+	public void testSearchVersions() throws Exception {
+		searchVersions();
+	}
+
+	@Test
+	public void testSearchWithinDDMStructure() throws Exception {
+		searchWithinDDMStructure();
 	}
 
 	protected void addAttachment(ClassedModel classedModel) throws Exception {
@@ -100,6 +135,14 @@ public abstract class BaseSearchTestCase {
 		finally {
 			WorkflowThreadLocal.setEnabled(workflowEnabled);
 		}
+	}
+
+	protected BaseModel<?> addBaseModelWithDDMStructure(
+			BaseModel<?> parentBaseModel, String keywords,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		return addBaseModel(parentBaseModel, true, keywords, serviceContext);
 	}
 
 	protected abstract BaseModel<?> addBaseModelWithWorkflow(
@@ -127,6 +170,12 @@ public abstract class BaseSearchTestCase {
 			message.getMessageId(), message.getSubject(), body, serviceContext);
 	}
 
+	protected void expireBaseModelVersions(
+			BaseModel<?> baseModel, boolean expireAllVersions,
+			ServiceContext serviceContext)
+		throws Exception {
+	}
+
 	protected abstract Class<?> getBaseModelClass();
 
 	protected String getBaseModelClassName() {
@@ -139,6 +188,10 @@ public abstract class BaseSearchTestCase {
 		return (Long)classedModel.getPrimaryKeyObj();
 	}
 
+	protected String getDDMStructureFieldName() {
+		return StringPool.BLANK;
+	}
+
 	protected BaseModel<?> getParentBaseModel(
 			Group group, ServiceContext serviceContext)
 		throws Exception {
@@ -147,6 +200,10 @@ public abstract class BaseSearchTestCase {
 	}
 
 	protected abstract String getSearchKeywords();
+
+	protected boolean isExpirableAllVersions() {
+		return false;
+	}
 
 	protected void searchAttachments() throws Exception {
 		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
@@ -211,11 +268,49 @@ public abstract class BaseSearchTestCase {
 
 		Indexer indexer = IndexerRegistryUtil.getIndexer(clazz);
 
-		searchContext.setGroupIds(new long[]{groupId});
+		searchContext.setGroupIds(new long[] {groupId});
 
 		Hits results = indexer.search(searchContext);
 
 		return results.getLength();
+	}
+
+	protected int searchBaseModelsCount(
+			Class<?> clazz, long groupId, String keywords,
+			SearchContext searchContext)
+		throws Exception {
+
+		searchContext.setKeywords(keywords);
+
+		return searchBaseModelsCount(clazz, groupId, searchContext);
+	}
+
+	protected void searchByDDMStructureField() throws Exception {
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		SearchContext searchContext = ServiceTestUtil.getSearchContext(
+			group.getGroupId());
+
+		int initialBaseModelsSearchCount = searchBaseModelsCount(
+			getBaseModelClass(), group.getGroupId(), searchContext);
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		baseModel = addBaseModelWithDDMStructure(
+			parentBaseModel, getSearchKeywords(), serviceContext);
+
+		searchContext.setAttribute(
+			"ddmStructureFieldName", getDDMStructureFieldName());
+		searchContext.setAttribute(
+			"ddmStructureFieldValue", getSearchKeywords());
+
+		Assert.assertEquals(
+			initialBaseModelsSearchCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
 	}
 
 	protected void searchByKeywords() throws Exception {
@@ -232,7 +327,7 @@ public abstract class BaseSearchTestCase {
 			getBaseModelClass(), group.getGroupId(), searchContext);
 
 		BaseModel<?> parentBaseModel = getParentBaseModel(
-					group, serviceContext);
+			group, serviceContext);
 
 		baseModel = addBaseModel(
 			parentBaseModel, true, getSearchKeywords(), serviceContext);
@@ -274,6 +369,191 @@ public abstract class BaseSearchTestCase {
 			initialBaseModelsSearchCount + 2,
 			searchBaseModelsCount(
 				getBaseModelClass(), group.getGroupId(), searchContext));
+	}
+
+	protected void searchExpireVersions(boolean expireAllVersions)
+		throws Exception {
+
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		SearchContext searchContext = ServiceTestUtil.getSearchContext(
+			group.getGroupId());
+
+		searchContext.setKeywords(getSearchKeywords());
+
+		int initialBaseModelsCount = searchBaseModelsCount(
+			getBaseModelClass(), group.getGroupId(), searchContext);
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		baseModel = addBaseModel(
+			parentBaseModel, true, getSearchKeywords(), serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+
+		baseModel = updateBaseModel(baseModel, "liferay", serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+
+		expireBaseModelVersions(baseModel, expireAllVersions, serviceContext);
+
+		if (expireAllVersions && isExpirableAllVersions()) {
+			Assert.assertEquals(
+				initialBaseModelsCount,
+				searchBaseModelsCount(
+					getBaseModelClass(), group.getGroupId(), searchContext));
+		}
+		else {
+			Assert.assertEquals(
+				initialBaseModelsCount + 1,
+				searchBaseModelsCount(
+					getBaseModelClass(), group.getGroupId(), searchContext));
+		}
+	}
+
+	protected void searchStatus() throws Exception {
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		SearchContext searchContext = ServiceTestUtil.getSearchContext(
+			group.getGroupId());
+
+		int initialBaseModelsCount = searchBaseModelsCount(
+			getBaseModelClass(), group.getGroupId(), "1.0", searchContext);
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		baseModel = addBaseModel(
+			parentBaseModel, false, "Version 1.0", serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+
+		baseModel = updateBaseModel(baseModel, "Version 1.1", serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), "1.0", searchContext));
+		Assert.assertEquals(
+			initialBaseModelsCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), "1.1", searchContext));
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		baseModel = updateBaseModel(baseModel, "Version 1.2", serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), "1.1", searchContext));
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), "1.2", searchContext));
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+
+		baseModel = updateBaseModel(baseModel, "Version 1.3", serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), "1.2", searchContext));
+		Assert.assertEquals(
+			initialBaseModelsCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), "1.3", searchContext));
+	}
+
+	protected void searchVersions() throws Exception {
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		SearchContext searchContext = ServiceTestUtil.getSearchContext(
+			group.getGroupId());
+
+		searchContext.setKeywords(getSearchKeywords());
+
+		int initialBaseModelsCount = searchBaseModelsCount(
+			getBaseModelClass(), group.getGroupId(), searchContext);
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		baseModel = addBaseModel(
+			parentBaseModel, true, getSearchKeywords(), serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+
+		baseModel = updateBaseModel(baseModel, "liferay", serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+
+		baseModel = updateBaseModel(baseModel, "portal", serviceContext);
+
+		searchContext.setKeywords("portal");
+
+		Assert.assertEquals(
+			initialBaseModelsCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+	}
+
+	protected void searchWithinDDMStructure() throws Exception {
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		SearchContext searchContext = ServiceTestUtil.getSearchContext(
+			group.getGroupId());
+
+		searchContext.setKeywords(getSearchKeywords());
+
+		int initialBaseModelsSearchCount = searchBaseModelsCount(
+			getBaseModelClass(), group.getGroupId(), searchContext);
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		baseModel = addBaseModelWithDDMStructure(
+			parentBaseModel,  getSearchKeywords(), serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsSearchCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+	}
+
+	protected BaseModel<?> updateBaseModel(
+			BaseModel<?> baseModel, String keywords,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		return baseModel;
 	}
 
 	protected BaseModel<?> baseModel;

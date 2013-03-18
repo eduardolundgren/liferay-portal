@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,7 +68,7 @@ String url = (String)request.getAttribute("liferay-ui:app-view-search-entry:url"
 				<liferay-ui:icon
 					image='<%= (Validator.isNotNull(containerIcon)) ? containerIcon : "folder" %>'
 					label="<%= true %>"
-					message='<%= LanguageUtil.format(locale, "found-in-x-x", new String[]{containerType, containerName}) %>'
+					message='<%= LanguageUtil.format(locale, "found-in-x-x", new String[] {containerType, containerName}) %>'
 				/>
 			</span>
 		</c:if>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,8 @@ import java.util.ResourceBundle;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -291,6 +293,25 @@ public class LocalizationImpl implements Localization {
 	}
 
 	public Map<Locale, String> getLocalizationMap(
+		HttpServletRequest request, String parameter) {
+
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+
+		Map<Locale, String> map = new HashMap<Locale, String>();
+
+		for (Locale locale : locales) {
+			String languageId = LocaleUtil.toLanguageId(locale);
+
+			String localeParameter = parameter.concat(
+				StringPool.UNDERLINE).concat(languageId);
+
+			map.put(locale, ParamUtil.getString(request, localeParameter));
+		}
+
+		return map;
+	}
+
+	public Map<Locale, String> getLocalizationMap(
 		PortletPreferences preferences, String parameter) {
 
 		Locale[] locales = LanguageUtil.getAvailableLocales();
@@ -332,6 +353,12 @@ public class LocalizationImpl implements Localization {
 	}
 
 	public Map<Locale, String> getLocalizationMap(String xml) {
+		return getLocalizationMap(xml, false);
+	}
+
+	public Map<Locale, String> getLocalizationMap(
+		String xml, boolean useDefault) {
+
 		Locale[] locales = LanguageUtil.getAvailableLocales();
 
 		Map<Locale, String> map = new HashMap<Locale, String>();
@@ -339,7 +366,7 @@ public class LocalizationImpl implements Localization {
 		for (Locale locale : locales) {
 			String languageId = LocaleUtil.toLanguageId(locale);
 
-			map.put(locale, getLocalization(xml, languageId, false));
+			map.put(locale, getLocalization(xml, languageId, useDefault));
 		}
 
 		return map;

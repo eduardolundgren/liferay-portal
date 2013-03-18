@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -431,10 +431,12 @@ public class DLFolderServiceSoap {
 		}
 	}
 
-	public static void unlockFolder(long groupId, long folderId,
-		java.lang.String lockUuid) throws RemoteException {
+	public static void unlockFolder(long groupId, long parentFolderId,
+		java.lang.String name, java.lang.String lockUuid)
+		throws RemoteException {
 		try {
-			DLFolderServiceUtil.unlockFolder(groupId, folderId, lockUuid);
+			DLFolderServiceUtil.unlockFolder(groupId, parentFolderId, name,
+				lockUuid);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -443,12 +445,10 @@ public class DLFolderServiceSoap {
 		}
 	}
 
-	public static void unlockFolder(long groupId, long parentFolderId,
-		java.lang.String name, java.lang.String lockUuid)
+	public static void unlockFolder(long folderId, java.lang.String lockUuid)
 		throws RemoteException {
 		try {
-			DLFolderServiceUtil.unlockFolder(groupId, parentFolderId, name,
-				lockUuid);
+			DLFolderServiceUtil.unlockFolder(folderId, lockUuid);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

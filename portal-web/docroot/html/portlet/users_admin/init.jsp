@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,10 @@ page import="com.liferay.portal.UserPortraitSizeException" %><%@
 page import="com.liferay.portal.UserScreenNameException" %><%@
 page import="com.liferay.portal.UserSmsException" %><%@
 page import="com.liferay.portal.WebsiteURLException" %><%@
-page import="com.liferay.portal.security.auth.MembershipPolicyUtil" %><%@
+page import="com.liferay.portal.security.membershippolicy.OrganizationMembershipPolicyUtil" %><%@
+page import="com.liferay.portal.security.membershippolicy.RoleMembershipPolicyUtil" %><%@
+page import="com.liferay.portal.security.membershippolicy.SiteMembershipPolicyUtil" %><%@
+page import="com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyUtil" %><%@
 page import="com.liferay.portal.service.permission.OrganizationPermissionUtil" %><%@
 page import="com.liferay.portal.service.permission.UserPermissionUtil" %><%@
 page import="com.liferay.portlet.announcements.model.AnnouncementsDelivery" %><%@
@@ -64,7 +67,6 @@ page import="com.liferay.portlet.rolesadmin.search.OrganizationRoleChecker" %><%
 page import="com.liferay.portlet.rolesadmin.search.UserGroupRoleChecker" %><%@
 page import="com.liferay.portlet.rolesadmin.search.UserRoleChecker" %><%@
 page import="com.liferay.portlet.rolesadmin.util.RolesAdminUtil" %><%@
-page import="com.liferay.portlet.usergroupsadmin.search.UserGroupGroupChecker" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupSearch" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupSearchTerms" %><%@
 page import="com.liferay.portlet.usersadmin.search.GroupDisplayTerms" %><%@

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -113,8 +113,8 @@ public interface GroupService extends BaseService {
 	information was invalid, if a layout could not be found, or
 	if a valid friendly URL could not be created for the group
 	* @throws SystemException if a system exception occurred
-	* @deprecated {@link #addGroup(long, long, String, String, int, String,
-	boolean, boolean, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #addGroup(long, long, String,
+	String, int, String, boolean, boolean, ServiceContext)}
 	*/
 	public com.liferay.portal.model.Group addGroup(long parentGroupId,
 		java.lang.String name, java.lang.String description, int type,
@@ -124,8 +124,8 @@ public interface GroupService extends BaseService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #addGroup(long, String, String, int, String, boolean,
-	boolean, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #addGroup(long, String,
+	String, int, String, boolean, boolean, ServiceContext)}
 	*/
 	public com.liferay.portal.model.Group addGroup(java.lang.String name,
 		java.lang.String description, int type, java.lang.String friendlyURL,

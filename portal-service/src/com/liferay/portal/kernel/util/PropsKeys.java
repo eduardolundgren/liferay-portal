@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1485,6 +1485,16 @@ public interface PropsKeys {
 
 	public static final String MAIL_SESSION_MAIL_TRANSPORT_PROTOCOL = "mail.session.mail.transport.protocol";
 
+	public static final String MEMBERSHIP_POLICY_AUTO_VERIFY = "membership.policy.auto.verify";
+
+	public static final String MEMBERSHIP_POLICY_ORGANIZATIONS = "membership.policy.organizations";
+
+	public static final String MEMBERSHIP_POLICY_ROLES = "membership.policy.roles";
+
+	public static final String MEMBERSHIP_POLICY_SITES = "membership.policy.sites";
+
+	public static final String MEMBERSHIP_POLICY_USER_GROUPS = "membership.policy.user.groups";
+
 	public static final String MEMORY_CLUSTER_SCHEDULER_LOCK_CACHE_ENABLED = "memory.cluster.scheduler.lock.cache.enabled";
 
 	public static final String MESSAGE_BOARDS_ALLOW_ANONYMOUS_POSTING = "message.boards.anonymous.posting.enabled";
@@ -1925,6 +1935,8 @@ public interface PropsKeys {
 
 	public static final String RATINGS_MIN_SCORE = "ratings.min.score";
 
+	public static final String RECENT_CONTENT_MAX_DISPLAY_ITEMS = "recent.content.max.display.items";
+
 	public static final String REDIRECT_URL_DOMAINS_ALLOWED = "redirect.url.domains.allowed";
 
 	public static final String REDIRECT_URL_IPS_ALLOWED = "redirect.url.ips.allowed";
@@ -2195,6 +2207,10 @@ public interface PropsKeys {
 
 	public static final String SOCIAL_ACTIVITY_PARTICIPATION_LIMIT_VALUES = "social.activity.participation.limit.values";
 
+	public static final String SOCIAL_ACTIVITY_SETS_ENABLED = "social.activity.sets.enabled";
+
+	public static final String SOCIAL_ACTIVITY_SETS_SELECTOR = "social.activity.sets.selector";
+
 	public static final String SOCIAL_BOOKMARK_JSP = "social.bookmark.jsp";
 
 	public static final String SOCIAL_BOOKMARK_POST_URL = "social.bookmark.post.url";
@@ -2311,6 +2327,8 @@ public interface PropsKeys {
 
 	public static final String TRASH_ENTRIES_MAX_AGE = "trash.entries.max.age";
 
+	public static final String TRASH_ENTRY_CHECK_INTERVAL = "trash.entry.check.interval";
+
 	public static final String TRASH_SEARCH_LIMIT = "trash.search.limit";
 
 	public static final String UPGRADE_DATABASE_TRANSACTIONS_DISABLED = "upgrade.database.transactions.disabled";
@@ -2376,8 +2394,6 @@ public interface PropsKeys {
 	public static final String USERS_LAST_NAME_REQUIRED = "users.last.name.required";
 
 	public static final String USERS_LIST_VIEWS = "users.list.views";
-
-	public static final String USERS_MEMBERSHIP_POLICY = "users.membership.policy";
 
 	public static final String USERS_REMINDER_QUERIES_CUSTOM_QUESTION_ENABLED = "users.reminder.queries.custom.question.enabled";
 

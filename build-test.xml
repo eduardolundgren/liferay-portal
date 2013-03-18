@@ -326,7 +326,7 @@
 	</target>
 
 	<target name="build-test-ant-scripts">
-		<property name="build-test-ant-scripts.version" value="8" />
+		<property name="build-test-ant-scripts.version" value="0" />
 
 		<if>
 			<available file="portal-web/test-ant-scripts/version" />
@@ -1083,6 +1083,11 @@
 		<antcall target="build-test-ant-script">
 			<param name="test.ant.script.command" value="permissions-web-content" />
 			<param name="test.ant.script.suite" value="PermissionsWebContentTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="permissions-web-content-display" />
+			<param name="test.ant.script.suite" value="PermissionsWebContentDisplayTestSuite" />
 		</antcall>
 
 		<antcall target="build-test-ant-script">
@@ -2012,12 +2017,6 @@
 		<antcall target="build-test-ant-script">
 			<param name="test.ant.script.command" value="smoke-test" />
 			<param name="test.ant.script.suite" value="SmokeTestSuite" />
-		</antcall>
-
-		<antcall target="build-test-ant-script">
-			<param name="test.ant.script.command" value="social-office-home-announcements" />
-			<param name="test.ant.script.social.office" value="true" />
-			<param name="test.ant.script.suite" value="SocialOfficeHomeAnnouncementsTestSuite" />
 		</antcall>
 
 		<antcall target="build-test-ant-script">
@@ -4291,12 +4290,14 @@ which can be downloaded from this website: http://code.google.com/p/chromedriver
 	</target>
 
 	<target name="test-integration">
+		<ant dir="osgi/modules" target="test-integration" inheritAll="false" />
 		<ant dir="portal-service" target="test-integration" inheritAll="false" />
 		<ant dir="portal-impl" target="test-integration" inheritAll="false" />
 		<ant dir="util-java" target="test-integration" inheritAll="false" />
 	</target>
 
 	<target name="test-unit">
+		<ant dir="osgi/modules" target="test-unit" inheritAll="false" />
 		<ant dir="portal-service" target="test-unit" inheritAll="false" />
 		<ant dir="portal-impl" target="test-unit" inheritAll="false" />
 		<ant dir="util-java" target="test-unit" inheritAll="false" />

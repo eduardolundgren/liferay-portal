@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -398,7 +398,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated {@link #checkInFileEntry(long, long, String, ServiceContext)}
+	 * @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long, long,
+	 *             String, ServiceContext)}
 	 */
 	public void checkInFileEntry(long userId, long fileEntryId, String lockUuid)
 		throws PortalException, SystemException {
@@ -435,7 +436,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated {@link #checkOutFileEntry(long, long, ServiceContext)}
+	 * @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
+	 *             long, ServiceContext)}
 	 */
 	public DLFileEntry checkOutFileEntry(long userId, long fileEntryId)
 		throws PortalException, SystemException {
@@ -453,8 +455,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated {@link #checkOutFileEntry(long, long, String, long,
-	 *             ServiceContext)}
+	 * @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
+	 *             long, String, long, ServiceContext)}
 	 */
 	public DLFileEntry checkOutFileEntry(
 			long userId, long fileEntryId, String owner, long expirationTime)
@@ -645,10 +647,8 @@ public class DLFileEntryLocalServiceImpl
 				toFileVersionId, fieldsMap, serviceContext);
 		}
 
-		long classNameId = PortalUtil.getClassNameId(DLFileEntry.class);
-
 		ddmStructures = ddmStructureLocalService.getClassStructures(
-			companyId, classNameId);
+			companyId, PortalUtil.getClassNameId(DLFileEntryMetadata.class));
 
 		for (DDMStructure ddmStructure : ddmStructures) {
 			try {
@@ -797,8 +797,9 @@ public class DLFileEntryLocalServiceImpl
 		}
 	}
 
-	@Indexable(type = IndexableType.DELETE)
-	public void deleteFileVersion(long userId, long fileEntryId, String version)
+	@Indexable(type = IndexableType.REINDEX)
+	public DLFileEntry deleteFileVersion(
+			long userId, long fileEntryId, String version)
 		throws PortalException, SystemException {
 
 		if (Validator.isNull(version) ||
@@ -810,6 +811,10 @@ public class DLFileEntryLocalServiceImpl
 		if (!hasFileEntryLock(userId, fileEntryId)) {
 			lockFileEntry(userId, fileEntryId);
 		}
+
+		boolean latestVersion = false;
+
+		DLFileEntry dlFileEntry = null;
 
 		try {
 			DLFileVersion dlFileVersion = dlFileVersionPersistence.findByF_V(
@@ -835,10 +840,11 @@ public class DLFileEntryLocalServiceImpl
 				DLFileVersion.class.getName(),
 				dlFileVersion.getFileVersionId());
 
-			DLFileEntry dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(
-				fileEntryId);
+			dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(fileEntryId);
 
-			if (version.equals(dlFileEntry.getVersion())) {
+			latestVersion = version.equals(dlFileEntry.getVersion());
+
+			if (latestVersion) {
 				try {
 					DLFileVersion dlLatestFileVersion =
 						dlFileVersionLocalService.getLatestFileVersion(
@@ -863,7 +869,7 @@ public class DLFileEntryLocalServiceImpl
 					dlFileEntry.setVersion(dlLatestFileVersion.getVersion());
 					dlFileEntry.setSize(dlLatestFileVersion.getSize());
 
-					dlFileEntryPersistence.update(dlFileEntry);
+					dlFileEntry = dlFileEntryPersistence.update(dlFileEntry);
 				}
 				catch (NoSuchFileVersionException nsfve) {
 				}
@@ -881,6 +887,12 @@ public class DLFileEntryLocalServiceImpl
 		finally {
 			unlockFileEntry(fileEntryId);
 		}
+
+		if (latestVersion) {
+			return dlFileEntry;
+		}
+
+		return null;
 	}
 
 	public DLFileEntry fetchFileEntry(long groupId, long folderId, String title)

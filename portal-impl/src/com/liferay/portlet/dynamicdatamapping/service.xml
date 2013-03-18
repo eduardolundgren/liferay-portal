@@ -86,6 +86,10 @@
 		<column name="storageType" type="String" />
 		<column name="type" type="int" />
 
+		<!-- Relationships -->
+
+		<column name="dlFileEntryTypes" type="Collection" entity="com.liferay.portlet.documentlibrary.DLFileEntryType" mapping-table="DLFileEntryTypes_DDMStructures" />
+
 		<!-- Finder methods -->
 
 		<finder name="GroupId" return-type="Collection">
@@ -98,7 +102,7 @@
 			<finder-column name="structureKey" />
 		</finder>
 		<finder name="G_C" return-type="Collection" >
-			<finder-column name="groupId" />
+			<finder-column name="groupId" arrayable-operator="OR" />
 			<finder-column name="classNameId" />
 		</finder>
 		<finder name="C_C" return-type="Collection">
@@ -199,6 +203,10 @@
 		<finder name="G_C" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="classNameId" />
+		</finder>
+		<finder name="G_CPK" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="classPK" />
 		</finder>
 		<finder name="G_C_C" return-type="Collection">
 			<finder-column name="groupId" />

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -531,8 +531,8 @@ public class DDLImpl implements DDL {
 	private static Log _log = LogFactoryUtil.getLog(DDLImpl.class);
 
 	private Transformer _transformer = new Transformer(
-		PropsKeys.DYNAMIC_DATA_LISTS_ERROR_TEMPLATE,
 		PropsKeys.DYNAMIC_DATA_LISTS_TRANSFORMER_LISTENER,
+		PropsKeys.DYNAMIC_DATA_LISTS_ERROR_TEMPLATE,
 		TemplateContextType.STANDARD);
 
 }

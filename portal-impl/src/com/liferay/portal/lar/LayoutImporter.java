@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -104,6 +104,7 @@ import com.liferay.portlet.journal.lar.JournalPortletDataHandler;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.portlet.journalcontent.util.JournalContentUtil;
+import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 
 import java.io.File;
@@ -836,7 +837,7 @@ public class LayoutImporter {
 						LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
 
 				typeSettingsProperties.setProperty(
-					SitesUtil.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
+					Sites.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
 
 				modifiedTypeSettingsProperties = true;
 			}
@@ -856,7 +857,7 @@ public class LayoutImporter {
 				layoutSet.getSettingsProperties();
 
 			settingsProperties.setProperty(
-				SitesUtil.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
+				Sites.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
 
 			LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet);
 		}

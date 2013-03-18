@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.model.Portlet;
@@ -48,15 +49,12 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.TestPropsValues;
-import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.blogs.asset.BlogsEntryAssetRendererFactory;
 import com.liferay.portlet.blogs.trash.BlogsEntryTrashHandler;
 import com.liferay.portlet.blogs.util.BlogsIndexer;
 import com.liferay.portlet.blogs.workflow.BlogsEntryWorkflowHandler;
 import com.liferay.portlet.bookmarks.util.BookmarksEntryIndexer;
 import com.liferay.portlet.bookmarks.util.BookmarksFolderIndexer;
 import com.liferay.portlet.directory.workflow.UserWorkflowHandler;
-import com.liferay.portlet.documentlibrary.asset.DLFileEntryAssetRendererFactory;
 import com.liferay.portlet.documentlibrary.trash.DLFileEntryTrashHandler;
 import com.liferay.portlet.documentlibrary.trash.DLFileShortcutTrashHandler;
 import com.liferay.portlet.documentlibrary.trash.DLFolderTrashHandler;
@@ -87,6 +85,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -315,13 +315,6 @@ public class ServiceTestUtil {
 			e.printStackTrace();
 		}
 
-		// Asset
-
-		AssetRendererFactoryRegistryUtil.register(
-			new BlogsEntryAssetRendererFactory());
-		AssetRendererFactoryRegistryUtil.register(
-			new DLFileEntryAssetRendererFactory());
-
 		// Trash
 
 		TrashHandlerRegistryUtil.register(new BlogsEntryTrashHandler());
@@ -388,6 +381,20 @@ public class ServiceTestUtil {
 
 	public static boolean randomBoolean() throws Exception {
 		return _random.nextBoolean();
+	}
+
+	public static Map<Locale, String> randomLocaleStringMap(Locale locale)
+		throws Exception {
+
+		Map<Locale, String> map = new HashMap<Locale, String>();
+
+		map.put(LocaleUtil.getDefault(), randomString());
+
+		return map;
+	}
+
+	public static Map<Locale, String> randomLocaleStringMap() throws Exception {
+		return randomLocaleStringMap(LocaleUtil.getDefault());
 	}
 
 	public static long randomLong() throws Exception {

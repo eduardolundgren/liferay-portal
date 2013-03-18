@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,6 +82,20 @@ public class DocumentImpl implements Document {
 		}
 
 		addKeyword(name, _dateFormat.format(value));
+	}
+
+	public void addDate(String name, Date[] values) {
+		if (values == null) {
+			return;
+		}
+
+		String[] dates = new String[values.length];
+
+		for (int i = 0; i < values.length; i++) {
+			dates[i] = _dateFormat.format(values[i]);
+		}
+
+		addKeyword(name, dates);
 	}
 
 	public void addFile(String name, byte[] bytes, String fileExt) {
@@ -277,8 +291,27 @@ public class DocumentImpl implements Document {
 	}
 
 	public void addLocalizedKeyword(String name, Map<Locale, String> values) {
+		addLocalizedKeyword(name, values, false);
+	}
+
+	public void addLocalizedKeyword(
+		String name, Map<Locale, String> values, boolean lowerCase) {
+
 		if ((values == null) || values.isEmpty()) {
 			return;
+		}
+
+		if (lowerCase) {
+			Map<Locale, String> lowerCaseValues = new HashMap<Locale, String>(
+				values.size());
+
+			for (Map.Entry<Locale, String> entry : values.entrySet()) {
+				String value = GetterUtil.getString(entry.getValue());
+
+				lowerCaseValues.put(entry.getKey(), value.toLowerCase());
+			}
+
+			values = lowerCaseValues;
 		}
 
 		Field field = new Field(name, values);
@@ -299,94 +332,107 @@ public class DocumentImpl implements Document {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 */
 	public void addModifiedDate() {
 		addModifiedDate(new Date());
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 */
 	public void addModifiedDate(Date modifiedDate) {
 		addDate(Field.MODIFIED, modifiedDate);
 	}
 
 	public void addNumber(String name, double value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Double.class);
 	}
 
 	public void addNumber(String name, Double value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Double.class);
 	}
 
 	public void addNumber(String name, double[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Double.class);
 	}
 
 	public void addNumber(String name, Double[] values) {
-		addNumber(name, String.valueOf(ArrayUtil.toStringArray(values)));
+		addNumber(name, ArrayUtil.toStringArray(values), Double.class);
 	}
 
 	public void addNumber(String name, float value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Float.class);
 	}
 
 	public void addNumber(String name, Float value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Float.class);
 	}
 
 	public void addNumber(String name, float[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Float.class);
 	}
 
 	public void addNumber(String name, Float[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Float.class);
 	}
 
 	public void addNumber(String name, int value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Integer.class);
 	}
 
 	public void addNumber(String name, int[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Integer.class);
 	}
 
 	public void addNumber(String name, Integer value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Integer.class);
 	}
 
 	public void addNumber(String name, Integer[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Integer.class);
 	}
 
 	public void addNumber(String name, long value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Long.class);
 	}
 
 	public void addNumber(String name, Long value) {
-		addNumber(name, String.valueOf(value));
+		addNumber(name, String.valueOf(value), Long.class);
 	}
 
 	public void addNumber(String name, long[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Long.class);
 	}
 
 	public void addNumber(String name, Long[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values));
+		addNumber(name, ArrayUtil.toStringArray(values), Long.class);
 	}
 
 	public void addNumber(String name, String value) {
+		addNumber(name, value, Long.class);
+	}
+
+	public void addNumber(
+		String name, String value, Class<? extends Number> clazz) {
+
 		if (Validator.isNotNull(value)) {
 			Field field = new Field(name, value);
 
 			field.setNumeric(true);
+			field.setNumericClass(clazz);
 
 			_fields.put(name, field);
 		}
 	}
 
 	public void addNumber(String name, String[] values) {
+		addNumber(name, values, Long.class);
+	}
+
+	public void addNumber(
+		String name, String[] values, Class<? extends Number> clazz) {
+
 		if (values == null) {
 			return;
 		}
@@ -394,6 +440,7 @@ public class DocumentImpl implements Document {
 		Field field = new Field(name, values);
 
 		field.setNumeric(true);
+		field.setNumericClass(clazz);
 
 		_fields.put(name, field);
 	}
@@ -596,6 +643,14 @@ public class DocumentImpl implements Document {
 		}
 
 		return field.getValues();
+	}
+
+	public boolean hasField(String name) {
+		if (_fields.containsKey(name)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isDocumentSortableTextField(String name) {

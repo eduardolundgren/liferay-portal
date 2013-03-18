@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,7 +62,6 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.LinkbackProducerUtil;
-import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.messageboards.MessageBodyException;
 import com.liferay.portlet.messageboards.MessageSubjectException;
 import com.liferay.portlet.messageboards.NoSuchDiscussionException;
@@ -190,7 +189,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 			if (discussion == null) {
 				mbDiscussionLocalService.addDiscussion(
-					classNameId, classPK, message.getThreadId());
+					userId, classNameId, classPK, message.getThreadId(),
+					serviceContext);
 			}
 		}
 
@@ -285,7 +285,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		if ((thread == null) ||
 			(parentMessageId == MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID)) {
 
-			thread = mbThreadLocalService.addThread(categoryId, message);
+			thread = mbThreadLocalService.addThread(
+				categoryId, message, serviceContext);
 		}
 
 		if ((priority != MBThreadConstants.PRIORITY_NOT_GIVEN) &&
@@ -317,6 +318,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			message.setClassNameId(classNameId);
 			message.setClassPK(classPK);
 		}
+
+		message.setExpandoBridgeAttributes(serviceContext);
 
 		mbMessagePersistence.update(message);
 
@@ -356,12 +359,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds(),
 			serviceContext.isAssetEntryVisible());
-
-		// Expando
-
-		ExpandoBridge expandoBridge = message.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		// Workflow
 
@@ -543,10 +540,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				(message.getCategoryId() !=
 					MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {
 
-				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
-					message.getCategoryId());
-
-				MBUtil.updateCategoryStatistics(category);
+				MBUtil.updateCategoryStatistics(
+					message.getCompanyId(), message.getCategoryId());
 			}
 		}
 		else {
@@ -634,7 +629,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			// Thread
 
 			if (message.isApproved()) {
-				MBUtil.updateThreadMessageCount(thread);
+				MBUtil.updateThreadMessageCount(
+					thread.getCompanyId(), thread.getThreadId());
 			}
 			else {
 				mbThreadPersistence.update(thread);
@@ -648,10 +644,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 					MBCategoryConstants.DISCUSSION_CATEGORY_ID) &&
 				!message.isDraft()) {
 
-				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
-					message.getCategoryId());
-
-				MBUtil.updateCategoryMessageCount(category);
+				MBUtil.updateCategoryMessageCount(
+					message.getCompanyId(), message.getCategoryId());
 			}
 		}
 
@@ -1454,6 +1448,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			}
 		}
 
+		message.setExpandoBridgeAttributes(serviceContext);
+
 		mbMessagePersistence.update(message);
 
 		// Thread
@@ -1474,12 +1470,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			userId, message, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
-
-		// Expando
-
-		ExpandoBridge expandoBridge = message.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		// Workflow
 
@@ -2130,6 +2120,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		if ((thread.getRootMessageId() == message.getMessageId()) &&
 			(oldStatus != status)) {
 
+			thread.setModifiedDate(modifiedDate);
 			thread.setStatus(status);
 			thread.setStatusByUserId(user.getUserId());
 			thread.setStatusByUserName(user.getFullName());
@@ -2152,6 +2143,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 			if (category != null) {
 				category.setLastPostDate(modifiedDate);
+
+				category = mbCategoryPersistence.update(category);
 			}
 		}
 
@@ -2160,25 +2153,27 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 			// Thread
 
-			MBUtil.updateThreadMessageCount(thread);
+			MBUtil.updateThreadMessageCount(
+				thread.getCompanyId(), thread.getThreadId());
 
 			// Category
 
 			if ((category != null) &&
 				(thread.getRootMessageId() == message.getMessageId())) {
 
-				MBUtil.updateCategoryStatistics(category);
+				MBUtil.updateCategoryStatistics(
+					category.getCompanyId(), category.getCategoryId());
 			}
 
 			if ((category != null) &&
 				!(thread.getRootMessageId() == message.getMessageId())) {
 
-				MBUtil.updateCategoryMessageCount(category);
+				MBUtil.updateCategoryMessageCount(
+					category.getCompanyId(), category.getCategoryId());
 			}
 		}
-		else {
-			mbThreadPersistence.update(thread);
-		}
+
+		mbThreadPersistence.update(thread);
 	}
 
 	protected void validate(String subject, String body)

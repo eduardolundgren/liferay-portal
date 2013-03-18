@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -161,12 +161,24 @@ public class DLFileEntryIndexer extends BaseIndexer {
 		contextQuery.addRequiredTerm(
 			Field.HIDDEN, searchContext.isIncludeAttachments());
 
+		addSearchClassTypeIds(contextQuery, searchContext);
+
+		String structureField = (String)searchContext.getAttribute(
+			"ddmStructureFieldName");
+		String structureValue = (String)searchContext.getAttribute(
+			"ddmStructureFieldValue");
+
+		if (Validator.isNotNull(structureField) &&
+			Validator.isNotNull(structureValue)) {
+
+			contextQuery.addRequiredTerm(structureField, structureValue);
+		}
+
 		long[] folderIds = searchContext.getFolderIds();
 
-		if ((folderIds != null) && (folderIds.length > 0)) {
-			if (folderIds[0] == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-				return;
-			}
+		if ((folderIds != null) && (folderIds.length > 0) &&
+			(folderIds[0] !=
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
 
 			BooleanQuery folderIdsQuery = BooleanQueryFactoryUtil.create(
 				searchContext);
@@ -210,7 +222,7 @@ public class DLFileEntryIndexer extends BaseIndexer {
 		DDMStructure tikaRawMetadataStructure =
 			DDMStructureLocalServiceUtil.fetchStructure(
 				group.getGroupId(),
-				PortalUtil.getClassNameId(DLFileEntry.class),
+				PortalUtil.getClassNameId(RawMetadataProcessor.class),
 				"TikaRawMetadata");
 
 		if (tikaRawMetadataStructure != null) {
@@ -249,26 +261,28 @@ public class DLFileEntryIndexer extends BaseIndexer {
 			Document document, DLFileVersion dlFileVersion)
 		throws PortalException, SystemException {
 
-		List<DLFileEntryMetadata> dlFileEntryMetadatas =
-			DLFileEntryMetadataLocalServiceUtil.
-				getFileVersionFileEntryMetadatas(
-					dlFileVersion.getFileVersionId());
+		DLFileEntryType dlFileEntryType =
+			DLFileEntryTypeLocalServiceUtil.getDLFileEntryType(
+				dlFileVersion.getFileEntryTypeId());
 
-		for (DLFileEntryMetadata dlFileEntryMetadata : dlFileEntryMetadatas) {
+		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
+
+		for (DDMStructure ddmStructure : ddmStructures) {
 			Fields fields = null;
 
 			try {
+				DLFileEntryMetadata fileEntryMetadata =
+					DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(
+						ddmStructure.getStructureId(),
+						dlFileVersion.getFileVersionId());
+
 				fields = StorageEngineUtil.getFields(
-					dlFileEntryMetadata.getDDMStorageId());
+					fileEntryMetadata.getDDMStorageId());
 			}
 			catch (Exception e) {
 			}
 
 			if (fields != null) {
-				DDMStructure ddmStructure =
-					DDMStructureLocalServiceUtil.getStructure(
-						dlFileEntryMetadata.getDDMStructureId());
-
 				DDMIndexerUtil.addAttributes(document, ddmStructure, fields);
 			}
 		}
@@ -355,6 +369,8 @@ public class DLFileEntryIndexer extends BaseIndexer {
 				}
 			}
 
+			document.addKeyword(
+				Field.CLASS_TYPE_ID, dlFileEntry.getFileEntryTypeId());
 			document.addText(Field.DESCRIPTION, dlFileEntry.getDescription());
 			document.addKeyword(Field.FOLDER_ID, dlFileEntry.getFolderId());
 			document.addKeyword(Field.HIDDEN, dlFileEntry.isInHiddenFolder());

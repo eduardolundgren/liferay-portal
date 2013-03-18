@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -216,6 +216,10 @@ public abstract class BaseSeleniumImpl
 
 	public boolean isText(String locator, String value) {
 		return value.equals(getText(locator));
+	}
+
+	public boolean isTextNotPresent(String pattern) {
+		return LiferaySeleniumHelper.isTextNotPresent(this, pattern);
 	}
 
 	public boolean isValue(String locator, String value) {

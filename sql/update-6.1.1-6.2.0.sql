@@ -1,3 +1,5 @@
+alter table AssetTag add uuid_ VARCHAR(75) null;
+
 update BlogsEntry set status = 2 where status = 9;
 
 alter table BookmarksEntry add status INTEGER;
@@ -368,6 +370,14 @@ alter table MBCategory add statusByUserId LONG;
 alter table MBCategory add statusByUserName VARCHAR(75) null;
 alter table MBCategory add statusDate DATE null;
 
+alter table MBDiscussion add uuid_ VARCHAR(75) null;
+alter table MBDiscussion add groupId LONG;
+alter table MBDiscussion add companyId LONG;
+alter table MBDiscussion add userId LONG;
+alter table MBDiscussion add userName VARCHAR(75) null;
+alter table MBDiscussion add createDate DATE null;
+alter table MBDiscussion add modifiedDate DATE null;
+
 COMMIT_TRANSACTION;
 
 update MBCategory set status = 0;
@@ -379,6 +389,18 @@ update MBMessage set status = 2 where status = 9;
 
 alter table MBMessage drop column attachments;
 
+alter table MBThread add uuid_ VARCHAR(75) null;
+alter table MBThread add userId LONG;
+alter table MBThread add userName VARCHAR(75) null;
+alter table MBThread add createDate DATE null;
+alter table MBThread add modifiedDate DATE null;
+
+alter table MBThreadFlag add uuid_ VARCHAR(75) null;
+alter table MBThreadFlag add groupId LONG;
+alter table MBThreadFlag add companyId LONG;
+alter table MBThreadFlag add userName VARCHAR(75) null;
+alter table MBThreadFlag add createDate DATE null;
+
 drop table OrgGroupPermission;
 
 alter table PasswordPolicy add regex VARCHAR(75) null;
@@ -387,6 +409,16 @@ drop index IX_C3A17327 on PasswordPolicyRel;
 drop index IX_ED7CF243 on PasswordPolicyRel;
 
 drop table Permission_;
+
+alter table PollsChoice add groupId LONG;
+alter table PollsChoice add companyId LONG;
+alter table PollsChoice add userId LONG;
+alter table PollsChoice add userName VARCHAR(75) null;
+alter table PollsChoice add createDate DATE null;
+alter table PollsChoice add modifiedDate DATE null;
+
+alter table PollsVote add uuid_ VARCHAR(75) null;
+alter table PollsVote add groupId LONG;
 
 alter table RepositoryEntry add companyId LONG;
 alter table RepositoryEntry add userId LONG;

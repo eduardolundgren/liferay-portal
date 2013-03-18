@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -186,7 +186,7 @@ public class VerifyJournal extends VerifyProcess {
 
 		if (!checkNewLine) {
 			if (_log.isInfoEnabled()) {
-				_log.debug("Do not fix oracle new line");
+				_log.info("Do not fix oracle new line");
 			}
 
 			return;

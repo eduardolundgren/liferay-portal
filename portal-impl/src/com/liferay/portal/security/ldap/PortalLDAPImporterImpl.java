@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1213,7 +1213,9 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 
 		Calendar birthdayCal = CalendarFactoryUtil.getCalendar();
 
-		birthdayCal.setTime(user.getContact().getBirthday());
+		Contact ldapContact = ldapUser.getContact();
+
+		birthdayCal.setTime(ldapContact.getBirthday());
 
 		int birthdayMonth = birthdayCal.get(Calendar.MONTH);
 		int birthdayDay = birthdayCal.get(Calendar.DAY_OF_MONTH);
@@ -1241,7 +1243,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 			}
 		}
 
-		updateLDAPUser(ldapUser.getUser(), ldapUser.getContact(), user);
+		updateLDAPUser(ldapUser.getUser(), ldapContact, user);
 
 		user = UserLocalServiceUtil.updateUser(
 			user.getUserId(), password, StringPool.BLANK, StringPool.BLANK,

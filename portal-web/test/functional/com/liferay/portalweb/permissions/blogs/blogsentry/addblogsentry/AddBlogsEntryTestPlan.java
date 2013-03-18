@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.orgrole.
 import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.orgroleinline.OrgRoleInlineTests;
 import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.regrole.RegRoleTests;
 import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.regroleinline.RegRoleInlineTests;
+import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.regrolescopesite.RegRoleScopeSiteTests;
 import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.siterole.SiteRoleTests;
 import com.liferay.portalweb.permissions.blogs.blogsentry.addblogsentry.siteroleinline.SiteRoleInlineTests;
 import com.liferay.portalweb.portal.BaseTestSuite;
@@ -35,6 +36,7 @@ public class AddBlogsEntryTestPlan extends BaseTestSuite {
 
 		testSuite.addTest(SiteRoleInlineTests.suite());
 		testSuite.addTest(SiteRoleTests.suite());
+		testSuite.addTest(RegRoleScopeSiteTests.suite());
 		testSuite.addTest(RegRoleInlineTests.suite());
 		testSuite.addTest(RegRoleTests.suite());
 		testSuite.addTest(OrgRoleInlineTests.suite());

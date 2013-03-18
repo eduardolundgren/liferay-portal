@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,9 @@ import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -54,10 +56,13 @@ import java.util.List;
  */
 public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
-	public MBThread addThread(long categoryId, MBMessage message)
+	public MBThread addThread(
+			long categoryId, MBMessage message, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Thread
+
+		Date now = new Date();
 
 		long threadId = message.getThreadId();
 
@@ -67,8 +72,13 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		MBThread thread = mbThreadPersistence.create(threadId);
 
+		thread.setUuid(serviceContext.getUuid());
 		thread.setGroupId(message.getGroupId());
 		thread.setCompanyId(message.getCompanyId());
+		thread.setUserId(message.getUserId());
+		thread.setUserName(message.getUserName());
+		thread.setCreateDate(serviceContext.getCreateDate(now));
+		thread.setModifiedDate(serviceContext.getModifiedDate(now));
 		thread.setCategoryId(categoryId);
 		thread.setRootMessageId(message.getMessageId());
 		thread.setRootMessageUserId(message.getUserId());
@@ -99,10 +109,10 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			assetEntryLocalService.updateEntry(
 				message.getUserId(), message.getGroupId(),
 				thread.getStatusDate(), thread.getLastPostDate(),
-				MBThread.class.getName(), thread.getThreadId(), null, 0,
-				new long[0], new String[0], false, null, null, null, null,
-				String.valueOf(thread.getRootMessageId()), null, null, null,
-				null, 0, 0, null, false);
+				MBThread.class.getName(), thread.getThreadId(),
+				thread.getUuid(), 0, new long[0], new String[0], false, null,
+				null, null, null, String.valueOf(thread.getRootMessageId()),
+				null, null, null, null, 0, 0, null, false);
 		}
 
 		return thread;
@@ -197,7 +207,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
 					thread.getCategoryId());
 
-				MBUtil.updateCategoryStatistics(category);
+				MBUtil.updateCategoryStatistics(
+					category.getCompanyId(), category.getCategoryId());
 			}
 			catch (NoSuchCategoryException nsce) {
 				if (!thread.isInTrash()) {
@@ -264,7 +275,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreads(long, QueryDefinition)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreads(long,
+	 *             QueryDefinition)}
 	 */
 	public List<MBThread> getGroupThreads(
 			long groupId, int status, int start, int end)
@@ -603,6 +615,13 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			category = mbCategoryPersistence.findByPrimaryKey(categoryId);
 		}
 
+		// Thread
+
+		thread.setModifiedDate(new Date());
+		thread.setCategoryId(categoryId);
+
+		mbThreadPersistence.update(thread);
+
 		// Messages
 
 		List<MBMessage> messages = mbMessagePersistence.findByG_C_T(
@@ -623,20 +642,16 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			}
 		}
 
-		// Thread
-
-		thread.setCategoryId(categoryId);
-
-		mbThreadPersistence.update(thread);
-
 		// Category
 
 		if ((oldCategory != null) && (categoryId != oldCategoryId)) {
-			MBUtil.updateCategoryStatistics(oldCategory);
+			MBUtil.updateCategoryStatistics(
+				oldCategory.getCompanyId(), oldCategory.getCategoryId());
 		}
 
 		if ((category != null) && (categoryId != oldCategoryId)) {
-			MBUtil.updateCategoryStatistics(category);
+			MBUtil.updateCategoryStatistics(
+				category.getCompanyId(), category.getCategoryId());
 		}
 
 		return thread;
@@ -732,7 +747,12 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Create new thread
 
-		MBThread thread = addThread(message.getCategoryId(), message);
+		MBThread thread = addThread(
+			message.getCategoryId(), message, serviceContext);
+
+		oldThread.setModifiedDate(serviceContext.getModifiedDate(new Date()));
+
+		mbThreadPersistence.update(oldThread);
 
 		// Update messages
 
@@ -792,11 +812,13 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Update new thread
 
-		MBUtil.updateThreadMessageCount(thread);
+		MBUtil.updateThreadMessageCount(
+			thread.getCompanyId(), thread.getThreadId());
 
 		// Update old thread
 
-		MBUtil.updateThreadMessageCount(oldThread);
+		MBUtil.updateThreadMessageCount(
+			oldThread.getCompanyId(), oldThread.getThreadId());
 
 		// Category
 
@@ -805,7 +827,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			(message.getCategoryId() !=
 				MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {
 
-			MBUtil.updateCategoryThreadCount(category);
+			MBUtil.updateCategoryThreadCount(
+				category.getCompanyId(), category.getCategoryId());
 		}
 
 		return thread;
@@ -857,6 +880,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				mbMessagePersistence.update(rootMessage);
 			}
 
+			thread.setModifiedDate(now);
 			thread.setStatus(status);
 			thread.setStatusByUserId(user.getUserId());
 			thread.setStatusByUserName(user.getFullName());
@@ -866,7 +890,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			// Messages
 
-			updateDependentStatus(threadId, status);
+			updateDependentStatus(thread.getGroupId(), threadId, status);
 
 			if (thread.getCategoryId() !=
 					MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
@@ -876,13 +900,9 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
 					thread.getCategoryId());
 
-				MBUtil.updateCategoryStatistics(category);
+				MBUtil.updateCategoryStatistics(
+					category.getCompanyId(), category.getCategoryId());
 			}
-
-			// Stats
-
-			mbStatsUserLocalService.updateStatsUser(
-				thread.getGroupId(), userId);
 
 			if (status == WorkflowConstants.STATUS_IN_TRASH) {
 
@@ -917,14 +937,15 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			}
 		}
 		else {
-			updateDependentStatus(threadId, status);
+			updateDependentStatus(thread.getGroupId(), threadId, status);
 		}
 
 		return thread;
 	}
 
 	/**
-	 * @deprecated {@link #incrementViewCounter(long, int)}
+	 * @deprecated As of 6.2.0, replaced by {@link #incrementViewCounter(long,
+	 *             int)}
 	 */
 	public MBThread updateThread(long threadId, int viewCount)
 		throws PortalException, SystemException {
@@ -963,8 +984,11 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		}
 	}
 
-	protected void updateDependentStatus(long threadId, int status)
+	protected void updateDependentStatus(
+			long groupId, long threadId, int status)
 		throws PortalException, SystemException {
+
+		Set<Long> userIds = new HashSet<Long>();
 
 		List<MBMessage> messages = mbMessageLocalService.getThreadMessages(
 			threadId, WorkflowConstants.STATUS_ANY);
@@ -973,6 +997,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			if (message.isDiscussion()) {
 				continue;
 			}
+
+			userIds.add(message.getUserId());
 
 			if (status == WorkflowConstants.STATUS_IN_TRASH) {
 
@@ -1030,6 +1056,12 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 				indexer.reindex(message);
 			}
+		}
+
+		// Statistics
+
+		for (long userId : userIds) {
+			mbStatsUserLocalService.updateStatsUser(groupId, userId);
 		}
 	}
 

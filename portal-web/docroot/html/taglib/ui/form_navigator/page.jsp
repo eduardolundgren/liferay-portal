@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -203,18 +203,21 @@ if (Validator.isNotNull(historyKey)) {
 </aui:script>
 
 <aui:script use="aui-base">
-	var portlet = A.one('#<portlet:namespace />sectionsContainer');
+	var sectionsContainer = A.one('#<portlet:namespace />sectionsContainer');
 
-	portlet.delegate(
-		'click',
-		function(event) {
-			A.fire(
-				'formNavigator:trackChanges',
-				event.currentTarget
-			);
-		},
-		'.modify-link'
-	);
+	var modifyLinks = sectionsContainer.all('.modify-link');
+
+	if (modifyLinks) {
+		modifyLinks.on(
+			'click',
+			function(event) {
+				A.fire(
+					'formNavigator:trackChanges',
+					event.currentTarget
+				);
+			}
+		);
+	}
 </aui:script>
 
 <%!

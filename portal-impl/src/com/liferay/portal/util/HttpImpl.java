@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -380,7 +379,8 @@ public class HttpImpl implements Http {
 	}
 
 	/**
-	 * @deprecated {@link #getHostConfiguration(String)}
+	 * @deprecated As of 6.1.0, replaced by {@link
+	 *             #getHostConfiguration(String)}
 	 */
 	public HostConfiguration getHostConfig(String location) throws IOException {
 		return getHostConfiguration(location);
@@ -1210,26 +1210,7 @@ public class HttpImpl implements Http {
 
 			proxifyState(httpState, hostConfiguration);
 
-			boolean checkReadFileDescriptor =
-				PortalSecurityManagerThreadLocal.isCheckReadFileDescriptor();
-			boolean checkWriteFileDescriptor =
-				PortalSecurityManagerThreadLocal.isCheckWriteFileDescriptor();
-
-			try {
-				PortalSecurityManagerThreadLocal.setCheckReadFileDescriptor(
-					false);
-				PortalSecurityManagerThreadLocal.setCheckWriteFileDescriptor(
-					false);
-
-				httpClient.executeMethod(
-					hostConfiguration, httpMethod, httpState);
-			}
-			finally {
-				PortalSecurityManagerThreadLocal.setCheckReadFileDescriptor(
-					checkReadFileDescriptor);
-				PortalSecurityManagerThreadLocal.setCheckWriteFileDescriptor(
-					checkWriteFileDescriptor);
-			}
+			httpClient.executeMethod(hostConfiguration, httpMethod, httpState);
 
 			Header locationHeader = httpMethod.getResponseHeader("location");
 

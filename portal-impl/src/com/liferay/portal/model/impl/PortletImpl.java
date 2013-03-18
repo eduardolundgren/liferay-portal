@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -110,6 +110,7 @@ public class PortletImpl extends PortletBaseImpl {
 		_indexerClasses = new ArrayList<String>();
 		_schedulerEntries = new ArrayList<SchedulerEntry>();
 		_stagedModelDataHandlerClasses = new ArrayList<String>();
+		_socialActivityInterpreterClasses = new ArrayList<String>();
 		_assetRendererFactoryClasses = new ArrayList<String>();
 		_atomCollectionAdapterClasses = new ArrayList<String>();
 		_customAttributesDisplayClasses = new ArrayList<String>();

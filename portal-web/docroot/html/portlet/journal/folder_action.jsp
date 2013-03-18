@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -122,7 +122,7 @@ else {
 					/>
 				</c:if>
 
-				<c:if test="<%= JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) %>">
+				<c:if test="<%= JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) && (JournalUtil.getEmailArticleAddedEnabled(portletPreferences) || JournalUtil.getEmailArticleApprovalDeniedEnabled(portletPreferences) || JournalUtil.getEmailArticleApprovalGrantedEnabled(portletPreferences) || JournalUtil.getEmailArticleApprovalRequestedEnabled(portletPreferences) || JournalUtil.getEmailArticleReviewEnabled(portletPreferences) || JournalUtil.getEmailArticleUpdatedEnabled(portletPreferences)) %>">
 					<c:choose>
 						<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(company.getCompanyId(), user.getUserId(), JournalArticle.class.getName(), scopeGroupId) %>">
 							<portlet:actionURL var="unsubscribeURL">

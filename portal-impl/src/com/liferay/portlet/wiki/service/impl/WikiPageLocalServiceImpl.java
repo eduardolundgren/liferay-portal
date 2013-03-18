@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,7 +54,6 @@ import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
-import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
@@ -154,6 +153,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		page.setHead(head);
 		page.setParentTitle(parentTitle);
 		page.setRedirectTitle(redirectTitle);
+		page.setExpandoBridgeAttributes(serviceContext);
 
 		wikiPagePersistence.update(page);
 
@@ -184,12 +184,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			userId, page, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
-
-		// Expando
-
-		ExpandoBridge expandoBridge = page.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		// Message boards
 
@@ -429,10 +423,14 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * @deprecated As of 6.2.0 replaced by {@link #discardDraft(long, String,
+	 *             double)}
+	 */
 	public void deletePage(long nodeId, String title, double version)
 		throws PortalException, SystemException {
 
-		wikiPagePersistence.removeByN_T_V(nodeId, title, version);
+		discardDraft(nodeId, title, version);
 	}
 
 	public void deletePage(WikiPage page)
@@ -589,6 +587,12 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		PortletFileRepositoryUtil.deletePortletFileEntries(
 			page.getGroupId(), page.getAttachmentsFolderId(),
 			WorkflowConstants.STATUS_IN_TRASH);
+	}
+
+	public void discardDraft(long nodeId, String title, double version)
+		throws PortalException, SystemException {
+
+		wikiPagePersistence.removeByN_T_V(nodeId, title, version);
 	}
 
 	public WikiPage fetchPage(long nodeId, String title, double version)
@@ -945,7 +949,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getRecentChanges(long, long, int, int)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getRecentChanges(long, long,
+	 *             int, int)}
 	 */
 	public List<WikiPage> getRecentChanges(long nodeId, int start, int end)
 		throws PortalException, SystemException {
@@ -968,7 +973,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getRecentChangesCount(long, long)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getRecentChangesCount(long,
+	 *             long)}
 	 */
 	public int getRecentChangesCount(long nodeId)
 		throws PortalException, SystemException {
@@ -1093,16 +1099,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 
-		AssetEntry assetEntry = assetEntryLocalService.getEntry(
-			WikiPage.class.getName(), page.getResourcePrimKey());
-
-		List<AssetLink> assetLinks = assetLinkLocalService.getDirectLinks(
-			assetEntry.getEntryId(), AssetLinkConstants.TYPE_RELATED);
-
-		long[] assetLinkEntryIds = StringUtil.split(
-			ListUtil.toString(assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
-
-		serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
+		populateServiceContext(serviceContext, page);
 
 		addPage(
 			userId, nodeId, title, version, content, summary, false, format,
@@ -1121,7 +1118,10 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		// Asset
 
-		updateAsset(userId, page, null, null, null);
+		updateAsset(
+			userId, page, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(),
+			serviceContext.getAssetLinkEntryIds());
 
 		// Indexer
 
@@ -1207,6 +1207,15 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		String trashTitle = TrashUtil.getTrashTitle(trashEntry.getEntryId());
 
+		List<WikiPage> redirectPages = wikiPagePersistence.findByN_R(
+			page.getNodeId(), page.getTitle());
+
+		for (WikiPage redirectPage : redirectPages) {
+			redirectPage.setRedirectTitle(trashTitle);
+
+			wikiPagePersistence.update(redirectPage);
+		}
+
 		List<WikiPage> versionPages = wikiPagePersistence.findByR_N_H(
 			page.getResourcePrimKey(), page.getNodeId(), false);
 
@@ -1279,9 +1288,14 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		String title = TrashUtil.getOriginalTitle(page.getTitle());
 
-		page.setTitle(title);
+		List<WikiPage> redirectPages = wikiPagePersistence.findByN_R(
+			page.getNodeId(), page.getTitle());
 
-		wikiPagePersistence.update(page);
+		for (WikiPage redirectPage : redirectPages) {
+			redirectPage.setRedirectTitle(title);
+
+			wikiPagePersistence.update(redirectPage);
+		}
 
 		List<WikiPage> versionPages = wikiPagePersistence.findByR_N_H(
 			page.getResourcePrimKey(), page.getNodeId(), false);
@@ -1299,6 +1313,10 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		pageResource.setTitle(title);
 
 		wikiPageResourcePersistence.update(pageResource);
+
+		page.setTitle(title);
+
+		wikiPagePersistence.update(page);
 
 		TrashEntry trashEntry = trashEntryLocalService.getEntry(
 			WikiPage.class.getName(), page.getResourcePrimKey());
@@ -1325,26 +1343,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		WikiPage oldPage = getPage(nodeId, title, version);
 
-		long[] assetCategoryIds = assetCategoryLocalService.getCategoryIds(
-			WikiPage.class.getName(), oldPage.getResourcePrimKey());
-
-		serviceContext.setAssetCategoryIds(assetCategoryIds);
-
-		AssetEntry assetEntry = assetEntryLocalService.getEntry(
-			WikiPage.class.getName(), oldPage.getResourcePrimKey());
-
-		List<AssetLink> assetLinks = assetLinkLocalService.getLinks(
-			assetEntry.getEntryId());
-
-		long[] assetLinkEntryIds = StringUtil.split(
-			ListUtil.toString(assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
-
-		serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
-
-		String[] assetTagNames = assetTagLocalService.getTagNames(
-			WikiPage.class.getName(), oldPage.getResourcePrimKey());
-
-		serviceContext.setAssetTagNames(assetTagNames);
+		populateServiceContext(serviceContext, oldPage);
 
 		return updatePage(
 			userId, nodeId, title, 0, oldPage.getContent(),
@@ -1509,13 +1508,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			page.setRedirectTitle(redirectTitle);
 		}
 
+		page.setExpandoBridgeAttributes(serviceContext);
+
 		wikiPagePersistence.update(page);
-
-		// Expando
-
-		ExpandoBridge expandoBridge = page.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		// Node
 
@@ -2027,6 +2022,32 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			WikiPage.class.getName(), page.getResourcePrimKey());
 
 		subscriptionSender.flushNotificationsAsync();
+	}
+
+	protected void populateServiceContext(
+			ServiceContext serviceContext, WikiPage page)
+		throws PortalException, SystemException {
+
+		long[] assetCategoryIds = assetCategoryLocalService.getCategoryIds(
+			WikiPage.class.getName(), page.getResourcePrimKey());
+
+		serviceContext.setAssetCategoryIds(assetCategoryIds);
+
+		AssetEntry assetEntry = assetEntryLocalService.getEntry(
+			WikiPage.class.getName(), page.getResourcePrimKey());
+
+		List<AssetLink> assetLinks = assetLinkLocalService.getLinks(
+			assetEntry.getEntryId());
+
+		long[] assetLinkEntryIds = StringUtil.split(
+			ListUtil.toString(assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
+
+		serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
+
+		String[] assetTagNames = assetTagLocalService.getTagNames(
+			WikiPage.class.getName(), page.getResourcePrimKey());
+
+		serviceContext.setAssetTagNames(assetTagNames);
 	}
 
 	protected String replaceStyles(String html) {

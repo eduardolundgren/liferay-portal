@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -79,6 +79,19 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			getPermissionChecker(), folder, ActionKeys.VIEW);
 
 		return folder;
+	}
+
+	public List<Long> getFolderIds(long groupId, long folderId)
+			throws PortalException, SystemException {
+
+		JournalFolderPermission.check(
+			getPermissionChecker(), groupId, folderId, ActionKeys.VIEW);
+
+		List<Long> folderIds = getSubfolderIds(groupId, folderId, true);
+
+		folderIds.add(0, folderId);
+
+		return folderIds;
 	}
 
 	public List<JournalFolder> getFolders(long groupId) throws SystemException {
@@ -185,6 +198,10 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			groupId, folderId);
 
 		for (JournalFolder folder : folders) {
+			if (folder.isInTrash() || folder.isInTrashContainer()) {
+				continue;
+			}
+
 			folderIds.add(folder.getFolderId());
 
 			getSubfolderIds(

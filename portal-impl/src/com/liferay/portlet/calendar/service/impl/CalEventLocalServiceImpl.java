@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -260,9 +260,10 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #addEvent(long, String, String, String, int, int, int,
-	 *             int, int, int, int, boolean, boolean, String, boolean,
-	 *             TZSRecurrence, int, int, int, ServiceContext)}
+	 * @deprecated As of 6.2.0, replaced by {@link #addEvent(long, String,
+	 *             String, String, int, int, int, int, int, int, int, boolean,
+	 *             boolean, String, boolean, TZSRecurrence, int, int, int,
+	 *             ServiceContext)}
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public CalEvent addEvent(
@@ -851,9 +852,10 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #updateEvent(long, long, String, String, String, int,
-	 *             int, int, int, int, int, int, boolean, boolean, String,
-	 *             boolean, TZSRecurrence, int, int, int, ServiceContext)}
+	 * @deprecated As of 6.2.0, replaced by {@link #updateEvent(long, long,
+	 *             String, String, String, int, int, int, int, int, int, int,
+	 *             boolean, boolean, String, boolean, TZSRecurrence, int, int,
+	 *             int, ServiceContext)}
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public CalEvent updateEvent(

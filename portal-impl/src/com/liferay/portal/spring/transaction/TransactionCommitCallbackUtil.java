@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,7 +48,7 @@ class TransactionCommitCallbackUtil {
 
 			List<Callable<?>> callableList = callbackListList.get(index);
 
-			if (callableList == Collections.EMPTY_LIST) {
+			if (callableList == Collections.<Callable<?>>emptyList()) {
 				callableList = new ArrayList<Callable<?>>();
 
 				callbackListList.set(index, callableList);
@@ -69,7 +69,7 @@ class TransactionCommitCallbackUtil {
 		List<List<Callable<?>>> callbackListList =
 			_callbackListListThreadLocal.get();
 
-		callbackListList.add(Collections.EMPTY_LIST);
+		callbackListList.add(Collections.<Callable<?>>emptyList());
 	}
 
 	private static ThreadLocal<List<List<Callable<?>>>>

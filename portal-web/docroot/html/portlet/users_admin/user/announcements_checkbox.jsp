@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,15 +24,15 @@ AnnouncementsDelivery delivery = (AnnouncementsDelivery)row.getObject();
 
 boolean defaultValue = false;
 boolean disabled = false;
-String param = "announcementsType" + delivery.getType();
 String messageKey = StringPool.BLANK;
+String param = "announcementsType" + delivery.getType();
 
 int index = entry.getIndex();
 
 if (index == 1) {
 	defaultValue = delivery.isEmail();
-	param += "Email";
 	messageKey = "receive-x-announcements-via-email";
+	param += "Email";
 }
 else if (index == 2) {
 	defaultValue = delivery.isSms();

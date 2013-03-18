@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,7 +42,7 @@ public class PasswordPolicyLocalServiceImpl
 	extends PasswordPolicyLocalServiceBaseImpl {
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public PasswordPolicy addPasswordPolicy(
 			long userId, boolean defaultPolicy, String name, String description,
@@ -223,7 +223,7 @@ public class PasswordPolicyLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 */
 	public PasswordPolicy getPasswordPolicy(
 			long companyId, long organizationId, long locationId)
@@ -318,7 +318,7 @@ public class PasswordPolicyLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public PasswordPolicy updatePasswordPolicy(
 			long passwordPolicyId, String name, String description,

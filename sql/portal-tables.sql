@@ -160,6 +160,7 @@ create table AssetLink (
 );
 
 create table AssetTag (
+	uuid_ VARCHAR(75) null,
 	tagId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -594,9 +595,9 @@ create table DLFileEntryType (
 );
 
 create table DLFileEntryTypes_DDMStructures (
-	fileEntryTypeId LONG not null,
 	structureId LONG not null,
-	primary key (fileEntryTypeId, structureId)
+	fileEntryTypeId LONG not null,
+	primary key (structureId, fileEntryTypeId)
 );
 
 create table DLFileEntryTypes_DLFolders (
@@ -1145,7 +1146,14 @@ create table MBCategory (
 );
 
 create table MBDiscussion (
+	uuid_ VARCHAR(75) null,
 	discussionId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
 	classNameId LONG,
 	classPK LONG,
 	threadId LONG
@@ -1217,9 +1225,14 @@ create table MBStatsUser (
 );
 
 create table MBThread (
+	uuid_ VARCHAR(75) null,
 	threadId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
 	categoryId LONG,
 	rootMessageId LONG,
 	rootMessageUserId LONG,
@@ -1236,8 +1249,13 @@ create table MBThread (
 );
 
 create table MBThreadFlag (
+	uuid_ VARCHAR(75) null,
 	threadFlagId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
 	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
 	modifiedDate DATE null,
 	threadId LONG
 );
@@ -1435,6 +1453,12 @@ create table PluginSetting (
 create table PollsChoice (
 	uuid_ VARCHAR(75) null,
 	choiceId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
 	questionId LONG,
 	name VARCHAR(75) null,
 	description STRING null
@@ -1456,7 +1480,9 @@ create table PollsQuestion (
 );
 
 create table PollsVote (
+	uuid_ VARCHAR(75) null,
 	voteId LONG not null primary key,
+	groupId LONG,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,

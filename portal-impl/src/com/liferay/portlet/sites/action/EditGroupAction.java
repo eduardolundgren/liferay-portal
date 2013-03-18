@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,6 +48,7 @@ import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.Role;
@@ -56,6 +57,8 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.GroupServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetPrototypeServiceUtil;
 import com.liferay.portal.service.LayoutSetServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestServiceUtil;
@@ -69,8 +72,8 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
+import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
-import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +92,7 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @author Brian Wing Shun Chan
  * @author Zsolt Berentey
+ * @author Josef Sustacek
  */
 public class EditGroupAction extends PortletAction {
 
@@ -132,6 +136,9 @@ public class EditGroupAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.DELETE)) {
 				deleteGroups(actionRequest);
+			}
+			else if (cmd.equals("reset_merge_fail_count_and_merge")) {
+				resetMergeFailCountAndMerge(actionRequest);
 			}
 
 			sendRedirect(
@@ -276,6 +283,40 @@ public class EditGroupAction extends PortletAction {
 		}
 
 		return teams;
+	}
+
+	protected void resetMergeFailCountAndMerge(ActionRequest actionRequest)
+		throws Exception {
+
+		long layoutSetPrototypeId = ParamUtil.getLong(
+			actionRequest, "layoutSetPrototypeId");
+
+		LayoutSetPrototype layoutSetPrototype =
+			LayoutSetPrototypeServiceUtil.getLayoutSetPrototype(
+				layoutSetPrototypeId);
+
+		SitesUtil.setMergeFailCount(layoutSetPrototype, 0);
+
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+		boolean privateLayoutSet = ParamUtil.getBoolean(
+			actionRequest, "privateLayoutSet");
+
+		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			groupId, privateLayoutSet);
+
+		SitesUtil.resetPrototype(layoutSet);
+
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
+
+		layoutSetPrototype =
+			LayoutSetPrototypeServiceUtil.getLayoutSetPrototype(
+				layoutSetPrototypeId);
+
+		if (SitesUtil.getMergeFailCount(layoutSetPrototype) > 0) {
+			SessionErrors.add(actionRequest, "resetMergeFailCountAndMerge");
+		}
 	}
 
 	protected void updateActive(ActionRequest actionRequest, String cmd)
@@ -490,12 +531,11 @@ public class EditGroupAction extends PortletAction {
 			}
 			else {
 				String analyticsScript = ParamUtil.getString(
-					actionRequest, SitesUtil.ANALYTICS_PREFIX + analyticsType,
+					actionRequest, Sites.ANALYTICS_PREFIX + analyticsType,
 					typeSettingsProperties.getProperty(analyticsType));
 
 				typeSettingsProperties.setProperty(
-					SitesUtil.ANALYTICS_PREFIX + analyticsType,
-					analyticsScript);
+					Sites.ANALYTICS_PREFIX + analyticsType, analyticsScript);
 			}
 		}
 
@@ -509,11 +549,10 @@ public class EditGroupAction extends PortletAction {
 		typeSettingsProperties.setProperty("false-robots.txt", publicRobots);
 		typeSettingsProperties.setProperty("true-robots.txt", privateRobots);
 
-		int trashEnabled = ParamUtil.getInteger(
+		boolean trashEnabled = ParamUtil.getBoolean(
 			actionRequest, "trashEnabled",
-			GetterUtil.getInteger(
-				typeSettingsProperties.getProperty("trashEnabled"),
-				TrashUtil.TRASH_DEFAULT_VALUE));
+			GetterUtil.getBoolean(
+				typeSettingsProperties.getProperty("trashEnabled"), true));
 
 		typeSettingsProperties.setProperty(
 			"trashEnabled", String.valueOf(trashEnabled));
@@ -542,7 +581,7 @@ public class EditGroupAction extends PortletAction {
 			GetterUtil.getInteger(
 				typeSettingsProperties.getProperty(
 					"contentSharingWithChildrenEnabled"),
-				SitesUtil.CONTENT_SHARING_WITH_CHILDREN_DEFAULT_VALUE));
+				Sites.CONTENT_SHARING_WITH_CHILDREN_DEFAULT_VALUE));
 
 		typeSettingsProperties.setProperty(
 			"contentSharingWithChildrenEnabled",

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,12 +54,7 @@ List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGro
 			property="name"
 		/>
 
-
-		<%
-		Set<UserGroup> mandatoryUserGroups = MembershipPolicyUtil.getMandatoryUserGroups(selUser);
-		%>
-
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryUserGroups.contains(userGroup) %>">
+		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !UserGroupMembershipPolicyUtil.isMembershipRequired(selUser.getUserId(), userGroup.getUserGroupId()) %>">
 			<liferay-ui:search-container-column-text>
 				<a class="modify-link" data-rowId="<%= userGroup.getUserGroupId() %>" href="javascript:;"><%= removeUserGroupIcon %></a>
 			</liferay-ui:search-container-column-text>

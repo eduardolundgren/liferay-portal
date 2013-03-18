@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,6 +63,24 @@ public class TrashEntryServiceWrapper implements TrashEntryService,
 		_trashEntryService.deleteEntries(groupId);
 	}
 
+	public void deleteEntries(long[] entryIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_trashEntryService.deleteEntries(entryIds);
+	}
+
+	public void deleteEntry(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_trashEntryService.deleteEntry(entryId);
+	}
+
+	public void deleteEntry(java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_trashEntryService.deleteEntry(className, classPK);
+	}
+
 	/**
 	* Returns the trash entries with the matching group ID.
 	*
@@ -100,15 +118,37 @@ public class TrashEntryServiceWrapper implements TrashEntryService,
 		return _trashEntryService.getEntries(groupId, start, end, obc);
 	}
 
+	public void moveEntry(java.lang.String className, long classPK,
+		long destinationContainerModelId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_trashEntryService.moveEntry(className, classPK,
+			destinationContainerModelId, serviceContext);
+	}
+
+	public com.liferay.portlet.trash.model.TrashEntry restoreEntry(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _trashEntryService.restoreEntry(entryId);
+	}
+
+	public com.liferay.portlet.trash.model.TrashEntry restoreEntry(
+		long entryId, long overrideClassPK, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _trashEntryService.restoreEntry(entryId, overrideClassPK, name);
+	}
+
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public TrashEntryService getWrappedTrashEntryService() {
 		return _trashEntryService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedTrashEntryService(TrashEntryService trashEntryService) {
 		_trashEntryService = trashEntryService;

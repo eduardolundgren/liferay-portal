@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,7 @@ import org.incava.util.diff.Difference;
  * Take a look at <code>DiffTest</code> to see the expected inputs and outputs.
  *
  * @author     Bruno Farache
- * @deprecated Moved to {@link com.liferay.portal.kernel.util.DiffUtil}
+ * @deprecated As of 6.2.0, moved to {@link com.liferay.portal.kernel.util.DiffUtil}
  */
 public class DiffUtil {
 

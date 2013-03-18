@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,8 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMStructureTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMTemplateTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
@@ -80,12 +82,13 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 		DDMTemplate ddmTemplate = null;
 
 		if (structuredContent) {
-			ddmStructure = JournalTestUtil.addDDMStructure(_group.getGroupId());
+			ddmStructure = DDMStructureTestUtil.addStructure(
+				_group.getGroupId(), JournalArticle.class.getName());
 
-			ddmTemplate = JournalTestUtil.addDDMTemplate(
+			ddmTemplate = DDMTemplateTestUtil.addTemplate(
 				_group.getGroupId(), ddmStructure.getStructureId());
 
-			String content = JournalTestUtil.getSampleStructuredContent();
+			String content = DDMStructureTestUtil.getSampleStructuredContent();
 
 			article = JournalTestUtil.addArticleWithXMLContent(
 				_group.getGroupId(), content, ddmStructure.getStructureKey(),

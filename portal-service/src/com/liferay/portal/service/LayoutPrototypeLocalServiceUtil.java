@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -266,7 +266,8 @@ public class LayoutPrototypeLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getLayoutPrototypeByUuidAndCompanyId(String, long)}
+	* @deprecated As of 6.2.0, replaced by {@link
+	#getLayoutPrototypeByUuidAndCompanyId(String, long)}
 	*/
 	public static com.liferay.portal.model.LayoutPrototype getLayoutPrototypeByUuid(
 		java.lang.String uuid)
@@ -317,7 +318,7 @@ public class LayoutPrototypeLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(LayoutPrototypeLocalService service) {
 	}

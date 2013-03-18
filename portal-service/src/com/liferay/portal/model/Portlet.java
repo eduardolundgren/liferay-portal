@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -879,9 +879,11 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public boolean getShowPortletInactive();
 
 	/**
-	* Returns the names of the classes that represent social activity interpreters associated with the portlet.
+	* Returns the names of the classes that represent social activity
+	* interpreters associated with the portlet.
 	*
-	* @return the names of the classes that represent social activity interpreters associated with the portlet
+	* @return the names of the classes that represent social activity
+	interpreters associated with the portlet
 	*/
 	public java.util.List<java.lang.String> getSocialActivityInterpreterClasses();
 
@@ -2051,8 +2053,8 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public void setShowPortletInactive(boolean showPortletInactive);
 
 	/**
-	* Sets the names of the classes that represent social activity interpreters associated with
-	* the portlet.
+	* Sets the names of the classes that represent social activity interpreters
+	* associated with the portlet.
 	*
 	* @param socialActivityInterpreterClasses the names of the classes that
 	represent social activity interpreters associated with the portlet

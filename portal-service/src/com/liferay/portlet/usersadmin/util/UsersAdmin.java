@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,11 +58,6 @@ public interface UsersAdmin {
 		throws PortalException, SystemException;
 
 	public long[] addRequiredRoles(User user, long[] roleIds)
-		throws PortalException, SystemException;
-
-	public long[] filterDeleteGroupRoleUserIds(
-			PermissionChecker permissionChecker, long groupId, long roleId,
-			long[] userIds)
 		throws PortalException, SystemException;
 
 	public List<Role> filterGroupRoles(

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,12 +18,17 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
 
 import java.io.File;
+
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Michael Hashimoto
@@ -38,25 +43,75 @@ public class SeleniumBuilderFileUtil {
 		return _baseDir;
 	}
 
+	public Set<String> getChildElementAttributeValues(
+		Element element, String attributeName) {
+
+		Set<String> childElementAttributeValues = new TreeSet<String>();
+
+		List<Element> childElements = element.elements();
+
+		if (childElements.isEmpty()) {
+			return childElementAttributeValues;
+		}
+
+		for (Element childElement : childElements) {
+			String childElementName = childElement.attributeValue(
+				attributeName);
+
+			if (childElementName != null) {
+				int x = childElementName.lastIndexOf(StringPool.POUND);
+
+				if (x != -1) {
+					childElementAttributeValues.add(
+						childElementName.substring(0, x));
+				}
+			}
+
+			childElementAttributeValues.addAll(
+				getChildElementAttributeValues(childElement, attributeName));
+		}
+
+		return childElementAttributeValues;
+	}
+
 	public String getClassName(String fileName) {
-		int x = fileName.indexOf(CharPool.PERIOD);
-
-		String fileSuffix = fileName.substring(x + 1);
-
-		String classSuffix = StringUtil.upperCaseFirstLetter(fileSuffix);
+		String classSuffix = getClassSuffix(fileName);
 
 		return getClassName(fileName, classSuffix);
 	}
 
 	public String getClassName(String fileName, String classSuffix) {
-		int x = fileName.lastIndexOf(StringPool.SLASH);
+		return
+			getPackageName(fileName) + "." +
+				getSimpleClassName(fileName, classSuffix);
+	}
 
-		String packagePath = StringUtil.replace(
-			fileName.substring(0, x + 1), StringPool.SLASH, StringPool.PERIOD);
+	public String getClassSuffix(String fileName) {
+		int x = fileName.indexOf(CharPool.PERIOD);
 
-		String simpleClassName = getName(fileName) + classSuffix;
+		String classSuffix = StringUtil.upperCaseFirstLetter(
+			fileName.substring(x + 1));
 
-		return packagePath + simpleClassName;
+		if (classSuffix.equals("Testcase")) {
+			classSuffix = "TestCase";
+		}
+		else if (classSuffix.equals("Testsuite")) {
+			classSuffix = "TestSuite";
+		}
+
+		return classSuffix;
+	}
+
+	public String getJavaFileName(String fileName) {
+		String classSuffix = getClassSuffix(fileName);
+
+		return getJavaFileName(fileName, classSuffix);
+	}
+
+	public String getJavaFileName(String fileName, String classSuffix) {
+		return
+			getPackagePath(fileName) + "/" +
+				getSimpleClassName(fileName, classSuffix) + ".java";
 	}
 
 	public String getName(String fileName) {
@@ -80,6 +135,27 @@ public class SeleniumBuilderFileUtil {
 		return content;
 	}
 
+	public String getPackageName(String fileName) {
+		String packagePath = getPackagePath(fileName);
+
+		return StringUtil.replace(
+			packagePath, StringPool.SLASH, StringPool.PERIOD);
+	}
+
+	public String getPackagePath(String fileName) {
+		int x = fileName.lastIndexOf(StringPool.SLASH);
+
+		return fileName.substring(0, x);
+	}
+
+	public String getReturnType(String name) {
+		if (name.startsWith("Is")) {
+			return "boolean";
+		}
+
+		return "void";
+	}
+
 	public Element getRootElement(String fileName) throws Exception {
 		String content = getNormalizedContent(fileName);
 
@@ -90,6 +166,36 @@ public class SeleniumBuilderFileUtil {
 		validateDocument(fileName, rootElement);
 
 		return rootElement;
+	}
+
+	public String getSimpleClassName(String fileName) {
+		String classSuffix = getClassSuffix(fileName);
+
+		return getSimpleClassName(fileName, classSuffix);
+	}
+
+	public String getSimpleClassName(String fileName, String classSuffix) {
+		return getName(fileName) + classSuffix;
+	}
+
+	public int getTargetCount(Element rootElement) {
+		String xml = rootElement.asXML();
+
+		for (int i = 1;; i++) {
+			if (xml.contains("${target" + i + "}")) {
+				continue;
+			}
+
+			if (i > 1) {
+				i--;
+			}
+
+			return i;
+		}
+	}
+
+	public String getVariableName(String name) {
+		return TextFormatter.format(name, TextFormatter.I);
 	}
 
 	public String normalizeFileName(String fileName) {
@@ -149,13 +255,6 @@ public class SeleniumBuilderFileUtil {
 
 			if ((tdText == null) || !shortFileName.equals(tdText)) {
 				System.out.println(fileName + " has an invalid <td>");
-			}
-		}
-		else {
-			String name = rootElement.attributeValue("name");
-
-			if ((name == null) || !name.equals(shortFileName)) {
-				System.out.println(fileName + " has an invalid name=\"\"");
 			}
 		}
 	}

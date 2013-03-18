@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,11 @@
 <liferay-util:include page="/html/portlet/wiki/top_links.jsp" />
 
 <liferay-util:include page="/html/portlet/wiki/page_tabs.jsp">
-	<liferay-util:param name="tabs1" value="activities" />
+	<liferay-util:param name="tabs1" value="history" />
+</liferay-util:include>
+
+<liferay-util:include page="/html/portlet/wiki/page_tabs_history.jsp">
+	<liferay-util:param name="tabs3" value="activities" />
 </liferay-util:include>
 
 <%
@@ -33,12 +37,10 @@ portletURL.setParameter("title", wikiPage.getTitle());
 
 PortalUtil.addPortletBreadcrumbEntry(request, wikiPage.getTitle(), portletURL.toString());
 
-portletURL.setParameter("struts_action", "/wiki/view_page_activities");
+portletURL.setParameter("struts_action", "/wiki/view_page_history");
 portletURL.setParameter("redirect", currentURL);
-portletURL.setParameter("nodeId", String.valueOf(node.getNodeId()));
-portletURL.setParameter("title", wikiPage.getTitle());
 
-PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "activities"), portletURL.toString());
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "history"), portletURL.toString());
 
 PortletURL iteratorURL = renderResponse.createRenderURL();
 

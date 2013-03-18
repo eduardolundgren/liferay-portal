@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,11 +42,15 @@ public class PortalPermissionCollection extends PermissionCollection {
 
 	@Override
 	public Enumeration<Permission> elements() {
-		return Collections.enumeration(Collections.EMPTY_LIST);
+		return Collections.enumeration(Collections.<Permission>emptyList());
 	}
 
 	public Policy getJavaSecurityPolicy() {
 		return null;
+	}
+
+	public PACLPolicy getPACLPolicy() {
+		return _paclPolicy;
 	}
 
 	@Override
@@ -55,15 +59,17 @@ public class PortalPermissionCollection extends PermissionCollection {
 			return true;
 		}
 
-		if (_permissionCollection.implies(permission)) {
+		if (permission instanceof PACLUtil.Permission) {
+			throw new PACLUtil.Exception(_paclPolicy);
+		}
+
+		if (_permissionCollection.implies(permission) ||
+			_paclPolicy.implies(permission)) {
+
 			return true;
 		}
 
-		if (!_paclPolicy.implies(permission)) {
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	@Override

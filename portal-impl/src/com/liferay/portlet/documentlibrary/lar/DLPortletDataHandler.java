@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.RepositoryEntry;
@@ -58,6 +57,7 @@ import com.liferay.portlet.documentlibrary.NoSuchFileException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileRank;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
@@ -959,7 +959,10 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		for (int i = 0; i < dlFileEntryTypes.size(); i++) {
 			DLFileEntryType dlFileEntryType = dlFileEntryTypes.get(i);
 
-			if (dlFileEntryType.getFileEntryTypeId() == 0) {
+			if (dlFileEntryType.getFileEntryTypeId() ==
+					DLFileEntryTypeConstants.
+						FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
+
 				fileEntryTypeUuids[i] = "@basic_document@";
 			}
 			else {
@@ -972,7 +975,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				defaultFileEntryTypeUuid = dlFileEntryType.getUuid();
 			}
 
-			if (isFileEntryTypeExportable(dlFileEntryType)) {
+			if (dlFileEntryType.isExportable()) {
 				exportFileEntryType(
 					portletDataContext, fileEntryTypesElement, dlFileEntryType);
 			}
@@ -1010,7 +1013,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		fileEntryElement.addAttribute(
 			"fileEntryTypeUuid", dlFileEntryType.getUuid());
 
-		if (!isFileEntryTypeExportable(dlFileEntryType)) {
+		if (!dlFileEntryType.isExportable()) {
 			return;
 		}
 
@@ -1786,16 +1789,6 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		}
 	}
 
-	protected static boolean isFileEntryTypeExportable(
-		DLFileEntryType dlFileEntryType) {
-
-		if (dlFileEntryType.getFileEntryTypeId() == 0) {
-			return false;
-		}
-
-		return true;
-	}
-
 	protected static boolean isFileEntryTypeGlobal(
 			long companyId, DLFileEntryType dlFileEntryType)
 		throws PortalException, SystemException {
@@ -1836,7 +1829,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			"com.liferay.portlet.documentlibrary",
 			portletDataContext.getScopeGroupId());
 
-		Element rootElement = addExportRootElement();
+		Element rootElement = addExportDataRootElement(portletDataContext);
 
 		rootElement.addAttribute(
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
@@ -1870,7 +1863,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				});
 
 		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
-			if (!isFileEntryTypeExportable(dlFileEntryType)) {
+			if (!dlFileEntryType.isExportable()) {
 				continue;
 			}
 
@@ -1912,7 +1905,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			}
 		}
 
-		return rootElement.formattedString();
+		return getExportDataRootElementString(rootElement);
 	}
 
 	@Override
@@ -1926,9 +1919,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			portletDataContext.getSourceGroupId(),
 			portletDataContext.getScopeGroupId());
 
-		Document document = SAXReaderUtil.read(data);
-
-		Element rootElement = document.getRootElement();
+		Element rootElement = portletDataContext.getImportDataRootElement();
 
 		Element repositoriesElement = rootElement.element("repositories");
 

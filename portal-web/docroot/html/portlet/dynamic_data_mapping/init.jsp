@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,9 @@ page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemp
 page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.template.TemplateConstants" %><%@
 page import="com.liferay.portal.kernel.template.TemplateManagerUtil" %><%@
+page import="com.liferay.portal.kernel.template.TemplateVariableDefinition" %><%@
+page import="com.liferay.portal.kernel.template.TemplateVariableGroup" %><%@
+page import="com.liferay.portal.template.TemplateContextHelper" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFolderConstants" %><%@
 page import="com.liferay.portlet.dynamicdatalists.model.DDLRecordSet" %><%@
@@ -63,6 +66,7 @@ String chooseCallback = ParamUtil.getString(request, "chooseCallback");
 String ddmResource = ParamUtil.getString(request, "ddmResource");
 String ddmResourceActionId = ParamUtil.getString(request, "ddmResourceActionId");
 String refererPortletName = ParamUtil.getString(request, "refererPortletName");
+String refererWebDAVToken = ParamUtil.getString(request, "refererWebDAVToken", portletConfig.getInitParameter("refererWebDAVToken"));
 String saveCallback = ParamUtil.getString(request, "saveCallback");
 String scopeAvailableFields = ParamUtil.getString(request, "scopeAvailableFields");
 String scopeStorageType = ParamUtil.getString(request, "scopeStorageType");

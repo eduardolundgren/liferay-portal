@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -188,12 +188,12 @@ public class JournalArticleLocalServiceWrapper
 	}
 
 	/**
-	* Returns the journal article with the UUID in the group.
+	* Returns the journal article matching the UUID and group.
 	*
-	* @param uuid the UUID of journal article
-	* @param groupId the group id of the journal article
-	* @return the journal article
-	* @throws PortalException if a journal article with the UUID in the group could not be found
+	* @param uuid the journal article's UUID
+	* @param groupId the primary key of the group
+	* @return the matching journal article
+	* @throws PortalException if a matching journal article could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.journal.model.JournalArticle getJournalArticleByUuidAndGroupId(
@@ -883,20 +883,23 @@ public class JournalArticleLocalServiceWrapper
 			version, status);
 	}
 
-	public void moveArticle(long groupId, java.lang.String articleId,
-		long newFolderId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleLocalService.moveArticle(groupId, articleId, newFolderId);
+	public com.liferay.portlet.journal.model.JournalArticle moveArticle(
+		long groupId, java.lang.String articleId, long newFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _journalArticleLocalService.moveArticle(groupId, articleId,
+			newFolderId);
 	}
 
 	public com.liferay.portlet.journal.model.JournalArticle moveArticleFromTrash(
 		long userId, long groupId,
 		com.liferay.portlet.journal.model.JournalArticle article,
-		long newFolderId)
+		long newFolderId,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleLocalService.moveArticleFromTrash(userId,
-			groupId, article, newFolderId);
+			groupId, article, newFolderId, serviceContext);
 	}
 
 	public com.liferay.portlet.journal.model.JournalArticle moveArticleToTrash(
@@ -1117,8 +1120,9 @@ public class JournalArticleLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated {@link #updateArticleTranslation(long, String, double,
-	Locale, String, String, String, Map, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link
+	#updateArticleTranslation(long, String, double, Locale,
+	String, String, String, Map, ServiceContext)}
 	*/
 	public com.liferay.portlet.journal.model.JournalArticle updateArticleTranslation(
 		long groupId, java.lang.String articleId, double version,
@@ -1204,14 +1208,14 @@ public class JournalArticleLocalServiceWrapper
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public JournalArticleLocalService getWrappedJournalArticleLocalService() {
 		return _journalArticleLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedJournalArticleLocalService(
 		JournalArticleLocalService journalArticleLocalService) {

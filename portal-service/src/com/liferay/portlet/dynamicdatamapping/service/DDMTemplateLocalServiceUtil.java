@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -193,12 +193,12 @@ public class DDMTemplateLocalServiceUtil {
 	}
 
 	/**
-	* Returns the d d m template with the UUID in the group.
+	* Returns the d d m template matching the UUID and group.
 	*
-	* @param uuid the UUID of d d m template
-	* @param groupId the group id of the d d m template
-	* @return the d d m template
-	* @throws PortalException if a d d m template with the UUID in the group could not be found
+	* @param uuid the d d m template's UUID
+	* @param groupId the primary key of the group
+	* @return the matching d d m template
+	* @throws PortalException if a matching d d m template could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMTemplate getDDMTemplateByUuidAndGroupId(
@@ -286,9 +286,9 @@ public class DDMTemplateLocalServiceUtil {
 	see {@link
 	com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants}.
 	* @param script the template's script
-	* @param serviceContext the template's service context. Can set the UUID,
-	creation date, modification date, guest permissions, and group
-	permissions for the template.
+	* @param serviceContext the service context to be applied. Can set the
+	UUID, creation date, modification date, guest permissions, and
+	group permissions for the template.
 	* @return the template
 	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
@@ -333,9 +333,9 @@ public class DDMTemplateLocalServiceUtil {
 	<code>null</code>)
 	* @param smallImageFile the template's small image file (optionally
 	<code>null</code>)
-	* @param serviceContext the template's service context. Can set the UUID,
-	creation date, modification date, guest permissions, and group
-	permissions for the template.
+	* @param serviceContext the service context to be applied. Can set the
+	UUID, creation date, modification date, guest permissions, and
+	group permissions for the template.
 	* @return the template
 	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
@@ -713,6 +713,54 @@ public class DDMTemplateLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getTemplates(groupId, classNameId, classPK, type, mode);
+	}
+
+	/**
+	* Returns all the templates matching the group and class PK.
+	*
+	* @param groupId the primary key of the group
+	* @param classPK the primary key of the template's related entity
+	* @return the matching templates
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplatesByClassPK(
+		long groupId, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getTemplatesByClassPK(groupId, classPK);
+	}
+
+	/**
+	* Returns an ordered range of all the templates matching the group and
+	* structure class name ID.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param groupId the primary key of the group
+	* @param structureClassNameId the primary key of the class name for the
+	template's related structure
+	* @param start the lower bound of the range of templates to return
+	* @param end the upper bound of the range of templates to return (not
+	inclusive)
+	* @param orderByComparator the comparator to order the templates
+	(optionally <code>null</code>)
+	* @return the range of matching templates ordered by the comparator
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplatesByStructureClassNameId(
+		long groupId, long structureClassNameId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getTemplatesByStructureClassNameId(groupId,
+			structureClassNameId, start, end, orderByComparator);
 	}
 
 	/**
@@ -1133,7 +1181,7 @@ public class DDMTemplateLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(DDMTemplateLocalService service) {
 	}

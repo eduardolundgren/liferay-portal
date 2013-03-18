@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -355,11 +355,7 @@ public class JavadocFormatter {
 					comment = element.getText();
 				}
 
-				String elementName = null;
-
-				if (commentElement != null) {
-					elementName = element.elementText("name");
-				}
+				String elementName = element.elementText("name");
 
 				if (Validator.isNotNull(comment)) {
 					comment = _assembleTagComment(
@@ -528,11 +524,9 @@ public class JavadocFormatter {
 
 		value = _trimMultilineText(value);
 
-		if (Validator.isNotNull(value)) {
-			Element commentElement = paramElement.addElement("comment");
+		Element commentElement = paramElement.addElement("comment");
 
-			commentElement.addCDATA(value);
-		}
+		commentElement.addCDATA(value);
 	}
 
 	private void _addParamElements(
@@ -547,8 +541,7 @@ public class JavadocFormatter {
 		}
 	}
 
-	private void _addReturnElement(
-			Element methodElement, JavaMethod javaMethod)
+	private void _addReturnElement(Element methodElement, JavaMethod javaMethod)
 		throws Exception {
 
 		Type returns = javaMethod.getReturns();
@@ -579,11 +572,9 @@ public class JavadocFormatter {
 
 		comment = _trimMultilineText(comment);
 
-		if (Validator.isNotNull(comment)) {
-			Element commentElement = returnElement.addElement("comment");
+		Element commentElement = returnElement.addElement("comment");
 
-			commentElement.addCDATA(comment);
-		}
+		commentElement.addCDATA(comment);
 	}
 
 	private void _addThrowsElement(
@@ -622,11 +613,9 @@ public class JavadocFormatter {
 
 		value = _trimMultilineText(value);
 
-		if (Validator.isNotNull(value)) {
-			Element commentElement = throwsElement.addElement("comment");
+		Element commentElement = throwsElement.addElement("comment");
 
-			commentElement.addCDATA(_getCDATA(value));
-		}
+		commentElement.addCDATA(_getCDATA(value));
 	}
 
 	private void _addThrowsElements(
@@ -649,7 +638,7 @@ public class JavadocFormatter {
 
 		if (Validator.isNotNull(elementName)) {
 			if (Validator.isNotNull(comment)) {
-				comment = elementName  + StringPool.SPACE + comment;
+				comment = elementName + StringPool.SPACE + comment;
 			}
 			else {
 				comment = elementName;
@@ -951,7 +940,7 @@ public class JavadocFormatter {
 		for (Annotation annotation : annotations) {
 			int annotationLineNumber = annotation.getLineNumber();
 
-			Map<String, String> propertyMap = annotation.getPropertyMap(); 
+			Map<String, String> propertyMap = annotation.getPropertyMap();
 
 			if (propertyMap.isEmpty()) {
 				annotationLineNumber--;
@@ -1287,7 +1276,7 @@ public class JavadocFormatter {
 		}
 	}
 
- 	private boolean _hasPublicModifier(AbstractJavaEntity abstractJavaEntity) {
+	private boolean _hasPublicModifier(AbstractJavaEntity abstractJavaEntity) {
 		String[] modifiers = abstractJavaEntity.getModifiers();
 
 		if (modifiers == null) {
@@ -1303,7 +1292,7 @@ public class JavadocFormatter {
 		return false;
 	}
 
-	private boolean  _isOverrideMethod(
+	private boolean _isOverrideMethod(
 		JavaClass javaClass, JavaMethod javaMethod,
 		Collection<JavaClass> ancestorJavaClasses) {
 
@@ -1362,9 +1351,7 @@ public class JavadocFormatter {
 		return false;
 	}
 
-	private String _removeJavadocFromJava(
-		JavaClass javaClass, String content) {
-
+	private String _removeJavadocFromJava(JavaClass javaClass, String content) {
 		Set<Integer> lineNumbers = new HashSet<Integer>();
 
 		lineNumbers.add(_getJavaClassLineNumber(javaClass));
@@ -1532,7 +1519,7 @@ public class JavadocFormatter {
 						_getIndent(lines, javaMethod) + "@Override\n";
 
 					if (Validator.isNotNull(javaMethodComment)) {
-						javaMethodComment =	javaMethodComment + overrideLine;
+						javaMethodComment = javaMethodComment + overrideLine;
 					}
 					else {
 						javaMethodComment = overrideLine;
@@ -1607,8 +1594,7 @@ public class JavadocFormatter {
 			while (matcher.find()) {
 				String wrapped = _formatInlines(matcher.group());
 
-				wrapped = StringUtil.wrap(
-					wrapped, 80 - indentLength, "\n");
+				wrapped = StringUtil.wrap(wrapped, 80 - indentLength, "\n");
 
 				matcher.appendReplacement(sb, wrapped);
 			}

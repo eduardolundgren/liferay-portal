@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ import com.liferay.portal.service.permission.PortalPermissionUtil;
 public class PasswordPolicyServiceImpl extends PasswordPolicyServiceBaseImpl {
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public PasswordPolicy addPasswordPolicy(
 			String name, String description, boolean changeable,
@@ -86,7 +86,7 @@ public class PasswordPolicyServiceImpl extends PasswordPolicyServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public PasswordPolicy updatePasswordPolicy(
 			long passwordPolicyId, String name, String description,

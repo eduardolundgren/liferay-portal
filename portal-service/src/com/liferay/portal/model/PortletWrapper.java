@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1323,9 +1323,11 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Returns the names of the classes that represent social activity interpreters associated with the portlet.
+	* Returns the names of the classes that represent social activity
+	* interpreters associated with the portlet.
 	*
-	* @return the names of the classes that represent social activity interpreters associated with the portlet
+	* @return the names of the classes that represent social activity
+	interpreters associated with the portlet
 	*/
 	public java.util.List<java.lang.String> getSocialActivityInterpreterClasses() {
 		return _portlet.getSocialActivityInterpreterClasses();
@@ -2766,8 +2768,8 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Sets the names of the classes that represent social activity interpreters associated with
-	* the portlet.
+	* Sets the names of the classes that represent social activity interpreters
+	* associated with the portlet.
 	*
 	* @param socialActivityInterpreterClasses the names of the classes that
 	represent social activity interpreters associated with the portlet
@@ -2982,7 +2984,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedModel}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
 	 */
 	public Portlet getWrappedPortlet() {
 		return _portlet;

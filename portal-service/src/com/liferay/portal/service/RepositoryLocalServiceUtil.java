@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -193,12 +193,12 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the repository with the UUID in the group.
+	* Returns the repository matching the UUID and group.
 	*
-	* @param uuid the UUID of repository
-	* @param groupId the group id of the repository
-	* @return the repository
-	* @throws PortalException if a repository with the UUID in the group could not be found
+	* @param uuid the repository's UUID
+	* @param groupId the primary key of the group
+	* @return the matching repository
+	* @throws PortalException if a matching repository could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Repository getRepositoryByUuidAndGroupId(
@@ -282,8 +282,9 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addRepository(long, long, long, long, String, String,
-	String, UnicodeProperties, boolean, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #addRepository(long, long,
+	long, long, String, String, String, UnicodeProperties,
+	boolean, ServiceContext)}
 	*/
 	public static long addRepository(long userId, long groupId,
 		long classNameId, long parentFolderId, java.lang.String name,
@@ -376,7 +377,7 @@ public class RepositoryLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(RepositoryLocalService service) {
 	}

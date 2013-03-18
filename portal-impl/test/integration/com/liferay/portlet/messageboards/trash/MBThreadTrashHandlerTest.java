@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,8 @@ import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 import com.liferay.portlet.messageboards.util.MBTestUtil;
 import com.liferay.portlet.trash.BaseTrashHandlerTestCase;
 
+import java.util.Calendar;
+
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
@@ -67,12 +69,17 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
-	public void testTrashVersionAndDelete() throws Exception {
+	public void testTrashVersionBaseModelAndDelete() throws Exception {
 		Assert.assertTrue("This test does not apply", true);
 	}
 
 	@Override
-	public void testTrashVersionAndRestore() throws Exception {
+	public void testTrashVersionBaseModelAndRestore() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
+	public void testTrashVersionParentBaseModel() throws Exception {
 		Assert.assertTrue("This test does not apply", true);
 	}
 
@@ -102,6 +109,14 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
+	protected int getMineBaseModelsCount(long groupId, long userId)
+		throws Exception {
+
+		return MBThreadServiceUtil.getGroupThreadsCount(
+			groupId, userId, WorkflowConstants.STATUS_APPROVED);
+	}
+
+	@Override
 	protected int getNotInTrashBaseModelsCount(BaseModel<?> parentBaseModel)
 		throws Exception {
 
@@ -128,6 +143,16 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
+	protected int getRecentBaseModelsCount(long groupId) throws Exception {
+		Calendar calendar = Calendar.getInstance();
+
+		calendar.add(Calendar.HOUR, -1);
+
+		return MBThreadServiceUtil.getGroupThreadsCount(
+			groupId, 0, calendar.getTime(), WorkflowConstants.STATUS_APPROVED);
+	}
+
+	@Override
 	protected String getSearchKeywords() {
 		return _SUBJECT;
 	}
@@ -148,12 +173,8 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
-	protected boolean isInTrashContainer(ClassedModel classedModel)
-		throws Exception {
-
-		MBThread thread = (MBThread)classedModel;
-
-		return thread.isInTrashContainer();
+	protected boolean isBaseModelContainerModel() {
+		return false;
 	}
 
 	@Override

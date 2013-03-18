@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -303,7 +303,7 @@ if (Validator.isNull(mainLanguageValue)) {
 
 		if (languageSelectorTrigger) {
 			Liferay.component(
-				'<%= namespace + name %>languageSelector',
+				'<%= namespace + id %>languageSelector',
 				function(event) {
 					if (handle) {
 						handle.detach();
@@ -329,7 +329,7 @@ if (Validator.isNull(mainLanguageValue)) {
 			var handle = languageSelectorTrigger.once(
 				'click',
 				function(event) {
-					Liferay.component('<%= namespace + name %>languageSelector');
+					Liferay.component('<%= namespace + id %>languageSelector');
 				}
 			);
 		}
