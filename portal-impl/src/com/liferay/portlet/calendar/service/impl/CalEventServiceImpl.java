@@ -130,6 +130,37 @@ public class CalEventServiceImpl extends CalEventServiceBaseImpl {
 			getGuestOrUserId(), groupId, fileName);
 	}
 
+	public List<CalEvent> getCalendarEvents(
+			long groupId, Calendar cal, String type)
+		throws PortalException, SystemException {
+
+		return getCalendarEvents(groupId, cal, new String[] {type});
+	}
+
+	public List<CalEvent> getCalendarEvents(
+			long groupId, Calendar cal, String[] types)
+		throws PortalException, SystemException {
+
+		List<CalEvent> events = calEventLocalService.getCalendarEvents(
+			groupId, cal, types);
+
+		events = ListUtil.copy(events);
+
+		Iterator<CalEvent> itr = events.iterator();
+
+		while (itr.hasNext()) {
+			CalEvent event = itr.next();
+
+			if (!CalEventPermission.contains(
+					getPermissionChecker(), event, ActionKeys.VIEW)) {
+
+				itr.remove();
+			}
+		}
+
+		return events;
+	}
+
 	public CalEvent getEvent(long eventId)
 		throws PortalException, SystemException {
 
@@ -207,6 +238,30 @@ public class CalEventServiceImpl extends CalEventServiceBaseImpl {
 		else {
 			return calEventPersistence.filterCountByGroupId(groupId);
 		}
+	}
+
+	public boolean hasCalendarEvents(long groupId, Calendar cal)
+		throws PortalException, SystemException {
+
+		return hasCalendarEvents(groupId, cal, new String[0]);
+	}
+
+	public boolean hasCalendarEvents(long groupId, Calendar cal, String type)
+		throws PortalException, SystemException {
+
+		return hasCalendarEvents(groupId, cal, new String[] {type});
+	}
+
+	public boolean hasCalendarEvents(long groupId, Calendar cal, String[] types)
+		throws PortalException, SystemException {
+
+		List<CalEvent> events = getCalendarEvents(groupId, cal, types);
+
+		if (events.isEmpty()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public boolean hasEvents(long groupId, Calendar cal)

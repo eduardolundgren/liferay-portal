@@ -186,12 +186,20 @@ Format dateFormatDayOfWeek = FastDateFormatFactoryUtil.getSimpleDateFormat("EEE"
 				<table border="0" cellpadding="4" cellspacing="0" width="100%">
 
 				<%
-				List events = CalEventServiceUtil.getEvents(scopeGroupId, cal, eventType);
+				List events = CalEventServiceUtil.getCalendarEvents(scopeGroupId, cal, eventType);
 
 				events = ListUtil.sort(events, new EventTimeComparator(timeZone, locale));
 
+				Date dateMidnight = CalendarUtil.getGTDate(cal);
+
 				for (int j = 0; j < events.size(); j++) {
 					CalEvent event = (CalEvent)events.get(j);
+
+					boolean isOverlapping = false;
+
+					if (event.getStartDate().before(dateMidnight)) {
+						isOverlapping = true;
+					}
 
 					event = event.toEscapedModel();
 
@@ -215,9 +223,17 @@ Format dateFormatDayOfWeek = FastDateFormatFactoryUtil.getSimpleDateFormat("EEE"
 								<c:otherwise>
 									<c:choose>
 										<c:when test="<%= event.isTimeZoneSensitive() %>">
+											<c:if test="<%= isOverlapping %>">
+												<%= dateFormatDate.format(Time.getDate(event.getStartDate(), timeZone)) %>
+											</c:if>
+
 											<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
 										</c:when>
 										<c:otherwise>
+											<c:if test="<%= isOverlapping %>">
+												<%= dateFormatDate.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
+											</c:if>
+
 											<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
 										</c:otherwise>
 									</c:choose>

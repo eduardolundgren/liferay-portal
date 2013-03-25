@@ -114,7 +114,7 @@
 				tempCal.set(Calendar.DATE, i);
 				tempCal.set(Calendar.YEAR, year);
 
-				boolean hasEvents = CalEventServiceUtil.hasEvents(scopeGroupId, tempCal, eventType);
+				boolean hasEvents = CalEventServiceUtil.hasCalendarEvents(scopeGroupId, tempCal, eventType);
 
 				if (hasEvents) {
 					data.add(new Integer(i));

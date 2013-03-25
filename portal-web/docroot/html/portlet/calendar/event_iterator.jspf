@@ -24,7 +24,7 @@ headerNames.add(StringPool.BLANK);
 
 SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, "there-are-no-events-on-this-day");
 
-List results = CalEventServiceUtil.getEvents(scopeGroupId, selCal, eventType);
+List results = CalEventServiceUtil.getCalendarEvents(scopeGroupId, selCal, eventType);
 
 results = ListUtil.sort(results, new EventTimeComparator(timeZone, locale));
 

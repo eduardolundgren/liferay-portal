@@ -109,7 +109,7 @@ dateFormatDate = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMMM d, yyyy", 
 <br />
 
 <%
-List<CalEvent> results = CalEventServiceUtil.getEvents(scopeGroupId, selCal, eventType);
+List<CalEvent> results = CalEventServiceUtil.getCalendarEvents(scopeGroupId, selCal, eventType);
 
 List<CalEvent> allDayResults = new ArrayList<CalEvent>();
 List<CalEvent> partDayResults = new ArrayList<CalEvent>();
@@ -238,6 +238,8 @@ if (!partDayResults.isEmpty()) {
 	<%
 	int eventWidth = 90 / (sortedResults.isEmpty() ? 1 : sortedResults.size());
 
+	Date selDateMidnight = CalendarUtil.getGTDate(selCal);
+
 	for (int i = 0; i < sortedResults.size(); i++) {
 		List<CalEvent> displayResults = sortedResults.get(i);
 
@@ -245,14 +247,28 @@ if (!partDayResults.isEmpty()) {
 			event = event.toEscapedModel();
 
 			Date startDate = Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault());
+			Date endDate = Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault());
 
 			if (event.isTimeZoneSensitive()) {
 				startDate = Time.getDate(event.getStartDate(), timeZone);
+				endDate = Time.getDate(CalUtil.getEndTime(event), timeZone);
 			}
 
 			int eventStartPos = (int)(((((startDate.getHours() * 60) + (float)startDate.getMinutes() ) / 60) * 50) - 2);
 
 			int eventDisplayDuration = Math.max(50, (event.getDurationHour() * 60) + event.getDurationMinute());
+
+			boolean isOverlapping = false;
+
+			if (startDate.before(selDateMidnight)) {
+				isOverlapping = true;
+
+				eventStartPos = -2;
+
+				long overlapping = startDate.getTime() + (event.getDurationHour() * Time.HOUR) + (event.getDurationMinute() * Time.MINUTE) - selDateMidnight.getTime();
+
+				eventDisplayDuration = (int)Math.max(50, (overlapping / Time.MINUTE));
+			}
 
 			int eventBoxLength = (int)(((eventDisplayDuration / 60) * 50) - 12);
 
@@ -280,18 +296,13 @@ if (!partDayResults.isEmpty()) {
 					</div>
 
 					<div class="event-time">
-						<c:choose>
-							<c:when test="<%= event.isTimeZoneSensitive() %>">
-								<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
-								-
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), timeZone)) %>
-							</c:when>
-							<c:otherwise>
-								<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
-								-
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())) %>
-							</c:otherwise>
-						</c:choose>
+						<c:if test="<%= isOverlapping %>">
+							<%= dateFormatDate.format(startDate) %>
+						</c:if>
+
+						<%= dateFormatTime.format(startDate) %>
+						-
+						<%= dateFormatTime.format(endDate) %>
 					</div>
 
 					<div class="event-title">
