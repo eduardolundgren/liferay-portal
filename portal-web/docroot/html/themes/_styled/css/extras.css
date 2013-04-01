@@ -1,5 +1,23 @@
 @import "compass";
 
+@mixin keyframes($name) {
+	@-webkit-keyframes #{$name} {
+		@content;
+	}
+
+	@-moz-keyframes #{$name} {
+		@content;
+	}
+
+	@-o-keyframes #{$name} {
+		@content;
+	}
+
+	@keyframes #{$name} {
+		@content;
+	}
+}
+
 .menu-content, .underlay-content {
 	@include box-shadow(2px 4px 7px rgba(0, 0, 0, 0.5));
 }
@@ -171,33 +189,13 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 	@include box-sizing("border-box");
 }
 
-@mixin progress-bar-stripes {
+@include keyframes(progress-bar-stripes) {
 	from {
 		background-position: 40px 0;
 	}
 	to {
 		background-position: 0 0;
 	}
-}
-
-@-webkit-keyframes progress-bar-stripes {
-	@include progress-bar-stripes;
-}
-
-@-moz-keyframes progress-bar-stripes {
-	@include progress-bar-stripes;
-}
-
-@-ms-keyframes progress-bar-stripes {
-	@include progress-bar-stripes;
-}
-
-@-o-keyframes progress-bar-stripes {
-	@include progress-bar-stripes;
-}
-
-@keyframes progress-bar-stripes {
-	@include progress-bar-stripes;
 }
 
 .lfr-progress-active .progress-bar-status, .lfr-upload-container .file-uploading .progress-bar .progress {
@@ -207,6 +205,20 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 	@include background-size(40px 40px);
 	@include experimental(animation, progress-bar-stripes 0.5s linear infinite);
 	@include single-transition(width, 0.5s, ease-out);
+}
+
+@include keyframes(highlight-animation) {
+	from {
+		background-color: #FFC;
+	}
+
+	to {
+		background-color: transparent;
+	}
+}
+
+.highlight-animation {
+	@include experimental(animation, highlight-animation 0.7s);
 }
 
 body:first-of-type {
@@ -281,7 +293,7 @@ body:first-of-type {
 	@include transition(transform 0.3s ease);
 }
 
-@mixin lfr-drop-active {
+@include keyframes(lfr-drop-active) {
 	0% {
 		background-color: #EBEBEB;
 		border-color: #DDD;
@@ -300,26 +312,6 @@ body:first-of-type {
 		background-color: #EBEBEB;
 		border-color: #DDD;
 	}
-}
-
-@-webkit-keyframes lfr-drop-active {
-	@include lfr-drop-active;
-}
-
-@-moz-keyframes lfr-drop-active {
-	@include lfr-drop-active;
-}
-
-@-ms-keyframes lfr-drop-active {
-	@include lfr-drop-active;
-}
-
-@-o-keyframes lfr-drop-active {
-	@include lfr-drop-active;
-}
-
-@keyframes lfr-drop-active {
-	@include lfr-drop-active;
 }
 
 .upload-drop-active {
