@@ -471,8 +471,8 @@ for (int i = 0; i < results.size(); i++) {
 	Liferay.fire(
 		'<portlet:namespace />pageLoaded',
 		{
-			paginator: {
-				name: 'entryPaginator',
+			pagination: {
+				name: 'entryPagination',
 				state: {
 					page: <%= (total == 0) ? 0 : (entryEnd / (entryEnd - entryStart)) %>,
 					rowsPerPage: <%= (entryEnd - entryStart) %>,
