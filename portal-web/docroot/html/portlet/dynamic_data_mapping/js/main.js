@@ -10,6 +10,8 @@ AUI.add(
 
 		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
+		var DDM_PAGE = 'ddm-page';
+
 		var LOCALIZABLE_FIELD_ATTRS = ['label', 'predefinedValue', 'tip'];
 
 		var MAP_HIDDEN_FIELD_ATTRS = {
@@ -163,7 +165,7 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						instance.LOCALIZABLE_FIELD_ATTRS = A.Array(LOCALIZABLE_FIELD_ATTRS);
+						instance.LOCALIZABLE_FIELD_ATTRS = AArray(LOCALIZABLE_FIELD_ATTRS);
 						instance.MAP_HIDDEN_FIELD_ATTRS = A.clone(MAP_HIDDEN_FIELD_ATTRS);
 
 						var translationManager = instance.translationManager = new Liferay.TranslationManager(instance.get('translationManager'));
@@ -172,6 +174,10 @@ AUI.add(
 							'render',
 							function(event) {
 								translationManager.render();
+
+								if (A.one('.page')) {
+									instance._unpaginateFields();
+								}
 							}
 						);
 
@@ -234,6 +240,20 @@ AUI.add(
 
 						buffer.push(root.openTag);
 
+						var container = A.one('.aui-diagram-builder-drop-container');
+
+						if (container) {
+							var size = container.all('.page').size();
+
+							if (size) {
+								var lastField = container.all('.aui-form-builder-field').last();
+
+								if (!(size === 1 && lastField.one('.page'))) {
+									instance._paginateFields();
+								}
+							}
+						}
+
 						instance.get('fields').each(
 							function(item, index, collection) {
 								instance._appendStructureTypeElementAndMetaData(item, buffer);
@@ -243,6 +263,107 @@ AUI.add(
 						buffer.push(root.closeTag);
 
 						return buffer.join(STR_BLANK);
+					},
+
+					_unpaginateFields: function() {
+						var instance = this;
+
+						var pageFields = [];
+
+						var fields = instance.get('fields');
+
+						var size = fields.size();
+
+						fields.each(
+							function(item1, index1) {
+								item1.get('fields').each(
+									function(item2, index2) {
+										pageFields.push(item2);
+									}
+								);
+
+								item1.set('fields', []);
+
+								if (!((index1 === (size - 1)) && (item1.name === 'ddm-page'))) {
+									pageFields.push(item1);
+								}
+							}
+						);
+
+						instance.set('fields', pageFields);
+					},
+
+					_paginateFields: function() {
+						var instance = this;
+
+						var fields = [];
+
+						var pages = instance.get('fields').filter(
+							function(item, index, collection) {
+								if (item.name == 'ddm-page') {
+									item.set('fields', fields);
+
+									fields = [];
+
+									return item;
+								}
+								else {
+									fields.push(item);
+								}
+							}
+						);
+
+						if (fields.length) {
+							var config = {
+								hiddenAttributes: ['readOnly'],
+								label: 'Page Break',
+								localizationMap: {},
+								options: undefined,
+								predefinedValue: '',
+								readOnlyAttributes: [],
+								required: false,
+								showLabel: true,
+								tip: '',
+								type: 'ddm-page',
+								unique: false,
+								width: undefined
+							};
+
+							var pageBreak = instance.createField(new A.FormBuilder.types['ddm-page'](config));
+
+							pageBreak.set('fields', fields);
+
+							pages.add(pageBreak);
+						}
+
+						instance.set('fields', pages);
+					},
+
+					_setFieldsNestedListConfig: function(val) {
+						var instance = this;
+
+						var config = LiferayFormBuilder.superclass._setFieldsNestedListConfig.apply(instance, arguments);
+
+						config.dropCondition = function(event) {
+							var dragNode = event.drag.get('node');
+							var dropNode = event.drop.get('node');
+
+							var dragField = A.AvailableField.getAvailableFieldByNode(dragNode);
+							var dropField = A.Widget.getByNode(dropNode);
+
+							if (!dragField || !instanceOf(dragField, A.AvailableField)) {
+								dragField = A.Widget.getByNode(dragNode);
+							}
+
+							if (dragField && dragField.get('type') == 'ddm-page' || dropField.get('type') == 'ddm-page') {
+								return false;
+							}
+
+							return true;
+
+						};
+
+						return config;
 					},
 
 					normalizeValue: function(value) {
@@ -291,7 +412,7 @@ AUI.add(
 									var name = item.name;
 
 									if (!name) {
-										name = A.FormBuilderField.buildFieldName('option');
+										name = FormBuilderField.buildFieldName('option');
 									}
 
 									var typeElementOption = instance._createDynamicNode(
@@ -814,6 +935,12 @@ AUI.add(
 					iconClass: 'form-builder-field-icon form-builder-field-icon-textarea',
 					label: Liferay.Language.get('text-box'),
 					type: 'textarea'
+				},
+				{
+					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
+					iconClass: 'aui-form-builder-field-icon aui-form-builder-field-icon-page',
+					label: Liferay.Language.get('page-break'),
+					type: 'ddm-page'
 				}
 			],
 

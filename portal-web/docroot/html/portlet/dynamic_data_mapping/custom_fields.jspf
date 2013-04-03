@@ -39,6 +39,8 @@
 
 			var TPL_SEPARATOR = '<div class="separator"></div>';
 
+			var TPL_PAGE = '<div class="page"> ' + Liferay.Language.get('page-break') + ' </div>';
+
 			var TPL_TEXT_HTML = '<textarea class="form-builder-field-node lfr-ddm-text-html"></textarea>';
 
 			var TPL_WCM_IMAGE = '<div class="lfr-wcm-image"></div>';
@@ -521,6 +523,48 @@
 				}
 			);
 
+			var DDMPageField = A.Component.create(
+				{
+					ATTRS: {
+						acceptChildren: {
+							value: true
+						},
+						dataType: {
+							value: undefined
+						},
+
+						fieldNamespace: {
+							value: 'ddm'
+						},
+
+						showLabel: {
+							readOnly: true,
+							value: false
+						}
+					},
+
+					EXTENDS: A.FormBuilderField,
+
+					NAME: 'ddm-page',
+
+					prototype: {
+						getHTML: function() {
+							return TPL_PAGE;
+						},
+
+						getPropertyModel: function() {
+							return [
+								{
+									attributeName: 'type',
+									editor: false,
+									name: '<%= UnicodeLanguageUtil.get(pageContext, "type") %>'
+								}
+							];
+						}
+					}
+				}
+			);
+
 			var DDMHTMLTextField = A.Component.create(
 				{
 					ATTRS: {
@@ -604,6 +648,8 @@
 			FormBuilderTypes['ddm-separator'] = DDMSeparatorField;
 			FormBuilderTypes['ddm-text-html'] = DDMHTMLTextField;
 			FormBuilderTypes['wcm-image'] = WCMImageField;
+
+			FormBuilderTypes['ddm-page'] = DDMPageField;
 		},
 		'',
 		{
