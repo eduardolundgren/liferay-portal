@@ -903,7 +903,7 @@
 				)
 			];
 
-			var cancelButton = iframeBody.one('.aui-button-input-cancel');
+			var cancelButton = iframeBody.one('.aui-btn-cancel');
 
 			if (cancelButton) {
 				cancelButton.after(
@@ -1688,7 +1688,7 @@
 			if (button) {
 				button.set('disabled', false);
 
-				button.ancestor('.aui-button').removeClass('aui-button-disabled');
+				button.ancestor('.aui-btn').removeClass('aui-btn-disabled');
 			}
 		},
 		['aui-base']
@@ -1847,7 +1847,7 @@
 				function(item, index, collection) {
 					item.attr('disabled', state);
 
-					item.ancestor('.aui-button').toggleClass('aui-button-disabled', state);
+					item.toggleClass('aui-disabled', state);
 				}
 			);
 		},
