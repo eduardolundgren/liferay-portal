@@ -493,7 +493,7 @@ AUI.add(
 					MAP_LIVE_SEARCH[id] = liveSearch;
 				}
 			},
-			['aui-live-search'],
+			['aui-live-search-deprecated'],
 			true
 		);
 
