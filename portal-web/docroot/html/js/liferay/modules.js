@@ -228,7 +228,7 @@ YUI.add(
 				'liferay-layout-column': {
 					fullpath: javaScriptRootPath + '/liferay/layout_column.js',
 					requires: [
-						'aui-portal-layout',
+						'aui-sortable-layout',
 						'dd'
 					]
 				},
@@ -275,7 +275,7 @@ YUI.add(
 						'aui-io-plugin-deprecated',
 						'aui-io-request',
 						'aui-modal',
-						'aui-tabs-base'
+						'aui-tabview'
 					]
 				},
 				'liferay-menu': {
