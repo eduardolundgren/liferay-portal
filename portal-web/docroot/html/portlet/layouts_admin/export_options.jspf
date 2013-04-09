@@ -67,7 +67,7 @@
 									yesterday.add(Calendar.DATE, -1);
 									%>
 
-									<ul class="aui-helper-hidden" id="<portlet:namespace />startEndDate">
+									<ul class="aui-hide" id="<portlet:namespace />startEndDate">
 										<li>
 											<aui:field-wrapper label="start-date">
 												<liferay-ui:input-date
@@ -224,7 +224,7 @@
 
 									<aui:input id="portletMetaDataFilter" label="choose-metadata" name="<%= PortletDataHandlerKeys.PORTLET_METADATA_ALL %>" type="radio" value="false" />
 
-									<ul class="aui-helper-hidden" id="<portlet:namespace />portletMetaDataList">
+									<ul class="aui-hide" id="<portlet:namespace />portletMetaDataList">
 
 										<%
 										Set<String> displayedControls = new HashSet<String>();
