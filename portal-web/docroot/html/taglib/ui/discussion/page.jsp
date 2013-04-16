@@ -205,18 +205,21 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 				<a name="<%= randomNamespace %>messages_top"></a>
 
 				<c:if test="<%= treeWalker != null %>">
-				<table class="tree-walker">
-					<tr class="portlet-section-header results-header" style="font-size: x-small; font-weight: bold;">
-						<td colspan="2">
+				<table class="tree-walker aui-table aui-table-bordered aui-table-hover aui-table-striped">
+					<thead>
+					<tr class="results-header">
+						<th colspan="2">
 							<liferay-ui:message key="threaded-replies" />
-						</td>
-						<td colspan="2">
+						</th>
+						<th colspan="2">
 							<liferay-ui:message key="author" />
-						</td>
-						<td>
+						</th>
+						<th>
 							<liferay-ui:message key="date" />
-						</td>
+						</th>
 					</tr>
+					</thead>
+					<tbody>
 
 					<%
 					int[] range = treeWalker.getChildrenRange(rootMessage);
@@ -245,6 +248,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 					}
 					%>
 
+					</tbody>
 				</table>
 
 					<br />

@@ -67,9 +67,10 @@ request.setAttribute("view.jsp-showIconLabel", false);
 %>
 
 <c:if test="<%= assetEntryIndex == 0 %>">
-	<table class="taglib-search-iterator">
-	<tr class="portlet-section-header results-header">
-		<th>
+	<table class="aui-table aui-table-bordered aui-table-hover aui-table-striped">
+	<thead>
+	<tr>
+		<th class="aui-table-header aui-table-sortable-column">
 			<liferay-ui:message key="title" />
 		</th>
 
@@ -89,17 +90,12 @@ request.setAttribute("view.jsp-showIconLabel", false);
 			<th></th>
 		</c:if>
 	</tr>
+	</thead>
+	<tbody>
 </c:if>
 
-<%
-String style = "class=\"portlet-section-body results-row\" onmouseover=\"this.className = 'portlet-section-body-hover results-row hover';\" onmouseout=\"this.className = 'portlet-section-body results-row';\"";
 
-if ((assetEntryIndex % 2) == 0) {
-	style = "class=\"portlet-section-alternate results-row alt\" onmouseover=\"this.className = 'portlet-section-alternate-hover results-row alt hover';\" onmouseout=\"this.className = 'portlet-section-alternate results-row alt';\"";
-}
-%>
-
-<tr <%= style %>>
+<tr class="results-row">
 	<td>
 		<c:choose>
 			<c:when test="<%= Validator.isNotNull(viewURL) %>">
@@ -154,7 +150,7 @@ if ((assetEntryIndex % 2) == 0) {
 			<td>
 				<liferay-ui:asset-categories-summary
 					className="<%= assetEntry.getClassName() %>"
-					classPK="<%= assetEntry.getClassPK () %>"
+					classPK="<%= assetEntry.getClassPK() %>"
 					portletURL="<%= renderResponse.createRenderURL() %>"
 				/>
 			</td>
@@ -167,7 +163,7 @@ if ((assetEntryIndex % 2) == 0) {
 			<td>
 				<liferay-ui:asset-tags-summary
 					className="<%= assetEntry.getClassName() %>"
-					classPK="<%= assetEntry.getClassPK () %>"
+					classPK="<%= assetEntry.getClassPK() %>"
 					portletURL="<%= renderResponse.createRenderURL() %>"
 				/>
 			</td>
@@ -195,5 +191,6 @@ if ((assetEntryIndex % 2) == 0) {
 </tr>
 
 <c:if test="<%= (assetEntryIndex + 1) == results.size() %>">
+	</tbody>
 	</table>
 </c:if>

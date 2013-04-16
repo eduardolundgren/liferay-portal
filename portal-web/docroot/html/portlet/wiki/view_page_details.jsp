@@ -56,8 +56,10 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "det
 int count = 0;
 %>
 
-<table class="lfr-table page-info">
-<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+<!-- try to remove lfr-table, page-info -->
+<table class="lfr-table page-info aui-table aui-table-bordered aui-table-hover aui-table-striped">
+<tbody>
+<tr class="results-row">
 	<th>
 		<liferay-ui:message key="title" />
 	</th>
@@ -65,7 +67,7 @@ int count = 0;
 		<%= wikiPage.getTitle() %>
 	</td>
 </tr>
-<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+<tr class="results-row">
 	<th>
 		<liferay-ui:message key="format" />
 	</th>
@@ -73,7 +75,7 @@ int count = 0;
 		<liferay-ui:message key='<%= "wiki.formats." + wikiPage.getFormat() %>'/>
 	</td>
 </tr>
-<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+<tr class="results-row">
 	<th>
 		<liferay-ui:message key="latest-version" />
 	</th>
@@ -85,7 +87,7 @@ int count = 0;
 		</c:if>
 	</td>
 </tr>
-<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+<tr class="results-row">
 	<th>
 		<liferay-ui:message key="created-by" />
 	</th>
@@ -93,7 +95,7 @@ int count = 0;
 		<%= HtmlUtil.escape(initialPage.getUserName()) %> (<%= dateFormatDateTime.format(initialPage.getCreateDate()) %>)
 	</td>
 </tr>
-<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+<tr class="results-row">
 	<th>
 		<liferay-ui:message key="last-changed-by" />
 	</th>
@@ -101,7 +103,7 @@ int count = 0;
 		<%= HtmlUtil.escape(wikiPage.getUserName()) %> (<%= dateFormatDateTime.format(wikiPage.getCreateDate()) %>)
 	</td>
 </tr>
-<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+<tr class="results-row">
 	<th>
 		<liferay-ui:message key="attachments" />
 	</th>
@@ -125,7 +127,7 @@ int count = 0;
 	exportPageURL.setWindowState(LiferayWindowState.EXCLUSIVE);
 	%>
 
-	<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+	<tr class="results-row">
 		<th>
 			<liferay-ui:message key="convert-to" />
 		</th>
@@ -155,7 +157,7 @@ int count = 0;
 </c:if>
 
 <c:if test="<%= enableRSS %>">
-	<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+	<tr class="results-row">
 		<th>
 			<liferay-ui:message key="rss-subscription" />
 		</th>
@@ -171,7 +173,7 @@ int count = 0;
 </c:if>
 
 <c:if test="<%= (WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.SUBSCRIBE) || WikiNodePermission.contains(permissionChecker, node, ActionKeys.SUBSCRIBE)) && (WikiUtil.getEmailPageAddedEnabled(preferences) || WikiUtil.getEmailPageUpdatedEnabled(preferences)) %>">
-	<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+	<tr class="results-row">
 		<th>
 			<liferay-ui:message key="email-subscription" />
 		</th>
@@ -276,7 +278,7 @@ int count = 0;
 </c:if>
 
 <c:if test="<%= WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.PERMISSIONS) || (WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.UPDATE) && WikiNodePermission.contains(permissionChecker, wikiPage.getNodeId(), ActionKeys.ADD_PAGE)) || WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.DELETE) %>">
-	<tr class="portlet-section-body<%= MathUtil.isOdd(count++) ? "-alternate" : "" %> results-row <%= MathUtil.isOdd(count) ? "alt" : "" %>">
+	<tr class="results-row">
 		<th>
 			<liferay-ui:message key="advanced-actions" />
 		</th>
@@ -354,5 +356,5 @@ int count = 0;
 		</td>
 	</tr>
 </c:if>
-
+</tbody>
 </table>

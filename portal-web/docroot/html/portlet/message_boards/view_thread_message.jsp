@@ -122,7 +122,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 				</c:otherwise>
 			</c:choose>
 		</td>
-		<td class="lfr-top">
+		<td>
 			<div class="thread-top float-container">
 				<div class="subject">
 					<c:choose>

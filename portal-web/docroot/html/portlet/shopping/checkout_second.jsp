@@ -158,7 +158,7 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 			</tr>
 			</table>
 		</td>
-		<td class="lfr-top">
+		<td>
 			<strong><liferay-ui:message key="shipping-address" /></strong>
 
 			<br /><br />

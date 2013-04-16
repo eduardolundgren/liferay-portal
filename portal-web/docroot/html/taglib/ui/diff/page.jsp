@@ -30,7 +30,7 @@ List<DiffResult> targetResults = diffResults[1];
 
 <c:choose>
 	<c:when test="<%= !sourceResults.isEmpty() %>">
-		<table class="taglib-search-iterator" id="taglib-diff-results">
+		<table class="aui-table aui-table-striped" id="taglib-diff-results">
 		<tr>
 			<td>
 				<%= sourceName %>
@@ -46,7 +46,8 @@ List<DiffResult> targetResults = diffResults[1];
 			DiffResult targetResult = targetResults.get(i);
 		%>
 
-			<tr class="portlet-section-header results-header">
+			<thead>
+			<tr class="results-header">
 				<th>
 					<liferay-ui:message key="line" /> <%= sourceResult.getLineNumber() %>
 				</th>
@@ -54,6 +55,9 @@ List<DiffResult> targetResults = diffResults[1];
 					<liferay-ui:message key="line" /> <%= targetResult.getLineNumber() %>
 				</th>
 			</tr>
+			</thead>
+
+			<tbody>
 			<tr>
 				<td class="lfr-top" width="50%">
 					<table class="taglib-diff-table">
@@ -90,6 +94,7 @@ List<DiffResult> targetResults = diffResults[1];
 					</table>
 				</td>
 			</tr>
+			</tbody>
 
 		<%
 		}

@@ -19,15 +19,17 @@ NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 NumberFormat percentFormat = NumberFormat.getPercentInstance(locale);
 %>
 
-<table border="0" cellpadding="4" cellspacing="0" width="100%">
-<tr class="portlet-section-header results-header" style="font-size: x-small; font-weight: bold;">
-	<td>
+<table class="aui-table aui-table-bordered aui-table-hover aui-table-striped" border="0" cellpadding="4" cellspacing="0" width="100%">
+<thead>
+<tr class="results-header" style="font-size: x-small; font-weight: bold;">
+	<th>
 		%
-	</td>
-	<td colspan="4">
+	</th>
+	<th colspan="4">
 		<liferay-ui:message key="votes" />
-	</td>
+	</th>
 </tr>
+</thead>
 
 <%
 int totalVotes = question.getVotesCount();
@@ -38,14 +40,6 @@ for (int i = 0; i < choices.size(); i++) {
 	choice = choice.toEscapedModel();
 
 	int choiceVotes = choice.getVotesCount();
-
-	String className = "portlet-section-body results-row";
-	String classHoverName = "portlet-section-body-hover results-row hover";
-
-	if (MathUtil.isEven(i)) {
-		className = "portlet-section-alternate results-row alt";
-		classHoverName = "portlet-section-alternate-hover results-row alt hover";
-	}
 
 	double votesPercent = 0.0;
 
@@ -62,7 +56,8 @@ for (int i = 0; i < choices.size(); i++) {
 	int votesPercentWidth = (int)Math.floor(votesPercent * 100);
 %>
 
-<tr class="<%= className %>" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';" style="font-size: x-small;">
+<tbody>
+<tr class="results-row" style="font-size: x-small;">
 	<td>
 		<%= percentFormat.format(votesPercent) %>
 	</td>
@@ -90,6 +85,7 @@ for (int i = 0; i < choices.size(); i++) {
 }
 %>
 
+</tbody>
 </table>
 
 <br />

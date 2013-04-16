@@ -131,7 +131,8 @@ if (ldapAuthEnabled && (ldapServerIds.length <= 0) && Validator.isNull(PrefsProp
 		<br /><br />
 
 		<div class="results-grid ldap-servers">
-			<table class="taglib-search-iterator">
+			<table class="aui-table aui-table-bordered aui-table-hover aui-table-striped">
+			<thead>
 			<tr class="results-header">
 				<th>
 					<liferay-ui:message key="ldap-server-id" />
@@ -141,21 +142,17 @@ if (ldapAuthEnabled && (ldapServerIds.length <= 0) && Validator.isNull(PrefsProp
 				</th>
 				<th></th>
 			</tr>
+			</thead>
 
+			<tbody>
 			<%
 			for (int i = 0; i < ldapServerIds.length; i++) {
 				long ldapServerId = ldapServerIds[i];
 
 				String ldapServerName = PrefsPropsUtil.getString(company.getCompanyId(), "ldap.server.name." + ldapServerId);
-
-				String className = "portlet-section-body results-row";
-
-				if (MathUtil.isEven(i)) {
-					className = "portlet-section-alternate results-row alt";
-				}
 			%>
 
-				<tr class="<%= className %>" data-ldapServerId="<%= ldapServerId %>">
+				<tr class="results-row" data-ldapServerId="<%= ldapServerId %>">
 					<td>
 						<%= ldapServerId %>
 					</td>
@@ -214,6 +211,7 @@ if (ldapAuthEnabled && (ldapServerIds.length <= 0) && Validator.isNull(PrefsProp
 			}
 			%>
 
+			</tbody>
 			</table>
 		</div>
 	</c:if>

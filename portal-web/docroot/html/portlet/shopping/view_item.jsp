@@ -60,7 +60,7 @@ ShoppingItem[] prevAndNext = ShoppingItemServiceUtil.getItemsPrevAndNext(item.ge
 
 	<table border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td class="lfr-top">
+		<td>
 			<strong><%= item.getSku() %></strong>
 
 			<br /><br />
@@ -76,7 +76,7 @@ ShoppingItem[] prevAndNext = ShoppingItemServiceUtil.getItemsPrevAndNext(item.ge
 			</c:if>
 		</td>
 		<td style="padding-left: 30px;"></td>
-		<td class="lfr-top">
+		<td>
 			<span style="font-size: small;">
 			<strong><%= item.getName() %></strong><br />
 			</span>
