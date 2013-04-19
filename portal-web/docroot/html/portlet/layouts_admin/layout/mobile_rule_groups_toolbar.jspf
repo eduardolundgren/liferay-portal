@@ -64,13 +64,11 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "add");
 				}
 			}
 		},
-		['aui-loading-mask']
+		['aui-loading-mask-deprecated']
 	);
 
 	function <portlet:namespace />saveRuleGroupsPriorities(dialog) {
 		<portlet:namespace />processDialog(dialog);
-
-		location.href = '<%= redirect %>' + Liferay.Util.getHistoryParam('<portlet:namespace />');
 	}
 
 	Liferay.provide(
@@ -94,13 +92,10 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "add");
 							userId: themeDisplay.getUserId()
 						}
 					)
-				},
-				function(response, xhr) {
-					location.href = '<%= redirect %>' + Liferay.Util.getHistoryParam('<portlet:namespace />');
 				}
 			);
 		},
-		['aui-loading-mask']
+		['aui-loading-mask-deprecated']
 	);
 </aui:script>
 
@@ -135,7 +130,6 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "add");
 			'click',
 			function(event) {
 				config.dialog.title = '<%= UnicodeLanguageUtil.get(pageContext, "rule-group-priorities") %>';
-				config.dialog.width = 460;
 
 				config.id = '<portlet:namespace />ruleGroupsPriorities';
 				config.uri = '<%= managePrioritiesURL %>';

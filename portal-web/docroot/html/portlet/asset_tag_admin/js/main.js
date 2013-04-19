@@ -38,11 +38,11 @@ AUI.add(
 
 		var NODE = 'node';
 
-		var TPL_PORTLET_MESSAGES = '<div class="aui-helper-hidden lfr-message-response" id="portletMessages" />';
+		var TPL_PORTLET_MESSAGES = '<div class="aui-hide lfr-message-response" id="portletMessages" />';
 
 		var TPL_TAG_LIST = '<li class="tag-item-container results-row {cssClassSelected}" data-tag="{name}" data-tagId="{tagId}" tabIndex="0">' +
 			'<div class="tags-admin-content-wrapper">' +
-					'<input type="checkbox" class="tag-item-check aui-field-input-choice" name="tag-item-check" data-tagId="{tagId}" data-tagName="{name}">' +
+					'<input type="checkbox" class="tag-item-check" name="tag-item-check" data-tagId="{tagId}" data-tagName="{name}">' +
 					'<span class="tag-item">' +
 						'<a href="javascript:;" data-tagId="{tagId}" tabIndex="-1">{name}</a>' +
 					'</span>' +
@@ -92,7 +92,7 @@ AUI.add(
 
 		var TPL_TAG_MERGE_ITEM = '<option value="{value}" title="{name}" selected>{name}</option>';
 
-		var TPL_TAGS_MESSAGES = '<div class="aui-helper-hidden lfr-message-response portlet-msg-info" id="tagsMessages" />';
+		var TPL_TAGS_MESSAGES = '<div class="aui-hide lfr-message-response portlet-msg-info" id="tagsMessages" />';
 
 		var AssetTagsAdmin = A.Component.create(
 			{
@@ -238,6 +238,49 @@ AUI.add(
 						clone.html(node.html());
 					},
 
+					_afterTagsPaginationChangeRequest: function(event) {
+						var instance = this;
+
+						var lastState = event.state.lastState;
+						var state = event.state;
+
+						var historyState = {};
+
+						var paginationMap = instance._getTagsPaginationMap();
+
+						AObject.each(
+							paginationMap,
+							function(item, index, collection) {
+								if (owns(state, index)) {
+									var historyEntry = item.historyEntry;
+
+									var newItemValue = state[index];
+
+									var value = INVALID_VALUE;
+
+									if (newItemValue === item.defaultValue &&
+										Lang.isValue(HistoryManager.get(historyEntry))) {
+
+										value = null;
+									}
+									else if (lastState && (newItemValue !== lastState[index])) {
+										value = newItemValue;
+									}
+
+									if (value !== INVALID_VALUE) {
+										historyState[historyEntry] = value;
+									}
+								}
+							}
+						);
+
+						if (!AObject.isEmpty(historyState)) {
+							HistoryManager.add(historyState);
+						}
+
+						instance._reloadData();
+					},
+
 					_bindCloseEvent: function(contextPanel) {
 						var instance = this;
 
@@ -253,16 +296,15 @@ AUI.add(
 					_createTagPanelAdd: function() {
 						var instance = this;
 
-						var tagPanelAdd = new A.Dialog(
-							{
-								align: instance._dialogAlignConfig,
-								cssClass: CSS_TAG_DIALOG,
-								resizable: false,
-								title: Liferay.Language.get('add-tag'),
-								width: 550,
-								zIndex: 1000
-							}
-						).render();
+						var tagPanelAdd = Liferay.Util.Window.getWindow(
+						    {
+								dialog: {
+									align: instance._dialogAlignConfig,
+									cssClass: CSS_TAG_DIALOG
+								},
+								title: Liferay.Language.get('add-tag')
+						    }
+						);
 
 						tagPanelAdd.hide();
 
@@ -276,16 +318,15 @@ AUI.add(
 					_createTagPanelEdit: function() {
 						var instance = this;
 
-						instance._tagPanelEdit = new A.Dialog(
-							{
-								align: instance._dialogAlignConfig,
-								cssClass: CSS_TAG_DIALOG,
-								resizable: false,
-								title: Liferay.Language.get('edit-tag'),
-								width: 550,
-								zIndex: 1000
-							}
-						).render();
+						instance._tagPanelEdit = Liferay.Util.Window.getWindow(
+						    {
+								dialog: {
+									align: instance._dialogAlignConfig,
+									cssClass: CSS_TAG_DIALOG
+								},
+								title: Liferay.Language.get('edit-tag')
+						    }
+						);
 
 						instance._tagPanelEdit.hide();
 
@@ -311,7 +352,7 @@ AUI.add(
 						var panelPermissionsChange = instance._panelPermissionsChange;
 
 						if (!panelPermissionsChange) {
-							panelPermissionsChange = Liferay.Util._openWindow(
+							panelPermissionsChange = Liferay.Util.Window.getWindow(
 								{
 									dialog: {
 										align: instance._dialogAlignConfig,
@@ -639,66 +680,62 @@ AUI.add(
 						return attr;
 					},
 
-					_getTagsPaginator: function() {
+					_getTagsPagination: function() {
 						var instance = this;
 
-						var tagsPaginator = instance._tagsPaginator;
+						var tagsPagination = instance._tagsPagination;
 
-						if (!tagsPaginator) {
+						if (!tagsPagination) {
 							var instanceConfig = instance._config;
 
 							var config = {
-								alwaysVisible: false,
-								containers: '.tags-paginator',
-								firstPageLinkLabel: '<<',
-								lastPageLinkLabel: '>>',
-								nextPageLinkLabel: '>',
-								prevPageLinkLabel: '<',
-								rowsPerPageOptions: instanceConfig.tagsPerPageOptions
+								boundingBox: '.tags-pagination',
+								circular: false,
+								visible: false
 							};
 
-							var paginatorMap = instance._getTagsPaginatorMap();
+							var paginationMap = instance._getTagsPaginationMap();
 
 							AObject.each(
-								paginatorMap,
+								paginationMap,
 								function(item, index, collection) {
 									config[index] = Number(HistoryManager.get(item.historyEntry)) || item.defaultValue;
 								}
 							);
 
-							tagsPaginator = new A.Paginator(config).render();
+							tagsPagination = new A.Pagination(config).render();
 
-							tagsPaginator.on('changeRequest', instance._onTagsPaginatorChangeRequest, instance);
+							tagsPagination.after('changeRequest', instance._afterTagsPaginationChangeRequest, instance);
 
-							instance._tagsPaginator = tagsPaginator;
+							instance._tagsPagination = tagsPagination;
 						}
 
-						return tagsPaginator;
+						return tagsPagination;
 					},
 
-					_getTagsPaginatorMap: function() {
+					_getTagsPaginationMap: function() {
 						var instance = this;
 
-						var paginatorMap = instance._mapPaginator;
+						var paginationMap = instance._paginationMap;
 
-						if (!paginatorMap) {
-							paginatorMap = {
+						if (!paginationMap) {
+							paginationMap = {
 								page: {
 									historyEntry: instance._prefixedPortletId + 'page',
 									defaultValue: 1,
 									formatter: Number
 								},
-								rowsPerPage: {
-									historyEntry: instance._prefixedPortletId + 'rowsPerPage',
+								tagsPerPage: {
+									historyEntry: instance._prefixedPortletId + 'tagsPerPage',
 									defaultValue: instance._config.tagsPerPage,
 									formatter: Number
 								}
 							};
 
-							instance._mapPaginator = paginatorMap;
+							instance._paginationMap = paginationMap;
 						}
 
-						return paginatorMap;
+						return paginationMap;
 					},
 
 					_getTagPanelMerge: function() {
@@ -716,20 +753,19 @@ AUI.add(
 							var panelBodyContent = Lang.sub(TPL_TAG_MERGE_BODY, tplValues);
 							var panelFooterContent = Lang.sub(TPL_TAG_MERGE_FOOTER, tplValues);
 
-							tagPanelMerge = new A.Dialog(
-								{
-									align: instance._dialogAlignConfig,
-									bodyContent: panelBodyContent,
-									cssClass: CSS_TAG_DIALOG,
-									footerContent: panelFooterContent,
-									resizable: false,
-									title: Liferay.Language.get('merge-tags'),
-									width: 500,
-									zIndex: 1000
-								}
-							).render();
+							tagPanelMerge = Liferay.Util.Window.getWindow(
+							    {
+									dialog: {
+										align: instance._dialogAlignConfig,
+										bodyContent: panelBodyContent,
+										cssClass: CSS_TAG_DIALOG,
+										footerContent: panelFooterContent,
+									},
+									title: Liferay.Language.get('merge-tags')
+							    }
+							);
 
-							var okButton = new A.ButtonItem(
+							var okButton = new A.Button(
 								{
 									label: Liferay.Language.get('ok'),
 									on: {
@@ -738,7 +774,7 @@ AUI.add(
 								}
 							);
 
-							var cancelButton = new A.ButtonItem(
+							var cancelButton = new A.Button(
 								{
 									label: Liferay.Language.get('cancel'),
 									on: {
@@ -795,28 +831,30 @@ AUI.add(
 					_getTags: function(callback) {
 						var instance = this;
 
-						var paginator = instance._getTagsPaginator();
+						var pagination = instance._getTagsPagination();
+
+						var config = instance._config;
+
+						var tagsPerPage = config.tagsPerPage;
 
 						var currentPage = 0;
 
 						var query = instance._tagsSearch.get('query');
 
 						if (!instance._restartSearch) {
-							currentPage = paginator.get('page');
+							currentPage = pagination.get('page');
 
 							if (!currentPage) {
-								var paginatorMap = instance._getTagsPaginatorMap();
+								var paginationMap = instance._getTagsPaginationMap();
 
-								currentPage = paginatorMap['page'].defaultValue;
+								currentPage = paginationMap['page'].defaultValue;
 							}
 
 							currentPage -= 1;
 						}
 
-						var rowsPerPage = paginator.get('rowsPerPage');
-
-						var start = currentPage * rowsPerPage;
-						var end = start + rowsPerPage;
+						var start = currentPage * tagsPerPage;
+						var end = start + tagsPerPage;
 
 						Liferay.Service(
 							'/assettag/get-json-group-tags',
@@ -827,9 +865,14 @@ AUI.add(
 								end: end
 							},
 							function(result) {
+								var total = result.total;
+
 								instance._restartSearch = false;
 
-								paginator.setState(result);
+								pagination.set('total', Math.ceil(total / tagsPerPage));
+								pagination.set('visible', (total > tagsPerPage));
+
+								pagination.setState(result);
 
 								if (callback) {
 									callback.apply(instance, arguments);
@@ -851,7 +894,7 @@ AUI.add(
 
 						instance._tagFormAdd = tagFormAdd;
 
-						var closeButton = tagFormAdd.one('.aui-button-input-cancel');
+						var closeButton = tagFormAdd.one('.aui-btn-cancel');
 
 						closeButton.on(
 							EVENT_CLICK,
@@ -891,7 +934,7 @@ AUI.add(
 
 						tagFormEdit.on(EVENT_SUBMIT, instance._onTagFormSubmit, instance, tagFormEdit);
 
-						var closeButton = tagFormEdit.one('.aui-button-input-cancel');
+						var closeButton = tagFormEdit.one('.aui-btn-cancel');
 
 						closeButton.on(
 							EVENT_CLICK,
@@ -1107,12 +1150,12 @@ AUI.add(
 						var changed = event.changed;
 						var removed = event.removed;
 
-						var paginatorState = {};
+						var paginationState = {};
 
-						var paginatorMap = instance._getTagsPaginatorMap();
+						var paginationMap = instance._getTagsPaginationMap();
 
 						AObject.each(
-							paginatorMap,
+							paginationMap,
 							function(item, index, collection) {
 								var historyEntry = item.historyEntry;
 
@@ -1126,13 +1169,13 @@ AUI.add(
 								}
 
 								if (value) {
-									paginatorState[index] = value;
+									paginationState[index] = value;
 								}
 							}
 						);
 
-						if (AObject.size(paginatorState)) {
-							instance._tagsPaginator.setState(paginatorState);
+						if (AObject.size(paginationState)) {
+							instance._tagsPagination.setState(paginationState);
 
 							instance._reloadData();
 						}
@@ -1221,49 +1264,6 @@ AUI.add(
 						else {
 							alert(Liferay.Language.get('there-are-no-selected-tags'));
 						}
-					},
-
-					_onTagsPaginatorChangeRequest: function(event) {
-						var instance = this;
-
-						var stateBefore = event.state.before;
-						var state = event.state;
-
-						var historyState = {};
-
-						var paginatorMap = instance._getTagsPaginatorMap();
-
-						AObject.each(
-							paginatorMap,
-							function(item, index, collection) {
-								if (owns(state, index)) {
-									var historyEntry = item.historyEntry;
-
-									var newItemValue = state[index];
-
-									var value = INVALID_VALUE;
-
-									if (newItemValue === item.defaultValue &&
-										Lang.isValue(HistoryManager.get(historyEntry))) {
-
-										value = null;
-									}
-									else if (newItemValue !== stateBefore[index]) {
-										value = newItemValue;
-									}
-
-									if (value !== INVALID_VALUE) {
-										historyState[historyEntry] = value;
-									}
-								}
-							}
-						);
-
-						if (!AObject.isEmpty(historyState)) {
-							HistoryManager.add(historyState);
-						}
-
-						instance._reloadData();
 					},
 
 					_onTagUpdateFailure: function(response) {
@@ -1360,7 +1360,7 @@ AUI.add(
 							A.each(
 								tags,
 								function(item, index, collection) {
-									if (index == 0) {
+									if (index === 0) {
 										item.cssClassSelected = 'selected';
 									}
 									else {
@@ -1673,6 +1673,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-dialog', 'aui-dialog-iframe', 'aui-loading-mask', 'aui-paginator', 'autocomplete-base', 'aui-tree-view', 'dd', 'json', 'liferay-history-manager', 'liferay-portlet-url', 'liferay-util-window']
+		requires: ['aui-button', 'aui-dialog-iframe-deprecated', 'aui-io-plugin-deprecated', 'aui-loading-mask-deprecated', 'aui-pagination', 'autocomplete-base', 'aui-tree-view', 'dd', 'json', 'liferay-history-manager', 'liferay-portlet-url', 'liferay-util-window']
 	}
 );

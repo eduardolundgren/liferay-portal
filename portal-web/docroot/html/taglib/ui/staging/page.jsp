@@ -119,7 +119,7 @@ String publishScheduleMessage = LanguageUtil.get(pageContext, publishScheduleDia
 
 <c:if test="<%= stagingGroup != null %>">
 	<span class="staging-icon-menu-container">
-		<liferay-ui:icon-menu align="auto" cssClass="<%= cssClass %>" direction="down" extended="<%= extended %>" icon="<%= extended ? icon : StringPool.BLANK %>" message="<%= extended ? message : StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
+		<liferay-ui:icon-menu cssClass="<%= cssClass %>" direction="down" extended="<%= extended %>" icon="<%= extended ? icon : StringPool.BLANK %>" message="<%= extended ? message : StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
 			<c:choose>
 				<c:when test="<%= group.isCompany() && GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.PUBLISH_STAGING) %>">
 					<liferay-ui:icon id='<%= groupId + "publishGlobalNowLink" %>' image="maximize" message="<%= publishNowDialogTitle %>" url="<%= publishRenderURL.toString() %>" />
@@ -291,9 +291,6 @@ String publishScheduleMessage = LanguageUtil.get(pageContext, publishScheduleDia
 
 										Liferay.Util.openWindow(
 											{
-												dialog: {
-													width: 820
-												},
 												id: '<portlet:namespace />layoutSetBranches',
 												title: '<%= UnicodeLanguageUtil.get(pageContext, "manage-site-pages-variations") %>',
 												uri: event.currentTarget.attr('href')

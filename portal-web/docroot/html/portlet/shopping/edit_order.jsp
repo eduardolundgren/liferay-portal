@@ -177,7 +177,7 @@ long orderId = BeanParamUtil.getLong(order, request, "orderId");
 			</tr>
 			</table>
 		</td>
-		<td class="lfr-top">
+		<td>
 			<strong><liferay-ui:message key="shipping-address" /></strong>
 
 			<br /><br />

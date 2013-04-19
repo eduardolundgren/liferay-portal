@@ -40,10 +40,6 @@
 
 	var REGEX_DASH = /-([a-z])/gi;
 
-	var STR_LEFT_ROUND_BRACKET = '(';
-
-	var STR_RIGHT_ROUND_BRACKET = ')';
-
 	var STR_LEFT_SQUARE_BRACKET = '[';
 
 	var STR_RIGHT_SQUARE_BRACKET = ']';
@@ -57,11 +53,6 @@
 	};
 
 	var Window = {
-		ALIGN_CENTER: {
-			points: ['tc', 'tc']
-		},
-		XY: [50, 100],
-		XY_INCREMENTOR: 50,
 		_map: {}
 	};
 
@@ -381,24 +372,6 @@
 			return columnId;
 		},
 
-		getHistoryParam: function(portletNamespace) {
-			var historyKey = '&' + portletNamespace + 'historyKey=';
-			var historyParam = '';
-
-			if (location.hash) {
-				historyParam = location.hash.replace('#_LFR_FN_', historyKey);
-			}
-			else if (location.href.indexOf(historyKey) > -1) {
-				var historyParamRE = new RegExp(historyKey + '([^#&]+)');
-
-				historyParam = location.href.match(historyParamRE);
-
-				historyParam = historyParam && historyParam[0];
-			}
-
-			return historyParam;
-		},
-
 		getOpener: function() {
 			var openingWindow = Window._opener;
 
@@ -477,7 +450,7 @@
 				id = Util.getWindowName();
 			}
 
-			return Util.getTop().Liferay.Util.Window._map[id];
+			return Util.getTop().Liferay.Util.Window.getById(id);
 		},
 
 		getWindowName: function() {
@@ -903,7 +876,7 @@
 				)
 			];
 
-			var cancelButton = iframeBody.one('.aui-button-input-cancel');
+			var cancelButton = iframeBody.one('.aui-btn-cancel');
 
 			if (cancelButton) {
 				cancelButton.after(
@@ -1367,10 +1340,6 @@
 				config.dialog = dialogConfig;
 			}
 
-			if (!('align' in dialogConfig)) {
-				dialogConfig.align = Util.Window.ALIGN_CENTER;
-			}
-
 			Util.openWindow(config);
 
 			Liferay.on(config.eventName, callback);
@@ -1438,7 +1407,7 @@
 				}
 			}
 		},
-		['aui-editable']
+		['aui-editable-deprecated']
 	);
 
 	Liferay.provide(
@@ -1688,7 +1657,7 @@
 			if (button) {
 				button.set('disabled', false);
 
-				button.ancestor('.aui-button').removeClass('aui-button-disabled');
+				button.ancestor('.aui-btn').removeClass('aui-btn-disabled');
 			}
 		},
 		['aui-base']
@@ -1847,7 +1816,7 @@
 				function(item, index, collection) {
 					item.attr('disabled', state);
 
-					item.ancestor('.aui-button').toggleClass('aui-button-disabled', state);
+					item.toggleClass('aui-disabled', state);
 				}
 			);
 		},
@@ -1969,7 +1938,7 @@
 		Util,
 		'_openWindowProvider',
 		function(config, callback) {
-			Util._openWindow(config, callback);
+			Window.getWindow(config, callback);
 		},
 		['liferay-util-window']
 	);
@@ -1979,7 +1948,7 @@
 		function(event) {
 			var id = event.id;
 
-			var dialog = Liferay.Util.getTop().Liferay.Util.Window._map[id];
+			var dialog = Liferay.Util.getTop().Liferay.Util.Window.getById(id);
 
 			if (dialog && dialog.iframe) {
 				var dialogWindow = dialog.iframe.node.get('contentWindow').getDOM();

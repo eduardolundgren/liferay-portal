@@ -102,9 +102,9 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 
 <br />
 
-<table class="calendar">
+<table class="calendar aui-table aui-table-bordered aui-table-hover aui-table-striped">
 <thead>
-	<tr class="portlet-section-header results-header">
+	<tr class="results-header">
 
 		<%
 		for (int i = 0; i < 7; i++) {
@@ -227,15 +227,15 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 					}
 				%>
 
-					<tr class="<%= className %>">
+					<tr class="results-row">
 						<td>
 							<c:if test="<%= !allDay %>">
 								<c:choose>
 									<c:when test="<%= event.isTimeZoneSensitive() %>">
-										<%= dateFormatTime.format(Time.getDate(startDate, timeZone)) %>
+										<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
 									</c:when>
 									<c:otherwise>
-										<%= dateFormatTime.format(Time.getDate(startDate, TimeZoneUtil.getDefault())) %>
+										<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
 									</c:otherwise>
 								</c:choose>
 							</c:if>

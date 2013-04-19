@@ -54,7 +54,7 @@ int weekNumber = 1;
 %>
 
 <div class="taglib-calendar">
-	<table class="lfr-table calendar-panel">
+	<table class="calendar-panel aui-table aui-table-bordered aui-table-hover aui-table-striped">
 
 	<c:if test="<%= Validator.isNotNull(headerPattern) || (headerFormat != null) %>">
 
@@ -65,15 +65,17 @@ int weekNumber = 1;
 			dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(headerPattern, locale);
 		}
 		%>
-
+		<thead>
 		<tr class="calendar-header">
 			<th colspan="7">
 				<%= dateFormat.format(Time.getDate(selCal.getTime(), timeZone)) %>
 			</th>
 		</tr>
+		</thead>
 	</c:if>
 
-	<tr class="portlet-section-header results-header">
+	<tbody>
+	<tr class="results-header">
 
 		<%
 		for (int i = 0; i < 7; i++) {
@@ -223,5 +225,6 @@ int weekNumber = 1;
 		%>
 
 	</tr>
+	</tbody>
 	</table>
 </div>

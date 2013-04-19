@@ -709,15 +709,14 @@ AUI.add(
 				var previewDialog = instance.previewDialog;
 
 				if (!previewDialog) {
-					previewDialog = new A.Dialog(
-						{
-							bodyContent: content,
-							centered: true,
-							modal: true,
-							width: A.getWin().width() / 2,
+					previewDialog = Liferay.Util.Window.getWindow(
+					    {
+							dialog: {
+								bodyContent: content
+							},
 							title: Liferay.Language.get('preview')
-						}
-					).render();
+					    }
+					);
 
 					instance.previewDialog = previewDialog;
 				}
@@ -735,6 +734,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-arraysort', 'aui-datatable', 'datatable-sort', 'aui-dialog', 'json', 'liferay-portlet-url']
+		requires: ['aui-arraysort', 'aui-datatable', 'datatable-sort', 'json', 'liferay-portlet-url', 'liferay-util-window']
 	}
 );

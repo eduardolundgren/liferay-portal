@@ -80,14 +80,20 @@
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
-				<name>inputCssClass</name>
+				<name>name</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
-				<name>name</name>
+				<name>icon</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>iconAlign</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue>left</defaultValue>
 			</attribute>
 			<attribute>
 				<name>onClick</name>
@@ -436,11 +442,6 @@
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
-				<name>inputCssClass</name>
-				<inputType>java.lang.String</inputType>
-				<outputType>java.lang.String</outputType>
-			</attribute>
-			<attribute>
 				<name>label</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
@@ -697,11 +698,6 @@
 			</attribute>
 			<attribute>
 				<name>inlineLabel</name>
-				<inputType>java.lang.String</inputType>
-				<outputType>java.lang.String</outputType>
-			</attribute>
-			<attribute>
-				<name>inputCssClass</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 			</attribute>

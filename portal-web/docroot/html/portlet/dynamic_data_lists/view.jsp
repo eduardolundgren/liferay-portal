@@ -79,7 +79,7 @@ portletURL.setParameter("struts_action", "/dynamic_data_lists/view");
 	</liferay-ui:search-container>
 </aui:form>
 
-<div class="aui-helper-hidden" id="<portlet:namespace />export-list">
+<div class="aui-hide" id="<portlet:namespace />export-list">
 	<aui:select label="file-extension" name="fileExtension">
 		<aui:option value="csv">CSV</aui:option>
 		<aui:option value="xml">XML</aui:option>
@@ -104,31 +104,36 @@ portletURL.setParameter("struts_action", "/dynamic_data_lists/view");
 				content.show();
 			}
 
-			var dialog = new A.Dialog(
+			var dialog = Liferay.Util.Window.getWindow(
 				{
-					align: Liferay.Util.Window.ALIGN_CENTER,
-					bodyContent: form,
-					buttons: [
-						{
-							handler: function() {
-								submitForm(form, url, false);
-							},
-							label: '<%= UnicodeLanguageUtil.get(pageContext, "ok") %>'
-						},
-						{
-							handler: function() {
-								this.close();
-							},
-							label: '<%= UnicodeLanguageUtil.get(pageContext, "cancel") %>'
+					dialog: {
+						bodyContent: form,
+						toolbars: {
+							footer: [
+								{
+									label: '<%= UnicodeLanguageUtil.get(pageContext, "ok") %>',
+									on: {
+										click: function() {
+											submitForm(form, url, false);
+										}
+									}
+								},
+								{
+									label: '<%= UnicodeLanguageUtil.get(pageContext, "cancel") %>',
+									on: {
+										click: function() {
+											dialog.hide();
+										}
+									}
+								}
+							]
 						}
-					],
-					modal: true,
-					title: '<%= UnicodeLanguageUtil.get(pageContext, "export") %>',
-					width: 400
+					},
+					title: '<%= UnicodeLanguageUtil.get(pageContext, "export") %>'
 				}
-			).render();
+			);
 
 		},
-		['aui-dialog']
+		['liferay-util-window']
 	);
 </aui:script>

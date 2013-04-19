@@ -77,7 +77,7 @@ else {
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
-<div class="aui-helper-hidden lfr-message-response" id="<portlet:namespace />discussion-status-messages"></div>
+<div class="aui-hide lfr-message-response" id="<portlet:namespace />discussion-status-messages"></div>
 
 <c:if test="<%= (messagesCount > 1) || MBDiscussionPermission.contains(permissionChecker, company.getCompanyId(), scopeGroupId, permissionClassName, permissionClassPK, userId, ActionKeys.VIEW) %>">
 	<div class="taglib-discussion">
@@ -189,13 +189,13 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 						</c:if>
 
 						<aui:button-row>
-							<aui:button cssClass="aui-button-comment" id='<%= namespace + randomNamespace + "postReplyButton" + i %>' onClick='<%= randomNamespace + "postReply(" + i + ");" %>' value="<%= postReplyButtonLabel %>" />
+							<aui:button cssClass="aui-btn-comment" id='<%= namespace + randomNamespace + "postReplyButton" + i %>' onClick='<%= randomNamespace + "postReply(" + i + ");" %>' value="<%= postReplyButtonLabel %>" />
 
 							<%
 							String taglibCancel = "document.getElementById('" + randomNamespace + "postReplyForm" + i + "').style.display = 'none'; document.getElementById('" + namespace + randomNamespace + "postReplyBody" + i + "').value = ''; void('');";
 							%>
 
-							<aui:button cssClass="aui-button-comment" onClick="<%= taglibCancel %>" type="cancel" />
+							<aui:button cssClass="aui-btn-comment" onClick="<%= taglibCancel %>" type="cancel" />
 						</aui:button-row>
 					</div>
 				</aui:fieldset>
@@ -205,18 +205,21 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 				<a name="<%= randomNamespace %>messages_top"></a>
 
 				<c:if test="<%= treeWalker != null %>">
-				<table class="tree-walker">
-					<tr class="portlet-section-header results-header" style="font-size: x-small; font-weight: bold;">
-						<td colspan="2">
+				<table class="tree-walker aui-table aui-table-bordered aui-table-hover aui-table-striped">
+					<thead>
+					<tr class="results-header">
+						<th colspan="2">
 							<liferay-ui:message key="threaded-replies" />
-						</td>
-						<td colspan="2">
+						</th>
+						<th colspan="2">
 							<liferay-ui:message key="author" />
-						</td>
-						<td>
+						</th>
+						<th>
 							<liferay-ui:message key="date" />
-						</td>
+						</th>
 					</tr>
+					</thead>
+					<tbody>
 
 					<%
 					int[] range = treeWalker.getChildrenRange(rootMessage);
@@ -245,6 +248,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 					}
 					%>
 
+					</tbody>
 				</table>
 
 					<br />
@@ -430,13 +434,13 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 									<aui:input id='<%= randomNamespace + "postReplyBody" + i %>' label="" name='<%= "postReplyBody" + i %>' style='<%= "height: " + ModelHintsConstants.TEXTAREA_DISPLAY_HEIGHT + "px; width: " + ModelHintsConstants.TEXTAREA_DISPLAY_WIDTH + "px;" %>' type="textarea" wrap="soft" />
 
 									<aui:button-row>
-										<aui:button cssClass="aui-button-comment" id='<%= namespace + randomNamespace + "postReplyButton" + i %>' onClick='<%= randomNamespace + "postReply(" + i + ");" %>' value='<%= themeDisplay.isSignedIn() ? "reply" : "reply-as" %>' />
+										<aui:button cssClass="aui-btn-comment" id='<%= namespace + randomNamespace + "postReplyButton" + i %>' onClick='<%= randomNamespace + "postReply(" + i + ");" %>' value='<%= themeDisplay.isSignedIn() ? "reply" : "reply-as" %>' />
 
 										<%
 										String taglibCancel = "document.getElementById('" + randomNamespace + "postReplyForm" + i + "').style.display = 'none'; document.getElementById('" + namespace + randomNamespace + "postReplyBody" + i + "').value = ''; void('');";
 										%>
 
-										<aui:button cssClass="aui-button-comment" onClick="<%= taglibCancel %>" type="cancel" />
+										<aui:button cssClass="aui-btn-comment" onClick="<%= taglibCancel %>" type="cancel" />
 									</aui:button-row>
 								</div>
 
@@ -555,10 +559,6 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 
 				Liferay.Util.openWindow(
 					{
-						dialog: {
-							align: Liferay.Util.Window.ALIGN_CENTER,
-							modal: true
-						},
 						id: '<%= namespace %>signInDialog',
 						title: '<%= UnicodeLanguageUtil.get(pageContext, "sign-in") %>',
 						uri: '<%= loginURL.toString() %>'
@@ -615,7 +615,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 
 				form = A.one(form);
 
-				var commentButtonList = form.all('.aui-button-comment input');
+				var commentButtonList = form.all('.aui-btn-comment');
 
 				A.io.request(
 					form.attr('action'),

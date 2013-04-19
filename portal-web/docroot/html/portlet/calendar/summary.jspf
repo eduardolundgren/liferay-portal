@@ -34,7 +34,7 @@ for (int i = 1; i <= maxDayOfMonth; i++) {
 }
 %>
 
-<table width="100%">
+<table class="aui-table aui-table-bordered aui-table-hover aui-table-striped">
 <tr>
 	<c:if test="<%= summaryTabShowMiniMonth %>">
 		<td class="lfr-top" style="padding-right: 10px;" width="1%">
@@ -61,7 +61,7 @@ for (int i = 1; i <= maxDayOfMonth; i++) {
 	</c:if>
 
 	<c:if test="<%= summaryTabShowTodaysEvents %>">
-		<td class="lfr-top">
+		<td>
 			<%@ include file="/html/portlet/calendar/event_iterator.jspf" %>
 		</td>
 	</c:if>

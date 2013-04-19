@@ -43,21 +43,22 @@ AUI.add(
 						}
 
 						if (!instance._currentPopup) {
-							instance._currentPopup = new A.Dialog(
+							instance._currentPopup = Liferay.Util.Window.getWindow(
 								{
-									on: {
-										close: function() {
-											if (Browser.isIe() && Browser.getMajorVersion() == 6) {
-												window.location.reload(true);
+									dialog: {
+										on: {
+											visibleChange: function(event) {
+												if (!event.newVal && Browser.isIe() && Browser.getMajorVersion() == 6) {
+													window.location.reload(true);
+												}
 											}
 
 											instance._destroyColorPickers();
 										}
 									},
-									title: Liferay.Language.get('look-and-feel'),
-									width: 820
+									title: Liferay.Language.get('look-and-feel')
 								}
-							).render();
+							);
 
 							instance._currentPopup.plug(
 								[
@@ -96,7 +97,6 @@ AUI.add(
 						}
 
 						instance._currentPopup.show();
-						instance._currentPopup.alignToViewport(20, 20);
 						instance._currentPopup.loadingmask.show();
 						instance._currentPopup.io.start();
 					}
@@ -818,10 +818,10 @@ AUI.add(
 
 				instance._tabs = new A.TabView(
 					{
-						listNode: newPanel.one('.aui-tabview-list'),
-						contentNode: newPanel.one('.aui-tabview-content')
+						srcNode: newPanel,
+						panelNode: newPanel.one('.aui-tab-pane')
 					}
-				).render(newPanel.one('form'));
+				).render();
 
 				newPanel.show();
 
@@ -1903,6 +1903,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-color-picker', 'aui-dialog', 'aui-io-request', 'aui-tabs-base']
+		requires: ['aui-color-picker-deprecated', 'aui-io-plugin-deprecated', 'aui-io-request', 'aui-tabview', 'liferay-util-window']
 	}
 );

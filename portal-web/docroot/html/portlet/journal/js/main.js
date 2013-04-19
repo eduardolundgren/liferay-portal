@@ -37,17 +37,17 @@ AUI.add(
 							'<span class="aui-field-content">' +
 								'<span class="aui-field-element aui-field-label-right">' +
 									'<input type="hidden" value="false" name="{portletNamespace}{instanceId}localized-checkbox">' +
-									'<input type="checkbox" onclick="Liferay.Util.updateCheckboxValue(this); " name="{portletNamespace}{instanceId}localized-checkboxCheckbox" id="{portletNamespace}{instanceId}localized-checkboxCheckbox" class="aui-field-input aui-field-input-choice"> </span>' +
-									'<label for="{portletNamespace}{instanceId}localized-checkboxCheckbox" class="aui-field-label">{localizedLabelLanguage}</label>' +
+									'<input type="checkbox" onclick="Liferay.Util.updateCheckboxValue(this); " name="{portletNamespace}{instanceId}localized-checkboxCheckbox" id="{portletNamespace}{instanceId}localized-checkboxCheckbox"> </span>' +
+									'<label for="{portletNamespace}{instanceId}localized-checkboxCheckbox">{localizedLabelLanguage}</label>' +
 								'</span>' +
 							'</span>' +
 						'<div class="journal-article-required-message portlet-msg-error">{requiredFieldLanguage}</div>' +
 						'<div class="journal-article-buttons {articleButtonsRowCSSClass}">' +
 							'<span class="aui-field aui-field-inline aui-field-text journal-article-variable-name">' +
 								'<span class="aui-field-content">' +
-									'<label for="{portletNamespace}{instanceId}variableName" class="aui-field-label">{variableNameLanguage}</label>' +
+									'<label for="{portletNamespace}{instanceId}variableName">{variableNameLanguage}</label>' +
 									'<span class="aui-field-element ">' +
-										'<input type="text" size="25" value="{variableName}" name="{portletNamespace}variableName" id="{portletNamespace}{instanceId}variableName" class="aui-field-input aui-field-input-text">' +
+										'<input type="text" size="25" value="{variableName}" name="{portletNamespace}variableName" id="{portletNamespace}{instanceId}variableName">' +
 									'</span>' +
 								'</span>' +
 							'</span>' +
@@ -70,7 +70,7 @@ AUI.add(
 
 		var TPL_PLACEHOLDER = '<div class="aui-tree-placeholder aui-tree-sub-placeholder"></div>';
 
-		var TPL_STRUCTURE_FIELD_INPUT = '<input class="aui-field-input lfr-input-text" type="text" value="" size="40"/>';
+		var TPL_STRUCTURE_FIELD_INPUT = '<input class="lfr-input-text" type="text" value="" size="40"/>';
 
 		var TPL_TOOLTIP_IMAGE = '<img align="top" class="journal-article-instructions-container" src="' + themeDisplay.getPathThemeImages() + '/portlet/help.png" />';
 
@@ -315,14 +315,14 @@ AUI.add(
 
 				instance.closeEditFieldOptions();
 
-				saveStructureButton.ancestor('.aui-button').hide();
+				saveStructureButton.hide();
 				journalComponentList.hide();
 
 				var structureButtonText = Liferay.Language.get('edit');
 
 				editStructureLink.show();
 
-				editStructureButton.ancestor('.aui-button').hide();
+				editStructureButton.hide();
 
 				A.all('input.journal-list-label').attr('disabled', 'disabled');
 
@@ -414,11 +414,11 @@ AUI.add(
 				var saveStructureButton = instance.getById('saveStructureButton');
 
 				if (editStructureButton) {
-					editStructureButton.ancestor('.aui-button').show();
+					editStructureButton.ancestor('.aui-btn').show();
 				}
 
 				if (saveStructureButton) {
-					saveStructureButton.ancestor('.aui-button').show();
+					saveStructureButton.ancestor('.aui-btn').show();
 				}
 
 				instance._attachEditStructureEvents();
@@ -546,7 +546,7 @@ AUI.add(
 			getEditButton: function(source) {
 				var instance = this;
 
-				return source.one('.edit-button .aui-button-input');
+				return source.one('.edit-button');
 			},
 
 			getFieldInstance: function(source) {
@@ -663,27 +663,32 @@ AUI.add(
 						}
 					};
 
-					instance._saveDialog = new A.Dialog(
-						{
-							align: Liferay.Util.Window.ALIGN_CENTER,
-							bodyContent: htmlTemplate,
-							buttons: [
-								{
-									handler: saveCallback,
-									label: Liferay.Language.get('save')
-								},
-								{
-									handler: function() {
-										this.close();
-									},
-									label: Liferay.Language.get('cancel')
+					instance._saveDialog = Liferay.Util.Window.getWindow(
+					    {
+							dialog: {
+								bodyContent: htmlTemplate,
+								toolbars: {
+									footer: [
+										{
+											label: Liferay.Language.get('save'),
+											on: {
+												click: saveCallback
+											}
+										},
+										{
+											label: Liferay.Language.get('cancel'),
+											on: {
+												click: function() {
+													instance._saveDialog.close();
+												}
+											}
+										}
+									]
 								}
-							],
-							modal: true,
-							title: title,
-							width: 550
-						}
-					).render();
+							},
+							title: title
+					    }
+					);
 
 					instance._saveDialog.fields = {
 						autoGenerateIdMessage: Liferay.Language.get('autogenerate-id'),
@@ -845,7 +850,7 @@ AUI.add(
 
 				var componentContainer = source.one('div.journal-article-component-container');
 
-				return componentContainer.one('.aui-field-input');
+				return componentContainer.one('input');
 			},
 
 			getPrincipalForm: function(formName) {
@@ -982,10 +987,6 @@ AUI.add(
 
 				Liferay.Util.openWindow(
 					{
-						dialog: {
-							align: Liferay.Util.Window.ALIGN_CENTER,
-							width: 680
-						},
 						id: instance.portletNamespace + id,
 						title: title,
 						uri: url
@@ -1115,7 +1116,7 @@ AUI.add(
 					fieldInstance.set('source', newSource);
 					fieldInstance.set('instanceId', instanceId);
 
-					var localizedCheckbox = newSource.one('.journal-article-localized-checkbox .aui-field-input');
+					var localizedCheckbox = newSource.one('.journal-article-localized-checkbox input');
 
 					if (localizedCheckbox) {
 						localizedCheckbox.attr('checked', false);
@@ -1128,12 +1129,12 @@ AUI.add(
 					if (fieldType == 'boolean') {
 						componentContainer = newSource.one('.journal-article-component-container');
 
-						componentContainer.one('.aui-field-input').attr('checked', false);
+						componentContainer.one('input').attr('checked', false);
 					}
 					else if (fieldType == 'document_library' || fieldType == 'text') {
 						componentContainer = newSource.one('.journal-article-component-container');
 
-						componentContainer.one('.aui-field-input').val('');
+						componentContainer.one('input').val('');
 					}
 					else if (fieldType == 'image') {
 						newSource.all('.journal-image-preview, .journal-image-show-hide').remove(true);
@@ -1148,7 +1149,7 @@ AUI.add(
 					else if (fieldType == 'text_box') {
 						componentContainer = newSource.one('.journal-article-component-container');
 
-						componentContainer.one('.aui-field-input').html('');
+						componentContainer.one('input').html('');
 					}
 
 					return fieldInstance;
@@ -1851,7 +1852,7 @@ AUI.add(
 						instance.editContainerContextPanel.set('trigger', editButton);
 						instance.editContainerContextPanel.show();
 					},
-					instance._getNamespacedId('#structureTree') + ' div.journal-article-buttons .edit-button .aui-button-input'
+					instance._getNamespacedId('#structureTree') + ' div.journal-article-buttons .edit-button'
 				);
 
 				container.delegate(
@@ -1861,7 +1862,7 @@ AUI.add(
 
 						instance.repeatField(source);
 					},
-					'.repeatable-field-add, .journal-article-buttons .repeatable-button .aui-button-input'
+					'.repeatable-field-add, .journal-article-buttons .repeatable-button'
 				);
 
 				container.delegate(
@@ -1872,7 +1873,7 @@ AUI.add(
 
 						instance._updateLocaleState(source, checkbox);
 					},
-					'.journal-article-localized-checkbox .aui-field-input-choice'
+					'.journal-article-localized-checkbox input'
 				);
 
 				container.delegate('keypress', keyPressAddItem, '.journal-list-key, .journal-list-value');
@@ -1915,7 +1916,7 @@ AUI.add(
 						var showLabel = link.one('.show-label').show();
 						var hideLabel = link.one('.hide-label').show();
 
-						var visible = imagePreviewDiv.hasClass('aui-helper-hidden');
+						var visible = imagePreviewDiv.hasClass('aui-hide');
 
 						if (visible) {
 							showLabel.hide();
@@ -1935,7 +1936,7 @@ AUI.add(
 					'click',
 					function(event) {
 						var button = event.currentTarget;
-						var input = button.ancestor('.journal-article-component-container').one('.aui-field-input');
+						var input = button.ancestor('.journal-article-component-container').one('input');
 						var selectUrl = button.attr('data-documentlibraryUrl');
 
 						window[instance.portletNamespace + 'selectDocumentLibrary'] = function(url) {
@@ -1944,7 +1945,7 @@ AUI.add(
 
 						instance.openPopupWindow(selectUrl, Liferay.Language.get('javax.portlet.title.20'), 'selectDocumentLibrary');
 					},
-					'.journal-documentlibrary-button .aui-button-input'
+					'.journal-documentlibrary-button'
 				);
 
 				container.delegate(
@@ -1972,8 +1973,8 @@ AUI.add(
 
 					var closeEditField = instance.closeEditFieldOptions;
 
-					editContainerWrapper.delegate('click', closeEditField, '.cancel-button .aui-button-input', instance);
-					editContainerWrapper.delegate('click', closeEditField, '.close-button .aui-button-input', instance);
+					editContainerWrapper.delegate('click', closeEditField, '.cancel-button', instance);
+					editContainerWrapper.delegate('click', closeEditField, '.close-button', instance);
 
 					editContainerWrapper.delegate(
 						'click',
@@ -1982,7 +1983,7 @@ AUI.add(
 
 							instance.saveEditFieldOptions(source);
 						},
-						'.save-button .aui-button-input'
+						'.save-button'
 					);
 				}
 
@@ -2143,7 +2144,7 @@ AUI.add(
 						instance.clonedSource.guid();
 
 						instance.clonedSource.show().setStyle('visibility', 'visible');
-						instance.clonedSource.removeClass('aui-helper-hidden');
+						instance.clonedSource.removeClass('aui-hide');
 						instance.clonedSource.addClass('dragging');
 
 						instance.createNestedList(
@@ -3087,7 +3088,7 @@ AUI.add(
 						var type = instance.get('fieldType');
 						var componentContainer = source.one('div.journal-article-component-container');
 
-						var principalElement = componentContainer.one('.aui-field-input');
+						var principalElement = componentContainer.one('input');
 
 						if (type == 'boolean') {
 							content = principalElement.attr('checked');
@@ -3176,7 +3177,7 @@ AUI.add(
 							var articleButtonsRowCSSClass = '';
 
 							if (!optionsEditable) {
-								articleButtonsRowCSSClass = 'aui-helper-hidden';
+								articleButtonsRowCSSClass = 'aui-hide';
 							}
 
 							var repeatableButtonTemplate = instance.getById('repeatableButtonTemplate');
@@ -3420,7 +3421,7 @@ AUI.add(
 						var fieldLabel = instance.getFieldLabelElement();
 
 						if (fieldLabel) {
-							var input = fieldLabel.get('parentNode').one('.journal-article-component-container .aui-field-input');
+							var input = fieldLabel.get('parentNode').one('.journal-article-component-container input');
 
 							if (input) {
 								input.attr('id', value);
@@ -3517,6 +3518,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-data-set', 'aui-datatype', 'aui-dialog', 'aui-dialog-iframe', 'aui-io-request', 'aui-nested-list', 'aui-overlay-context-panel', 'json']
+		requires: ['aui-base', 'aui-data-set-deprecated', 'aui-datatype', 'aui-dialog-iframe-deprecated', 'aui-io-request', 'aui-nested-list', 'aui-overlay-context-panel-deprecated', 'json', 'liferay-util-window']
 	}
 );

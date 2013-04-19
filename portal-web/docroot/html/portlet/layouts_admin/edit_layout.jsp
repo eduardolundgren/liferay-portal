@@ -219,80 +219,83 @@ String[][] categorySections = {mainSections};
 					</div>
 				</c:if>
 
-				<aui:script use="aui-dialog,aui-dialog-iframe,aui-toolbar">
+				<aui:script use="aui-dialog-iframe-deprecated,aui-toolbar,liferay-util-window">
 					var buttonRow = A.one('#<portlet:namespace />layoutToolbar');
 
 					var popup = null;
 
-					var layoutToolbarChildren = [];
+					var layoutToolbarButtonGroup = [];
 
 					<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selPlid, ActionKeys.ADD_LAYOUT) && PortalUtil.isLayoutParentable(selLayout.getType()) %>">
-						layoutToolbarChildren.push(
+						layoutToolbarButtonGroup.push(
 							{
-								handler: function(event) {
-									var content = A.one('#<portlet:namespace />addLayout');
+								icon: 'aui-icon-plus-sign',
+								label: '<%= UnicodeLanguageUtil.get(pageContext, "add-child-page") %>',
+								on: {
+									click: function(event) {
+										var content = A.one('#<portlet:namespace />addLayout');
 
-									if (!popup) {
-										popup = new A.Dialog(
-											{
-												align: Liferay.Util.Window.ALIGN_CENTER,
-												bodyContent: content.show(),
-												title: '<%= UnicodeLanguageUtil.get(pageContext, "add-child-page") %>',
-												modal: true,
-												width: 500
-											}
-										).render();
+										if (!popup) {
+											popup = Liferay.Util.Window.getWindow(
+												{
+													dialog: {
+														bodyContent: content.show()
+													},
+													title: '<%= UnicodeLanguageUtil.get(pageContext, "add-child-page") %>'
+												}
+											);
+										}
+
+										popup.show();
+
+										Liferay.Util.focusFormField(content.one('input:text'));
 									}
-
-									popup.show();
-
-									Liferay.Util.focusFormField(content.one('input:text'));
-								},
-								icon: 'add',
-								label: '<%= UnicodeLanguageUtil.get(pageContext, "add-child-page") %>'
+								}
 							}
 						);
 					</c:if>
 
 					<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selPlid, ActionKeys.PERMISSIONS) %>">
-						layoutToolbarChildren.push(
+						layoutToolbarButtonGroup.push(
 							{
-								handler: function(event) {
-									Liferay.Util.openWindow(
-										{
-											cache: false,
-											dialog: {
-												width: 900
-											},
-											id: '<portlet:namespace /><%= selLayout.getFriendlyURL().substring(1) %>_permissions',
-											title: '<%= UnicodeLanguageUtil.get(pageContext, "permissions") %>',
-											uri: '<%= permissionURL %>'
-										}
-									);
-								},
-								icon: 'permissions',
-								label: '<%= UnicodeLanguageUtil.get(pageContext, "permissions") %>'
+								icon: 'aui-icon-lock',
+								label: '<%= UnicodeLanguageUtil.get(pageContext, "permissions") %>',
+								on: {
+									click: function(event) {
+										Liferay.Util.openWindow(
+											{
+												cache: false,
+												id: '<portlet:namespace /><%= selLayout.getFriendlyURL().substring(1) %>_permissions',
+												title: '<%= UnicodeLanguageUtil.get(pageContext, "permissions") %>',
+												uri: '<%= permissionURL %>'
+											}
+										);
+									}
+								}
 							}
 						);
 					</c:if>
 
 					<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selPlid, ActionKeys.DELETE) %>">
-						layoutToolbarChildren.push(
+						layoutToolbarButtonGroup.push(
 							{
-								handler: function(event) {
-									<portlet:namespace />saveLayout('<%= Constants.DELETE %>');
-								},
-								icon: 'delete',
-								label: '<%= UnicodeLanguageUtil.get(pageContext, "delete") %>'
+								icon: 'aui-icon-trash',
+								label: '<%= UnicodeLanguageUtil.get(pageContext, "delete") %>',
+								on: {
+									click: function(event) {
+										<portlet:namespace />saveLayout('<%= Constants.DELETE %>');
+									}
+								}
 							}
 						);
 					</c:if>
 
 					var layoutToolbar = new A.Toolbar(
 						{
-							activeState: false,
 							boundingBox: buttonRow,
-							children: layoutToolbarChildren
+							children: [
+								layoutToolbarButtonGroup
+							]
 						}
 					).render();
 
@@ -325,9 +328,6 @@ String[][] categorySections = {mainSections};
 				}
 
 				document.<portlet:namespace />fm.<portlet:namespace />redirect.value = '<%= HttpUtil.setParameter(redirectURL.toString(), liferayPortletResponse.getNamespace() + "selPlid", selLayout.getParentPlid()) %>';
-			}
-			else {
-				document.<portlet:namespace />fm.<portlet:namespace />redirect.value += Liferay.Util.getHistoryParam('<portlet:namespace />');
 			}
 
 			document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = action;

@@ -21,7 +21,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 %>
 
 <div id="lfr-look-and-feel">
-	<div class="aui-tabview" id="portlet-set-properties">
+	<div class="aui-tabbable-content" id="portlet-set-properties">
 		<liferay-ui:tabs
 			names="portlet-configuration,text-styles,background-styles,border-styles,margin-and-padding,advanced-styling,wap-styling"
 			url="<%= portletURL.toString() %>"
@@ -31,7 +31,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 			<input id="portlet-area" name="portlet-area" type="hidden" />
 			<input id="portlet-boundary-id" name="portlet-boundary-id" type="hidden" />
 
-			<div class="aui-tabview-content">
+			<div class="aui-tab-pane">
 				<aui:fieldset id="portlet-config">
 					<span class="aui-field-row">
 						<aui:input inlineField="<%= true %>" label="portlet-title" name="custom-title" />
@@ -117,7 +117,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 						<aui:option label="no" value="false" />
 					</aui:select>
 
-					<span class="form-hint portlet-msg-info aui-helper-hidden" id="border-note">
+					<span class="form-hint portlet-msg-info aui-hide" id="border-note">
 						<liferay-ui:message key="this-change-will-only-be-shown-after-you-refresh-the-page" />
 					</span>
 				</aui:fieldset>

@@ -134,7 +134,7 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 
 						<c:choose>
 							<c:when test="<%= layoutSetBranches.size() > 1 %>">
-								<liferay-ui:icon-menu align="left" cssClass="layoutset-branches-menu" direction="down" extended="<%= true %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/staging.png" %>' message="<%= HtmlUtil.escape(layoutSetBranch.getName()) %>">
+								<liferay-ui:icon-menu cssClass="layoutset-branches-menu" direction="down" extended="<%= true %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/staging.png" %>' message="<%= HtmlUtil.escape(layoutSetBranch.getName()) %>">
 
 									<%
 									for (int i = 0; i < layoutSetBranches.size(); i++) {
@@ -201,7 +201,7 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 </aui:layout>
 
 <c:if test="<%= !group.isLayoutPrototype() %>">
-	<aui:script use="aui-io-plugin">
+	<aui:script use="aui-io-plugin-deprecated">
 		var layoutsContainer = A.one('#<portlet:namespace />layoutsContainer');
 
 		layoutsContainer.plug(

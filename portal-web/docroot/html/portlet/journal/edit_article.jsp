@@ -187,7 +187,7 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 
 	<table class="lfr-table" id="<portlet:namespace />journalArticleWrapper" width="100%">
 	<tr>
-		<td class="lfr-top">
+		<td>
 			<c:if test="<%= Validator.isNull(toLanguageId) %>">
 				<c:if test="<%= article != null %>">
 					<aui:workflow-status id="<%= String.valueOf(article.getArticleId()) %>" status="<%= article.getStatus() %>" version="<%= String.valueOf(article.getVersion()) %>" />
