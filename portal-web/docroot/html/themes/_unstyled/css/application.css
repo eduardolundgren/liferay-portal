@@ -1,68 +1,9 @@
 /* ---------- Main ---------- */
 
-.aui-state-default {
-}
-
-.aui-state-hover {
-}
-
-.aui-state-active {
-}
-
 .results-grid {
 }
 
 .context-pane-content .results-grid {
-}
-
-.results-header {
-	th {
-		&.sort-column {
-			.result-column-name {
-			}
-		}
-
-		&.first {
-		}
-
-		&.last {
-		}
-	}
-
-	td, th {
-	}
-
-	th.sort-desc .result-column-name {
-	}
-
-	a, span {
-	}
-
-	a {
-		&:hover {
-		}
-	}
-}
-
-.results-row {
-	td {
-		&.sort-column {
-		}
-	}
-
-	&.selected td, &.selected.hover td {
-		& a {
-		}
-	}
-
-	&.alt.selected td, &.alt.selected.hover td {
-	}
-
-	&.alt td {
-	}
-
-	&.hover td {
-	}
 }
 
 .taglib-search-iterator .results-row {
@@ -91,7 +32,7 @@
 	}
 }
 
-.aui-portal-layout-proxy {
+.aui-sortable-layout-proxy {
 	.portlet-topper {
 	}
 }
@@ -115,7 +56,7 @@
 .lfr-freeform-layout-drag-indicator {
 }
 
-.aui-portal-layout-drag-target-indicator {
+.aui-sortable-layout-drag-target-indicator {
 }
 
 /* ---------- Portal tool tips ---------- */
@@ -228,16 +169,6 @@
 
 /* ---------- Menus ---------- */
 
-.lfr-actions.portlet-options, .visible.portlet-options {
-	.lfr-trigger strong span {
-	}
-}
-
-.lfr-actions.portlet-options:hover {
-	&, ul {
-	}
-}
-
 .lfr-menu-list {
 }
 
@@ -286,7 +217,7 @@
 .aui-menu-content li a.aui-focus, .lfr-menu-expanded li a:focus, .lfr-menu-list ul .taglib-icon.aui-focus {
 }
 
-.aui-menu-content a, .lfr-menu-list li .taglib-icon, .aui-menu-content .disabled, .lfr-actions .lfr-trigger, .lfr-actions .lfr-trigger strong {
+.aui-menu-content a, .lfr-menu-list li .taglib-icon, .aui-menu-content .disabled {
 }
 
 /* ---------- Toolbar ---------- */
@@ -376,9 +307,6 @@
 /* ---------- Header row ---------- */
 
 .lfr-header-row {
-	.lfr-actions.show-arrow.direction-down .lfr-trigger strong a {
-	}
-
 	.aui-toolbar {
 		.aui-toolbar-content {
 		}
@@ -406,9 +334,6 @@
 }
 
 .ie7 {
-	.aui-tabview-list {
-	}
-
 	.aui-menu-content li {
 	}
 
@@ -429,8 +354,5 @@
 	.lfr-header-row .aui-buttonitem-content {
 		.aui-buttonitem-label {
 		}
-	}
-
-	.results-row.hover td {
 	}
 }

@@ -124,7 +124,7 @@ if (Validator.isNull(mainLanguageValue)) {
 		}
 		%>
 
-		<div class="lfr-floating-container lfr-language-selector aui-helper-hidden" id="<%= randomNamespace %>languageSelector">
+		<div class="lfr-floating-container lfr-language-selector aui-hide" id="<%= randomNamespace %>languageSelector">
 			<div class="lfr-panel aui-form">
 				<div class="lfr-panel-titlebar">
 					<h3 class="lfr-panel-title"><span><liferay-ui:message key="other-languages" /></span></h3>
@@ -213,7 +213,7 @@ if (Validator.isNull(mainLanguageValue)) {
 </span>
 
 <c:if test="<%= (locales.length > 1) && Validator.isNull(languageId) %>">
-	<aui:script use="liferay-auto-fields,liferay-panel-floating">
+	<aui:script use="liferay-auto-fields">
 		var updateLanguageFlag = function(event) {
 			var target = event.target;
 
@@ -276,29 +276,6 @@ if (Validator.isNull(mainLanguageValue)) {
 
 		var form = A.one(document.<portlet:namespace /><%= formName %>);
 
-		var panel = new Liferay.PanelFloating(
-			{
-				collapsible: false,
-				container: '#<%= randomNamespace %>languageSelector',
-				on: {
-					hide: function(event) {
-						var instance = this;
-
-						instance._positionHelper.appendTo(form);
-					},
-					show: function(event) {
-						var instance = this;
-
-						instance._positionHelper.appendTo(document.body);
-					}
-				},
-				trigger: '#<%= randomNamespace %>languageSelectorTrigger',
-				width: 500
-			}
-		);
-
-		panel._positionHelper.appendTo(form);
-
 		var languageSelectorTrigger = A.one('#<%= randomNamespace %>languageSelectorTrigger');
 
 		if (languageSelectorTrigger) {
@@ -322,7 +299,6 @@ if (Validator.isNull(mainLanguageValue)) {
 					);
 
 					languageSelectorTrigger.setData('autoFieldsInstance', autoFields);
-					languageSelectorTrigger.setData('panelInstance', panel);
 				}
 			);
 

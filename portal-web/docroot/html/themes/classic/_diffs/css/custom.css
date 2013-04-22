@@ -8,22 +8,7 @@
 
 /* ---------- Base styles ---------- */
 
-body {
-	background: #EEF0F2;
-	font-size: 11px;
-}
-
-a {
-	color: #5B677D;
-	text-decoration: underline;
-
-	&:hover {
-		color: #06C;
-		text-decoration: none;
-	}
-}
-
-hr, .separator {
+.separator {
 	border-color: #BFBFBF transparent #FFF;
 	border-style: solid;
 	border-width: 1px 0;
@@ -329,19 +314,6 @@ hr, .separator {
 
 .lfr-panel-container {
 	background-color: transparent;
-}
-
-.aui-combobox {
-	.aui-field-input {
-		font-size: 11px;
-		height: 15px;
-		padding: 4px 3px 3px;
-	}
-
-	.aui-field {
-		float: left;
-		line-height: 0;
-	}
 }
 
 .lfr-portlet-title-editable-content .aui-field {

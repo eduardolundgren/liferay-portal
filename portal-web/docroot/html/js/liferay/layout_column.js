@@ -149,7 +149,7 @@ AUI.add(
 
 				NAME: 'ColumnLayout',
 
-				EXTENDS: A.PortalLayout,
+				EXTENDS: A.SortableLayout,
 
 				prototype: {
 					dragItem: 0,
@@ -196,6 +196,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-portal-layout', 'dd']
+		requires: ['aui-sortable-layout', 'dd']
 	}
 );

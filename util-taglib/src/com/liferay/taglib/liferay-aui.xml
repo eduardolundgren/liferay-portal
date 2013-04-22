@@ -80,14 +80,20 @@
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
-				<name>inputCssClass</name>
+				<name>name</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
-				<name>name</name>
+				<name>icon</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>iconAlign</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue>left</defaultValue>
 			</attribute>
 			<attribute>
 				<name>onClick</name>
@@ -436,11 +442,6 @@
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
-				<name>inputCssClass</name>
-				<inputType>java.lang.String</inputType>
-				<outputType>java.lang.String</outputType>
-			</attribute>
-			<attribute>
 				<name>label</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
@@ -555,6 +556,103 @@
 				<name>model</name>
 				<inputType><![CDATA[java.lang.Class<?>]]></inputType>
 				<outputType><![CDATA[java.lang.Class<?>]]></outputType>
+			</attribute>
+		</attributes>
+	</component>
+	<component name="Nav" bodyContent="true">
+		<attributes>
+			<attribute>
+				<name>cssClass</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>id</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+		</attributes>
+	</component>
+	<component name="NavBar" bodyContent="true">
+		<attributes>
+			<attribute>
+				<name>cssClass</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>id</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+		</attributes>
+	</component>
+	<component name="NavBarSearch" bodyContent="true">
+		<attributes>
+			<attribute>
+				<name>cssClass</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>id</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>file</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>searchContainer</name>
+				<inputType>com.liferay.portal.kernel.dao.search.SearchContainer</inputType>
+				<outputType>com.liferay.portal.kernel.dao.search.SearchContainer</outputType>
+			</attribute>
+		</attributes>
+	</component>
+	<component name="NavItem" bodyContent="true">
+		<attributes>
+			<attribute>
+				<name>anchorId</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>cssClass</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>dropdown</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+			</attribute>
+			<attribute>
+				<name>href</name>
+				<inputType>java.lang.Object</inputType>
+				<outputType>java.lang.String</outputType>
+				<defaultValue>javascript:void(0);</defaultValue>
+			</attribute>
+			<attribute>
+				<name>iconClass</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>id</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>label</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>selected</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
 			</attribute>
 		</attributes>
 	</component>
@@ -697,11 +795,6 @@
 			</attribute>
 			<attribute>
 				<name>inlineLabel</name>
-				<inputType>java.lang.String</inputType>
-				<outputType>java.lang.String</outputType>
-			</attribute>
-			<attribute>
-				<name>inputCssClass</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 			</attribute>

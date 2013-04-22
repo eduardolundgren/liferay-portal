@@ -443,7 +443,7 @@ AUI.add(
 
 				instance._addMenu(options);
 			},
-			['aui-overlay-context', 'node-focusmanager']
+			['aui-overlay-context-deprecated', 'node-focusmanager']
 		);
 
 		Liferay.provide(
@@ -674,23 +674,10 @@ AUI.add(
 						function(event) {
 							event.preventDefault();
 
-							var fullDialog = event.currentTarget.ancestor('li').hasClass('full-dialog');
-
 							manageContent.hide();
-
-							var width = 960;
-
-							if (fullDialog) {
-								width = '90%';
-							}
 
 							instance._openWindow(
 								{
-									dialog: {
-										align: Util.Window.ALIGN_CENTER,
-										modal: fullDialog,
-										width: width
-									},
 									id: 'manageContentDialog'
 								},
 								event.currentTarget
@@ -768,12 +755,7 @@ AUI.add(
 							event.preventDefault();
 
 							instance._openWindow(
-								{
-									dialog: {
-										align: Util.Window.ALIGN_CENTER,
-										width: 960
-									}
-								},
+								{},
 								event.currentTarget
 							);
 						},
@@ -793,7 +775,7 @@ AUI.add(
 
 				Liferay.fire('dockbarLoaded');
 			},
-			['aui-io-request', 'aui-overlay-context', 'liferay-dockbar-underlay', 'liferay-store', 'node-focusmanager']
+			['aui-io-request', 'aui-overlay-context-deprecated', 'liferay-dockbar-underlay', 'liferay-store', 'node-focusmanager']
 		);
 
 		Liferay.provide(
@@ -874,6 +856,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-node', 'event-touch']
+		requires: ['aui-node', 'aui-overlay-context-deprecated', 'aui-overlay-manager-deprecated', 'event-touch']
 	}
 );

@@ -214,7 +214,7 @@ if (Validator.isNotNull(content)) {
 		<c:if test="<%= Validator.isNull(toLanguageId) %>">
 			<tr>
 				<td class="article-structure-template-toolbar journal-metadata">
-					<span class="portlet-msg-alert structure-message aui-helper-hidden" id="<portlet:namespace />structureMessage">
+					<span class="portlet-msg-alert structure-message aui-hide" id="<portlet:namespace />structureMessage">
 						<liferay-ui:message key="this-structure-has-not-been-saved" />
 
 						<liferay-ui:message arguments='<%= new Object[] {"journal-save-structure-trigger", "#"} %>' key="click-here-to-save-it-now" />
@@ -222,7 +222,7 @@ if (Validator.isNotNull(content)) {
 
 					<aui:layout>
 						<aui:column columnWidth="50" cssClass="article-structure">
-							<label class="article-structure-label"><liferay-ui:message key="structure" />:</label>
+							<span class="article-structure-label"><liferay-ui:message key="structure" />:</span>
 
 							<aui:fieldset cssClass="article-structure-toolbar">
 								<div class="journal-form-presentation-label">
@@ -250,9 +250,9 @@ if (Validator.isNotNull(content)) {
 
 										<span class="structure-controls">
 											<span class="structure-buttons">
-												<aui:button cssClass="save-structure-button aui-helper-hidden" name="saveStructureButton" value="save" />
+												<aui:button cssClass="save-structure-button aui-hide" name="saveStructureButton" value="save" />
 
-												<aui:button cssClass="edit-structure-button aui-helper-hidden" name="editStructureButton" value="stop-editing" />
+												<aui:button cssClass="edit-structure-button aui-hide" name="editStructureButton" value="stop-editing" />
 											</span>
 										</span>
 									</c:if>
@@ -261,7 +261,7 @@ if (Validator.isNotNull(content)) {
 						</aui:column>
 
 						<aui:column columnWidth="50" cssClass="article-template">
-							<label class="article-template-label"><liferay-ui:message key="template" />:</label>
+							<span class="article-template-label"><liferay-ui:message key="template" />:</span>
 
 							<aui:fieldset cssClass="article-template-toolbar">
 								<div class="journal-form-presentation-label">
@@ -346,7 +346,7 @@ if (Validator.isNotNull(content)) {
 
 											</aui:select>
 
-											<img border="0" class="aui-helper-hidden article-template-image" hspace="0" id="<portlet:namespace />templateImage" src="" vspace="0" />
+											<img border="0" class="aui-hide article-template-image" hspace="0" id="<portlet:namespace />templateImage" src="" vspace="0" />
 
 											<liferay-ui:icon id="editTemplateLink" image="edit" url="javascript:;" />
 										</c:otherwise>
@@ -361,14 +361,14 @@ if (Validator.isNotNull(content)) {
 
 		<tr>
 			<td class="article-translation-toolbar journal-metadata">
-				<div class="portlet-msg-info aui-helper-hidden" id="<portlet:namespace />translationsMessage">
+				<div class="portlet-msg-info aui-hide" id="<portlet:namespace />translationsMessage">
 					<liferay-ui:message key="the-changes-in-your-translations-will-be-available-once-the-content-is-published" />
 				</div>
 
 				<div>
 					<c:choose>
 						<c:when test="<%= Validator.isNull(toLanguageId) %>">
-							<label for="<portlet:namespace />defaultLanguageId"><liferay-ui:message key="web-content-default-language" /></label>:
+							<span for="<portlet:namespace />defaultLanguageId"><liferay-ui:message key="web-content-default-language" /></span>:
 
 							<span class="lfr-translation-manager-selector nobr">
 								<span class="article-default-language lfr-token lfr-token-primary" id="<portlet:namespace />textLanguageId">
@@ -377,11 +377,9 @@ if (Validator.isNotNull(content)) {
 									<%= LocaleUtil.fromLanguageId(defaultLanguageId).getDisplayName(locale) %>
 								</span>
 
-								<liferay-ui:icon-help message="default-language-help" />
-
 								<a href="javascript:;" id="<portlet:namespace />changeLanguageId"><liferay-ui:message key="change" /></a>
 
-								<aui:select id="defaultLocale" inlineField="<%= true %>" inputCssClass="aui-helper-hidden" label="" name="defaultLanguageId">
+								<aui:select cssClass="aui-hide" id="defaultLocale" inlineField="<%= true %>" label="" name="defaultLanguageId">
 
 									<%
 									Locale[] locales = LanguageUtil.getAvailableLocales();
@@ -396,12 +394,13 @@ if (Validator.isNotNull(content)) {
 									%>
 
 								</aui:select>
+
+								<liferay-ui:icon-help message="default-language-help" />
 							</span>
 
 							<c:if test="<%= article != null %>">
 								<span class="lfr-translation-manager-add-menu">
 									<liferay-ui:icon-menu
-										align="left"
 										cssClass="add-translations-menu"
 										direction="down"
 										icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>'
@@ -462,7 +461,7 @@ if (Validator.isNotNull(content)) {
 								<aui:input name="toLanguageId" type="hidden" value="<%= toLanguageId %>" />
 							</c:when>
 							<c:otherwise>
-								<span class='available-translations<%= (translations.length > 1) ? "" : " aui-helper-hidden" %>' id="<portlet:namespace />availableTranslationsLinks">
+								<span class='available-translations<%= (translations.length > 1) ? "" : " aui-hide" %>' id="<portlet:namespace />availableTranslationsLinks">
 									<label><liferay-ui:message key="available-translations" /></label>
 
 										<%
@@ -532,7 +531,7 @@ if (Validator.isNotNull(content)) {
 
 											<aui:button cssClass="edit-button" value="edit-options" />
 
-											<aui:button cssClass="repeatable-button aui-helper-hidden" value="repeat" />
+											<aui:button cssClass="repeatable-button aui-hide" value="repeat" />
 										</div>
 									</div>
 
@@ -689,8 +688,7 @@ if (Validator.isNotNull(content)) {
 				classPK: <%= (ddmStructure != null) ? ddmStructure.getPrimaryKey() : 0 %>,
 				ddmResource: '<%= ddmResource %>',
 				dialog: {
-					modal: true,
-					width: '80%'
+					destroyOnHide: true
 				},
 				eventName: '<portlet:namespace />selectStructure',
 				groupId: <%= groupId %>,
@@ -720,8 +718,7 @@ if (Validator.isNotNull(content)) {
 				ddmResource: '<%= ddmResource %>',
 				ddmResourceActionId: '<%= ActionKeys.ADD_TEMPLATE %>',
 				dialog: {
-					modal: true,
-					width: '80%'
+					destroyOnHide: true
 				},
 				eventName: '<portlet:namespace />selectTemplate',
 				groupId: <%= groupId %>,
@@ -741,7 +738,7 @@ if (Validator.isNotNull(content)) {
 	}
 </aui:script>
 
-<aui:script use="aui-base,aui-dialog-iframe,liferay-portlet-journal">
+<aui:script use="aui-base,aui-dialog-iframe-deprecated,liferay-portlet-journal">
 	var editDDMTemplate = A.one('#<portlet:namespace />editDDMTemplate');
 
 	if (editDDMTemplate) {
@@ -752,10 +749,6 @@ if (Validator.isNotNull(content)) {
 			function (event) {
 				Liferay.Util.openWindow(
 					{
-						dialog: {
-							constrain: true,
-							width: 820
-						},
 						id: windowId,
 						title: '<%= UnicodeLanguageUtil.get(pageContext, "templates") %>',
 
@@ -814,10 +807,6 @@ if (Validator.isNotNull(content)) {
 
 					Liferay.Util.openWindow(
 					{
-						dialog: {
-							constrain: true,
-							width: 820
-						},
 						id: windowId,
 						title: '<%= UnicodeLanguageUtil.get(pageContext, "templates") %>',
 						uri: editTemplateURL

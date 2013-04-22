@@ -163,7 +163,7 @@
 								</c:if>
 							</div>
 
-							<div class="aui-helper-hidden" id="customDatabaseOptions">
+							<div class="aui-hide" id="customDatabaseOptions">
 								<div class="connection-messages" id="connectionMessages"></div>
 
 								<a class="database-options" href="<%= HttpUtil.addParameter(themeDisplay.getPathMain() + "/portal/setup_wizard", "defaultDatabase", true) %>" id="defaultDatabaseOptionsLink">
@@ -214,7 +214,7 @@
 						</aui:button-row>
 					</aui:form>
 
-					<aui:script use="aui-base,aui-io-request,aui-loading-mask">
+					<aui:script use="aui-base,aui-io-request,aui-loading-mask-deprecated">
 						var customDatabaseOptions = A.one('#customDatabaseOptions');
 						var customDatabaseOptionsLink = A.one('#customDatabaseOptionsLink');
 						var databaseSelector = A.one('#databaseType');
@@ -412,7 +412,7 @@
 								</span>
 							</p>
 
-							<aui:input inputCssClass="properties-text" label="" name="portal-ext" type="textarea" value="<%= unicodeProperties.toSortedString() %>" wrap="soft" />
+							<aui:input cssClass="properties-text" label="" name="portal-ext" type="textarea" value="<%= unicodeProperties.toSortedString() %>" wrap="soft" />
 						</c:otherwise>
 					</c:choose>
 				</c:otherwise>

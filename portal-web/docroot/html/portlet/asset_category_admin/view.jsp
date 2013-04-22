@@ -82,7 +82,7 @@
 
 				<div class="vocabulary-list lfr-component"></div>
 
-				<div class="vocabularies-paginator"></div>
+				<div class="vocabularies-pagination"></div>
 			</aui:column>
 
 			<aui:column columnWidth="75" cssClass="vocabulary-categories-container">
@@ -95,7 +95,7 @@
 				<div class="vocabulary-categories"></div>
 			</aui:column>
 
-			<aui:column columnWidth="35" cssClass="aui-helper-hidden vocabulary-edit-category">
+			<aui:column columnWidth="35" cssClass="aui-hide vocabulary-edit-category">
 				<div class="results-header">
 					<liferay-ui:message key="category-details" />
 
@@ -121,7 +121,6 @@
 	new Liferay.Portlet.AssetCategoryAdmin(
 		{
 			itemsPerPage: <%= SearchContainer.DEFAULT_DELTA %>,
-			itemsPerPageOptions: [<%= StringUtil.merge(PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) %>],
 			portletId: '<%= portletDisplay.getId() %>'
 		}
 	);

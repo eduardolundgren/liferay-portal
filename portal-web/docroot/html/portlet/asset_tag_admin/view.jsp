@@ -22,10 +22,9 @@
 	<div class="lfr-header-row">
 		<div class="lfr-header-row-content">
 			<div class="toolbar">
-				<aui:input cssClass="select-tags aui-state-default" inline="<%= true %>" label="" name="checkAllTags" title='<%= LanguageUtil.get(pageContext, "check-all-tags") %>' type="checkbox" />
+				<aui:input cssClass="select-tags" inline="<%= true %>" label="" name="checkAllTags" title='<%= LanguageUtil.get(pageContext, "check-all-tags") %>' type="checkbox" />
 
 				<liferay-ui:icon-menu
-					align="left"
 					direction="down"
 					icon=""
 					message="actions"
@@ -80,7 +79,7 @@
 
 				<div class="tags-admin-list lfr-component"></div>
 
-				<div class="tags-paginator"></div>
+				<div class="tags-pagination"></div>
 			</aui:column>
 
 			<aui:column columnWidth="65" cssClass="tags-admin-edit-tag">
@@ -100,8 +99,7 @@
 	new Liferay.Portlet.AssetTagsAdmin(
 		{
 			portletId: '<%= portletDisplay.getId() %>',
-			tagsPerPage: <%= SearchContainer.DEFAULT_DELTA %>,
-			tagsPerPageOptions: [<%= StringUtil.merge(PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) %>]
+			tagsPerPage: <%= SearchContainer.DEFAULT_DELTA %>
 		}
 	);
 </aui:script>

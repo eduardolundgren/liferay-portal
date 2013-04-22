@@ -65,10 +65,6 @@
 		margin: 0 auto;
 		padding: 0.5em;
 
-		label {
-			font-weight: bold;
-		}
-
 		.article-structure-toolbar, .article-template-toolbar {
 			display: inline;
 			margin-left: 0.5em;
@@ -87,10 +83,6 @@
 		display: block;
 		margin: 0 auto;
 		padding: 0.5em;
-
-		label {
-			font-weight: bold;
-		}
 
 		.add-translations-menu {
 			display: inline;
@@ -152,47 +144,9 @@
 		background-color: #FAFAFA;
 	}
 
-	.lfr-actions {
-		&.lfr-extended .lfr-trigger {
-			min-width: auto;
-
-			strong {
-				min-width: 10px;
-			}
-		}
-
-		&.show-arrow.direction-down .lfr-trigger strong a {
-			background: url(@theme_image_path@/arrows/08_down.png) 100% -5px no-repeat;
-		}
-	}
-
 	.lfr-search-combobox {
 		.advanced-search-column-content {
 			border-right: 0;
-		}
-
-		.article-advanced-search-icon {
-			background: #D4D4D4 url(@theme_image_path@/portlet/header_bg.png) repeat-x scroll 0 0;
-
-			&:hover {
-				background: #B9CED9 url(@theme_image_path@/application/state_hover_bg.png) repeat-x scroll 0 0;
-				border-color: #627782;
-				color: #369;
-			}
-
-			input {
-				background: url(@theme_image_path@/arrows/05_down.png) no-repeat scroll 9px 60% transparent;
-				width: 28px;
-
-				&.close-advanced-search {
-					background-image: url(@theme_image_path@/arrows/05_up.png);
-					background-position: 8px 50%;
-				}
-			}
-		}
-
-		.aui-button {
-			margin-left: 0;
 		}
 	}
 
@@ -308,14 +262,6 @@
 			clear: both;
 		}
 
-		.journal-article-field-label {
-			display: block;
-			font-weight: bold;
-			margin-left: 3px;
-			margin-top: 25px;
-			padding-bottom: 5px;
-		}
-
 		.journal-subfield input {
 			float: left;
 		}
@@ -415,8 +361,17 @@
 		}
 	}
 
-	.journal-container, .article-entries-paginator {
+	.journal-container, .article-entries-pagination {
 		clear: both;
+	}
+
+	.article-entries-pagination {
+		text-align: center;
+		margin: 10px 0;
+
+		.aui-pagination-content {
+			margin: 0;
+		}
 	}
 
 	.lfr-journal-small-image-content img {
@@ -541,34 +496,6 @@
 
 	.lfr-textarea {
 		width: 350px;
-	}
-
-	.lfr-header-row-content .add-button {
-		float: left;
-	}
-
-	.lfr-menu-list ul {
-		background: #F0F0F0;
-		position: relative;
-
-		&:after {
-			border: 10px solid transparent;
-			border-bottom-color: #F0F0F0;
-			content: '';
-			position: absolute;
-			right: 5px;
-			top: -10px;
-		}
-	}
-
-	.lfr-template-editor {
-		.aui-field-element, .aui-field-content, .aui-field-input-text {
-			display: block;
-		}
-
-		.aui-field-input-text {
-			height: 400px;
-		}
 	}
 
 	.localization-disabled {
@@ -1044,12 +971,4 @@
 	background: #FFFFE0 url(@theme_image_path@/portlet/pop_up.png) no-repeat 10px 50%;
 	font-size: 1.2em;
 	padding: 0.3em 0.3em 0.3em 2em;
-}
-
-.ie7 {
-	.portlet-journal {
-		.lfr-actions .lfr-trigger strong {
-			min-width: 0px;
-		}
-	}
 }

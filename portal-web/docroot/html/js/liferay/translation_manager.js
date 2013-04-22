@@ -5,7 +5,7 @@ AUI.add(
 		var Lang = A.Lang;
 		var Node = A.Node;
 
-		var CSS_HELPER_HIDDEN = 'aui-helper-hidden';
+		var CSS_HELPER_HIDDEN = 'aui-hide';
 
 		var CSS_ACTIONS = 'lfr-actions';
 
@@ -51,7 +51,7 @@ AUI.add(
 
 		var TPL_DEFAULT_LOCALE_LABEL_NODE = '<label>' + Liferay.Language.get('default-language') + ':</label>';
 
-		var TPL_DEFAULT_LOCALE_NODE = '<select class="' + [CSS_HELPER_HIDDEN, 'aui-field-input', 'aui-field-input-select', 'aui-field-input-menu'].join(STR_SPACE) + '"></select>';
+		var TPL_DEFAULT_LOCALE_NODE = '<select class="' + [CSS_HELPER_HIDDEN, 'aui-field-input-menu'].join(STR_SPACE) + '"></select>';
 
 		var TPL_LOCALE_IMAGE = '<img src="' + themeDisplay.getPathThemeImages() + '/language/{locale}.png" />';
 

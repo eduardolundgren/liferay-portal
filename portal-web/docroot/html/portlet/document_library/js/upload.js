@@ -23,10 +23,6 @@ AUI.add(
 
 		var CSS_ICON = 'icon';
 
-		var CSS_PORTLET_SECTION_BODY = 'portlet-section-body';
-
-		var CSS_PORTLET_SECTION_ALT = 'alt portlet-section-alternate';
-
 		var CSS_TAGLIB_ICON = 'taglib-icon';
 
 		var CSS_TAGLIB_TEXT = 'taglib-text';
@@ -57,7 +53,7 @@ AUI.add(
 
 		var SELECTOR_DISPLAY_ICON = '.display-icon';
 
-		var SELECTOR_DOCUMENT_ENTRIES_PAGINATOR = '.document-entries-paginator';
+		var SELECTOR_DOCUMENT_ENTRIES_PAGINATION = '.document-entries-pagination';
 
 		var SELECTOR_ENTRIES_EMPTY = '.entries-empty';
 
@@ -388,14 +384,6 @@ AUI.add(
 				);
 
 				var row = searchContainer.addRow(columnValues, A.guid());
-
-				var rowCssClass = CSS_PORTLET_SECTION_ALT;
-
-				if (searchContainer._ids.length % 2) {
-					rowCssClass = CSS_PORTLET_SECTION_BODY;
-				}
-
-				row.addClass(rowCssClass);
 
 				row.attr('data-draggable', true);
 
@@ -752,9 +740,9 @@ AUI.add(
 
 					var columnContent = container.ancestor(CSS_COLUMN_CONTENT);
 
-					var documentEntriesPaginator = A.one(SELECTOR_DOCUMENT_ENTRIES_PAGINATOR);
+					var documentEntriesPagination = A.one(SELECTOR_DOCUMENT_ENTRIES_PAGINATION);
 
-					var documentEntriesPaginatorOverlay = instance._createOverlay(documentEntriesPaginator, STR_NAVIGATION_OVERLAY_BACKGROUND);
+					var documentEntriesPaginationOverlay = instance._createOverlay(documentEntriesPagination, STR_NAVIGATION_OVERLAY_BACKGROUND);
 
 					var headerRow = columnContent.one(SELECTOR_HEADER_ROW);
 
@@ -764,7 +752,7 @@ AUI.add(
 
 					var navigationPaneOverlay = instance._createOverlay(navigationPane, STR_NAVIGATION_OVERLAY_BACKGROUND);
 
-					navigationOverlays = [documentEntriesPaginatorOverlay, headerRowOverlay, navigationPaneOverlay];
+					navigationOverlays = [documentEntriesPaginationOverlay, headerRowOverlay, navigationPaneOverlay];
 
 					instance._navigationOverlays = navigationOverlays;
 				}
@@ -831,7 +819,7 @@ AUI.add(
 
 							var emptyMessage = instance._getEmptyMessage();
 
-							if (emptyMessage && !emptyMessage.hasClass('aui-helper-hidden')) {
+							if (emptyMessage && !emptyMessage.hasClass('aui-hide')) {
 								emptyMessage.hide(true);
 							}
 						}
@@ -1301,6 +1289,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-data-set', 'aui-overlay-manager', 'aui-overlay-mask', 'aui-progressbar', 'aui-template', 'aui-tooltip', 'liferay-app-view-folders', 'liferay-app-view-move', 'liferay-app-view-paginator', 'liferay-app-view-select', 'liferay-search-container', 'uploader']
+		requires: ['aui-data-set-deprecated', 'aui-overlay-manager-deprecated', 'aui-overlay-mask-deprecated', 'aui-progressbar', 'aui-template-deprecated', 'aui-tooltip-deprecated', 'liferay-app-view-folders', 'liferay-app-view-move', 'liferay-app-view-paginator', 'liferay-app-view-select', 'liferay-search-container', 'uploader']
 	}
 );

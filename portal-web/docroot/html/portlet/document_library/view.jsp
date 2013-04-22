@@ -85,7 +85,7 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 		<aui:column columnWidth="<%= 20 %>" cssClass="navigation-pane" first="<%= true %>">
 			<liferay-util:include page="/html/portlet/document_library/view_folders.jsp" />
 
-			<div class="folder-paginator"></div>
+			<div class="folder-pagination"></div>
 		</aui:column>
 
 		<aui:column columnWidth="<%= showFolderMenu ? 80 : 100 %>" cssClass="context-pane" last="<%= true %>">
@@ -103,7 +103,7 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 			String cssClass = "show-sync-message-icon-container";
 
 			if (showSyncMessage || !PropsValues.DL_SHOW_LIFERAY_SYNC_MESSAGE) {
-				cssClass += " aui-helper-hidden";
+				cssClass += " aui-hide";
 			}
 			%>
 
@@ -115,7 +115,7 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 				<liferay-util:include page="/html/portlet/document_library/breadcrumb.jsp" />
 			</div>
 
-			<div class="aui-helper-hidden" id="<portlet:namespace />syncNotification">
+			<div class="aui-hide" id="<portlet:namespace />syncNotification">
 				<div class="lfr-message-info sync-notification" id="<portlet:namespace />syncNotificationContent">
 					<a href="http://www.liferay.com/products/liferay-sync" target="_blank">
 						<liferay-ui:message key="access-these-files-offline-using-liferay-sync" />
@@ -149,7 +149,7 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 					</c:choose>
 				</div>
 
-				<div class="document-entries-paginator"></div>
+				<div class="document-entries-pagination"></div>
 			</aui:form>
 		</aui:column>
 	</aui:layout>
@@ -235,12 +235,10 @@ if (folder != null) {
 				entriesTotal: <%= entriesTotal %>,
 				entryEnd: <%= entryEnd %>,
 				entryRowsPerPage: <%= entryEnd - entryStart %>,
-				entryRowsPerPageOptions: [<%= StringUtil.merge(PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) %>],
 				entryStart: <%= entryStart %>,
 				folderEnd: <%= folderEnd %>,
 				folderId: <%= folderId %>,
 				folderRowsPerPage: <%= folderRowsPerPage %>,
-				folderRowsPerPageOptions: [<%= StringUtil.merge(PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) %>],
 				folderStart: <%= folderStart %>,
 				foldersTotal: <%= foldersTotal %>
 			},

@@ -377,7 +377,7 @@
 				var content = portlet.one('.portlet-content-container');
 
 				if (content) {
-					var restore = content.hasClass('aui-helper-hidden');
+					var restore = content.hasClass('aui-hide');
 
 					content.toggle();
 					portlet.toggleClass('portlet-minimized');
@@ -664,15 +664,6 @@
 				Liferay.Util.openWindow(
 					{
 						cache: false,
-						dialog: {
-							align: Util.Window.ALIGN_CENTER,
-							after: {
-								render: function(event) {
-									this.set('y', this.get('y') + 50);
-								}
-							},
-							width: 820
-						},
 						dialogIframe: {
 							id: namespacedId + 'configurationIframe',
 							uri: configurationURL
