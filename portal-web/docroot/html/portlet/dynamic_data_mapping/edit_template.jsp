@@ -430,7 +430,7 @@ DDMDisplay ddmDisplay = DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName)
 	String taglibOnClick = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveTemplate');";
 	%>
 
-	<aui:button onClick="<%= taglibOnClick %>" value='<%= LanguageUtil.get(pageContext, "save") %>' />
+	<aui:button onClick="<%= taglibOnClick %>" primary="<%= true %>" value='<%= LanguageUtil.get(pageContext, "save") %>' />
 
 	<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value='<%= LanguageUtil.get(pageContext, "save-and-continue") %>' />
 
