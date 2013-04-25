@@ -113,7 +113,6 @@
 
 	.taglib-custom-attributes-list label {
 		display: block;
-		font-weight: bold;
 	}
 
 	.child-pages {
@@ -391,10 +390,6 @@
 			margin-bottom: 0;
 			padding: 0 15px;
 		}
-	}
-
-	.portlet-msg-alert {
-		margin: 10px 0;
 	}
 }
 

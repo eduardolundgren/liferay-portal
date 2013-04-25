@@ -4,7 +4,10 @@
 
 .aui-field-wrapper {
 	clear: both;
-	overflow: hidden;
+}
+
+.aui-button-holder {
+	margin-top: 20px;
 }
 
 .aui-form-validator-error-container .aui-field-element {

@@ -407,7 +407,7 @@ YUI.add(
 					fullpath: javaScriptRootPath + '/liferay/staging.js',
 					requires: [
 						'aui-io-plugin-deprecated',
-						'aui-modal',
+						'aui-modal'
 					]
 				},
 				'liferay-staging-branch': {

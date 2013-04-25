@@ -171,11 +171,6 @@
 
 	.taglib-custom-attributes-list {
 		margin-bottom: 1em;
-
-		label {
-			display: block;
-			font-weight: bold;
-		}
 	}
 
 	.message-boards-panels {
@@ -424,9 +419,5 @@
 			margin-bottom: 0;
 			padding: 0 15px;
 		}
-	}
-
-	.portlet-msg-alert {
-		margin: 10px 0;
 	}
 }
