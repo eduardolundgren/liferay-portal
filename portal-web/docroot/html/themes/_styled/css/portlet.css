@@ -659,11 +659,6 @@ body.portlet {
 	display: inline-block;
 }
 
-.breadcrumbs-horizontal li {
-	display: inline-block;
-	vertical-align: middle;
-}
-
 /* ---------- Calendar taglib ---------- */
 
 .taglib-calendar {
@@ -756,7 +751,7 @@ body.portlet {
 		float: left;
 	}
 
-	.breadcrumbs-horizontal li, .breadcrumbs-vertical {
+	.breadcrumbs-vertical {
 		display: inline;
 		zoom: 1;
 	}

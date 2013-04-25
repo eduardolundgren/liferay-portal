@@ -38,19 +38,26 @@ if (showPortletBreadcrumb) {
 String breadcrumbString = sb.toString();
 
 if (Validator.isNotNull(breadcrumbString)) {
-	int x = breadcrumbString.indexOf("<li");
-	int y = breadcrumbString.lastIndexOf("<li");
+	String keyString = "<li";
+
+	int keyLength = keyString.length();
+
+	int x = breadcrumbString.indexOf(keyString);
+	int y = breadcrumbString.lastIndexOf(keyString);
+
+	int xIndex = x + keyLength;
+	int yIndex = y + keyLength;
 
 	if (x == y) {
-		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"only\"", x + 3);
+		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"only\"", xIndex);
 	}
 	else {
-		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"last\"", y + 3);
-		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"first\"", x + 3);
+		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"aui-active last\"", yIndex);
+		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"first\"", xIndex);
 	}
 }
 %>
 
-<ul class="breadcrumbs breadcrumbs-horizontal lfr-component">
+<ul class="aui-breadcrumb">
 	<%= breadcrumbString %>
 </ul>
