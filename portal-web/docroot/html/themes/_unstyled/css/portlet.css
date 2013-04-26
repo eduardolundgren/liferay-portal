@@ -413,9 +413,6 @@ body.portlet {
 .breadcrumbs-vertical {
 }
 
-.breadcrumbs-horizontal li {
-}
-
 /* ---------- Calendar taglib ---------- */
 
 .taglib-calendar {
@@ -475,7 +472,7 @@ body.portlet {
 	.portlet-title-default {
 	}
 
-	.breadcrumbs-horizontal li, .breadcrumbs-vertical {
+	.breadcrumbs-vertical {
 	}
 
 	.lfr-message .lfr-message-close {
