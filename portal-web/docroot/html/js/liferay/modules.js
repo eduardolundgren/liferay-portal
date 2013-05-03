@@ -556,7 +556,7 @@ YUI.add(
 		// 		test: function(A) {
 		// 			return true;
 		// 		},
-		// 		trigger: 'aui-calendar-deprecated'
+		// 		trigger: 'calendar-deprecated'
 		// 	}
 		// );
 	},
