@@ -205,7 +205,7 @@ DDMDisplay ddmDisplay = DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName)
 								<aui:input name="smallImage" />
 							</div>
 
-							<div class="lfr-ddm-small-image-content aui-toggler-content-collapsed">
+							<div class="lfr-ddm-small-image-content toggler-content-collapsed">
 								<aui:row>
 									<c:if test="<%= smallImage && (template != null) %>">
 										<aui:col width="<%= 50 %>">
