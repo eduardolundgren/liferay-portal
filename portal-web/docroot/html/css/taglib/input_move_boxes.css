@@ -1,6 +1,10 @@
 .taglib-move-boxes {
 	margin-bottom: 1em;
 
+	.toolbar {
+		text-align: center;
+	}
+
 	.arrow-button img {
 		border-width: 0;
 		height: 16px;
@@ -8,20 +12,8 @@
 	}
 
 	.choice-selector {
-		select {
 			min-width: 150px;
-		}
-
-		label {
-			border-bottom: 1px solid transparent;
-			display: block;
-			margin-bottom: 5px;
-			padding: 5px;
-		}
-
-		.aui-field-content {
-			margin-bottom: 0;
-		}
+			width: 100%;
 	}
 
 	.move-arrow-buttons {
