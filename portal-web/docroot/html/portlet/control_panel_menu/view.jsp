@@ -24,7 +24,7 @@
 	<div class="control-panel-tools">
 		<div class="search-panels">
 			<div class="search-panels-bar">
-				<aui:input cssClass="search-panels-input" label="" name="searchPanel" />
+				<aui:input cssClass="search-query aui-span12 search-panels-input" label="" name="searchPanel" />
 			</div>
 		</div>
 	</div>
