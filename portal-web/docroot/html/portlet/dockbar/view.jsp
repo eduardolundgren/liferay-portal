@@ -31,7 +31,7 @@ boolean hasLayoutUpdatePermission = LayoutPermissionUtil.contains(permissionChec
 String toggleControlsState = GetterUtil.getString(SessionClicks.get(request, "liferay_toggle_controls", ""));
 %>
 
-<aui:nav-bar cssClass="navbar-fixed-top dockbar" data-namespace="<%= renderResponse.getNamespace() %>" id="dockbar">
+<aui:nav-bar cssClass="navbar-static-top dockbar" data-namespace="<%= renderResponse.getNamespace() %>" id="dockbar">
 	<aui:nav>
 		<c:if test="<%= group.isControlPanel() %>">
 
