@@ -88,7 +88,7 @@ List<Group> mySites = user.getMySites(true, max);
 							itemCssClass += " last";
 						}
 
-						String iconCssClass = "aui-icon-spacer";
+						String iconCssClass = "icon-spacer";
 						%>
 
 						<c:choose>
@@ -99,7 +99,7 @@ List<Group> mySites = user.getMySites(true, max);
 										<%
 										String siteName = mySite.getDescriptiveName(locale);
 
-										iconCssClass = "aui-icon-wrench";
+										iconCssClass = "icon-wrench";
 										%>
 
 										<%@ include file="/html/taglib/ui/my_sites/page_site_name.jspf" %>
@@ -171,14 +171,14 @@ List<Group> mySites = user.getMySites(true, max);
 											}
 
 											if ((mySite.getPrivateLayoutsPageCount() > 0) || showPrivateSiteStaging) {
-												iconCssClass = "aui-icon-eye-open";
+												iconCssClass = "icon-eye-open";
 											}
 											%>
 
 											<%@ include file="/html/taglib/ui/my_sites/page_site_name.jspf" %>
 
 											<c:if test="<%= (mySite.getPrivateLayoutsPageCount() > 0) || showPrivateSiteStaging %>">
-												<span class="aui-badge site-type"><liferay-ui:message key="public" /></span>
+												<span class="badge site-type"><liferay-ui:message key="public" /></span>
 											</c:if>
 										</a>
 									</li>
@@ -232,14 +232,14 @@ List<Group> mySites = user.getMySites(true, max);
 											}
 
 											if ((mySite.getPublicLayoutsPageCount() > 0) || showPublicSiteStaging) {
-												iconCssClass = "aui-icon-eye-close";
+												iconCssClass = "icon-eye-close";
 											}
 											%>
 
 											<%@ include file="/html/taglib/ui/my_sites/page_site_name.jspf" %>
 
 											<c:if test="<%= (mySite.getPublicLayoutsPageCount() > 0) || showPublicSiteStaging %>">
-												<span class="aui-badge site-type"><liferay-ui:message key="private" /></span>
+												<span class="badge site-type"><liferay-ui:message key="private" /></span>
 											</c:if>
 										</a>
 									</li>
