@@ -64,7 +64,7 @@
 		padding: 3px 3px 2px 1px;
 	}
 
-	[class~="aui-form-validator-message"] {
+	[class~="form-validator-message"] {
 		clip: rect(auto auto auto auto);
 		width: auto;
 	}
