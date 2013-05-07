@@ -58,7 +58,7 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "add");
 					dialog.plug(A.LoadingMask).render();
 				}
 				else {
-					dialog.close();
+					dialog.hide();
 				}
 			}
 		},
