@@ -357,8 +357,8 @@ public class DynamicCSSUtil {
 		String cssThemePath = _getCssThemePath(request, themeDisplay, theme);
 
 		inputObjects.put("content", content);
-		inputObjects.put("cssResourcePath", resourcePath);
-		inputObjects.put("cssThemeRealPath", portalWebDir.concat(cssThemePath));
+		inputObjects.put("cssRealPath", resourcePath);
+		inputObjects.put("cssThemePath", portalWebDir.concat(cssThemePath));
 
 		File sassTempDir = _getSassTempDir(servletContext);
 
