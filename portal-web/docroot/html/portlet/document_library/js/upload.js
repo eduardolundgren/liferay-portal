@@ -188,7 +188,7 @@ AUI.add(
 
 				var folderId = instance.ns('folderId');
 
-				A.getWin().on('beforeunload', instance._onBeforeUnload, instance);
+				A.getWin()._node.onbeforeunload = A.bind(instance._confirmUnload, instance);
 
 				Liferay.on(instance.ns('dataRequest'), instance._onDataRequest, instance);
 
@@ -252,6 +252,8 @@ AUI.add(
 
 							instance._getNavigationOverlays();
 
+							instance._getNavigationOverlays();
+
 							var uploader = instance._getUploader();
 
 							uploader.fire('fileselect', event);
@@ -305,6 +307,12 @@ AUI.add(
 						fileList.push(item);
 					}
 				);
+			},
+
+			_confirmUnload: function() {
+				var instance = this;
+
+				return instance._isUploading() ? Liferay.Language.get('uploads-are-in-progress-confirmation') : null;
 			},
 
 			_createEntryNode: function(name, size, displayStyle) {
@@ -736,23 +744,21 @@ AUI.add(
 				var navigationOverlays = instance._navigationOverlays;
 
 				if (!navigationOverlays) {
-					var container = instance._entriesContainer;
+					navigationOverlays = [];
 
-					var columnContent = container.ancestor(CSS_COLUMN_CONTENT);
+					var createNavigationOverlay = function(target) {
+						if (target) {
+							var overlay = instance._createOverlay(target, STR_NAVIGATION_OVERLAY_BACKGROUND);
 
-					var documentEntriesPagination = A.one(SELECTOR_DOCUMENT_ENTRIES_PAGINATION);
+							navigationOverlays.push(overlay);
+						}
+					};
 
-					var documentEntriesPaginationOverlay = instance._createOverlay(documentEntriesPagination, STR_NAVIGATION_OVERLAY_BACKGROUND);
+					var entriesContainer = A.one('#_20_documentLibraryContainer');
 
-					var headerRow = columnContent.one(SELECTOR_HEADER_ROW);
-
-					var headerRowOverlay = instance._createOverlay(headerRow, STR_NAVIGATION_OVERLAY_BACKGROUND);
-
-					var navigationPane = instance.byId('listViewContainer');
-
-					var navigationPaneOverlay = instance._createOverlay(navigationPane, STR_NAVIGATION_OVERLAY_BACKGROUND);
-
-					navigationOverlays = [documentEntriesPaginationOverlay, headerRowOverlay, navigationPaneOverlay];
+					createNavigationOverlay(entriesContainer.one(SELECTOR_DOCUMENT_ENTRIES_PAGINATION));
+					createNavigationOverlay(entriesContainer.one('.app-view-taglib.lfr-header-row'));
+					createNavigationOverlay(instance.byId('listViewContainer'));
 
 					instance._navigationOverlays = navigationOverlays;
 				}
@@ -917,22 +923,11 @@ AUI.add(
 			_isUploading: function() {
 				var instance = this;
 
-				var uploader = instance._getUploader();
+				var uploader = instance._uploader;
 
-				var queue = uploader.queue;
+				var queue = uploader && uploader.queue;
 
 				return !!(queue && (queue.queuedFiles.length > 0 || queue.numberOfUploads > 0 || !A.Object.isEmpty(queue.currentFiles)) && queue._currentState === UploaderQueue.UPLOADING);
-			},
-
-			_onBeforeUnload: function(event) {
-				var instance = this;
-
-				if (instance._isUploading()) {
-					event.preventDefault();
-				}
-				else {
-					instance.destructor();
-				}
 			},
 
 			_onDataRequest: function(event) {
