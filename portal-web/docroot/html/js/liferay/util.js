@@ -886,7 +886,7 @@
 					function() {
 						detachEventHandles();
 
-						dialog.close();
+						dialog.hide();
 					}
 				);
 			}
@@ -1999,7 +1999,7 @@
 					}
 				}
 
-				dialog.close();
+				dialog.hide();
 			}
 		}
 	);

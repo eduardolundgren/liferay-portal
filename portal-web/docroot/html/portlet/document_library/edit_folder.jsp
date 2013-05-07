@@ -378,7 +378,7 @@ if (workflowEnabled) {
 			select.append(option);
 
 			if (dialog) {
-				dialog.close();
+				dialog.hide();
 			}
 		},
 		['liferay-search-container']

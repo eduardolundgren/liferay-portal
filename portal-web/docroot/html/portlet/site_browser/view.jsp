@@ -176,7 +176,7 @@ portletURL.setParameter("target", target);
 				sb.append(AssetPublisherUtil.getScopeId(group, scopeGroupId));
 				sb.append("', '");
 				sb.append(target);
-				sb.append("'); Liferay.Util.getWindow().close();");
+				sb.append("'); Liferay.Util.getWindow().hide();");
 
 				rowHREF = sb.toString();
 			}

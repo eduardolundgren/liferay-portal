@@ -414,7 +414,7 @@ if (feed != null) {
 			document.<portlet:namespace />fm.<portlet:namespace />templateId.value = templateId;
 
 			if (dialog) {
-				dialog.close();
+				dialog.hide();
 			}
 
 			submitForm(document.<portlet:namespace />fm);
