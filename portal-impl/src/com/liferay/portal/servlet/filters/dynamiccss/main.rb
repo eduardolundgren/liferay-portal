@@ -17,9 +17,13 @@ end
 
 Compass.add_project_configuration
 
-Compass.configuration.project_path ||= $cssThemeRealPath
+Compass.configuration.project_path ||= $cssThemePath
 
-load_paths = [$cssThemeRealPath]
+load_paths = []
+
+if $cssThemePath
+	load_paths += [$cssThemePath]
+end
 
 load_paths += Compass.configuration.sass_load_paths
 
@@ -28,7 +32,7 @@ engine = Sass::Engine.new(
 	{
 		:cache_location => $sassCachePath,
 		:debug_info => log.isDebugEnabled,
-		:filename => $cssResourcePath,
+		:filename => $cssRealPath,
 		:full_exception => log.isDebugEnabled,
 		:line => 0,
 		:load_paths => load_paths,
