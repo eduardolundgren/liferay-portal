@@ -179,7 +179,7 @@ if (step == 1) {
 
 						submitForm(document.<portlet:namespace />selectOrganizationRoleFm, "<%= portletURL.toString() %>");
 					},
-					'.organization-selector-button input'
+					'.organization-selector-button'
 				);
 			</aui:script>
 		</c:when>
@@ -301,6 +301,6 @@ if (step == 1) {
 
 			Util.getWindow().hide();
 		},
-		'.selector-button input'
+		'.selector-button'
 	);
 </aui:script>

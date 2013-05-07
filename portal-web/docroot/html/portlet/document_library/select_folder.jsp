@@ -183,6 +183,6 @@ if (folder != null) {
 
 			Util.getWindow().hide();
 		},
-		'.selector-button input'
+		'.selector-button'
 	);
 </aui:script>
