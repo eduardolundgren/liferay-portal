@@ -2,6 +2,7 @@ require 'compass'
 require 'fileutils'
 require 'java'
 require 'rubygems'
+require 'sass/plugin'
 
 java_import com.liferay.portal.kernel.log.LogFactoryUtil
 java_import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSFilter
@@ -16,9 +17,9 @@ end
 
 Compass.add_project_configuration
 
-Compass.configuration.project_path ||= $cssThemePath
+Compass.configuration.project_path ||= $cssThemeRealPath
 
-load_paths = []
+load_paths = [$cssThemeRealPath]
 
 load_paths += Compass.configuration.sass_load_paths
 
@@ -27,7 +28,7 @@ engine = Sass::Engine.new(
 	{
 		:cache_location => $sassCachePath,
 		:debug_info => log.isDebugEnabled,
-		:filename => $cssRealPath,
+		:filename => $cssResourcePath,
 		:full_exception => log.isDebugEnabled,
 		:line => 0,
 		:load_paths => load_paths,
