@@ -203,6 +203,6 @@ portletURL.setParameter("target", target);
 
 			Util.getWindow().close();
 		},
-		'.selector-button input'
+		'.selector-button'
 	);
 </aui:script>

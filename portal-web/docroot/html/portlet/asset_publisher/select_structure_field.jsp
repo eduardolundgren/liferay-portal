@@ -151,7 +151,7 @@ portletURL.setParameter("classTypeId", String.valueOf(classTypeId));
 				}
 			);
 		},
-		'.selector-button input'
+		'.selector-button'
 	);
 
 	A.one('#<portlet:namespace />tuplesSearchContainer').delegate(
