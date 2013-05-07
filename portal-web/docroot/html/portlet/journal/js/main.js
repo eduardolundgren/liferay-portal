@@ -679,7 +679,7 @@ AUI.add(
 											label: Liferay.Language.get('cancel'),
 											on: {
 												click: function() {
-													instance._saveDialog.close();
+													instance._saveDialog.hide();
 												}
 											}
 										}

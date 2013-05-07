@@ -120,7 +120,7 @@ WorkflowTask workflowTask = (WorkflowTask)row.getObject();
 								label: '<%= UnicodeLanguageUtil.get(pageContext, "cancel") %>',
 								on: {
 									click: function() {
-										dialog.close();
+										dialog.hide();
 									}
 								}
 							}

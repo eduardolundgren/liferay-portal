@@ -103,7 +103,7 @@
 							submitButton.on(
 								'click',
 								function(event) {
-									popUp.close();
+									popUp.hide();
 
 									var form = A.one('#<portlet:namespace />fm');
 
