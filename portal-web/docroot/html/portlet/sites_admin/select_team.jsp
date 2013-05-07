@@ -104,6 +104,6 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 
 			Util.getWindow().hide();
 		},
-		'.selector-button input'
+		'.selector-button'
 	);
 </aui:script>

@@ -132,7 +132,7 @@ if (step == 1) {
 
 						submitForm(document.<portlet:namespace />selectSiteRoleFm, "<%= portletURL.toString() %>");
 					},
-					'.group-selector-button input'
+					'.group-selector-button'
 				);
 			</aui:script>
 		</c:when>
@@ -253,7 +253,7 @@ if (step == 1) {
 
 						Util.getWindow().hide();
 					},
-					'.selector-button input'
+					'.selector-button'
 				);
 			</aui:script>
 		</c:when>
