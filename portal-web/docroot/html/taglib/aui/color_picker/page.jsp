@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,13 +14,15 @@
  */
 --%>
 
-<%
-String iconTypeClass = null;
+<%@ include file="/html/taglib/aui/color_picker/init.jsp" %>
 
-if (Validator.isNull(label) && Validator.isNotNull(icon)) {
-	iconTypeClass = "buttonitem-icon-only";
-}
-else if (Validator.isNotNull(label) && Validator.isNull(icon)) {
-	iconTypeClass = "buttonitem-label-only";
-}
-%>
+<aui:component
+	excludeAttributes="javaScriptAttributes,useJavaScript,useMarkup,var"
+	module="aui-color-picker"
+	name="ColorPicker"
+	options="<%= _options %>"
+	scriptPosition='<%= GetterUtil.getString(_options.get("scriptPosition")) %>'
+	tagPageContext="<%= pageContext %>"
+	useJavaScript='<%= GetterUtil.getBoolean(_options.get("useJavaScript"), true) %>'
+	var='<%= GetterUtil.getString(_options.get("var")) %>'
+/>
