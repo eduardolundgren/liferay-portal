@@ -65,13 +65,15 @@ int mountFoldersCount = DLAppServiceUtil.getMountFoldersCount(scopeGroupId, DLFo
 		title="search"
 	/>
 
-	<span class="form-search">
-		<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" title="search-documents" type="text" value="<%= keywords %>" />
+	<div class="navbar-search pull-right">
+		<div class="form-search">
+			<div class="input-append">
+				<input class="search-query span9" label="search-documents" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
 
-		<aui:button type="submit" value="search" />
-	</span>
-
-	<br /><br />
+				<aui:button primary="<%= false %>" type="submit" value="search" />
+			</div>
+		</div>
+	</div>
 
 	<c:if test="<%= (mountFoldersCount > 0) && (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>">
 

@@ -61,11 +61,43 @@ serverURL.setParameter("tabs3", tabs3);
 
 		<c:choose>
 			<c:when test='<%= tabs2.equals("log-levels") %>'>
-				<liferay-ui:tabs
-					names="update-categories,add-category"
-					param="tabs3"
-					portletURL="<%= serverURL %>"
-				/>
+				<aui:nav-bar>
+					<aui:nav>
+						<%
+							String label = "update-categories";
+
+							serverURL.setParameter("tabs3", label);
+
+							boolean selected = tabs3.equals(label);
+						%>
+
+						<aui:nav-item cssClass='<%= selected ? "active" : "" %>' href="<%= serverURL.toString() %>" label="<%= label %>" />
+
+						<%
+							label = "add-category";
+
+							serverURL.setParameter("tabs3", label);
+
+							selected = tabs3.equals(label);
+						%>
+						<aui:nav-item cssClass='<%= selected ? "active" : "" %>' href="<%= serverURL.toString() %>" label="<%= label %>" />
+					</aui:nav>
+
+					<c:choose>
+						<c:when test='<%= tabs3.equals("update-categories") %>'>
+							<div class="navbar-search pull-right">
+								<div class="form-search">
+									<div class="input-append">
+										<input class="search-query span9" label="" name="<portlet:namespace/>keywords" type="text" />
+
+										<aui:button primary="<%= false %>" type="submit" value="search" />
+									</div>
+								</div>
+							</div>
+						</c:when>
+					</c:choose>
+
+				</aui:nav-bar>
 
 				<c:choose>
 					<c:when test='<%= tabs3.equals("add-category") %>'>
@@ -96,14 +128,10 @@ serverURL.setParameter("tabs3", tabs3);
 							<aui:button onClick="<%= taglibAddLogLevel %>" value="save" />
 						</aui:button-row>
 					</c:when>
-					<c:otherwise>
-						<span class="form-search">
-							<aui:input inlineField="<%= true %>" label="" name="keywords" title="search-categories" type="text" value="<%= keywords %>" />
+				</c:choose>
 
-							<aui:button type="submit" value="search" />
-						</span>
-
-						<br /><br />
+				<c:choose>
+					<c:when test='<%= tabs3.equals("update-categories") %>'>
 
 						<%
 						List<String> headerNames = new ArrayList<String>();
@@ -210,23 +238,40 @@ serverURL.setParameter("tabs3", tabs3);
 
 							<aui:button onClick="<%= taglibUpdateLogLevels %>" value="save" />
 						</aui:button-row>
-					</c:otherwise>
+					</c:when>
 				</c:choose>
 			</c:when>
 			<c:when test='<%= tabs2.equals("properties") %>'>
-				<liferay-ui:tabs
-					names="system-properties,portal-properties"
-					param="tabs3"
-					portletURL="<%= serverURL %>"
-				/>
+				<aui:nav-bar>
+					<aui:nav>
+						<%
+							String label = "system-properties";
 
-				<span class="form-search">
-					<aui:input inlineField="<%= true %>" label="" name="keywords" title="search-properties" type="text" value="<%= keywords %>" />
+							serverURL.setParameter("tabs3", label);
 
-					<aui:button type="submit" value="search" />
-				</span>
+							boolean selected = tabs3.equals(label);
+						%>
+						<aui:nav-item cssClass='<%= selected ? "active" : "" %>' href="<%= serverURL.toString() %>" label="<%= label %>" />
+						<%
+							label = "portal-properties";
 
-				<br /><br />
+							serverURL.setParameter("tabs3", label);
+
+							selected = tabs3.equals(label);
+						%>
+						<aui:nav-item cssClass='<%= selected ? "active" : "" %>' href="<%= serverURL.toString() %>" label="<%= label %>" />
+					</aui:nav>
+
+					<div class="navbar-search pull-right">
+						<div class="form-search">
+							<div class="input-append">
+								<input class="search-query span9" label="" name="<portlet:namespace/>keywords" type="text" />
+
+								<aui:button primary="<%= false %>" type="submit" value="search" />
+							</div>
+						</div>
+					</div>
+				</aui:nav-bar>
 
 				<%
 				List<String> headerNames = new ArrayList<String>();

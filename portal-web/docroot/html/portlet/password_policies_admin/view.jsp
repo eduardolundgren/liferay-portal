@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/password_policies_admin/init.jsp" %>
 
 <%
-PortletURL portletURL = renderResponse.createRenderURL();
-
 portletURL.setParameter("struts_action", "/password_policies_admin/view");
 
 pageContext.setAttribute("portletURL", portletURL);
@@ -40,21 +38,6 @@ boolean passwordPolicyEnabled = LDAPSettingsUtil.isPasswordPolicyEnabled(company
 	<liferay-util:include page="/html/portlet/password_policies_admin/toolbar.jsp">
 		<liferay-util:param name="toolbarItem" value="view-all" />
 	</liferay-util:include>
-
-	<%
-	PasswordPolicySearch searchContainer = new PasswordPolicySearch(renderRequest, portletURL);
-
-	List headerNames = searchContainer.getHeaderNames();
-
-	headerNames.add(StringPool.BLANK);
-	%>
-
-	<c:if test="<%= !passwordPolicyEnabled %>">
-		<liferay-ui:search-form
-			page="/html/portlet/password_policies_admin/password_policy_search.jsp"
-			searchContainer="<%= searchContainer %>"
-		/>
-	</c:if>
 
 	<c:if test="<%= !passwordPolicyEnabled && windowState.equals(WindowState.MAXIMIZED) %>">
 

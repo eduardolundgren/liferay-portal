@@ -22,8 +22,12 @@ TeamSearch searchContainer = (TeamSearch)request.getAttribute("liferay-ui:search
 TeamDisplayTerms displayTerms = (TeamDisplayTerms)searchContainer.getDisplayTerms();
 %>
 
-<span class="form-search lfr-display-terms-search">
-	<aui:input inlineField="<%= true %>" label="" name="<%= displayTerms.NAME %>" size="30" type="text" value="<%= displayTerms.getName() %>" />
+<div class="navbar-search pull-right">
+	<div class="form-search">
+		<div class="input-append">
+			<input class="search-query span9" label="" name="<%= displayTerms.NAME %>" type="text" value="<%= displayTerms.getName() %>" />
 
-	<aui:button type="submit" value="search" />
-</span>
+			<aui:button primary="<%= false %>" type="submit" value="search" />
+		</div>
+	</div>
+</div>

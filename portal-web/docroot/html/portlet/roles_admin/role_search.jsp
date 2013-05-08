@@ -17,13 +17,15 @@
 <%@ include file="/html/portlet/roles_admin/init.jsp" %>
 
 <%
-RoleSearch searchContainer = (RoleSearch)request.getAttribute("liferay-ui:search:searchContainer");
-
 RoleDisplayTerms displayTerms = (RoleDisplayTerms)searchContainer.getDisplayTerms();
 %>
 
-<span class="form-search lfr-display-terms-search">
-	<aui:input inlineField="<%= true %>" label="" name="<%= displayTerms.KEYWORDS %>" size="30" type="text" value="<%= displayTerms.getKeywords() %>" />
+<div class="navbar-search pull-right">
+	<div class="form-search">
+		<div class="input-append">
+			<input class="search-query span9" label="" name="<%= displayTerms.KEYWORDS %>" type="text" value="<%= displayTerms.getKeywords() %>" />
 
-	<aui:button type="submit" value="search" />
-</span>
+			<aui:button primary="<%= false %>" type="submit" value="search" />
+		</div>
+	</div>
+</div>

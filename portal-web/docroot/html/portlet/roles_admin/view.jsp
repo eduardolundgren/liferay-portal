@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/roles_admin/init.jsp" %>
 
 <%
-PortletURL portletURL = renderResponse.createRenderURL();
-
 portletURL.setParameter("struts_action", "/roles_admin/view");
 
 pageContext.setAttribute("portletURL", portletURL);
@@ -36,17 +34,10 @@ String portletURLString = portletURL.toString();
 	</liferay-util:include>
 
 	<%
-	RoleSearch searchContainer = new RoleSearch(renderRequest, portletURL);
-
 	List headerNames = searchContainer.getHeaderNames();
 
 	headerNames.add(StringPool.BLANK);
 	%>
-
-	<liferay-ui:search-form
-		page="/html/portlet/roles_admin/role_search.jsp"
-		searchContainer="<%= searchContainer %>"
-	/>
 
 	<%
 	RoleSearchTerms searchTerms = (RoleSearchTerms)searchContainer.getSearchTerms();

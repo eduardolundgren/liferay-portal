@@ -55,11 +55,15 @@ portletURL.setParameter("keywords", keywords);
 		title="search"
 	/>
 
-	<span class="form-search">
-		<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" title="search-pages" type="text" value="<%= keywords %>" />
+	<div class="navbar-search pull-right">
+		<div class="form-search">
+			<div class="input-append">
+				<input class="search-query span9" label="search-pages" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
 
-		<aui:button type="submit" value="search" />
-	</span>
+				<aui:button primary="<%= false %>" type="submit" value="search" />
+			</div>
+		</div>
+	</div>
 
 	<liferay-ui:search-container
 		emptyResultsMessage='<%= LanguageUtil.format(pageContext, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>") %>'

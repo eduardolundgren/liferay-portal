@@ -56,4 +56,8 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 			</aui:nav-item>
 		</c:if>
 	</aui:nav>
+	<liferay-ui:search-form
+		page="/html/portlet/roles_admin/role_search.jsp"
+		searchContainer="<%= searchContainer %>"
+	/>
 </aui:nav-bar>

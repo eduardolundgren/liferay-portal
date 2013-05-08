@@ -30,4 +30,9 @@ page import="com.liferay.portlet.usersadmin.search.OrganizationSearchTerms" %><%
 page import="com.liferay.portlet.usersadmin.search.UserSearch" %><%@
 page import="com.liferay.portlet.usersadmin.search.UserSearchTerms" %>
 
+<%
+PortletURL portletURL = renderResponse.createRenderURL();
+PasswordPolicySearch searchContainer = new PasswordPolicySearch(renderRequest, portletURL);
+%>
+
 <%@ include file="/html/portlet/password_policies_admin/init-ext.jsp" %>

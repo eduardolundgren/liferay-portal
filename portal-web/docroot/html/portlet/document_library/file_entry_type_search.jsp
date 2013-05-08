@@ -16,10 +16,20 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
-<div class="search-form">
-	<span class="form-search">
-		<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" title="search-entries" type="text" />
+<%
+PortletURL portletURL = renderResponse.createRenderURL();
 
-		<aui:button type="submit" value="search" />
-	</span>
-</div>
+portletURL.setParameter("struts_action", "/document_library/view_file_entry_type");
+%>
+
+<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+	<div class="navbar-search pull-right">
+		<div class="form-search">
+			<div class="input-append">
+				<input class="search-query span9" label="" name="<portlet:namespace/>keywords" type="text" />
+
+				<aui:button primary="<%= false %>" type="submit" value="search" />
+			</div>
+		</div>
+	</div>
+</aui:form>
