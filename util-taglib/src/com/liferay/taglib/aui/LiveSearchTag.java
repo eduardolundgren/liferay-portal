@@ -1,6 +1,5 @@
-<%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -12,15 +11,17 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%
-String iconTypeClass = null;
+package com.liferay.taglib.aui;
 
-if (Validator.isNull(label) && Validator.isNotNull(icon)) {
-	iconTypeClass = "buttonitem-icon-only";
+import com.liferay.taglib.aui.base.BaseLiveSearchTag;
+
+/**
+ * @author Eduardo Lundgren
+ * @author Bruno Basto
+ * @author Nathan Cavanaugh
+ * @author Julio Camarero
+ * @author Antonio Junior
+ */
+public class LiveSearchTag extends BaseLiveSearchTag {
 }
-else if (Validator.isNotNull(label) && Validator.isNull(icon)) {
-	iconTypeClass = "buttonitem-label-only";
-}
-%>
