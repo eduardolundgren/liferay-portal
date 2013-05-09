@@ -98,8 +98,8 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 <aui:row cssClass="manage-view lfr-app-column-view">
 	<c:if test="<%= !group.isLayoutPrototype() %>">
 		<aui:col cssClass="manage-sitemap" width="<%= 25 %>">
-			<div class="lfr-header-row">
-				<div class="lfr-header-row-content">
+			<aui:nav-bar>
+				<aui:nav>
 					<c:if test="<%= stagingGroup != null %>">
 
 						<%
@@ -175,8 +175,8 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 
 						<liferay-ui:staging cssClass="manage-pages-branch-menu" extended="<%= true %>" groupId="<%= groupId %>" icon="/common/tool.png" message="" privateLayout="<%= privateLayout %>" selPlid="<%= selPlid %>" showManageBranches="<%= true %>"  />
 					</c:if>
-				</div>
-			</div>
+				</aui:nav>
+			</aui:nav-bar>
 
 			<liferay-util:include page="/html/portlet/layouts_admin/tree_js.jsp">
 				<liferay-util:param name="treeId" value="layoutsTree" />
