@@ -1,7 +1,7 @@
 .portlet-communities, .portlet-users-admin {
 	.lfr-theme-list {
 		h3 {
-			background: #D3DADD;
+			background: #DCEAF4;
 			padding: 0.5em;
 		}
 
@@ -24,42 +24,6 @@
 
 		.field-content {
 			margin: 0;
-		}
-	}
-
-	.lfr-current-theme {
-		background: #F0F5F7;
-		border: 1px solid #828F95;
-		margin-bottom: 1em;
-		padding: 3px 3px 1em;
-
-		h3 {
-			margin: 0 0 0.5em;
-		}
-
-		.selected-theme {
-			border-bottom: 1px solid #CCC;
-			font-size: 1.5em;
-
-			.field-content {
-				display: inline-block;
-			}
-		}
-
-		.theme-details {
-			padding: 0 2px 0 170px;
-		}
-
-		.theme-fields {
-			margin-left: 0.5em;
-		}
-
-		.theme-screenshot {
-			border: 1px solid #CCC;
-			float: left;
-			height: 120px;
-			margin: 0 0.5em;
-			width: 150px;
 		}
 	}
 
