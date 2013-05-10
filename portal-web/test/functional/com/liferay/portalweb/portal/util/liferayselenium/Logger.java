@@ -14,6 +14,13 @@
 
 package com.liferay.portalweb.portal.util.liferayselenium;
 
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portalweb.portal.BaseTestCase;
+
+import java.lang.reflect.Method;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
@@ -38,6 +45,80 @@ public class Logger {
 		JavascriptExecutor javascriptExecutor = (JavascriptExecutor)_webDriver;
 
 		javascriptExecutor.executeScript("window.name = 'log window';");
+	}
+
+	public void logCommand(Method method, Object[] arguments) {
+		StringBundler sb = new StringBundler();
+
+		sb.append("Running <b>");
+		sb.append(method.getName());
+		sb.append("</b>");
+
+		if (arguments.length == 1) {
+			sb.append(" with parameter ");
+		}
+		else if (arguments.length > 1) {
+			sb.append(" with parameters ");
+		}
+
+		for (Object argument : arguments) {
+			sb.append("<b>");
+			sb.append(String.valueOf(argument));
+			sb.append("</b> ");
+		}
+
+		log(sb.toString());
+	}
+
+	public void logError(Method method, Object[] arguments) {
+		StringBundler sb = new StringBundler();
+
+		sb.append("<font color=\"red\">");
+		sb.append("Command failure <b>");
+		sb.append(method.getName());
+		sb.append("</b>");
+
+		if (arguments.length == 1) {
+			sb.append(" with parameter ");
+		}
+		else if (arguments.length > 1) {
+			sb.append(" with parameters ");
+		}
+
+		for (Object argument : arguments) {
+			sb.append("<b>");
+			sb.append(String.valueOf(argument));
+			sb.append("</b> ");
+		}
+
+		log(sb.toString());
+
+		sb = new StringBundler();
+
+		sb.append("Command failure ");
+		sb.append(method.getName());
+
+		if (arguments.length == 1) {
+			sb.append(" with parameter ");
+		}
+		else if (arguments.length > 1) {
+			sb.append(" with parameters ");
+		}
+
+		for (Object argument : arguments) {
+			sb.append(String.valueOf(argument));
+			sb.append(" ");
+		}
+
+		BaseTestCase.fail(sb.toString());
+	}
+
+	public void start() {
+		if (_loggerStarted) {
+			return;
+		}
+
+		_loggerStarted = true;
 
 		_webDriver.get(
 			"file:///" + _projectDir +
@@ -49,6 +130,29 @@ public class Logger {
 		_webDriver.quit();
 	}
 
+	protected void log(String message) {
+		WebDriver.TargetLocator targetLocator = _webDriver.switchTo();
+
+		targetLocator.window("Log Window");
+
+		JavascriptExecutor javascriptExecutor = (JavascriptExecutor)_webDriver;
+
+		StringBundler sb = new StringBundler();
+
+		String formattedMessage = StringEscapeUtils.escapeJava(message);
+
+		formattedMessage = formattedMessage.replace("'", "\\'");
+
+		sb.append("logger = window.document.getElementById('log');");
+		sb.append("logger.innerHTML += '");
+		sb.append(formattedMessage);
+		sb.append("<br /><hr />';");
+		sb.append("logger.scrollTop = logger.scrollHeight;");
+
+		javascriptExecutor.executeScript(sb.toString());
+	}
+
+	private boolean _loggerStarted = false;
 	private String _projectDir;
 	private WebDriver _webDriver = new FirefoxDriver();
 
