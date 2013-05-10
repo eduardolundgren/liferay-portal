@@ -32,12 +32,24 @@ public class LoggerHandler implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] arguments)
 		throws Throwable {
 
+		String methodName = method.getName();
+
 		try {
-			System.out.println(_logger);
+			if (methodName.equals("startLogger")) {
+				_logger.start();
+			}
+			else if (methodName.equals("stopLogger")) {
+				_logger.stop();
+			}
+			else {
+				_logger.logCommand(method, arguments);
+			}
 
 			return method.invoke(_liferaySelenium, arguments);
 		}
 		catch (InvocationTargetException ite) {
+			_logger.logError(method, arguments);
+
 			throw ite.getTargetException();
 		}
 	}
