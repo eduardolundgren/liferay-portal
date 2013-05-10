@@ -51,7 +51,7 @@ if (assetVocabularies.isEmpty()) {
 	%>
 
 		<div class="search-asset-vocabulary-list-container">
-			<ul class="lfr-component search-asset-vocabulary-list">
+			<ul class="unstyled search-asset-vocabulary-list">
 
 				<%
 				StringBundler sb = new StringBundler();
