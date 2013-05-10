@@ -1,9 +1,11 @@
 .taglib-icon-list {
+	margin-left: 0;
+
 	li {
 		float: left;
+		list-style: none;
 		margin-right: 1em;
 	}
-
 	&:after {
 		clear: both;
 		content: ".";
