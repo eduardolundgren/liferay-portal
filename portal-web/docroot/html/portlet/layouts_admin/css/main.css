@@ -1,10 +1,5 @@
 .portlet-communities, .portlet-users-admin {
 	.lfr-theme-list {
-		h3 {
-			background: #DCEAF4;
-			padding: 0.5em;
-		}
-
 		li {
 			float: left;
 			margin: 0 1.3em 1.3em 0;

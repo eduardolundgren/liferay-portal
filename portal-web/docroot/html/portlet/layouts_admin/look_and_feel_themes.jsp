@@ -35,7 +35,7 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 		<h3><liferay-ui:message key="current-theme" /></h3>
 
 		<div>
-			<img alt="<%= selTheme.getName() %>" class="theme-screenshot" onclick="<portlet:namespace /><%= device %>selectTheme('SelTheme', false);" src="<%= themeDisplay.getCDNBaseURL() %><%= selTheme.getStaticResourcePath() %><%= selTheme.getImagesPath() %>/thumbnail.png" title="<%= selTheme.getName() %>" />
+			<img alt="<%= selTheme.getName() %>" class="img-polaroid theme-screenshot" onclick="<portlet:namespace /><%= device %>selectTheme('SelTheme', false);" src="<%= themeDisplay.getCDNBaseURL() %><%= selTheme.getStaticResourcePath() %><%= selTheme.getImagesPath() %>/thumbnail.png" title="<%= selTheme.getName() %>" />
 
 			<div class="theme-details">
 				<c:choose>
