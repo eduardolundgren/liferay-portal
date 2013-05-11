@@ -3,6 +3,7 @@
 		fieldset {
 			border-width: 0;
 			padding: 0;
+			/*margin-left: 0.5em;*/
 		}
 
 		.fieldset {
@@ -15,13 +16,7 @@
 				padding: 3px 1px;
 			}
 
-			.checkbox, .radio {
-				margin-bottom: 10px;
-			}
-
 			.field {
-				margin-bottom: 10px;
-
 				&.mailing-ctrl {
 					clear: both;
 

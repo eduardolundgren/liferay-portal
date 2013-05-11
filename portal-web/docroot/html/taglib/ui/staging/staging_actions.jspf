@@ -16,13 +16,13 @@
 
 <c:choose>
 	<c:when test="<%= group.isCompany() && GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.PUBLISH_STAGING) %>">
-		<liferay-ui:icon id='<%= groupId + "publishGlobalNowLink" %>' image="maximize" message="<%= publishNowDialogTitle %>" url="<%= publishRenderURL.toString() %>" />
+		<aui:nav-item id='<%= groupId + "publishGlobalNowLink" %>' label="<%= publishNowDialogTitle %>" href="<%= publishRenderURL.toString() %>" />
 
 		<%
 		publishRenderURL.setParameter("schedule", String.valueOf(true));
 		%>
 
-		<liferay-ui:icon id='<%= groupId + "publishGlobalScheduleLink" %>' image="time" message="<%= publishScheduleMessage %>" url="<%= publishRenderURL.toString() %>" />
+		<aui:nav-item id='<%= groupId + "publishGlobalScheduleLink" %>' label="<%= publishScheduleMessage %>" href="<%= publishRenderURL.toString() %>" />
 
 		<aui:script use="aui-base">
 			var publishGlobalNowLink = A.one('#<portlet:namespace /><%= groupId + "publishGlobalNowLink" %>');
@@ -103,13 +103,12 @@
 				</c:otherwise>
 			</c:choose>
 
-			<liferay-ui:icon id='<%= layoutSetBranchId + "publishNowLink" %>' image="maximize" message="<%= publishNowMessage %>" url="<%= publishRenderURL.toString() %>" />
-
+			<aui:nav-item id='<%= layoutSetBranchId + "publishNowLink" %>' label="<%= publishNowMessage %>" href="<%= publishRenderURL.toString() %>" />
 			<%
 			publishRenderURL.setParameter("schedule", String.valueOf(true));
 			%>
 
-			<liferay-ui:icon id='<%= layoutSetBranchId + "publishScheduleLink" %>' image="time" message="<%= publishScheduleMessage %>" url="<%= publishRenderURL.toString() %>" />
+			<aui:nav-item id='<%= layoutSetBranchId + "publishScheduleLink" %>' label="<%= publishScheduleMessage %>" href="<%= publishRenderURL.toString() %>" />
 
 			<aui:script use="aui-base">
 				var publishNowLink = A.one('#<portlet:namespace /><%= layoutSetBranchId + "publishNowLink" %>');
@@ -163,14 +162,7 @@
 				<portlet:param name="selPlid" value="<%= String.valueOf(selPlid) %>" />
 			</portlet:renderURL>
 
-			<liferay-ui:icon
-				cssClass="manage-layout-set-branches"
-				id="manageLayoutSetBranches"
-				image="configuration"
-				label="<%= true %>"
-				message="manage-site-pages-variations"
-				url="<%= layoutSetBranchesURL %>"
-			/>
+			<aui:nav-item cssClass="manage-layout-set-branches" id="manageLayoutSetBranches" label="manage-site-pages-variations" href="<%= layoutSetBranchesURL %>" />
 
 			<aui:script use="aui-base">
 				var layoutSetBranchesLink = A.one('#<portlet:namespace />manageLayoutSetBranches');
