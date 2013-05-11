@@ -169,9 +169,6 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 			</div>
 			<div class="span9">
 				<div id="<portlet:namespace />layoutsContainer">
-
-				<liferay-util:include page="/html/portlet/layouts_admin/add_layout.jsp" />
-
 					<c:choose>
 						<c:when test="<%= selPlid > 0 %>">
 							<liferay-util:include page="/html/portlet/layouts_admin/edit_layout.jsp" />
