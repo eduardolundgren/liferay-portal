@@ -237,8 +237,7 @@ String[][] categorySections = {mainSections};
 					var clickHandler = function(event) {
 						var dataValue = event.target.ancestor().attr('data-value');
 
-						switch (dataValue) {
-						case 'add-child-page':
+						if (dataValue == 'add-child-page') {
 							content = A.one('#<portlet:namespace />addLayout');
 
 							if (!popup) {
@@ -255,10 +254,8 @@ String[][] categorySections = {mainSections};
 							popup.show();
 
 							Liferay.Util.focusFormField(content.one('input:text'));
-
-							break;
-
-						case 'permissions':
+						}
+						else if (dataValue == 'permissions') {
 							<liferay-security:permissionsURL
 								modelResource="<%= Layout.class.getName() %>"
 								modelResourceDescription="<%= selLayout.getName(locale) %>"
@@ -275,15 +272,11 @@ String[][] categorySections = {mainSections};
 									uri: '<%= permissionURL %>'
 								}
 							);
-
-							break;
-
-						case 'delete':
+						}
+						else if (dataValue == 'delete') {
 							<portlet:namespace />saveLayout('<%= Constants.DELETE %>');
-
-							break;
-
-						case 'copy-portlets-from-page':
+						}
+						else if (dataValue == 'copy-portlets-from-page') {
 							content = A.one('#<portlet:namespace />copyPortletsFromPage');
 
 							popUp = Liferay.Util.Window.getWindow(
@@ -316,11 +309,6 @@ String[][] categorySections = {mainSections};
 									}
 								);
 							}
-
-							break;
-
-						default:
-							break;
 						}
 					};
 

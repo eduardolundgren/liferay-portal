@@ -229,8 +229,7 @@ boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || se
 	var clickHandler = function(event) {
 		var dataValue = event.target.ancestor().attr('data-value');
 
-		switch (dataValue) {
-		case 'add-page':
+		if (dataValue == 'add-child-page') {
 			var content = A.one('#<portlet:namespace />addLayout');
 
 			if (!popup) {
@@ -247,10 +246,8 @@ boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || se
 			popup.show();
 
 			Liferay.Util.focusFormField(content.one('input:text'));
-
-			break;
-
-		case 'view-pages' :
+		}
+		else if (dataValue == 'view-pages') {
 			<liferay-portlet:actionURL plid="<%= selPlid %>" portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewPagesURL">
 				<portlet:param name="struts_action" value="/my_sites/view" />
 				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
@@ -258,10 +255,8 @@ boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || se
 			</liferay-portlet:actionURL>
 
 			window.open('<%= viewPagesURL %>').focus();
-
-			break;
-
-		case 'import':
+		}
+		else if (dataValue == 'view') {
 			<portlet:renderURL var="importPagesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/layouts_admin/import_layouts" />
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.VALIDATE %>" />
@@ -278,10 +273,8 @@ boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || se
 					uri: '<%= importPagesURL.toString() %>'
 				}
 			);
-
-			break;
-
-		case 'export':
+		}
+		else if (dataValue == 'export') {
 			<portlet:renderURL var="exportPagesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/layouts_admin/export_layouts" />
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EXPORT %>" />
@@ -298,11 +291,6 @@ boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || se
 					uri: '<%= exportPagesURL.toString() %>'
 				}
 			);
-
-			break;
-
-		default:
-			break;
 		}
 	};
 
