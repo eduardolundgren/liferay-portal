@@ -71,6 +71,8 @@ boolean hasAddPageLayoutsPermission = !group.isLayoutPrototype() && GroupPermiss
 boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || selGroup.isLayoutSetPrototype() || selGroup.isStagingGroup() || portletName.equals(PortletKeys.MY_SITES) || portletName.equals(PortletKeys.GROUP_PAGES) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN));
 %>
 
+<liferay-util:include page="/html/portlet/layouts_admin/add_layout.jsp" />
+
 <aui:nav-bar>
 	<aui:nav id="layoutsNav">
 		<c:if test="<%= hasViewPagesPermission %>">

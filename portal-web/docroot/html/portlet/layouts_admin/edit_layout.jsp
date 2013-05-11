@@ -106,6 +106,8 @@ if (!group.isUser() && selLayout.isTypePortlet()) {
 String[][] categorySections = {mainSections};
 %>
 
+<liferay-util:include page="/html/portlet/layouts_admin/add_layout.jsp" />
+
 <aui:nav-bar>
 	<aui:nav id="layoutsNav">
 		<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selPlid, ActionKeys.ADD_LAYOUT) && PortalUtil.isLayoutParentable(selLayout.getType()) %>">
