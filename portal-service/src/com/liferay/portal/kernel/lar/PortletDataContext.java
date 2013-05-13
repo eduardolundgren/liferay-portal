@@ -25,6 +25,7 @@ import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.ratings.model.RatingsEntry;
@@ -47,6 +48,18 @@ import java.util.Set;
  * @author Raymond Augé
  */
 public interface PortletDataContext extends Serializable {
+
+	public static final String REFERENCE_TYPE_CHILD = "child";
+
+	public static final String REFERENCE_TYPE_DEPENDENCY = "dependency";
+
+	public static final String REFERENCE_TYPE_EMBEDDED = "embedded";
+
+	public static final String REFERENCE_TYPE_PARENT = "parent";
+
+	public static final String REFERENCE_TYPE_STRONG = "strong";
+
+	public static final String REFERENCE_TYPE_WEAK = "weak";
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link
@@ -120,20 +133,22 @@ public interface PortletDataContext extends Serializable {
 
 	public Element addReferenceElement(
 		StagedModel referrerStagedModel, Element element,
-		ClassedModel classedModel, boolean missing);
+		ClassedModel classedModel, Class<?> clazz, String referenceType,
+		boolean missing);
 
 	public Element addReferenceElement(
 		StagedModel referrerStagedModel, Element element,
-		ClassedModel classedModel, Class<?> clazz, boolean missing);
+		ClassedModel classedModel, String referenceType, boolean missing);
 
 	public Element addReferenceElement(
 		StagedModel referrerStagedModel, Element element,
-		ClassedModel classedModel, String binPath, boolean missing);
+		ClassedModel classedModel, String binPath, String referenceType,
+		boolean missing);
 
 	public Element addReferenceElement(
 		StagedModel referrerStagedModel, Element element,
 		ClassedModel classedModel, String className, String binPath,
-		boolean missing);
+		String referenceType, boolean missing);
 
 	public boolean addScopedPrimaryKey(Class<?> clazz, String primaryKey);
 
@@ -169,7 +184,7 @@ public interface PortletDataContext extends Serializable {
 
 	public Map<String, String[]> getAssetCategoryUuidsMap();
 
-	public Map<String, String[]> getAssetLinkUuidsMap();
+	public Map<String, List<AssetLink>> getAssetLinksMap();
 
 	public String[] getAssetTagNames(Class<?> clazz, long classPK);
 
@@ -254,7 +269,13 @@ public interface PortletDataContext extends Serializable {
 		Element parentElement, Class<?> clazz);
 
 	public List<Element> getReferenceDataElements(
+		Element parentElement, Class<?> clazz, String referenceType);
+
+	public List<Element> getReferenceDataElements(
 		StagedModel parentStagedModel, Class<?> clazz);
+
+	public List<Element> getReferenceDataElements(
+		StagedModel parentStagedModel, Class<?> clazz, String referenceType);
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link
