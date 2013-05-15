@@ -731,7 +731,7 @@ if (Validator.isNotNull(content)) {
 	}
 </aui:script>
 
-<aui:script use="aui-base,aui-dialog-iframe-deprecated,aui-paginator,liferay-portlet-journal">
+<aui:script use="aui-base,aui-dialog-iframe-deprecated,aui-pagination,liferay-portlet-journal">
 	var editDDMTemplate = A.one('#<portlet:namespace />editDDMTemplate');
 
 	if (editDDMTemplate) {
@@ -843,7 +843,7 @@ if (Validator.isNotNull(content)) {
 	var paginatorBottomControls = A.one('.journal-article-container-content-paginator.paginator-bottom-controls');
 
 	if (total) {
-		new A.Paginator(
+		new A.Pagination(
 			{
 				containers: '.journal-article-container-content-paginator',
 				on: {

@@ -240,13 +240,13 @@ AUI.add(
 
 						buffer.push(root.openTag);
 
-						var container = A.one('.aui-diagram-builder-drop-container');
+						var container = A.one('.diagram-builder-drop-container');
 
 						if (container) {
 							var size = container.all('.page').size();
 
 							if (size) {
-								var lastField = container.all('.aui-form-builder-field').last();
+								var lastField = container.all('.form-builder-field').last();
 
 								if (!(size === 1 && lastField.one('.page'))) {
 									instance._paginateFields();
@@ -938,7 +938,7 @@ AUI.add(
 				},
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
-					iconClass: 'aui-form-builder-field-icon aui-form-builder-field-icon-page',
+					iconClass: 'form-builder-field-icon form-builder-field-icon-page',
 					label: Liferay.Language.get('page-break'),
 					type: 'ddm-page'
 				}
