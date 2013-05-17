@@ -34,11 +34,9 @@
 		}
 
 		.select-all-entries {
-			border-color: #5F5F5F;
-			float: left;
-			line-height: 0;
-			margin-right: 2px;
-			padding: 0;
+			position: absolute;
+			left: 10px;
+			top: 10px;
 		}
 	}
 }

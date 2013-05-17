@@ -97,7 +97,7 @@ else if (((folderId != rootFolderId) && (parentFolderId == 0)) || ((folderId == 
 <div id="<portlet:namespace />listViewContainer">
 	<div id="<portlet:namespace />folderContainer">
 		<aui:nav cssClass="nav-list well">
-			<c:if test="<%= Validator.isNotNull(parentTitle)%>">
+			<c:if test="<%= Validator.isNotNull(parentTitle) %>">
 				<li class="nav-header">
 					<%= parentTitle %>
 				</li>

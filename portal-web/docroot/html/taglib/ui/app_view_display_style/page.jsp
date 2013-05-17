@@ -23,7 +23,7 @@ Map<String, String> requestParams = (Map<String, String>)request.getAttribute("l
 %>
 
 <c:if test="<%= displayStyles.length > 1 %>">
-	<div id="<portlet:namespace />displayStyleButtons" class="toolbar">
+	<div class="toolbar" id="<portlet:namespace />displayStyleButtons">
 		<div class="btn-group btn-group-radio">
 
 			<%
@@ -43,7 +43,7 @@ Map<String, String> requestParams = (Map<String, String>)request.getAttribute("l
 				}
 			%>
 
-				<button data-displayStyle="<%= dataStyle %>" class='btn <%= displayStyle.equals(displayStyles[i]) ? "active" : StringPool.BLANK %>'><i class="<%= iconClass %>"></i></button>
+				<button class='btn <%= displayStyle.equals(displayStyles[i]) ? "active" : StringPool.BLANK %>' data-displayStyle="<%= dataStyle %>"><i class="<%= iconClass %>"></i></button>
 
 			<%
 			}
