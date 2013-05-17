@@ -134,6 +134,7 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 							<aui:nav-bar>
 								<aui:nav>
 									<aui:nav-item dropdown="<%= true %>" label="<%= HtmlUtil.escape(layoutSetBranch.getName()) %>">
+
 										<%
 										for (int i = 0; i < layoutSetBranches.size(); i++) {
 											LayoutSetBranch curLayoutSetBranch = layoutSetBranches.get(i);
@@ -150,10 +151,12 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 												<portlet:param name="layoutSetBranchId" value="<%= String.valueOf(curLayoutSetBranch.getLayoutSetBranchId()) %>" />
 											</portlet:actionURL>
 
-											<aui:nav-item cssClass='<%= selected ? "disabled" : StringPool.BLANK %>' label="<%= HtmlUtil.escape(curLayoutSetBranch.getName()) %>" href="<%= selected ? null : layoutSetBranchURL %>" />
+											<aui:nav-item cssClass='<%= selected ? "disabled" : StringPool.BLANK %>' href="<%= selected ? null : layoutSetBranchURL %>" label="<%= HtmlUtil.escape(curLayoutSetBranch.getName()) %>" />
+
 										<%
 										}
 										%>
+
 									</aui:nav-item>
 								</aui:nav>
 							</aui:nav-bar>
