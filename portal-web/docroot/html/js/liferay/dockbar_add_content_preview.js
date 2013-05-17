@@ -60,7 +60,7 @@ AUI.add(
 					]
 				);
 
-				instance._tooltip.set(BODY_CONTENT, errorMsg);
+				tooltip.setStdModContent(A.WidgetStdMod.BODY, errorMsg);
 			},
 
 			_afterPreviewSuccess: function(event) {
@@ -68,7 +68,7 @@ AUI.add(
 
 				var tooltip = instance._tooltip;
 
-				tooltip.set(BODY_CONTENT, event.currentTarget.get(STR_RESPONSE_DATA));
+				tooltip.setStdModContent(A.WidgetStdMod.BODY, event.currentTarget.get(STR_RESPONSE_DATA));
 				tooltip.align();
 
 				instance._eventHandles.push(
