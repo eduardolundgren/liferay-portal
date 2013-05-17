@@ -60,7 +60,7 @@
 						<aui:form action="<%= updateContentListURL %>" name="addContentForm" onSubmit="event.preventDefault();">
 							<div class="container-fluid">
 
-							<div class="btn-toolbar">							
+							<div class="btn-toolbar">
 								<aui:input cssClass="input-medium search-query" inlineField="<%= true %>" label="" name="searchContentInput" type="text" />
 
 								<%
@@ -70,17 +70,11 @@
 								%>
 
 								<div class="btn-group" id="<portlet:namespace />styleButtons">
-									<aui:button cssClass='<%= displayStyle.equals("icon") ? "active" : StringPool.BLANK %>'
-										icon="icon-th-large"
-										data-style="icon" />
+									<aui:button cssClass='<%= displayStyle.equals("icon") ? "active" : StringPool.BLANK %>' icon="icon-th-large" data-style="icon" />
 
-									<aui:button cssClass='<%= displayStyle.equals("descriptive") ? "active" : StringPool.BLANK %>'
-										icon="icon-th-list"
-										data-style="descriptive" />
+									<aui:button cssClass='<%= displayStyle.equals("descriptive") ? "active" : StringPool.BLANK %>' icon="icon-th-list" data-style="descriptive" />
 
-									<aui:button cssClass='<%= displayStyle.equals("list") ? "active" : StringPool.BLANK %>'
-										icon="icon-list"
-										data-style="list" />
+									<aui:button cssClass='<%= displayStyle.equals("list") ? "active" : StringPool.BLANK %>' icon="icon-list" data-style="list" />
 								</div>
 
 								<aui:select cssClass="input-mini" inlineField="<%= true %>" label="" name="numItems">
@@ -130,6 +124,7 @@
 								</c:if>
 
 								<div class="row-fluid">
+
 									<%
 									int portletCategoryIndex = 0;
 
@@ -154,6 +149,7 @@
 											<liferay-ui:panel collapsible="<%= layout.isTypePortlet() %>" cssClass="lfr-content-category lfr-component panel-page-category" extended="<%= true %>" id="<%= panelId %>" persistState="<%= true %>" title='<%= LanguageUtil.get(pageContext, "highlighted") %>'>
 
 												<aui:nav cssClass="nav-list">
+
 													<%
 													for (Portlet portlet : portlets) {
 														if (!PortletPermissionUtil.contains(permissionChecker, layout, portlet.getPortletId(), ActionKeys.ADD_TO_PAGE)) {
@@ -186,7 +182,7 @@
 														data='<%= data %>'
 														href=""
 														iconClass='<%= portletInstanceable ? "icon-th-large" : "icon-stop" %>'
-														label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" >
+														label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>">
 
 														<span <%= AUIUtil.buildData(data) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
 															<liferay-ui:message key="add" />
@@ -196,6 +192,7 @@
 													<%
 													}
 													%>
+
 												</aui:nav>
 
 											</liferay-ui:panel>

@@ -80,6 +80,7 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 		<liferay-ui:panel collapsible="<%= layout.isTypePortlet() %>" cssClass="lfr-content-category panel-page-category unstyled" defaultState="closed" extended="<%= true %>" id="<%= panelId %>" persistState="<%= true %>" title="<%= title %>">
 
 			<aui:nav cssClass="nav-list">
+
 				<%
 				for (PortletCategory category : categories) {
 					request.setAttribute(WebKeys.PORTLET_CATEGORY, category);
@@ -143,7 +144,7 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 								data="<%= data %>"
 								href=""
 								iconClass='<%= portletInstanceable ? "icon-th-large" : "icon-stop" %>'
-								label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" >
+								label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>">
 
 								<span <%= AUIUtil.buildData(data) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
 									<liferay-ui:message key="add" />
@@ -179,16 +180,12 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 								portletItemData.put("title", HtmlUtil.escape(portletItem.getName()));
 							%>
 
-								<aui:nav-item cssClass="lfr-content-item lfr-archived-setup"
-									data="<%= portletItemData %>"
-									href=""
-									iconClass='<%= portletInstanceable ? "icon-th-large" : "icon-stop" %>'
-									label="<%= HtmlUtil.escape(portletItem.getName()) %>" >
-
+								<aui:nav-item cssClass="lfr-content-item lfr-archived-setup" data="<%= portletItemData %>" href="" iconClass='<%= portletInstanceable ? "icon-th-large" : "icon-stop" %>' label="<%= HtmlUtil.escape(portletItem.getName()) %>">
 									<span <%= AUIUtil.buildData(portletItemData) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
 										<liferay-ui:message key="add" />
 									</span>
 								</aui:nav-item>
+
 							<%
 							}
 							%>
@@ -204,6 +201,7 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 				<%
 				}
 				%>
+
 			</aui:nav>
 
 		 </liferay-ui:panel>

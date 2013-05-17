@@ -241,17 +241,19 @@ AUI.add(
 
 				var addPanelNode = instance._getPanelNode();
 
+				var contentWrapper = A.one('#content-wrapper');
+
 				if (BODY.hasClass(CSS_ADD_CONTENT)) {
 					instance._addPanel();
 
 					addPanelNode.show();
 
-					A.one('#content-wrapper').replaceClass('span12', 'span8');
+					contentWrapper.replaceClass('span12', 'span8');
 				}
 				else {
 					addPanelNode.hide();
 
-					A.one('#content-wrapper').replaceClass('span8', 'span12');
+					contentWrapper.replaceClass('span8', 'span12');
 				}
 			},
 

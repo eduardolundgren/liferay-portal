@@ -114,7 +114,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 						data.put("title", title);
 					%>
 
-						<aui:nav-item cssClass='<%= displayStyle.equals("icon") ? "span6 content-shortcut lfr-content-item" : "row-fluid has-preview content-shortcut lfr-content-item" %>'
+						<aui:nav-item cssClass='<%= displayStyle.equals("icon") ? "content-shortcut lfr-content-item span6" : "has-preview content-shortcut lfr-content-item row-fluid" %>'
 							data="<%= data %>"
 							href=""
 							iconClass='<%= displayStyle.equals("icon") ? "" : "icon-file" %>'
@@ -122,7 +122,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 
 							<c:choose>
 								<c:when test='<%= !displayStyle.equals("list") %>' >
-									<img class='<%= displayStyle.equals("descriptive") ? "span4" : StringPool.BLANK %>' src='<%= assetRenderer.getThumbnailPath(liferayPortletRequest) %>' />
+									<img class='<%= displayStyle.equals("descriptive") ? "span4" : StringPool.BLANK %>' src="<%= assetRenderer.getThumbnailPath(liferayPortletRequest) %>" />
 
 									<c:choose>
 										<c:when test='<%= displayStyle.equals("descriptive") %>' >
@@ -148,6 +148,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 					<%
 					}
 					%>
+
 				</aui:nav>
 			</liferay-ui:panel>
 		</div>
