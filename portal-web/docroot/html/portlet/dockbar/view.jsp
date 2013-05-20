@@ -169,7 +169,19 @@ String toggleControlsState = GetterUtil.getString(SessionClicks.get(request, "li
 					A.one('#mySites').on(
 						'click',
 						function(event) {
-							event.currentTarget.toggleClass('open');
+							var STR_ACTIVE = 'active';
+							var STR_OPEN = 'open';
+
+							var currentTarget = event.currentTarget;
+
+							currentTarget.toggleClass(STR_ACTIVE).toggleClass(STR_OPEN);
+
+							currentTarget.once(
+								'mousedownoutside', 
+								function(event) {
+									currentTarget.removeClass(STR_ACTIVE).removeClass(STR_OPEN);
+								}
+							);
 						}
 					);
 				</aui:script>
