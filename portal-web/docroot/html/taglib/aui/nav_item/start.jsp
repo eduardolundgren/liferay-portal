@@ -39,9 +39,21 @@
 		<aui:script use="aui-base">
 			A.one('#<%= id %>').on(
 				'click',
-				function(event) {
-					event.currentTarget.toggleClass('open');
-				}
+						function(event) {
+							var STR_ACTIVE = 'active';
+							var STR_OPEN = 'open';
+
+							var currentTarget = event.currentTarget;
+
+							currentTarget.toggleClass(STR_ACTIVE).toggleClass(STR_OPEN);
+
+							currentTarget.once(
+								'mousedownoutside', 
+								function(event) {
+									currentTarget.removeClass(STR_ACTIVE).removeClass(STR_OPEN);
+								}
+							);
+						}
 			);
 		</aui:script>
 
