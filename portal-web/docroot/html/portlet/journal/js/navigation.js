@@ -468,7 +468,7 @@ AUI.add(
 						}
 
 						if (searchResultsContainer || fragmentSearchResults) {
-							instance.all('#addButtonContainer, #sortButtonContainer').hide();
+							instance.all('#addButtonContainer').hide();
 						}
 					}
 				}
