@@ -57,10 +57,6 @@
 	<liferay-util:include page="/html/portlet/journal/add_button.jsp" />
 </span>
 
-<span class="sort-button" id="<portlet:namespace />sortButtonContainer">
-	<liferay-util:include page="/html/portlet/journal/sort_button.jsp" />
-</span>
-
 <span class="manage-button">
 	<c:if test="<%= !user.isDefaultUser() %>">
 		<liferay-ui:icon-menu direction="down" icon="" message="manage" showExpanded="<%= false %>" showWhenSingleIcon="<%= true %>">
