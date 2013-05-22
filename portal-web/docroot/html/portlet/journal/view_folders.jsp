@@ -131,7 +131,7 @@ else {
 						dataView="<%= dataView %>"
 						entryTitle='<%= LanguageUtil.get(pageContext, "home") %>'
 						expandURL="<%= expandArticlesHomeURL.toString() %>"
-						iconImage="../aui/home"
+						iconImage="icon-home"
 						selected='<%= (navigation.equals("home") && (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)) && Validator.isNull(structureId) %>'
 						showExpand="<%= foldersCount > 0 %>"
 						viewURL="<%= viewArticlesHomeURL.toString() %>"
@@ -156,7 +156,7 @@ else {
 					<liferay-ui:app-view-navigation-entry
 						dataView="<%= dataView %>"
 						entryTitle='<%= LanguageUtil.get(pageContext, "recent") %>'
-						iconImage="../aui/clock"
+						iconImage="icon-time"
 						selected='<%= navigation.equals("recent") %>'
 						viewURL="<%= viewRecentArticlesURL.toString() %>"
 					/>
@@ -181,7 +181,7 @@ else {
 						<liferay-ui:app-view-navigation-entry
 							dataView="<%= dataView %>"
 							entryTitle='<%= LanguageUtil.get(pageContext, "mine") %>'
-							iconImage="../aui/person"
+							iconImage="icon-user"
 							selected='<%= navigation.equals("mine") %>'
 							viewURL="<%= viewMyArticlesURL.toString() %>"
 						/>
