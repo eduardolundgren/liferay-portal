@@ -22,7 +22,7 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 
 <aui:nav-bar>
 	<aui:nav>
-		<aui:nav-item class="helper-hidden" dropdown="<%= true %>" id="actionsButtonContainer" label="actions">
+		<aui:nav-item cssClass="hide" dropdown="<%= true %>" id="actionsButtonContainer" label="actions">
 
 			<%
 			String taglibOnClick = "javascript:Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + (TrashUtil.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE) + "'});";
