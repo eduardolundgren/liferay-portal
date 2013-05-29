@@ -525,9 +525,11 @@ AUI.add(
 					tooltipDelegate = new A.TooltipDelegate(
 						{
 							formatter: function() {
-								tooltipDelegate.getTooltip().set('zIndex', 2);
+								var tooltip = this;
 
-								var node = this.get('trigger');
+								tooltip.set('zIndex', 2);
+
+								var node = tooltip.get('trigger');
 
 								return node.attr('data-message');
 							},
