@@ -39,7 +39,7 @@
 
 			var TPL_SEPARATOR = '<div class="separator"></div>';
 
-			var TPL_PAGE = '<div class="page"> ' + Liferay.Language.get('page-break') + ' </div>';
+			var TPL_PAGE = '<div data-type="page-break"> ' + Liferay.Language.get('page-break') + ' </div>';
 
 			var TPL_TEXT_HTML = '<textarea class="form-builder-field-node lfr-ddm-text-html"></textarea>';
 

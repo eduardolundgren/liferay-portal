@@ -845,7 +845,7 @@ if (Validator.isNotNull(content)) {
 	if (total) {
 		new A.Pagination(
 			{
-				containers: '.journal-article-container-content-paginator',
+				boundingBox: '.journal-article-container-content-paginator',
 				on: {
 					changeRequest: function(event) {
 						var instance = this;

@@ -8,6 +8,8 @@ AUI.add(
 		var instanceOf = A.instanceOf;
 		var isObject = Lang.isObject;
 
+		var CSS_PAGE_BREAK = '[data-type="page-break"]';
+
 		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
 		var DDM_PAGE = 'ddm-page';
@@ -175,8 +177,8 @@ AUI.add(
 							function(event) {
 								translationManager.render();
 
-								if (A.one('.page')) {
-									instance._unpaginateFields();
+								if (A.one('.diagram-builder-drop-container ' + CSS_PAGE_BREAK)) {
+									instance._flattenPageFields();
 								}
 							}
 						);
@@ -240,18 +242,10 @@ AUI.add(
 
 						buffer.push(root.openTag);
 
-						var container = A.one('.diagram-builder-drop-container');
+						var dropContainer = A.one('.diagram-builder-drop-container');
 
-						if (container) {
-							var size = container.all('.page').size();
-
-							if (size) {
-								var lastField = container.all('.form-builder-field').last();
-
-								if (!(size === 1 && lastField.one('.page'))) {
-									instance._paginateFields();
-								}
-							}
+						if (dropContainer.one(CSS_PAGE_BREAK)) {
+							instance._createNestedPageStructure(dropContainer);
 						}
 
 						instance.get('fields').each(
@@ -260,110 +254,11 @@ AUI.add(
 							}
 						);
 
+						instance._flattenPageFields();
+
 						buffer.push(root.closeTag);
 
 						return buffer.join(STR_BLANK);
-					},
-
-					_unpaginateFields: function() {
-						var instance = this;
-
-						var pageFields = [];
-
-						var fields = instance.get('fields');
-
-						var size = fields.size();
-
-						fields.each(
-							function(item1, index1) {
-								item1.get('fields').each(
-									function(item2, index2) {
-										pageFields.push(item2);
-									}
-								);
-
-								item1.set('fields', []);
-
-								if (!((index1 === (size - 1)) && (item1.name === 'ddm-page'))) {
-									pageFields.push(item1);
-								}
-							}
-						);
-
-						instance.set('fields', pageFields);
-					},
-
-					_paginateFields: function() {
-						var instance = this;
-
-						var fields = [];
-
-						var pages = instance.get('fields').filter(
-							function(item, index, collection) {
-								if (item.name == 'ddm-page') {
-									item.set('fields', fields);
-
-									fields = [];
-
-									return item;
-								}
-								else {
-									fields.push(item);
-								}
-							}
-						);
-
-						if (fields.length) {
-							var config = {
-								hiddenAttributes: ['readOnly'],
-								label: 'Page Break',
-								localizationMap: {},
-								options: undefined,
-								predefinedValue: '',
-								readOnlyAttributes: [],
-								required: false,
-								showLabel: true,
-								tip: '',
-								type: 'ddm-page',
-								unique: false,
-								width: undefined
-							};
-
-							var pageBreak = instance.createField(new A.FormBuilder.types['ddm-page'](config));
-
-							pageBreak.set('fields', fields);
-
-							pages.add(pageBreak);
-						}
-
-						instance.set('fields', pages);
-					},
-
-					_setFieldsNestedListConfig: function(val) {
-						var instance = this;
-
-						var config = LiferayFormBuilder.superclass._setFieldsNestedListConfig.apply(instance, arguments);
-
-						config.dropCondition = function(event) {
-							var dragNode = event.drag.get('node');
-							var dropNode = event.drop.get('node');
-
-							var dragField = A.AvailableField.getAvailableFieldByNode(dragNode);
-							var dropField = A.Widget.getByNode(dropNode);
-
-							if (!dragField || !instanceOf(dragField, A.AvailableField)) {
-								dragField = A.Widget.getByNode(dragNode);
-							}
-
-							if (dragField && dragField.get('type') == 'ddm-page' || dropField.get('type') == 'ddm-page') {
-								return false;
-							}
-
-							return true;
-
-						};
-
-						return config;
 					},
 
 					normalizeValue: function(value) {
@@ -581,6 +476,50 @@ AUI.add(
 						};
 					},
 
+					_createNestedPageStructure: function(container) {
+						var instance = this;
+
+						var pageBreakNodeList = container.all(CSS_PAGE_BREAK);
+
+						var size = pageBreakNodeList.size();
+
+						if (size) {
+							var lastField = container.all('.form-builder-field').last();
+
+							if (!(size === 1 && lastField.one(CSS_PAGE_BREAK))) {
+								instance._setFieldsNestedStructure(container, pageBreakNodeList);
+							}
+						}
+					},
+
+					_flattenPageFields: function() {
+						var instance = this;
+
+						var pageFields = [];
+
+						var fields = instance.get('fields');
+
+						var size = fields.size();
+
+						fields.each(
+							function(item1, index1) {
+								item1.get('fields').each(
+									function(item2, index2) {
+										pageFields.push(item2);
+									}
+								);
+
+								item1.set('fields', []);
+
+								if (!((index1 === (size - 1)) && (item1.name === 'ddm-page'))) {
+									pageFields.push(item1);
+								}
+							}
+						);
+
+						instance.set('fields', pageFields);
+					},
+
 					_getReadOnlyFieldAttributes: function(field) {
 						var instance = this;
 
@@ -670,6 +609,74 @@ AUI.add(
 						);
 
 						return fields;
+					},
+
+					_setFieldsNestedStructure: function() {
+						var instance = this;
+
+						var fields = [];
+
+						var pages = instance.get('fields').filter(
+							function(item, index, collection) {
+								if (item.name == 'ddm-page') {
+									item.set('fields', fields);
+
+									fields = [];
+
+									return item;
+								}
+								else {
+									fields.push(item);
+								}
+							}
+						);
+
+						if (fields.length) {
+							var config = {
+								hiddenAttributes: ['readOnly'],
+								label: Liferay.Language.get('page-break'),
+								localizationMap: {},
+								options: undefined,
+								predefinedValue: '',
+								readOnlyAttributes: [],
+								required: false,
+								showLabel: true,
+								tip: '',
+								type: 'ddm-page',
+								unique: false,
+								width: undefined
+							};
+
+							var page = instance.createField(new A.FormBuilder.types['ddm-page'](config));
+
+							page.set('fields', fields);
+
+							pages.add(page);
+						}
+
+						instance.set('fields', pages);
+					},
+
+					_setFieldsSortableListConfig: function(val) {
+						var instance = this;
+
+						var config = LiferayFormBuilder.superclass._setFieldsSortableListConfig.apply(instance, arguments);
+
+						config.dropCondition = function(event) {
+							var dragNode = event.drag.get('node');
+							var dropNode = event.drop.get('node');
+
+							var dragField = A.AvailableField.getAvailableFieldByNode(dragNode);
+							var dropField = A.Widget.getByNode(dropNode);
+
+							if (!dragField || !instanceOf(dragField, A.AvailableField)) {
+								dragField = A.Widget.getByNode(dragNode);
+							}
+
+							return (!((dragField && dragField.get('type') == 'ddm-page') || (dropField.get('type') == 'ddm-page')));
+						};
+
+						return config;
 					},
 
 					_syncFieldOptionsLocaleUI: function(field, locale) {
@@ -938,7 +945,7 @@ AUI.add(
 				},
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
-					iconClass: 'form-builder-field-icon form-builder-field-icon-page',
+					iconClass: 'form-builder-field-icon form-builder-field-icon-separator',
 					label: Liferay.Language.get('page-break'),
 					type: 'ddm-page'
 				}
