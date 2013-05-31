@@ -250,14 +250,27 @@ if (Validator.isNotNull(historyKey)) {
 	A.on(
 		'history:change',
 		function(event) {
-			if (event.src === A.HistoryHash.SRC_HASH) {
-				var state = event.changed.<portlet:namespace />tab;
+			var state = event.newVal;
 
-				if (state) {
-					selectTabBySectionId(state.newVal);
+			var changed = event.changed.<portlet:namespace />tab;
+
+			var removed = event.removed.<portlet:namespace />tab;
+
+			if (event.src === A.HistoryHash.SRC_HASH) {
+				if (changed) {
+					selectTabBySectionId(changed.newVal);
 				}
-				else if (event.removed.<portlet:namespace />tab) {
+				else if (removed) {
 					tabview.selectChild(0);
+				}
+				else if (state) {
+					var sectionId = state.<portlet:namespace />tab;
+
+					if (!sectionId) {
+						sectionId = '<portlet:namespace />' + state.tab;
+					}
+
+					selectTabBySectionId(sectionId);
 				}
 			}
 		}
@@ -272,6 +285,10 @@ if (Validator.isNotNull(historyKey)) {
 	var currentLocationHash = A.HistoryHash.getHash();
 
 	var locationSectionId = currentLocationHash.substring(currentLocationHash.indexOf('=') + 1);
+
+	if (locationSectionId.indexOf('<portlet:namespace />') === -1) {
+		locationSectionId = '<portlet:namespace />' + locationSectionId;
+	}
 
 	selectTabBySectionId(locationSectionId);
 </aui:script>
