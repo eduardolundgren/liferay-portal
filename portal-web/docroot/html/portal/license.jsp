@@ -22,6 +22,10 @@
 <%@ page import="com.liferay.portal.license.util.LicenseUtil" %>
 
 <style type="text/css">
+	.info-header {
+		display: inline-block;
+	}
+
 	.build-info {
 		color: #555;
 		font-size: 11px;
@@ -71,13 +75,15 @@ DateFormat dateFormatDateTime = DateFormat.getDateTimeInstance(DateFormat.LONG, 
 dateFormatDateTime.setTimeZone(timeZone);
 %>
 
-<h2 class="version-info">
-	<%= versionInfo %>
-</h2>
+<div class="info-header">
+	<h2 class="version-info">
+		<%= versionInfo %>
+	</h2>
 
-<h3 class="build-info">
-	<%= buildInfo %>
-</h3>
+	<h3 class="build-info">
+		<%= buildInfo %>
+	</h3>
+</div>
 
 <form method="post" name="license_fm" <%= (clusterNodes.size() > 1) ? "onsubmit=\"return validateForm();\"" : "" %>>
 
