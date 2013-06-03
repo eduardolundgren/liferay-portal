@@ -1,5 +1,11 @@
-Liferay.Language = {
-	get: function(key, extraParams) {
+var Language = {
+	_cache: {}
+};
+
+Liferay.provide(
+	Language,
+	'get',
+	function(key, extraParams) {
 		var instance = this;
 
 		var url = themeDisplay.getPathContext() + '/language/' + themeDisplay.getLanguageId() + '/' + key + '/';
@@ -16,7 +22,7 @@ Liferay.Language = {
 		var value = instance._cache[url];
 
 		if (!value) {
-			AUI().use('io-base').io(
+			AUI().io(
 				url,
 				{
 					on: {
@@ -34,6 +40,7 @@ Liferay.Language = {
 
 		return value;
 	},
+	['io-base']
+);
 
-	_cache: {}
-};
+Liferay.Language = Language;
