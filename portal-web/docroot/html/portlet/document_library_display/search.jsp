@@ -65,13 +65,11 @@ int mountFoldersCount = DLAppServiceUtil.getMountFoldersCount(scopeGroupId, DLFo
 		title="search"
 	/>
 
-	<div class="navbar-search pull-right">
-		<div class="form-search">
-			<div class="input-append">
-				<input class="search-query span9" label="search-documents" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
+	<div class="form-search navbar-search pull-right">
+		<div class="input-append">
+			<input class="search-query span9" label="search-documents" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
 
-				<aui:button primary="<%= false %>" type="submit" value="search" />
-			</div>
+			<aui:button primary="<%= false %>" type="submit" value="search" />
 		</div>
 	</div>
 

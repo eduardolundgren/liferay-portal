@@ -117,13 +117,11 @@ boolean useAssetEntryQuery = false;
 	%>
 
 	<div id="<portlet:namespace />imageGalleryAssetInfo">
-		<div class="navbar-search pull-right">
-			<div class="form-search">
-				<div class="input-append">
-					<input class="search-query span9" label="search-images" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
+		<div class="form-search navbar-search pull-right">
+			<div class="input-append">
+				<input class="search-query span9" label="search-images" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
 
-					<aui:button primary="<%= false %>" type="submit" value="search" />
-				</div>
+				<aui:button primary="<%= false %>" type="submit" value="search" />
 			</div>
 		</div>
 

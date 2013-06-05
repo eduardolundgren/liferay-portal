@@ -43,10 +43,8 @@
 			</aui:nav-item>
 		</aui:nav>
 
-		<div class="navbar-search pull-right">
-			<div class="form-search">
-				<input class="search-query span9" id="<portlet:namespace/>tagsAdminSearchInput" name="<portlet:namespace/>tagsAdminSearchInput" type="text" />
-			</div>
+		<div class="form-search navbar-search pull-right">
+			<input class="search-query span9" id="<portlet:namespace/>tagsAdminSearchInput" name="<portlet:namespace/>tagsAdminSearchInput" type="text" />
 		</div>
 	</aui:nav-bar>
 
