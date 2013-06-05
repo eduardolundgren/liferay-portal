@@ -12,33 +12,15 @@
  * details.
  */
 
-package com.liferay.taglib.aui.base;
+package com.liferay.portlet.layoutprototypes.lar;
 
-import javax.servlet.jsp.JspException;
+import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 
 /**
- * @author Eduardo Lundgren
- * @author Bruno Basto
- * @author Nathan Cavanaugh
- * @author Julio Camarero
- * @generated
+ * @author Daniela Zapata Riesco
  */
-public class BaseSpacerTag extends com.liferay.portal.kernel.servlet.taglib.TagSupport {
+public class LayoutPrototypePortletDataHandler extends BasePortletDataHandler {
 
-	@Override
-	public int doStartTag() throws JspException {
-		return super.doStartTag();
-	}
-
-	protected void cleanUp() {
-	}
-
-	protected String getPage() {
-		return _PAGE;
-	}
-
-	private static final String _PAGE =
-		"/html/taglib/aui/spacer/page.jsp";
-
+	public static final String NAMESPACE = "layout_prototypes";
 
 }

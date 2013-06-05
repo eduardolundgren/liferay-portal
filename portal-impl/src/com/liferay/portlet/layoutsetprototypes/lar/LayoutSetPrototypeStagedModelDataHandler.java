@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portlet.layoutsadmin.lar;
+package com.liferay.portlet.layoutsetprototypes.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.layoutprototypes.lar.LayoutSetPrototypePortletDataHandler;
 
 /**
  * @author Daniela Zapata Riesco

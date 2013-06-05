@@ -116,6 +116,10 @@ public class SearchContext implements Serializable {
 		return _keywords;
 	}
 
+	public String getLanguageId() {
+		return LocaleUtil.toLanguageId(_locale);
+	}
+
 	public Layout getLayout() {
 		return _layout;
 	}

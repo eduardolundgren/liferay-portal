@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.portlet.layoutsadmin.lar;
+package com.liferay.portlet.layoutprototypes.lar;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.LayoutPrototype;
 import com.liferay.portal.model.StagedModel;
-import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.service.LayoutPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
@@ -40,7 +40,7 @@ import org.junit.runner.RunWith;
 		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-public class LayoutSetPrototypeStagedModelDataHandlerTest
+public class LayoutPrototypeStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
 	@Override
@@ -49,15 +49,15 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 			Map<String, List<StagedModel>> dependentStagedModelsMap)
 		throws Exception {
 
-		return LayoutTestUtil.addLayoutSetPrototype(
+		return LayoutTestUtil.addLayoutPrototype(
 			ServiceTestUtil.randomString());
 	}
 
 	@Override
 	protected StagedModel getStagedModel(String uuid, Group group) {
 		try {
-			return LayoutSetPrototypeLocalServiceUtil.
-				fetchLayoutSetPrototypeByUuidAndCompanyId(
+			return LayoutPrototypeLocalServiceUtil.
+				fetchLayoutPrototypeByUuidAndCompanyId(
 					uuid, group.getCompanyId());
 		}
 		catch (Exception e) {
@@ -67,7 +67,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 
 	@Override
 	protected Class<? extends StagedModel> getStagedModelClass() {
-		return LayoutSetPrototype.class;
+		return LayoutPrototype.class;
 	}
 
 }
