@@ -88,7 +88,9 @@ AUI.add(
 							function(item, index, collection) {
 								var categoryIndex = instance._categories.indexOf(item);
 
-								instance._togglerDelegate[categoryIndex].collapse(
+								var togglerItems = instance._togglerDelegate.items;
+
+								togglerItems[categoryIndex].collapse(
 									{
 										silent: true
 									}
