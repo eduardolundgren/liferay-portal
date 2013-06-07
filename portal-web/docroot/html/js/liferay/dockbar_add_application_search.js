@@ -28,6 +28,7 @@ AUI.add(
 
 				instance._categories = nodeList.all(CSS_LFR_CONTENT_CATEGORY_SELECTOR);
 				instance._categoryContainers = nodeList.all(CSS_LFR_CATEGORY_CONTAINER_SELECTOR);
+
 				instance._togglerDelegate = Liferay.component(namespace + "addApplicationPanelContainer");
 
 				var applicationSearch = new AddSearch(
@@ -90,7 +91,11 @@ AUI.add(
 							function(item, index, collection) {
 								var categoryIndex = instance._categories.indexOf(item);
 
-								togglerItems[categoryIndex].collapse({ silent: true });
+								togglerItems[categoryIndex].collapse(
+									{
+										silent: true
+									}
+								);
 							}
 						);
 
@@ -102,7 +107,11 @@ AUI.add(
 
 					instance.get(STR_NODES).show();
 
-					instance._togglerDelegate.expandAll({ silent: true });
+					instance._togglerDelegate.expandAll(
+						{
+							silent: true
+						}
+					);
 				}
 				else {
 					instance._categoryContainers.hide();
@@ -127,7 +136,11 @@ AUI.add(
 							if (categoryParent) {
 								var categoryIndex = instance._categories.indexOf(categoryParent);
 
-								togglerItems[categoryIndex].expand({ silent: true });
+								togglerItems[categoryIndex].expand(
+									{
+										silent: true
+									}
+								);
 							}
 						}
 					);
