@@ -1,46 +1,43 @@
-var Language = {
-	_cache: {}
-};
+;(function(A, Liferay) {
+	A.use('io-base');
 
-Liferay.provide(
-	Language,
-	'get',
-	function(key, extraParams) {
-		var instance = this;
+	Liferay.Language = {
+		get: function(key, extraParams) {
+			var instance = this;
 
-		var url = themeDisplay.getPathContext() + '/language/' + themeDisplay.getLanguageId() + '/' + key + '/';
+			var url = themeDisplay.getPathContext() + '/language/' + themeDisplay.getLanguageId() + '/' + key + '/';
 
-		if (extraParams) {
-			if (typeof extraParams == 'string') {
-				url += extraParams;
-			}
-			else if (Liferay.Util.isArray(extraParams)) {
-				url += extraParams.join('/');
-			}
-		}
-
-		var value = instance._cache[url];
-
-		if (!value) {
-			AUI().io(
-				url,
-				{
-					on: {
-						complete: function(i, o) {
-							value = o.responseText;
-						}
-					},
-					sync: true,
-					type: 'GET'
+			if (extraParams) {
+				if (typeof extraParams == 'string') {
+					url += extraParams;
 				}
-			);
+				else if (Liferay.Util.isArray(extraParams)) {
+					url += extraParams.join('/');
+				}
+			}
 
-			instance._cache[url] = value;
-		}
+			var value = instance._cache[url];
 
-		return value;
-	},
-	['io-base']
-);
+			if (!value) {
+				A.io(
+					url,
+					{
+						on: {
+							complete: function(i, o) {
+								value = o.responseText;
+							}
+						},
+						sync: true,
+						type: 'GET'
+					}
+				);
 
-Liferay.Language = Language;
+				instance._cache[url] = value;
+			}
+
+			return value;
+		},
+
+		_cache: {}
+	};
+})(AUI(), Liferay);
