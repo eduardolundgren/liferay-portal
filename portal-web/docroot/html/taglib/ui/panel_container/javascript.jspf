@@ -53,7 +53,5 @@
 		}
 	);
 
-	console.log('Delegate');
-
 	Liferay.component('<%= namespace + id %>');
 </aui:script>
