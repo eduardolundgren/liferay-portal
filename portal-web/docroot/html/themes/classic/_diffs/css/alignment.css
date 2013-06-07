@@ -1,0 +1,47 @@
+.aui {
+	/* Edit > Page (Manage Page) - Scrollbar on certain .tab-content divs */
+	.tab-content {
+		overflow: visible;
+		/* Edit > Page > Layout - Layout boxes/captions mis-aligned */
+		.lfr-layout-template {
+			label {
+				width: auto;
+			}
+			input {
+				float: none;
+				margin: -5px 5px 0 -15px;
+			}
+		}
+		/* Edit > Page > Customization Settings - labels/input mis-aligned */
+		.customization-settings {
+			input {
+				float: none;
+				margin: -5px 5px 0 -15px;
+			}
+			label {
+				width: auto;
+			}
+		}
+	}
+}
+
+/* Edit > Page Custimizations - Font size 1.5em, sending box outside of containing area */
+.layout-customizable-controls {
+	font-size: 1em;
+}
+
+/* Admin > Site Administration */
+.aui {
+	/* > Site Pages > Logo - Change the copy under logo so it doesn't wrap? */
+	.control-group {
+		/* > Site Settings > Categorization - Tagselector needs to be recoded. Fixed best as I could. */
+		.tagselector-content {
+			ul {
+				display: inline-block;
+				margin: 0;
+			}
+		}
+	}
+}
+
+/* Edit > Page > Advanced - Misalignment of "No file chosen" text. Possible solution here: http://goo.gl/YQC2u */
