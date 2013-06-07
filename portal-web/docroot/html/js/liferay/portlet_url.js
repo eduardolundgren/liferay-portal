@@ -10,33 +10,33 @@ AUI.add(
 
 			instance.reservedParams = {
 				controlPanelCategory: null,
+				doAsGroupId: null,
 				doAsUserId: null,
 				doAsUserLanguageId: null,
-				doAsGroupId: null,
 				p_auth: null,
 				p_auth_secret: null,
+				p_f_id: null,
+				p_j_a_id: null,
 				p_l_id: null,
 				p_l_reset: null,
 				p_p_auth: null,
-				p_p_id: null,
-				p_p_i_id: null,
-				p_p_lifecycle: null,
-				p_p_url_type: null,
-				p_p_state: null,
-				p_p_state_rcv: null, // LPS-14144
-				p_p_mode: null,
-				p_p_resource_id: null,
 				p_p_cacheability: null,
-				p_p_width: null,
+				p_p_col_count: null,
 				p_p_col_id: null,
 				p_p_col_pos: null,
-				p_p_col_count: null,
-				p_p_static: null,
+				p_p_i_id: null,
+				p_p_id: null,
 				p_p_isolated: null,
-				p_t_lifecycle: null, // LPS-14383
-				p_v_l_s_g_id: null, // LPS-23010
-				p_f_id: null,
-				p_j_a_id: null, // LPS-16418
+				p_p_lifecycle: null,
+				p_p_mode: null,
+				p_p_resource_id: null,
+				p_p_state: null,
+				p_p_state_rcv: null,
+				p_p_static: null,
+				p_p_url_type: null,
+				p_p_width: null,
+				p_t_lifecycle: null,
+				p_v_l_s_g_id: null,
 				refererGroupId: null,
 				refererPlid: null,
 				saveLastPath: null,
@@ -55,13 +55,13 @@ AUI.add(
 
 			A.each(
 				params,
-				function(value, key) {
-					if (value) {
-						if (instance._isReservedParam(key)) {
-							instance.reservedParams[key] = value;
+				function(item, index, collection) {
+					if (item) {
+						if (instance._isReservedParam(index)) {
+							instance.reservedParams[index] = item;
 						}
 						else {
-							instance.params[key] = value;
+							instance.params[index] = item;
 						}
 					}
 				}
@@ -73,17 +73,15 @@ AUI.add(
 		};
 
 		PortletURL.prototype = {
-			setCopyCurrentRenderParameters: function(copyCurrentRenderParameters) {
+			/*
+			 * @deprecated
+			 */
+			setCopyCurrentRenderParameters: function() {
 				var instance = this;
-
-				/* Deprecate - we may not know current render parameters (e.g. set by the event phase)
-				 * Only server side knows the parameters - must be already inside baseURL.
-				 */
-
-				// instance.options.copyCurrentRenderParameters = copyCurrentRenderParameters;
 
 				return instance;
 			},
+
 			setDoAsGroupId: function(doAsGroupId) {
 				var instance = this;
 
@@ -100,12 +98,11 @@ AUI.add(
 				return instance;
 			},
 
-			setEncrypt: function(encrypt) {
+			/*
+			 * @deprecated
+			 */
+			setEncrypt: function() {
 				var instance = this;
-
-				/* Deprecate - removed from backend for a longer time */
-
-				// instance.options.encrypt = encrypt;
 
 				return instance;
 			},
@@ -123,14 +120,14 @@ AUI.add(
 
 				var reservedParams = instance.reservedParams;
 
-				if (lifecycle === 'ACTION_PHASE') {
-					reservedParams.p_p_lifecycle = '1';
+				if (lifecycle === PortletURL.ACTION_PHASE) {
+					reservedParams.p_p_lifecycle = PortletURL.ACTION_PHASE;
 				}
-				else if (lifecycle === 'RENDER_PHASE') {
-					reservedParams.p_p_lifecycle = '0';
+				else if (lifecycle === PortletURL.RENDER_PHASE) {
+					reservedParams.p_p_lifecycle = PortletURL.RENDER_PHASE;
 				}
-				else if (lifecycle === 'RESOURCE_PHASE') {
-					reservedParams.p_p_lifecycle = '2';
+				else if (lifecycle === PortletURL.RESOURCE_PHASE) {
+					reservedParams.p_p_lifecycle = PortletURL.RESOURCE_PHASE;
 					reservedParams.p_p_cacheability = 'cacheLevelPage';
 				}
 
@@ -166,12 +163,11 @@ AUI.add(
 				return instance;
 			},
 
-			setPortletConfiguration: function(portletConfiguration) {
+			/*
+			 * @deprecated
+			 */
+			setPortletConfiguration: function() {
 				var instance = this;
-
-				/* Deprecate - it's not used for a longer time */
-
-				// instance.options.portletConfiguration = portletConfiguration;
 
 				return instance;
 			},
@@ -233,20 +229,13 @@ AUI.add(
 
 				var namespacePrefix = Util.getPortletNamespace(portletId);
 
-				A.each(
-					reservedParams,
-					function(value, key) {
-						if (value) {
-							resultURL.setParameter(key, value);
-						}
-					}
-				);
+				resultURL.setParameters(reservedParams);
 
 				A.each(
 					instance.params,
-					function(value, key) {
-						if (value) {
-							resultURL.setParameter(namespacePrefix + key, value);
+					function(item, index, collection) {
+						if (item) {
+							resultURL.setParameter(namespacePrefix + index, item);
 						}
 					}
 				);
@@ -270,8 +259,8 @@ AUI.add(
 
 				A.each(
 					instance.reservedParams,
-					function(value, key) {
-						if (key === paramName) {
+					function(item, index, collection) {
+						if (index === paramName) {
 							result = true;
 						}
 					}
@@ -284,8 +273,14 @@ AUI.add(
 		A.mix(
 			PortletURL,
 			{
+				ACTION_PHASE: '1',
+
+				RENDER_PHASE: '0',
+
+				RESOURCE_PHASE: '2',
+
 				createActionURL: function() {
-					return new PortletURL('ACTION_PHASE');
+					return new PortletURL(PortletURL.ACTION_PHASE);
 				},
 
 				createPermissionURL: function(portletResource, modelResource, modelResourceDescription, resourcePrimKey) {
@@ -312,11 +307,11 @@ AUI.add(
 				},
 
 				createRenderURL: function() {
-					return new PortletURL('RENDER_PHASE');
+					return new PortletURL(PortletURL.RENDER_PHASE);
 				},
 
 				createResourceURL: function() {
-					return new PortletURL('RESOURCE_PHASE');
+					return new PortletURL(PortletURL.RESOURCE_PHASE);
 				},
 
 				createURL: function(baseURL, params) {
