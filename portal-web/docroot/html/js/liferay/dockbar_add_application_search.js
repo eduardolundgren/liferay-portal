@@ -61,8 +61,6 @@ AUI.add(
 
 				instance._togglerDelegate.createAll();
 
-				var togglerItems = instance._togglerDelegate.items;
-
 				var query = event.query;
 
 				if (!instance._collapsedCategories) {
@@ -90,45 +88,47 @@ AUI.add(
 							function(item, index, collection) {
 								var categoryIndex = instance._categories.indexOf(item);
 
-								togglerItems[categoryIndex].collapse({ silent: true });
+								instance._togglerDelegate[categoryIndex].collapse(
+									{
+										silent: true
+									}
+								);
 							}
 						);
 
 						instance._collapsedCategories = null;
 					}
 				}
-				else if (query === '*') {
-					instance._categoryContainers.show();
-
-					instance.get(STR_NODES).show();
-
-					instance._togglerDelegate.expandAll({ silent: true });
-				}
 				else {
-					instance._categoryContainers.hide();
+					if (query === '*') {
+						instance._categoryContainers.show();
 
-					instance.get(STR_NODES).hide();
+						instance.get(STR_NODES).show();
+					}
+					else {
+						instance._categoryContainers.hide();
 
-					A.each(
-						event.results,
-						function(item, index, collection) {
-							var node = item.raw.node;
+						instance.get(STR_NODES).hide();
 
-							node.show();
+						A.each(
+							event.results,
+							function(item, index, collection) {
+								var node = item.raw.node;
 
-							var contentParent = node.ancestorsByClassName(CSS_LFR_CATEGORY_CONTAINER);
+								node.show();
 
-							if (contentParent) {
-								contentParent.show();
+								var contentParent = node.ancestorsByClassName(CSS_LFR_CATEGORY_CONTAINER);
+
+								if (contentParent) {
+									contentParent.show();
+								}
 							}
+						);
+					}
 
-							var categoryParent = node.ancestorsByClassName(CSS_LFR_CONTENT_CATEGORY).item(0);
-
-							if (categoryParent) {
-								var categoryIndex = instance._categories.indexOf(categoryParent);
-
-								togglerItems[categoryIndex].expand({ silent: true });
-							}
+					instance._togglerDelegate.expandAll(
+						{
+							silent: true
 						}
 					);
 				}
