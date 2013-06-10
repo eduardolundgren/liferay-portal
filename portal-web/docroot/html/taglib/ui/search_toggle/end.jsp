@@ -16,7 +16,6 @@
 
 <%@ include file="/html/taglib/ui/search_toggle/init.jsp" %>
 
-			</div>
 		</div>
 	</div>
 </div>

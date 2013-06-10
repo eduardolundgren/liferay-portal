@@ -39,4 +39,8 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 			<aui:nav-item href="<%= addFileEntryTypeURL %>" iconClass="icon-plus" label="add" selected='<%= toolbarItem.equals("add") %>' />
 		</c:if>
 	</aui:nav>
+
+	<liferay-ui:search-form
+		page="/html/portlet/document_library/file_entry_type_search.jsp"
+	/>
 </aui:nav-bar>

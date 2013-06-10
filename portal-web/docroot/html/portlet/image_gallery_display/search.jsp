@@ -117,13 +117,13 @@ boolean useAssetEntryQuery = false;
 	%>
 
 	<div id="<portlet:namespace />imageGalleryAssetInfo">
-			<span class="form-search">
-				<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" title="search-images" type="text" value="<%= keywords %>" />
+		<div class="form-search navbar-search pull-right">
+			<div class="input-append">
+				<input class="search-query span9" label="search-images" name="<portlet:namespace/>keywords" type="text" value="<%= keywords %>" />
 
-				<aui:button type="submit" value="search" />
-			</span>
-
-		<br /><br />
+				<aui:button primary="<%= false %>" type="submit" value="search" />
+			</div>
+		</div>
 
 		<%
 		Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);

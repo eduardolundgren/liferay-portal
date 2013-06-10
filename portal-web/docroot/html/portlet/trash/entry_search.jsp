@@ -16,8 +16,12 @@
 
 <%@ include file="/html/portlet/trash/init.jsp" %>
 
-<span class="form-search">
-	<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" title="search-entries" type="text" />
+<aui:nav-bar>
+	<div class="form-search navbar-search pull-right">
+		<div class="input-append">
+			<input class="search-query span9" label="" name="<portlet:namespace/>keywords" type="text" />
 
-	<aui:button type="submit" value="search" />
-</span>
+			<aui:button primary="<%= false %>" type="submit" value="search" />
+		</div>
+	</div>
+</aui:nav-bar>

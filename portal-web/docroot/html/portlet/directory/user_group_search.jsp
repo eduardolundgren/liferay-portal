@@ -22,11 +22,15 @@ UserGroupSearch searchContainer = (UserGroupSearch)request.getAttribute("liferay
 UserGroupDisplayTerms displayTerms = (UserGroupDisplayTerms)searchContainer.getDisplayTerms();
 %>
 
-<span class="form-search lfr-display-terms-search">
-	<aui:input inlineField="<%= true %>" label="" name="<%= displayTerms.KEYWORDS %>" size="30" type="text" />
+<aui:nav-bar>
+	<div class="form-search navbar-search pull-right">
+		<div class="input-append">
+			<input class="search-query span9" label="" name="<%= displayTerms.KEYWORDS %>" type="text" />
 
-	<aui:button type="submit" value="search" />
-</span>
+			<aui:button primary="<%= false %>" type="submit" value="search" />
+		</div>
+	</div>
+</aui:nav-bar>
 
 <c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">
 	<aui:script>

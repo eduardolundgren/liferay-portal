@@ -39,9 +39,15 @@ portletURL.setParameter("struts_action", "/blogs_admin/view");
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 	<aui:input name="deleteEntryIds" type="hidden" />
 
-	<liferay-util:include page="/html/portlet/blogs_admin/toolbar.jsp">
-		<liferay-util:param name="toolbarItem" value="view-all" />
-	</liferay-util:include>
+	<aui:nav-bar>
+		<liferay-util:include page="/html/portlet/blogs_admin/toolbar.jsp">
+			<liferay-util:param name="toolbarItem" value="view-all" />
+		</liferay-util:include>
+
+		<liferay-ui:search-form
+				page="/html/portlet/blogs_admin/entry_search.jsp"
+			/>
+	</aui:nav-bar>
 
 	<liferay-ui:search-container
 		rowChecker="<%= new RowChecker(renderResponse) %>"
@@ -52,10 +58,6 @@ portletURL.setParameter("struts_action", "/blogs_admin/view");
 		EntryDisplayTerms displayTerms = (EntryDisplayTerms)searchContainer.getDisplayTerms();
 		EntrySearchTerms searchTerms = (EntrySearchTerms)searchContainer.getSearchTerms();
 		%>
-
-		<liferay-ui:search-form
-			page="/html/portlet/blogs_admin/entry_search.jsp"
-		/>
 
 		<liferay-ui:search-container-results>
 			<%@ include file="/html/portlet/blogs_admin/entry_search_results.jspf" %>

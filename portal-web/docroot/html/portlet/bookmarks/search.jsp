@@ -201,13 +201,13 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "sea
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<span class="form-search">
-			<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" title="search-bookmarks" type="text" value="<%= keywords %>" />
+		<div class="form-search navbar-search pull-right">
+			<div class="input-append">
+				<input class="search-query span9" label="" name="<portlet:namespace/>keywords" type="text" />
 
-			<aui:button type="submit" value="search" />
-		</span>
-
-		<br /><br />
+				<aui:button primary="<%= false %>" type="submit" value="search-bookmarks" />
+			</div>
+		</div>
 
 		<liferay-ui:search-iterator type="more" />
 	</liferay-ui:search-container>

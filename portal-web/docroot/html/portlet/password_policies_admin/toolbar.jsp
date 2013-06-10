@@ -37,4 +37,19 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 			<aui:nav-item href="<%= addPasswordPolicyURL %>" iconClass="icon-plus" label="add" selected='<%= toolbarItem.equals("add") %>' />
 		</c:if>
 	</aui:nav>
+
+	<%
+	boolean passwordPolicyEnabled = LDAPSettingsUtil.isPasswordPolicyEnabled(company.getCompanyId());
+
+	List headerNames = searchContainer.getHeaderNames();
+
+	headerNames.add(StringPool.BLANK);
+	%>
+
+	<c:if test="<%= !passwordPolicyEnabled %>">
+		<liferay-ui:search-form
+			page="/html/portlet/password_policies_admin/password_policy_search.jsp"
+			searchContainer="<%= searchContainer %>"
+		/>
+	</c:if>
 </aui:nav-bar>

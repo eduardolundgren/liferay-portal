@@ -48,6 +48,9 @@ if (permissionChecker.isCompanyAdmin()) {
 	filterManageableGroups = false;
 	filterManageableOrganizations = false;
 }
+
+PortletURL portletURL = renderResponse.createRenderURL();
+RoleSearch searchContainer = new RoleSearch(renderRequest, portletURL);
 %>
 
 <%@ include file="/html/portlet/roles_admin/init-ext.jsp" %>

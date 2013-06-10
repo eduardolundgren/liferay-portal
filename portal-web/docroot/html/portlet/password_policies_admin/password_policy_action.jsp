@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/password_policies_admin/init.jsp" %>
 
 <%
-PasswordPolicySearch searchContainer = (PasswordPolicySearch)request.getAttribute("liferay-ui:search:searchContainer");
-
 String redirect = searchContainer.getIteratorURL().toString();
 
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);

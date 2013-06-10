@@ -60,15 +60,13 @@ if (organization != null) {
 	<aui:nav-bar>
 		<liferay-util:include page="/html/portlet/users_admin/toolbar.jsp" />
 
-		<aui:nav-bar-search cssClass="pull-right">
-			<div class="form-search">
-				<div class="input-append">
-					<input class="search-query span9" name="keywords" type="text" />
+		<aui:nav-bar-search cssClass="form-search pull-right">
+			<div class="input-append">
+				<input class="search-query span9" name="keywords" type="text" />
 
-					<button class="btn" onClick='<%= "javascript:" + renderResponse.getNamespace() + "search();" %>' type="submit">
-						<liferay-ui:message key="search" />
-					</button>
-				</div>
+				<button class="btn" onClick='<%= "javascript:" + renderResponse.getNamespace() + "search();" %>' type="submit">
+					<liferay-ui:message key="search" />
+				</button>
 			</div>
 		</aui:nav-bar-search>
 	</aui:nav-bar>
