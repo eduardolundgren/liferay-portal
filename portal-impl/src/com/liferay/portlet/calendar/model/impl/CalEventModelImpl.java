@@ -26,21 +26,15 @@ import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-
 import com.liferay.portlet.calendar.model.CalEvent;
 import com.liferay.portlet.calendar.model.CalEventModel;
-import com.liferay.portlet.calendar.model.CalEventSoap;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
-
 import java.sql.Types;
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,66 +108,6 @@ public class CalEventModelImpl extends BaseModelImpl<CalEvent>
 	public static long UUID_COLUMN_BITMASK = 32L;
 	public static long STARTDATE_COLUMN_BITMASK = 64L;
 	public static long TITLE_COLUMN_BITMASK = 128L;
-
-	/**
-	 * Converts the soap model instance into a normal model instance.
-	 *
-	 * @param soapModel the soap model instance to convert
-	 * @return the normal model instance
-	 */
-	public static CalEvent toModel(CalEventSoap soapModel) {
-		if (soapModel == null) {
-			return null;
-		}
-
-		CalEvent model = new CalEventImpl();
-
-		model.setUuid(soapModel.getUuid());
-		model.setEventId(soapModel.getEventId());
-		model.setGroupId(soapModel.getGroupId());
-		model.setCompanyId(soapModel.getCompanyId());
-		model.setUserId(soapModel.getUserId());
-		model.setUserName(soapModel.getUserName());
-		model.setCreateDate(soapModel.getCreateDate());
-		model.setModifiedDate(soapModel.getModifiedDate());
-		model.setTitle(soapModel.getTitle());
-		model.setDescription(soapModel.getDescription());
-		model.setLocation(soapModel.getLocation());
-		model.setStartDate(soapModel.getStartDate());
-		model.setEndDate(soapModel.getEndDate());
-		model.setDurationHour(soapModel.getDurationHour());
-		model.setDurationMinute(soapModel.getDurationMinute());
-		model.setAllDay(soapModel.getAllDay());
-		model.setTimeZoneSensitive(soapModel.getTimeZoneSensitive());
-		model.setType(soapModel.getType());
-		model.setRepeating(soapModel.getRepeating());
-		model.setRecurrence(soapModel.getRecurrence());
-		model.setRemindBy(soapModel.getRemindBy());
-		model.setFirstReminder(soapModel.getFirstReminder());
-		model.setSecondReminder(soapModel.getSecondReminder());
-
-		return model;
-	}
-
-	/**
-	 * Converts the soap model instances into normal model instances.
-	 *
-	 * @param soapModels the soap model instances to convert
-	 * @return the normal model instances
-	 */
-	public static List<CalEvent> toModels(CalEventSoap[] soapModels) {
-		if (soapModels == null) {
-			return null;
-		}
-
-		List<CalEvent> models = new ArrayList<CalEvent>(soapModels.length);
-
-		for (CalEventSoap soapModel : soapModels) {
-			models.add(toModel(soapModel));
-		}
-
-		return models;
-	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.calendar.model.CalEvent"));
