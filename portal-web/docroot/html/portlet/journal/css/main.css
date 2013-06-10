@@ -62,6 +62,14 @@
 		border-bottom: 1px solid #666;
 	}
 
+	.lfr-table .journal-article-container-content-paginator {
+		margin-top: 1em;
+
+		&.hide-controls {
+			display: none;
+		}
+	}
+
 	.lfr-table .journal-metadata {
 		background: #EEE;
 		border: 1px solid #979798;

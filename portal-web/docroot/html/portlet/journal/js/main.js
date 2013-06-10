@@ -2474,6 +2474,7 @@ AUI.add(
 					'link_to_layout': Journal.FieldModel.LinkToPage,
 					'list': Journal.FieldModel.List,
 					'multi-list': Journal.FieldModel.MultiList,
+					'page': Journal.FieldModel.Page,
 					'selection_break': Journal.FieldModel.SelectionBreak,
 					'text': Journal.FieldModel.Text,
 					'text_area': Journal.FieldModel.TextArea,
@@ -3507,16 +3508,17 @@ AUI.add(
 			};
 		};
 
+		registerFieldModel('Boolean', 'boolean', 'BooleanField', true);
+		registerFieldModel('DocumentLibrary', 'document_library', 'DocumentLibraryField', true);
+		registerFieldModel('Image', 'image', 'ImageField', true);
+		registerFieldModel('LinkToPage', 'link_to_layout', 'LinkToPageField', true);
+		registerFieldModel('List', 'list', 'ListField', true);
+		registerFieldModel('MultiList', 'multi-list', 'MultiListField', true);
+		registerFieldModel('Page', 'page', 'PageField', false);
+		registerFieldModel('SelectionBreak', 'selection_break', 'SelectionBreakField', false);
 		registerFieldModel('Text', 'text', 'TextField', true);
 		registerFieldModel('TextArea', 'text_area', 'TextAreaField', true);
 		registerFieldModel('TextBox', 'text_box', 'TextBoxField', true);
-		registerFieldModel('Image', 'image', 'ImageField', true);
-		registerFieldModel('DocumentLibrary', 'document_library', 'DocumentLibraryField', true);
-		registerFieldModel('Boolean', 'boolean', 'BooleanField', true);
-		registerFieldModel('List', 'list', 'ListField', true);
-		registerFieldModel('MultiList', 'multi-list', 'MultiListField', true);
-		registerFieldModel('LinkToPage', 'link_to_layout', 'LinkToPageField', true);
-		registerFieldModel('SelectionBreak', 'selection_break', 'SelectionBreakField', false);
 
 		Liferay.Portlet.Journal = Journal;
 	},
