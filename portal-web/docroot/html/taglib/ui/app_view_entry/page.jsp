@@ -224,38 +224,36 @@ if (showLinkTitle) {
 					%>
 
 					<c:if test="<%= displayDate != null %>">
-						<c:choose>
-							<c:when test="<%= expirationDate != null %>">
-								<dt>
-									<liferay-ui:message key="schedule" />
-								</dt>
-								<dd>
-									<c:choose>
-										<c:when test="<%= reviewDate != null %>">
-											<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(dateFormatDateTime.format(displayDate)), HtmlUtil.escape(dateFormatDateTime.format(expirationDate)), HtmlUtil.escape(dateFormatDateTime.format(reviewDate))} %>" key="x-to-x-review-date-x" />
-										</c:when>
-										<c:otherwise>
-											<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(dateFormatDateTime.format(displayDate)), HtmlUtil.escape(dateFormatDateTime.format(expirationDate))} %>" key="x-to-x" />
-										</c:otherwise>
-									</c:choose>
-								</dd>
-							</c:when>
-							<c:otherwise>
-								<dt>
-									<liferay-ui:message key="display-date" />
-								</dt>
-								<dd>
-									<c:choose>
-										<c:when test="<%= reviewDate != null %>">
-											<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(dateFormatDateTime.format(displayDate)), HtmlUtil.escape(dateFormatDateTime.format(reviewDate))} %>" key="x-review-date-x" />
-										</c:when>
-										<c:otherwise>
-											<%= HtmlUtil.escape(dateFormatDateTime.format(displayDate)) %>
-										</c:otherwise>
-									</c:choose>
-								</dd>
-							</c:otherwise>
-						</c:choose>
+						<dt>
+							<liferay-ui:message key="display-date" />
+						</dt>
+						<dd>
+
+							<%= HtmlUtil.escape(dateFormatDateTime.format(displayDate)) %>
+
+						</dd>
+					</c:if>
+
+					<c:if test="<%= expirationDate != null %>">
+						<dt>
+							<liferay-ui:message key="expiration-date" />
+						</dt>
+						<dd>
+
+							<%= HtmlUtil.escape(dateFormatDateTime.format(expirationDate)) %>
+
+						</dd>
+					</c:if>
+
+					<c:if test="<%= reviewDate != null %>">
+						<dt>
+							<liferay-ui:message key="review-date" />
+						</dt>
+						<dd>
+
+							<%= HtmlUtil.escape(dateFormatDateTime.format(reviewDate)) %>
+
+						</dd>
 					</c:if>
 				</dl>
 
@@ -283,7 +281,18 @@ if (showLinkTitle) {
 							<liferay-ui:message key="latest-aproved-version" />
 						</dt>
 						<dd>
-							<liferay-ui:message arguments="<%= new String[] {latestApprovedVersion, latestApprovedVersionAuthor} %>" key="x-by-x" />
+
+							<%= HtmlUtil.escape(latestApprovedVersion) %>
+
+						</dd>
+
+						<dt>
+							<liferay-ui:message key="latest-aproved-version-author" />
+						</dt>
+						<dd>
+
+							<%= HtmlUtil.escape(latestApprovedVersionAuthor) %>
+
 						</dd>
 					</dl>
 				</c:if>
