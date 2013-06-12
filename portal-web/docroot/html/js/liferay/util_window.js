@@ -47,9 +47,7 @@ AUI.add(
 
 					instance._bindDOMWinResizeIfNeeded();
 
-					var parentNode = config && config.dialog && config.dialog.render;
-
-					modal.render(parentNode);
+					modal.render();
 
 					return modal;
 				},
@@ -169,6 +167,8 @@ AUI.add(
 
 					var id = config.id;
 
+					var modalConfig = instance._getWindowConfig(config);
+
 					var dialogIframeConfig = instance._getDialogIframeConfig(config);
 
 					var modal = instance.getById(id);
@@ -177,10 +177,13 @@ AUI.add(
 						var titleNode = A.Node.create(instance.TITLE_TEMPLATE);
 
 						modal = new A.Modal(
-							{
-								headerContent: titleNode,
-								id: id
-							}
+							A.merge(
+								{
+									headerContent: titleNode,
+									id: id
+								},
+								modalConfig
+							)
 						);
 
 						if (dialogIframeConfig) {
@@ -194,6 +197,8 @@ AUI.add(
 						instance._bindWindowHooks(modal, config);
 					}
 					else {
+						modal.setAttrs(modalConfig);
+
 						if (dialogIframeConfig) {
 							modal.iframe.set('uri', dialogIframeConfig.uri);
 						}
@@ -202,10 +207,6 @@ AUI.add(
 					if (!Lang.isValue(config.title)) {
 						config.title = instance.DEFAULTS.headerContent;
 					}
-
-					var modalConfig = instance._getWindowConfig(config);
-
-					modal.setAttrs(modalConfig);
 
 					modal.titleNode.html(config.title);
 
