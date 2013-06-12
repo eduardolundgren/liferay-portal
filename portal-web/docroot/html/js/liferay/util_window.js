@@ -5,6 +5,39 @@ AUI.add(
 		var Util = Liferay.Util;
 		var Window = Util.Window;
 
+		var LiferayModal = A.Component.create(
+			{
+				NAME: A.Modal.NAME,
+
+				ATTRS: {
+					autoHeight: {
+						value: false
+					},
+
+					autoHeightRatio: {
+						value: 0.95
+					},
+
+					autoSizeNode: {
+						setter: A.one
+					},
+
+					autoWidth: {
+						value: false
+					},
+
+					autoWidthRatio: {
+						value: 0.95
+					}
+				},
+
+				EXTENDS: A.Modal,
+
+				prototype: {
+				}
+			}
+		);
+
 		A.mix(
 			Window,
 			{
@@ -97,23 +130,6 @@ AUI.add(
 						}
 					);
 
-					var height = config.height;
-
-					var width = config.width;
-
-					if (!modal.attrAdded('autoHeight') && !modal.attrAdded('autoWidth')) {
-						modal.addAttrs(
-							{
-								autoHeight: {
-									value: (height === 'auto' || height === '' || height === undefined)
-								},
-								autoWidth: {
-									value: (width === 'auto' || width === '' || width === undefined)
-								}
-							}
-						);
-					}
-
 					var liferayHandles = modal._liferayHandles;
 
 					liferayHandles.push(
@@ -176,7 +192,7 @@ AUI.add(
 					if (!modal) {
 						var titleNode = A.Node.create(instance.TITLE_TEMPLATE);
 
-						modal = new A.Modal(
+						modal = new LiferayModal(
 							A.merge(
 								{
 									headerContent: titleNode,
@@ -186,10 +202,6 @@ AUI.add(
 							)
 						);
 
-						if (dialogIframeConfig) {
-							modal.plug(A.Plugin.DialogIframe, dialogIframeConfig);
-						}
-
 						modal.titleNode = titleNode;
 
 						instance._register(modal);
@@ -198,10 +210,10 @@ AUI.add(
 					}
 					else {
 						modal.setAttrs(modalConfig);
+					}
 
-						if (dialogIframeConfig) {
-							modal.iframe.set('uri', dialogIframeConfig.uri);
-						}
+					if (dialogIframeConfig) {
+						modal.plug(A.Plugin.DialogIframe, dialogIframeConfig);
 					}
 
 					if (!Lang.isValue(config.title)) {
@@ -217,6 +229,18 @@ AUI.add(
 					var instance = this;
 
 					var modalConfig = A.merge(instance.DEFAULTS, config.dialog);
+
+					var height = modalConfig.height;
+
+					var width = modalConfig.width;
+
+					if (height === 'auto' || height === '' || height === undefined) {
+						modalConfig.autoHeight = true;
+					}
+
+					if (width === 'auto' || width === '' || width === undefined) {
+						modalConfig.autoWidth = true;
+					}
 
 					modalConfig.id = config.id;
 
@@ -290,18 +314,6 @@ AUI.add(
 					return dialogIframeConfig;
 				},
 
-				_getWinDefaultHeight: function() {
-					var instance = this;
-
-					return A.DOM.winHeight() * 0.95;
-				},
-
-				_getWinDefaultWidth: function() {
-					var instance = this;
-
-					return A.DOM.winWidth() * 0.95;
-				},
-
 				_register: function(modal) {
 					var instance = this;
 
@@ -316,12 +328,36 @@ AUI.add(
 				_setWindowDefaultSizeIfNeeded: function(modal) {
 					var instance = this;
 
+					var autoSizeNode = modal.get('autoSizeNode');
+
 					if (modal.get('autoHeight')) {
-						modal.set('height', instance._getWinDefaultHeight());
+						var height;
+
+						if (autoSizeNode) {
+							height = autoSizeNode.get('offsetHeight');
+						}
+						else {
+							height = A.DOM.winHeight();
+						}
+
+						height *= modal.get('autoHeightRatio');
+
+						modal.set('height', height);
 					}
 
 					if (modal.get('autoWidth')) {
-						modal.set('width', instance._getWinDefaultWidth());
+						var width;
+
+						if (autoSizeNode) {
+							width = autoSizeNode.get('offsetWidth');
+						}
+						else {
+							width = A.DOM.winWidth();
+						}
+
+						width *= modal.get('autoWidthRatio');
+
+						modal.set('width', width);
 					}
 				},
 
