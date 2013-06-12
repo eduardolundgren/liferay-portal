@@ -109,8 +109,14 @@ AUI.add(
 								autoHeight: {
 									value: (height === 'auto' || height === '' || height === undefined)
 								},
+								autoHeightRatio: {
+									value: (config.autoHeightRatio !== undefined) ? config.autoHeightRatio : 0.95
+								},
 								autoWidth: {
 									value: (width === 'auto' || width === '' || width === undefined)
+								},
+								autoWidthRatio: {
+									value: (config.autoWidthRatio !== undefined) ? config.autoWidthRatio : 0.95
 								}
 							}
 						);
@@ -171,16 +177,25 @@ AUI.add(
 
 					var dialogIframeConfig = instance._getDialogIframeConfig(config);
 
+					if (!Lang.isValue(config.title)) {
+						config.title = instance.DEFAULTS.headerContent;
+					}
+
+					var modalConfig = instance._getWindowConfig(config);
+
 					var modal = instance.getById(id);
 
 					if (!modal) {
 						var titleNode = A.Node.create(instance.TITLE_TEMPLATE);
 
 						modal = new A.Modal(
-							{
-								headerContent: titleNode,
-								id: id
-							}
+							A.mix(
+								modalConfig,
+								{
+									headerContent: titleNode,
+									id: id
+								}
+							)
 						);
 
 						if (dialogIframeConfig) {
@@ -191,21 +206,15 @@ AUI.add(
 
 						instance._register(modal);
 
-						instance._bindWindowHooks(modal, config);
+						instance._bindWindowHooks(modal, modalConfig);
 					}
 					else {
 						if (dialogIframeConfig) {
 							modal.iframe.set('uri', dialogIframeConfig.uri);
 						}
+
+						modal.setAttrs(modalConfig);
 					}
-
-					if (!Lang.isValue(config.title)) {
-						config.title = instance.DEFAULTS.headerContent;
-					}
-
-					var modalConfig = instance._getWindowConfig(config);
-
-					modal.setAttrs(modalConfig);
 
 					modal.titleNode.html(config.title);
 
@@ -289,16 +298,16 @@ AUI.add(
 					return dialogIframeConfig;
 				},
 
-				_getWinDefaultHeight: function() {
+				_getWinDefaultHeight: function(modal) {
 					var instance = this;
 
-					return A.DOM.winHeight() * 0.95;
+					return A.DOM.winHeight() * modal.get('autoHeightRatio');
 				},
 
-				_getWinDefaultWidth: function() {
+				_getWinDefaultWidth: function(modal) {
 					var instance = this;
 
-					return A.DOM.winWidth() * 0.95;
+					return A.DOM.winWidth() * modal.get('autoWidthRatio');
 				},
 
 				_register: function(modal) {
@@ -316,11 +325,11 @@ AUI.add(
 					var instance = this;
 
 					if (modal.get('autoHeight')) {
-						modal.set('height', instance._getWinDefaultHeight());
+						modal.set('height', instance._getWinDefaultHeight(modal));
 					}
 
 					if (modal.get('autoWidth')) {
-						modal.set('width', instance._getWinDefaultWidth());
+						modal.set('width', instance._getWinDefaultWidth(modal));
 					}
 				},
 
