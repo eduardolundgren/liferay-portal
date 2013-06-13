@@ -104,8 +104,8 @@ if (showLinkTitle) {
 						String statusLabel = WorkflowConstants.toLabel(status);
 						%>
 
-						<span class="workflow-status-<%= statusLabel %>">
-							(<liferay-ui:message key="<%= statusLabel %>" />)
+						<span class="<%= _getStatusCssClass(status) %>">
+							<liferay-ui:message key="<%= statusLabel %>" />
 						</span>
 					 </c:if>
 				</span>
@@ -161,86 +161,88 @@ if (showLinkTitle) {
 					</c:if>
 				</span>
 
-				<dl>
-					<c:if test="<%= Validator.isNotNull(version) || ((status != WorkflowConstants.STATUS_ANY) && (status != WorkflowConstants.STATUS_APPROVED)) %>">
-						<dt>
-							<liferay-ui:message key='<%= Validator.isNotNull(version) ? "version" : "status" %>' />
-						</dt>
+				<small>
+					<dl>
+						<c:if test="<%= Validator.isNotNull(version) || ((status != WorkflowConstants.STATUS_ANY) && (status != WorkflowConstants.STATUS_APPROVED)) %>">
+							<dt>
+								<liferay-ui:message key='<%= Validator.isNotNull(version) ? "version" : "status" %>' />:
+							</dt>
 
-						<dd>
-							<c:if test="<%= Validator.isNotNull(version) %>">
-								<%= HtmlUtil.escape(version) %>
-							</c:if>
+							<dd>
+								<c:if test="<%= Validator.isNotNull(version) %>">
+									<%= HtmlUtil.escape(version) %>
+								</c:if>
 
-							<c:if test="<%= (status != WorkflowConstants.STATUS_ANY) && (status != WorkflowConstants.STATUS_APPROVED) %>">
+								<c:if test="<%= (status != WorkflowConstants.STATUS_ANY) && (status != WorkflowConstants.STATUS_APPROVED) %>">
 
-								<%
-								String statusLabel = WorkflowConstants.toLabel(status);
-								%>
+									<%
+									String statusLabel = WorkflowConstants.toLabel(status);
+									%>
 
-								<span class="workflow-status-<%= statusLabel %>">
-									(<liferay-ui:message key="<%= statusLabel %>" />)
-								</span>
-							</c:if>
-						</dd>
-					</c:if>
+									<span class="<%= _getStatusCssClass(status) %>">
+										<liferay-ui:message key="<%= statusLabel %>" />
+									</span>
+								</c:if>
+							</dd>
+						</c:if>
 
-					<c:if test="<%= (createDate != null) && (modifiedDate != null) && Validator.isNotNull(author) %>">
-						<c:choose>
-							<c:when test="<%= modifiedDate.equals(createDate) %>">
-								<dt>
-									<liferay-ui:message key="created" />
-								</dt>
-							</c:when>
-							<c:otherwise >
-								<dt>
-									<liferay-ui:message key="last-updated" />
-								</dt>
-							</c:otherwise>
-						</c:choose>
+						<c:if test="<%= (createDate != null) && (modifiedDate != null) && Validator.isNotNull(author) %>">
+							<c:choose>
+								<c:when test="<%= modifiedDate.equals(createDate) %>">
+									<dt>
+										<liferay-ui:message key="created" />:
+									</dt>
+								</c:when>
+								<c:otherwise>
+									<dt>
+										<liferay-ui:message key="last-updated" />:
+									</dt>
+								</c:otherwise>
+							</c:choose>
 
-						<dd class="entry-author">
-							<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(locale, System.currentTimeMillis() - createDate.getTime(), true), author} %>" key="x-ago-by-x" />
-						</dd>
-					</c:if>
+							<dd class="entry-author">
+								<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(locale, System.currentTimeMillis() - createDate.getTime(), true), author} %>" key="x-ago-by-x" />
+							</dd>
+						</c:if>
 
-					<%
-					Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
-					%>
+						<%
+						Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+						%>
 
-					<c:if test="<%= displayDate != null %>">
-						<dt>
-							<liferay-ui:message key="display-date" />
-						</dt>
-						<dd>
+						<c:if test="<%= displayDate != null %>">
+							<dt>
+								<liferay-ui:message key="display-date" />:
+							</dt>
+							<dd>
 
-							<%= HtmlUtil.escape(dateFormatDateTime.format(displayDate)) %>
+								<%= HtmlUtil.escape(dateFormatDateTime.format(displayDate)) %>
 
-						</dd>
-					</c:if>
+							</dd>
+						</c:if>
 
-					<c:if test="<%= expirationDate != null %>">
-						<dt>
-							<liferay-ui:message key="expiration-date" />
-						</dt>
-						<dd>
+						<c:if test="<%= expirationDate != null %>">
+							<dt>
+								<liferay-ui:message key="expiration-date" />:
+							</dt>
+							<dd>
 
-							<%= HtmlUtil.escape(dateFormatDateTime.format(expirationDate)) %>
+								<%= HtmlUtil.escape(dateFormatDateTime.format(expirationDate)) %>
 
-						</dd>
-					</c:if>
+							</dd>
+						</c:if>
 
-					<c:if test="<%= reviewDate != null %>">
-						<dt>
-							<liferay-ui:message key="review-date" />
-						</dt>
-						<dd>
+						<c:if test="<%= reviewDate != null %>">
+							<dt>
+								<liferay-ui:message key="review-date" />:
+							</dt>
+							<dd>
 
-							<%= HtmlUtil.escape(dateFormatDateTime.format(reviewDate)) %>
+								<%= HtmlUtil.escape(dateFormatDateTime.format(reviewDate)) %>
 
-						</dd>
-					</c:if>
-				</dl>
+							</dd>
+						</c:if>
+					</dl>
+				</small>
 
 				<c:if test="<%= Validator.isNotNull(assetCategoryClassName) && (assetCategoryClassPK > 0) %>">
 					<span class="entry-categories">
@@ -272,7 +274,7 @@ if (showLinkTitle) {
 						</dd>
 
 						<dt>
-							<liferay-ui:message key="latest-aproved-version-author" />
+							<liferay-ui:message key="latest-aproved-version-author" />:
 						</dt>
 						<dd>
 
@@ -325,10 +327,33 @@ if (showLinkTitle) {
 				String statusLabel = WorkflowConstants.toLabel(status);
 				%>
 
-				<span class="workflow-status-<%= statusLabel %>">
-					(<liferay-ui:message key="<%= statusLabel %>" />)
+				<span class="<%= _getStatusCssClass(status) %>">
+					<liferay-ui:message key="<%= statusLabel %>" />
 				</span>
 			</c:if>
 		</div>
 	</c:when>
 </c:choose>
+
+<%!
+private String _getStatusCssClass(int status) {
+	String statusLabel = WorkflowConstants.toLabel(status);
+
+	String labelCssClass = "label workflow-status-" + statusLabel;
+
+	if (status == WorkflowConstants.STATUS_APPROVED) {
+		labelCssClass += " label-success";
+	}
+	else if (status == WorkflowConstants.STATUS_EXPIRED) {
+		labelCssClass += " label-important";
+	}
+	else if (status == WorkflowConstants.STATUS_PENDING) {
+		labelCssClass += " label-warning";
+	}
+	else if (status == WorkflowConstants.STATUS_DRAFT) {
+		labelCssClass += " label-info";
+	}
+
+	return labelCssClass;
+}
+%>
