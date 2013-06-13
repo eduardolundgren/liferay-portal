@@ -587,7 +587,6 @@ public class EditUserAction extends PortletAction {
 			contact, actionRequest, "suffixId");
 		boolean male = BeanParamUtil.getBoolean(
 			user, actionRequest, "male", true);
-		boolean updateLanguageId = false;
 
 		Calendar birthdayCal = CalendarFactoryUtil.getCalendar();
 
@@ -663,6 +662,8 @@ public class EditUserAction extends PortletAction {
 		if (oldScreenName.equals(user.getScreenName())) {
 			oldScreenName = StringPool.BLANK;
 		}
+
+		boolean updateLanguageId = false;
 
 		if (user.getUserId() == themeDisplay.getUserId()) {
 
