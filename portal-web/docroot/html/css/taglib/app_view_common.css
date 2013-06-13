@@ -27,7 +27,7 @@
 		}
 
 		.entry-metadata {
-			dt, dd, .entry-categories, .entry-tags, .entry-description, .workflow-status-approved, .workflow-status-draft, .workflow-status-expired, .workflow-status-pending {
+			dt, dd, .entry-categories, .entry-tags, .entry-description {
 				color: #f0f0f0;
 			}
 		}
@@ -102,26 +102,6 @@
 				margin-left: .8em;
 			}
 		}
-	}
-
-	.workflow-status-approved {
-		color: #41801D;
-		font-weight: bold;
-	}
-
-	.workflow-status-draft {
-		color: #3068BA;
-		font-weight: bold;
-	}
-
-	.workflow-status-expired {
-		color: #933;
-		font-weight: bold;
-	}
-
-	.workflow-status-pending {
-		color: #F7A233;
-		font-weight: bold;
 	}
 
 	.folder-action, .entry-action {
