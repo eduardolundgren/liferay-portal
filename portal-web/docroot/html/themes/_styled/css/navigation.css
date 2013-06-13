@@ -47,8 +47,14 @@
 }
 
 .nav {
-	li .toolbar {
-		margin-top: 5px;
+	li {
+		.toolbar {
+			margin-top: 5px;
+		}
+
+		.dropdown-menu {
+			min-width: 0;
+		}
 	}
 }
 
