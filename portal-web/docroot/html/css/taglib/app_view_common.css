@@ -69,11 +69,6 @@
 			dt {
 				float: left;
 
-				&:after {
-					content: ":";
-				}
-			}
-
 			dd {
 				text-indent: .5em;
 				display: block;
