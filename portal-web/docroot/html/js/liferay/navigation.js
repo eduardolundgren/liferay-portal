@@ -475,7 +475,7 @@ AUI.add(
 
 										parentListItem.append(instance._tempChildTab);
 									}
-								}								
+								}
 							}
 						}
 					},

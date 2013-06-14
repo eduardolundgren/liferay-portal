@@ -166,7 +166,7 @@ Layout addedLayout = (Layout)SessionMessages.get(renderRequest, portletDisplay.g
 					title: A.Lang.String.escapeHTML('<%= navItem.getName() %>'),
 					url: '<%= navItem.getURL() %>'
 				}
-			} 
+			}
 		);
 	</aui:script>
 </c:if>
