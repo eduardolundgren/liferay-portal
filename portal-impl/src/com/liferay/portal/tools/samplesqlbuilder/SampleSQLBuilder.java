@@ -83,6 +83,10 @@ public class SampleSQLBuilder {
 				"sample.sql.max.asset.entry.to.asset.category.count"));
 		_maxAssetEntryToAssetTagCount = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.asset.entry.to.asset.tag.count"));
+		_maxAssetPublisherFilterRuleCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.asset.publisher.filter.rule.count"));
+		_maxAssetPublisherPageCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.asset.publisher.page.count"));
 		_maxAssetTagCount = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.asset.tag.count"));
 		_maxAssetVocabularyCount = GetterUtil.getInteger(
@@ -139,7 +143,8 @@ public class SampleSQLBuilder {
 
 		_dataFactory = new DataFactory(
 			baseDir, _maxAssetCategoryCount, _maxAssetEntryToAssetCategoryCount,
-			_maxAssetEntryToAssetTagCount, _maxAssetTagCount,
+			_maxAssetEntryToAssetTagCount, _maxAssetPublisherFilterRuleCount,
+			_maxAssetPublisherPageCount, _maxAssetTagCount,
 			_maxAssetVocabularyCount, _maxBlogsEntryCount,
 			_maxDDLCustomFieldCount, _maxGroupCount, _maxJournalArticleCount,
 			_maxJournalArticleSize, _maxMBCategoryCount, _maxMBThreadCount,
@@ -311,6 +316,7 @@ public class SampleSQLBuilder {
 			}
 
 			protected void createSample() throws Exception {
+				_writerAssetPublisherCSV = getWriter("asset_publisher.csv");
 				_writerBlogsCSV = getWriter("blogs.csv");
 				_writerCompanyCSV = getWriter("company.csv");
 				_writerDocumentLibraryCSV = getWriter("document_library.csv");
@@ -325,6 +331,7 @@ public class SampleSQLBuilder {
 
 				processTemplate(_tplSample, context);
 
+				_writerAssetPublisherCSV.close();
 				_writerBlogsCSV.close();
 				_writerCompanyCSV.close();
 				_writerDocumentLibraryCSV.close();
@@ -349,9 +356,7 @@ public class SampleSQLBuilder {
 
 		put(context, "counter", _dataFactory.getCounter());
 		put(context, "dataFactory", _dataFactory);
-		put(context, "maxAssetCategoryCount", _maxAssetCategoryCount);
-		put(context, "maxAssetTagCount", _maxAssetTagCount);
-		put(context, "maxAssetVocabularyCount", _maxAssetVocabularyCount);
+		put(context, "maxAssetPublisherPageCount", _maxAssetPublisherPageCount);
 		put(context, "maxDLFileEntrySize", _maxDLFileEntrySize);
 		put(context, "maxBlogsEntryCommentCount", _maxBlogsEntryCommentCount);
 		put(context, "maxBlogsEntryCount", _maxBlogsEntryCount);
@@ -374,6 +379,7 @@ public class SampleSQLBuilder {
 		put(context, "maxWikiNodeCount", _maxWikiNodeCount);
 		put(context, "maxWikiPageCommentCount", _maxWikiPageCommentCount);
 		put(context, "maxWikiPageCount", _maxWikiPageCount);
+		put(context, "writerAssetPublisherCSV", _writerAssetPublisherCSV);
 		put(context, "writerBlogsCSV", _writerBlogsCSV);
 		put(context, "writerCompanyCSV", _writerCompanyCSV);
 		put(context, "writerDocumentLibraryCSV", _writerDocumentLibraryCSV);
@@ -507,6 +513,8 @@ public class SampleSQLBuilder {
 	private int _maxAssetCategoryCount;
 	private int _maxAssetEntryToAssetCategoryCount;
 	private int _maxAssetEntryToAssetTagCount;
+	private int _maxAssetPublisherFilterRuleCount;
+	private int _maxAssetPublisherPageCount;
 	private int _maxAssetTagCount;
 	private int _maxAssetVocabularyCount;
 	private int _maxBlogsEntryCommentCount;
@@ -537,6 +545,7 @@ public class SampleSQLBuilder {
 	private boolean _outputMerge;
 	private File _tempDir;
 	private String _tplSample = _TPL_ROOT + "sample.ftl";
+	private Writer _writerAssetPublisherCSV;
 	private Writer _writerBlogsCSV;
 	private Writer _writerCompanyCSV;
 	private Writer _writerDocumentLibraryCSV;

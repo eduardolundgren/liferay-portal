@@ -199,10 +199,6 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.servlet.filters.gzip.GZipFilter"
 		},
 		new String[] {
-			"com.liferay.filters.doubleclick.DoubleClickFilter",
-			"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter"
-		},
-		new String[] {
 			"com.liferay.filters.strip.StripFilter",
 			"com.liferay.portal.servlet.filters.strip.StripFilter"
 		},
@@ -266,8 +262,10 @@ public class VerifyProperties extends VerifyProcess {
 		"asset.entry.increment.view.counter.enabled", "auth.max.failures.limit",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
-		"cluster.executor.heartbeat.interval", "commons.pool.enabled",
-		"dl.file.entry.read.count.enabled",
+		"cluster.executor.heartbeat.interval",
+		"com.liferay.filters.doubleclick.DoubleClickFilter",
+		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
+		"commons.pool.enabled", "dl.file.entry.read.count.enabled",
 		"dynamic.data.lists.template.language.parser[ftl]",
 		"dynamic.data.lists.template.language.parser[vm]",
 		"dynamic.data.lists.template.language.parser[xsl]",

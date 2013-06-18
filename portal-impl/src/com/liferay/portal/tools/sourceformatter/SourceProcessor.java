@@ -12,27 +12,18 @@
  * details.
  */
 
-package com.liferay.portal.kernel.bean;
+package com.liferay.portal.tools.sourceformatter;
+
+import java.util.List;
 
 /**
- * @author Raymond Augé
+ * @author Hugo Huijser
  */
-public class RendererException extends RuntimeException {
+public interface SourceProcessor {
 
-	public RendererException() {
-		super();
-	}
+	public void format(boolean useProperties, boolean throwException)
+		throws Exception;
 
-	public RendererException(String msg) {
-		super(msg);
-	}
-
-	public RendererException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-
-	public RendererException(Throwable cause) {
-		super(cause);
-	}
+	public List<String> getErrorMessages();
 
 }

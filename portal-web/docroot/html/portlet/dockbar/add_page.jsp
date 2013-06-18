@@ -42,7 +42,7 @@
 			<div class="span12">
 				<aui:input name="name" />
 
-				<aui:input name="hidden" />
+				<aui:input label="hide-from-navigation-menu" name="hidden" />
 
 				<aui:fieldset cssClass="template-selector" label="templates">
 					<div class="search-panel btn-toolbar">
@@ -174,6 +174,7 @@ Layout addedLayout = (Layout)SessionMessages.get(renderRequest, portletDisplay.g
 <aui:script use="liferay-dockbar-add-page">
 	new Liferay.Dockbar.AddPage(
 		{
+			createPageMessage: '<%= LanguageUtil.get(pageContext, "loading") %>',
 			inputNode: A.one('#<portlet:namespace />searchTemplates'),
 			namespace: '<portlet:namespace />',
 			nodeList: A.one('#<portlet:namespace />templateList'),

@@ -162,6 +162,7 @@ import java.io.IOException;
 import java.text.Format;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -175,7 +176,9 @@ public class DataFactory {
 	public DataFactory(
 			String baseDir, int maxAssetCategoryCount,
 			int maxAssetEntryToAssetCategoryCount,
-			int maxAssetEntryToAssetTagCount, int maxAssetTagCount,
+			int maxAssetEntryToAssetTagCount,
+			int maxAssetPublisherFilterRuleCount,
+			int maxAssetPublisherPageCount, int maxAssetTagCount,
 			int maxAssetVocabularyCount, int maxBlogsEntryCount,
 			int maxDDLCustomFieldCount, int maxGroupsCount,
 			int maxJournalArticleCount, int maxJournalArticleSize,
@@ -187,6 +190,8 @@ public class DataFactory {
 		_maxAssetCategoryCount = maxAssetCategoryCount;
 		_maxAssetEntryToAssetCategoryCount = maxAssetEntryToAssetCategoryCount;
 		_maxAssetEntryToAssetTagCount = maxAssetEntryToAssetTagCount;
+		_maxAssetPublisherFilterRuleCount = maxAssetPublisherFilterRuleCount;
+		_maxAssetPublisherPageCount = maxAssetPublisherPageCount;
 		_maxAssetTagCount = maxAssetTagCount;
 		_maxAssetVocabularyCount = maxAssetVocabularyCount;
 		_maxBlogsEntryCount = maxBlogsEntryCount;
@@ -257,7 +262,13 @@ public class DataFactory {
 	}
 
 	public List<AssetCategory> getAssetCategories() {
-		return _assetCategories;
+		List<AssetCategory> allAssetCategories = new ArrayList<AssetCategory>();
+
+		for (List<AssetCategory> assetCategories : _assetCategoriesArray) {
+			allAssetCategories.addAll(assetCategories);
+		}
+
+		return allAssetCategories;
 	}
 
 	public List<Long> getAssetCategoryIds(long groupId) {
@@ -269,18 +280,20 @@ public class DataFactory {
 			_assetCategoryCounters.put(groupId, counter);
 		}
 
-		int maxAssetCategoryCount =
-			_maxAssetCategoryCount * _maxAssetVocabularyCount;
+		List<AssetCategory> assetCategories =
+			_assetCategoriesArray[(int)groupId - 1];
 
-		int startIndex = maxAssetCategoryCount * ((int)groupId - 1);
+		if ((assetCategories == null) || assetCategories.isEmpty()) {
+			return Collections.emptyList();
+		}
 
 		List<Long> assetCategoryIds = new ArrayList<Long>(
 			_maxAssetEntryToAssetCategoryCount);
 
 		for (int i = 0; i < _maxAssetEntryToAssetCategoryCount; i++) {
-			int index = startIndex + (int)counter.get() % maxAssetCategoryCount;
+			int index = (int)counter.get() % assetCategories.size();
 
-			AssetCategory assetCategory = _assetCategories.get(index);
+			AssetCategory assetCategory = assetCategories.get(index);
 
 			assetCategoryIds.add(assetCategory.getCategoryId());
 		}
@@ -297,15 +310,19 @@ public class DataFactory {
 			_assetTagCounters.put(groupId, counter);
 		}
 
-		int startIndex = _maxAssetTagCount * ((int)groupId - 1);
+		List<AssetTag> assetTags = _assetTagsArray[(int)groupId - 1];
+
+		if ((assetTags == null) || assetTags.isEmpty()) {
+			return Collections.emptyList();
+		}
 
 		List<Long> assetTagIds = new ArrayList<Long>(
 			_maxAssetEntryToAssetTagCount);
 
 		for (int i = 0; i < _maxAssetEntryToAssetTagCount; i++) {
-			int index = startIndex + (int)counter.get() % _maxAssetTagCount;
+			int index = (int)counter.get() % assetTags.size();
 
-			AssetTag assetTag = _assetTags.get(index);
+			AssetTag assetTag = assetTags.get(index);
 
 			assetTagIds.add(assetTag.getTagId());
 		}
@@ -314,15 +331,39 @@ public class DataFactory {
 	}
 
 	public List<AssetTag> getAssetTags() {
-		return _assetTags;
+		List<AssetTag> allAssetTags = new ArrayList<AssetTag>();
+
+		for (List<AssetTag> assetTags : _assetTagsArray) {
+			allAssetTags.addAll(assetTags);
+		}
+
+		return allAssetTags;
 	}
 
 	public List<AssetTagStats> getAssetTagStatsList() {
-		return _assetTagStatsList;
+		List<AssetTagStats> allAssetTagStatsList =
+			new ArrayList<AssetTagStats>();
+
+		for (List<AssetTagStats> assetTagStatsList : _assetTagStatsListArray) {
+			allAssetTagStatsList.addAll(assetTagStatsList);
+		}
+
+		return allAssetTagStatsList;
 	}
 
 	public List<AssetVocabulary> getAssetVocabularies() {
-		return _assetVocabularies;
+		List<AssetVocabulary> allAssetVocabularies =
+			new ArrayList<AssetVocabulary>();
+
+		allAssetVocabularies.add(_defaultAssetVocabulary);
+
+		for (List<AssetVocabulary> assetVocabularies :
+				_assetVocabulariesArray) {
+
+			allAssetVocabularies.addAll(assetVocabularies);
+		}
+
+		return allAssetVocabularies;
 	}
 
 	public long getBlogsEntryClassNameId() {
@@ -458,17 +499,22 @@ public class DataFactory {
 	}
 
 	public void initAssetCateogries() {
-		_assetVocabularies = new ArrayList<AssetVocabulary>();
-		_assetCategories = new ArrayList<AssetCategory>();
-
-		_assetVocabularies.add(
-			newAssetVocabulary(
-				_globalGroupId, _defaultUserId, null,
-				PropsValues.ASSET_VOCABULARY_DEFAULT));
+		_assetCategoriesArray =
+			(List<AssetCategory>[])new List<?>[_maxGroupsCount];
+		_assetVocabulariesArray =
+			(List<AssetVocabulary>[])new List<?>[_maxGroupsCount];
+		_defaultAssetVocabulary = newAssetVocabulary(
+			_globalGroupId, _defaultUserId, null,
+			PropsValues.ASSET_VOCABULARY_DEFAULT);
 
 		StringBundler sb = new StringBundler(4);
 
 		for (int i = 1; i <= _maxGroupsCount; i++) {
+			List<AssetVocabulary> assetVocabularies =
+				new ArrayList<AssetVocabulary>(_maxAssetVocabularyCount);
+			List<AssetCategory> assetCategories = new ArrayList<AssetCategory>(
+				_maxAssetVocabularyCount * _maxAssetCategoryCount);
+
 			long lastRightCategoryId = 2;
 
 			for (int j = 0; j < _maxAssetVocabularyCount; j++) {
@@ -482,7 +528,7 @@ public class DataFactory {
 				AssetVocabulary assetVocabulary = newAssetVocabulary(
 					i, _sampleUserId, _SAMPLE_USER_NAME, sb.toString());
 
-				_assetVocabularies.add(assetVocabulary);
+				assetVocabularies.add(assetVocabulary);
 
 				for (int k = 0; k < _maxAssetCategoryCount; k++) {
 					sb.setIndex(0);
@@ -498,18 +544,26 @@ public class DataFactory {
 
 					lastRightCategoryId += 2;
 
-					_assetCategories.add(assetCategory);
+					assetCategories.add(assetCategory);
 				}
 			}
+
+			_assetCategoriesArray[i - 1] = assetCategories;
+			_assetVocabulariesArray[i - 1] = assetVocabularies;
 		}
 	}
 
 	public void initAssetTags() {
-		_assetTags = new ArrayList<AssetTag>(_maxAssetTagCount);
-		_assetTagStatsList = new ArrayList<AssetTagStats>(
-			_maxAssetTagCount * 3);
+		_assetTagsArray = (List<AssetTag>[])new List<?>[_maxGroupsCount];
+		_assetTagStatsListArray =
+			(List<AssetTagStats>[])new List<?>[_maxGroupsCount];
 
 		for (int i = 1; i <= _maxGroupsCount; i++) {
+			List<AssetTag> assetTags = new ArrayList<AssetTag>(
+				_maxAssetTagCount);
+			List<AssetTagStats> assetTagStatsList =
+				new ArrayList<AssetTagStats>(_maxAssetTagCount * 3);
+
 			for (int j = 0; j < _maxAssetTagCount; j++) {
 				AssetTag assetTag = new AssetTagImpl();
 
@@ -522,26 +576,29 @@ public class DataFactory {
 				assetTag.setModifiedDate(new Date());
 				assetTag.setName("TestTag_" + i + "_" + j);
 
-				_assetTags.add(assetTag);
+				assetTags.add(assetTag);
 
 				AssetTagStats assetTagStats = newAssetTagStats(
 					assetTag.getTagId(),
 					_classNamesMap.get(BlogsEntry.class.getName()));
 
-				_assetTagStatsList.add(assetTagStats);
+				assetTagStatsList.add(assetTagStats);
 
 				assetTagStats = newAssetTagStats(
 					assetTag.getTagId(),
 					_classNamesMap.get(JournalArticle.class.getName()));
 
-				_assetTagStatsList.add(assetTagStats);
+				assetTagStatsList.add(assetTagStats);
 
 				assetTagStats = newAssetTagStats(
 					assetTag.getTagId(),
 					_classNamesMap.get(WikiPage.class.getName()));
 
-				_assetTagStatsList.add(assetTagStats);
+				assetTagStatsList.add(assetTagStats);
 			}
+
+			_assetTagsArray[i - 1] = assetTags;
+			_assetTagStatsListArray[i - 1] = assetTagStatsList;
 		}
 	}
 
@@ -806,6 +863,30 @@ public class DataFactory {
 			wikiPage.getModifiedDate(), getWikiPageClassNameId(),
 			wikiPage.getResourcePrimKey(), wikiPage.getUuid(), 0, true,
 			ContentTypes.TEXT_HTML, wikiPage.getTitle());
+	}
+
+	public List<PortletPreferences> newAssetPublisherPortletPreferences(
+		long plid) {
+
+		List<PortletPreferences> portletPreferencesList =
+			new ArrayList<PortletPreferences>(4);
+
+		portletPreferencesList.add(
+			newPortletPreferences(
+				plid, PortletKeys.BLOGS, PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesList.add(
+			newPortletPreferences(
+				plid, PortletKeys.DOCKBAR,
+				PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesList.add(
+			newPortletPreferences(
+				plid, PortletKeys.JOURNAL,
+				PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesList.add(
+			newPortletPreferences(
+				plid, PortletKeys.WIKI, PortletConstants.DEFAULT_PREFERENCES));
+
+		return portletPreferencesList;
 	}
 
 	public BlogsEntry newBlogsEntry(long groupId, int index) {
@@ -1498,13 +1579,63 @@ public class DataFactory {
 			newPortletPreferences(
 				plid, PortletKeys.DOCKBAR,
 				PortletConstants.DEFAULT_PREFERENCES));
-
 		portletPreferencesList.add(
 			newPortletPreferences(
 				plid, PortletKeys.PORTLET_CONFIGURATION,
 				PortletConstants.DEFAULT_PREFERENCES));
 
 		return portletPreferencesList;
+	}
+
+	public PortletPreferences newPortletPreferences(
+			long plid, long groupId, String portletId, int currentIndex)
+		throws Exception {
+
+		List<AssetCategory> assetCategories =
+			_assetCategoriesArray[(int)groupId - 1];
+
+		boolean assetPublisherFilterEnabled = false;
+
+		if ((_maxAssetPublisherPageCount * _maxAssetPublisherFilterRuleCount) >
+				0) {
+
+			assetPublisherFilterEnabled = true;
+		}
+
+		if (!assetPublisherFilterEnabled || (currentIndex == 1) ||
+			(assetCategories == null) || assetCategories.isEmpty()) {
+
+			return newPortletPreferences(
+				plid, portletId, PortletConstants.DEFAULT_PREFERENCES);
+		}
+
+		SimpleCounter counter = _assetPublisherRuleCounter.get(groupId);
+
+		if (counter == null) {
+			counter = new SimpleCounter(0);
+
+			_assetPublisherRuleCounter.put(groupId, counter);
+		}
+
+		javax.portlet.PortletPreferences jxPreferences =
+			new com.liferay.portlet.PortletPreferencesImpl();
+
+		for (int i = 0; i < _maxAssetPublisherFilterRuleCount; i++) {
+			int index = (int)counter.get() % assetCategories.size();
+
+			AssetCategory assetCategory = assetCategories.get(index);
+
+			jxPreferences.setValue("queryAndOperator" + i, "false");
+			jxPreferences.setValue("queryContains" + i, "false");
+			jxPreferences.setValue("queryName" + i, "assetCategories");
+			jxPreferences.setValue(
+				"queryValues" + i,
+				String.valueOf(assetCategory.getCategoryId()));
+		}
+
+		return newPortletPreferences(
+			plid, portletId,
+			PortletPreferencesFactoryUtil.toXML(jxPreferences));
 	}
 
 	public PortletPreferences newPortletPreferences(
@@ -2305,20 +2436,23 @@ public class DataFactory {
 	private Account _account;
 	private long _accountId;
 	private Role _administratorRole;
-	private List<AssetCategory> _assetCategories;
+	private List<AssetCategory>[] _assetCategoriesArray;
 	private Map<Long, SimpleCounter> _assetCategoryCounters =
+		new HashMap<Long, SimpleCounter>();
+	private Map<Long, SimpleCounter> _assetPublisherRuleCounter =
 		new HashMap<Long, SimpleCounter>();
 	private Map<Long, SimpleCounter> _assetTagCounters =
 		new HashMap<Long, SimpleCounter>();
-	private List<AssetTag> _assetTags;
-	private List<AssetTagStats> _assetTagStatsList;
-	private List<AssetVocabulary> _assetVocabularies;
+	private List<AssetTag>[] _assetTagsArray;
+	private List<AssetTagStats>[] _assetTagStatsListArray;
+	private List<AssetVocabulary>[] _assetVocabulariesArray;
 	private String _baseDir;
 	private List<ClassName> _classNames;
 	private Map<String, Long> _classNamesMap = new HashMap<String, Long>();
 	private Company _company;
 	private long _companyId;
 	private SimpleCounter _counter;
+	private AssetVocabulary _defaultAssetVocabulary;
 	private DDMStructure _defaultDLDDMStructure;
 	private DLFileEntryType _defaultDLFileEntryType;
 	private User _defaultUser;
@@ -2340,6 +2474,8 @@ public class DataFactory {
 	private int _maxAssetCategoryCount;
 	private int _maxAssetEntryToAssetCategoryCount;
 	private int _maxAssetEntryToAssetTagCount;
+	private int _maxAssetPublisherFilterRuleCount;
+	private int _maxAssetPublisherPageCount;
 	private int _maxAssetTagCount;
 	private int _maxAssetVocabularyCount;
 	private int _maxBlogsEntryCount;
