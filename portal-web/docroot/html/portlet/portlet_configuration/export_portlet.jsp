@@ -17,25 +17,7 @@
 <%@ include file="/html/portlet/portlet_configuration/init.jsp" %>
 
 <%
-String tabs2 = ParamUtil.getString(request, "tabs2", "export");
-
 Layout exportableLayout = ExportImportHelperUtil.getExportableLayout(themeDisplay);
-
-Date startDate = null;
-
-long startDateTime = ParamUtil.getLong(request, "startDate");
-
-if (startDateTime > 0) {
-	startDate = new Date(startDateTime);
-}
-
-Date endDate = null;
-
-long endDateTime = ParamUtil.getLong(request, "endDate");
-
-if (endDateTime > 0) {
-	endDate = new Date(endDateTime);
-}
 %>
 
 <portlet:actionURL var="exportPortletURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
@@ -44,7 +26,7 @@ if (endDateTime > 0) {
 
 <aui:form action='<%= exportPortletURL + "&etag=0&strip=0" %>' cssClass="lfr-export-dialog" method="post" name="fm1">
 	<aui:input name="tabs1" type="hidden" value="export_import" />
-	<aui:input name="tabs2" type="hidden" value="<%= tabs2 %>" />
+	<aui:input name="tabs2" type="hidden" value="export" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="plid" type="hidden" value="<%= exportableLayout.getPlid() %>" />
 	<aui:input name="groupId" type="hidden" value="<%= themeDisplay.getScopeGroupId() %>" />
@@ -55,40 +37,73 @@ if (endDateTime > 0) {
 	<div class="export-dialog-tree">
 		<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" size="50" value='<%= StringUtil.replace(selPortlet.getDisplayName(), " ", "_") + "-" + Time.getShortTimestamp() + ".portlet.lar" %>' />
 
-		<c:if test="<%= Validator.isNotNull(selPortlet.getConfigurationActionClass()) %>">
+		<%
+		PortletDataHandler portletDataHandler = selPortlet.getPortletDataHandlerInstance();
+		%>
+
+		<c:if test="<%= (portletDataHandler != null) && (portletDataHandler.getConfigurationControls(selPortlet) != null) %>">
 			<aui:fieldset cssClass="options-group" label="application">
 				<ul class="lfr-tree unstyled">
 					<li class="tree-item">
-						<aui:input label="setup" name="<%= PortletDataHandlerKeys.PORTLET_SETUP %>" type="checkbox" value="<%= true %>" />
+						<aui:input name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION %>" type="hidden" value="<%= true %>" />
 
-						<ul id="<portlet:namespace />showGlobalConfiguration">
-							<li class="tree-item">
-								<div class="selected-labels" id="<portlet:namespace />selectedGlobalConfiguration"></div>
+						<aui:input label="configuration" name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION + StringPool.UNDERLINE + selPortlet.getRootPortletId() %>" type="checkbox" value="<%= true %>" />
 
-								<aui:a cssClass="modify-link" href="javascript:;" id="globalConfigurationLink" label="change" method="get" />
+						<div class="hide" id="<portlet:namespace />configuration_<%= selPortlet.getRootPortletId() %>">
+							<aui:fieldset cssClass="portlet-type-data-section" label="configuration">
+								<ul class="lfr-tree unstyled">
+
+									<%
+									request.setAttribute("render_controls.jsp-action", Constants.EXPORT);
+									request.setAttribute("render_controls.jsp-controls", portletDataHandler.getConfigurationControls(selPortlet));
+									request.setAttribute("render_controls.jsp-portletId", selPortlet.getRootPortletId());
+									%>
+
+									<liferay-util:include page="/html/portlet/layouts_admin/render_controls.jsp" />
+								</ul>
+							</aui:fieldset>
+						</div>
+
+						<ul class="hide" id="<portlet:namespace />showChangeConfiguration_<%= selPortlet.getRootPortletId() %>">
+							<li>
+								<div class="selected-labels" id="<portlet:namespace />selectedConfiguration_<%= selPortlet.getRootPortletId() %>"></div>
+
+								<%
+								Map<String,Object> data = new HashMap<String,Object>();
+
+								data.put("portletid", selPortlet.getRootPortletId());
+								%>
+
+								<aui:a cssClass="configuration-link modify-link" data="<%= data %>" href="javascript:;" label="change" method="get" />
 							</li>
 						</ul>
 
 						<aui:script>
-							Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_SETUP %>Checkbox', '<portlet:namespace />showGlobalConfiguration');
+							Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_CONFIGURATION + StringPool.UNDERLINE + selPortlet.getRootPortletId() %>Checkbox', '<portlet:namespace />showChangeConfiguration<%= StringPool.UNDERLINE + selPortlet.getRootPortletId() %>');
 						</aui:script>
-
-						<div class="hide" id="<portlet:namespace />globalConfiguration">
-							<c:if test="<%= !PortletItemLocalServiceUtil.getPortletItems(exportableLayout.getGroupId(), selPortlet.getRootPortletId(), com.liferay.portal.model.PortletPreferences.class.getName()).isEmpty() %>">
-								<aui:input label="archived-setups" name="<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS %>" type="checkbox" value="<%= false %>" />
-							</c:if>
-
-							<aui:input helpMessage="import-user-preferences-help" label="user-preferences" name="<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES %>" type="checkbox" value="<%= true %>" />
-						</div>
 					</li>
 				</ul>
 			</aui:fieldset>
 		</c:if>
 
-		<c:if test="<%= Validator.isNotNull(selPortlet.getPortletDataHandlerClass()) %>">
+		<c:if test="<%= portletDataHandler != null %>">
 
 			<%
-			PortletDataHandler portletDataHandler = selPortlet.getPortletDataHandlerInstance();
+			Date startDate = null;
+
+			long startDateTime = ParamUtil.getLong(request, "startDate");
+
+			if (startDateTime > 0) {
+				startDate = new Date(startDateTime);
+			}
+
+			Date endDate = null;
+
+			long endDateTime = ParamUtil.getLong(request, "endDate");
+
+			if (endDateTime > 0) {
+				endDate = new Date(endDateTime);
+			}
 
 			PortletDataContext portletDataContext = PortletDataContextFactoryUtil.createPreparePortletDataContext(themeDisplay, startDate, endDate);
 
@@ -325,7 +340,6 @@ if (endDateTime > 0) {
 <aui:script use="liferay-export-import">
 	new Liferay.ExportImport(
 		{
-			archivedSetupsNode: '#<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS %>Checkbox',
 			commentsNode: '#<%= PortletDataHandlerKeys.COMMENTS %>Checkbox',
 			form: document.<portlet:namespace />fm1,
 			namespace: '<portlet:namespace />',
@@ -333,8 +347,7 @@ if (endDateTime > 0) {
 			rangeDateRangeNode: '#rangeDateRange',
 			rangeLastNode: '#rangeLast',
 			rangeLastPublishNode: '#rangeLastPublish',
-			ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>Checkbox',
-			userPreferencesNode: '#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES %>Checkbox'
+			ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>Checkbox'
 		}
 	);
 
