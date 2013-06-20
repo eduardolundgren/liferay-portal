@@ -65,7 +65,7 @@ Group scopeGroup = themeDisplay.getScopeGroup();
 			<aui:nav-item href="<%= taglibURL %>" iconClass="icon-trash" id="moveToTrashAction" label="move-to-the-recycle-bin" />
 
 			<%
-			taglibURL = "Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + Constants.DELETE + "'});";
+			taglibURL = "javascript:Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + Constants.DELETE + "'});";
 			%>
 
 			<aui:nav-item href="<%= taglibURL %>" iconClass="icon-remove" id="deleteAction" label="delete" />
