@@ -85,8 +85,9 @@ public class InstallPluginAction extends PortletAction {
 
 	@Override
 	public void processAction(
-			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
-			ActionRequest actionRequest, ActionResponse actionResponse)
+			ActionMapping actionMapping, ActionForm actionForm,
+			PortletConfig portletConfig, ActionRequest actionRequest,
+			ActionResponse actionResponse)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -203,7 +204,7 @@ public class InstallPluginAction extends PortletAction {
 			}
 
 			List<AutoDeployListener> autoDeployListeners =
-				GlobalStartupAction.getAutoDeployListeners();
+				GlobalStartupAction.getAutoDeployListeners(true);
 
 			AutoDeployDir autoDeployDir = new AutoDeployDir(
 				"defaultAutoDeployDir", new File(deployDir), new File(destDir),

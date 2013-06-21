@@ -974,7 +974,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		while (itr.hasNext()) {
 			JavaTerm javaTerm = itr.next();
 
-			if (fileName.contains("/test/") &&
+			if (portalSource && fileName.contains("/test/") &&
 				!fileName.endsWith("TestBean.java")) {
 
 				checkTestAnnotations(javaTerm, fileName);
@@ -1097,6 +1097,19 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			if (trimmedLine.startsWith(StringPool.EQUAL)) {
 				processErrorMessage(
 					fileName, "equal: " + fileName + " " + lineCount);
+			}
+
+			if (line.contains("ActionForm form")) {
+				processErrorMessage(
+					fileName,
+					"Rename form to actionForm: " + fileName + " " + lineCount);
+			}
+
+			if (line.contains("ActionMapping mapping")) {
+				processErrorMessage(
+					fileName,
+					"Rename mapping to ActionMapping: " + fileName + " " +
+						lineCount);
 			}
 
 			if (!trimmedLine.equals("{") && line.endsWith("{") &&
