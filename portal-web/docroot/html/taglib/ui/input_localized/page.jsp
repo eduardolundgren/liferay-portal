@@ -84,7 +84,7 @@ List<String> languageIds = new ArrayList<String>();
 
 			<aui:script>
 				function <portlet:namespace /><%= fieldName %>InitEditor() {
-					return "<%= UnicodeFormatter.toString(HtmlUtil.escape(mainLanguageValue)) %>";
+					return "<%= UnicodeFormatter.toString(mainLanguageValue) %>";
 				}
 
 				function <portlet:namespace /><%= fieldName %>OnBlurEditor() {
