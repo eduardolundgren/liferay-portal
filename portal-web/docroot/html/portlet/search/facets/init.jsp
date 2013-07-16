@@ -21,7 +21,7 @@ String randomNamespace = PortalUtil.generateRandomKey(request, _RANDOM_KEY_INPUT
 
 Facet facet = (Facet)request.getAttribute("search.jsp-facet");
 
-String fieldParam = ParamUtil.getString(request, facet.getFieldName());
+String fieldParam = ParamUtil.getString(request, facet.getFieldId());
 
 FacetConfiguration facetConfiguration = facet.getFacetConfiguration();
 
