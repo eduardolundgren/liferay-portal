@@ -39,6 +39,7 @@ import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil;
 import com.liferay.portal.util.JavaScriptBundleUtil;
 import com.liferay.portal.util.LimitedFilesCache;
 import com.liferay.portal.util.MinifierUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -157,7 +158,8 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 
 				importContent = StringUtil.replace(
 					importContent, "[$RELATIVE$]",
-					aggregateContext.getFullPath(StringPool.BLANK));
+					PortalUtil.getPathContext() +
+						aggregateContext.getFullPath(StringPool.BLANK));
 
 				importContent = StringUtil.replace(
 					importContent, _CSS_PATH_PLACEHOLDERS, _CSS_PATH_TYPES);
