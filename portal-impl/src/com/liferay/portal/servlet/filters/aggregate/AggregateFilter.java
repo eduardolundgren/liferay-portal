@@ -150,33 +150,19 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 
 				importContent = aggregateCss(aggregateContext, importContent);
 
-				aggregateContext.popPath(importDir);
-
-				int importDepth = StringUtil.count(
-					importFileName, StringPool.SLASH);
-
 				// LEP-7540
 
-				String relativePath = StringPool.BLANK;
-
-				for (int i = 0; i < importDepth; i++) {
-					relativePath += "../";
-				}
+				importContent = StringUtil.replace(
+					importContent, _CSS_PATH_TYPES, _CSS_PATH_PLACEHOLDERS);
 
 				importContent = StringUtil.replace(
-					importContent,
-					new String[] {
-						"url('" + relativePath, "url(\"" + relativePath,
-						"url(" + relativePath
-					},
-					new String[] {
-						"url('[$TEMP_RELATIVE_PATH$]",
-						"url(\"[$TEMP_RELATIVE_PATH$]",
-						"url([$TEMP_RELATIVE_PATH$]"
-					});
+					importContent, "[$RELATIVE$]",
+					aggregateContext.getFullPath(StringPool.BLANK));
 
 				importContent = StringUtil.replace(
-					importContent, "[$TEMP_RELATIVE_PATH$]", StringPool.BLANK);
+					importContent, _CSS_PATH_PLACEHOLDERS, _CSS_PATH_TYPES);
+
+				aggregateContext.popPath(importDir);
 
 				if (Validator.isNotNull(mediaQuery)) {
 					sb.append(_CSS_MEDIA_QUERY);
@@ -567,6 +553,20 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 	private static final String _CSS_IMPORT_END = ");";
 
 	private static final String _CSS_MEDIA_QUERY = "@media";
+
+	private static final String[] _CSS_PATH_PLACEHOLDERS = new String[] {
+		"[$EMPTY_1$]", "[$EMPTY_2$]", "[$EMPTY_3$]", "[$TOKEN_1$]",
+		"[$TOKEN_2$]", "[$TOKEN_3$]", "[$ABSOLUTE_1$]", "[$ABSOLUTE_2$]",
+		"[$ABSOLUTE_3$]", "[$ABSOLUTE_4$]", "[$ABSOLUTE_5$]", "[$ABSOLUTE_6$]",
+		"url('[$RELATIVE$]", "url(\"[$RELATIVE$]", "url([$RELATIVE$]"
+	};
+
+	private static final String[] _CSS_PATH_TYPES = new String[] {
+		"url('')", "url(\"\")", "url()", "url('@theme_image_path@",
+		"url(\"@theme_image_path@", "url(@theme_image_path@", "url('http://",
+		"url(\"http://", "url(http://", "url('/", "url(\"/", "url(/", "url('",
+		"url(\"", "url("
+	};
 
 	private static final String _JAVASCRIPT_EXTENSION = ".js";
 
