@@ -43,10 +43,11 @@ AUI.add(
 						valueFn: function() {
 							var instance = this;
 
-							return AArray.indexOf(
-								instance.get('items'),
-								instance.get('defaultLanguageId')
-							);
+							var items = instance.get('items');
+
+							defaultLanguageId = instance.get('defaultLanguageId');
+
+							return AArray.indexOf(items, defaultLanguageId);
 						}
 					},
 
