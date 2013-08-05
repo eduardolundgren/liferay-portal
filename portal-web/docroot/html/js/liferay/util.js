@@ -1362,12 +1362,12 @@
 				ddmURL.setParameter('showGlobalScope', config.showGlobalScope);
 			}
 
-			if ('showManageTemplates' in config) {
-				ddmURL.setParameter('showManageTemplates', config.showManageTemplates);
+			if ('showHeader' in config) {
+				ddmURL.setParameter('showHeader', config.showHeader);
 			}
 
-			if ('showHeader' in config) {
-				ddmURL.setParameter('showHeader', false);
+			if ('showManageTemplates' in config) {
+				ddmURL.setParameter('showManageTemplates', config.showManageTemplates);
 			}
 
 			if ('showToolbar' in config) {
