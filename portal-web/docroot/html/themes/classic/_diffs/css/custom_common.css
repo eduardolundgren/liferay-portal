@@ -322,6 +322,10 @@
 	}
 
 	.navbar {
+		.btn-navbar {
+			margin-bottom: 5px;
+		}
+
 		.icon-caret-down {
 			background: #27A7EB;
 			background: rgba(255, 255, 255, 0.2);
