@@ -175,6 +175,11 @@ $dockbarGradientStart: #118ADE;
 			}
 		}
 
+		.portlet-dockbar {
+			display: inline-block;
+			width: 100%;
+		}
+
 		.signed-out #navAddControlsNavbarBtn {
 			display: none;
 		}
