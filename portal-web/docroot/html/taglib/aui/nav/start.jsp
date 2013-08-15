@@ -16,4 +16,8 @@
 
 <%@ include file="/html/taglib/aui/nav/init.jsp" %>
 
+<c:if test="<%= collapsible %>">
+	<div class="collapse nav-collapse navbar-responsive-collapse" id="<%= id %>NavbarCollapse">
+</c:if>
+
 <ul class="nav <%= cssClass %>" id="<%= id %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
