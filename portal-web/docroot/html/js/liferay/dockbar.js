@@ -44,14 +44,19 @@ AUI.add(
 
 					Liferay.once('initDockbar', instance._init, instance);
 
-					var eventHandle = dockBar.on(
-						['focus', 'mousemove', 'touchstart'],
-						function(event) {
-							Liferay.fire('initDockbar');
+					if (Liferay.Browser.isMobile()) {
+						Liferay.fire('initDockbar');
+					}
+					else {
+						var eventHandle = dockBar.on(
+							['focus', 'mousemove'],
+							function(event) {
+								Liferay.fire('initDockbar');
 
-							eventHandle.detach();
-						}
-					);
+								eventHandle.detach();
+							}
+						);
+					}
 
 					BODY.addClass('dockbar-ready');
 				}
@@ -232,6 +237,36 @@ AUI.add(
 							instance._openWindow({}, event.currentTarget);
 						},
 						'a.use-dialog'
+					);
+				}
+
+				var btnNavigation = A.one('#navNavigationNavbarBtn');
+
+				var navigation = A.one('#navigation');
+
+				if (btnNavigation && navigation) {
+					var navigationNavbar = navigation.one('.navbar-responsive-collapse');
+
+					btnNavigation.on(
+						EVENT_CLICK,
+						function(event) {
+							if (navigation.hasClass('open')) {
+								btnNavigation.removeClass('open');
+
+								navigation.removeClass('open');
+								navigation.setStyle('display', 'none');
+
+								navigationNavbar.setStyle('height', 0);
+							}
+							else {
+								btnNavigation.addClass('open');
+
+								navigation.addClass('open');
+								navigation.setStyle('display', 'block');
+
+								navigationNavbar.setStyle('height', 'auto');
+							}
+						}
 					);
 				}
 
