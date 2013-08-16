@@ -235,6 +235,36 @@ AUI.add(
 					);
 				}
 
+				var btnNavigation = A.one('#navNavigationNavbarBtn');
+
+				var navigation = A.one('#navigation');
+
+				var navigationNavbar = navigation.one('.navbar-responsive-collapse');
+
+				if (btnNavigation) {
+					btnNavigation.on(
+						EVENT_CLICK,
+						function(event) {
+							if (navigation.hasClass('open')) {
+								btnNavigation.removeClass('open');
+
+								navigation.removeClass('open');
+								navigation.setStyle('display', 'none');
+
+								navigationNavbar.setStyle('height', 0);
+							}
+							else {
+								btnNavigation.addClass('open');
+
+								navigation.addClass('open');
+								navigation.setStyle('display', 'block');
+
+								navigationNavbar.setStyle('height', 'auto');
+							}
+						}
+					);
+				}
+
 				Liferay.fire('dockbarLoaded');
 			},
 			['aui-io-request', 'liferay-node', 'liferay-store', 'node-focusmanager']
