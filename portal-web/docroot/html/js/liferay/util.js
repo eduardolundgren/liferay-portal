@@ -465,14 +465,6 @@
 			return topWindow;
 		},
 
-		getWindow: function(id) {
-			if (!id) {
-				id = Util.getWindowName();
-			}
-
-			return Util.getTop().Liferay.Util.Window.getById(id);
-		},
-
 		getWindowName: function() {
 			return window.name || Window._name || '';
 		},
@@ -1334,6 +1326,19 @@
 			}
 		},
 		['aui-base']
+	);
+
+	Liferay.provide(
+		Util,
+		'getWindow',
+		function(id) {
+			if (!id) {
+				id = Util.getWindowName();
+			}
+
+			return Util.getTop().Liferay.Util.Window.getById(id);
+		},
+		['liferay-util-window']
 	);
 
 	Liferay.provide(
