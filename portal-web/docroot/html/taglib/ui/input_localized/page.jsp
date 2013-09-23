@@ -66,7 +66,7 @@ if (Validator.isNull(mainLanguageValue)) {
 
 String fieldSuffix = StringPool.BLANK;
 
-if ((availableLocales.length > 1) && !Validator.isNull(languageId)) {
+if (!Validator.isNull(languageId)) {
 	fieldSuffix = StringPool.UNDERLINE + mainLanguageId;
 }
 
@@ -247,7 +247,7 @@ String fieldName = HtmlUtil.escapeAttribute(name + fieldSuffix);
 	</aui:script>
 </c:if>
 
-<c:if test="<%= (availableLocales.length > 1) && Validator.isNull(languageId) %>">
+<c:if test="<%= (availableLocales.length > 0) && Validator.isNull(languageId) %>">
 	<aui:script use="liferay-input-localized">
 		var defaultLanguageId = themeDisplay.getDefaultLanguageId();
 
