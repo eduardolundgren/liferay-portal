@@ -34,7 +34,7 @@ if (bodyContent != null) {
 			<c:if test="<%= Validator.isNotNull(href) %>">
 				<c:choose>
 					<c:when test="<%= Validator.isNull(ariaLabel) %>">
-						<a aria-labelledby="<%= id %>" class="<%= anchorCssClass %>" <%= AUIUtil.buildData(anchorData) %> href="<%= href %>" id="<%= anchorId %>" role="<%= Validator.isNull(ariaRole) ? "menuitem" : ariaRole %>" title="<liferay-ui:message key="<%= title %>" />">
+						<a class="<%= anchorCssClass %>" <%= AUIUtil.buildData(anchorData) %> href="<%= href %>" id="<%= anchorId %>" role="<%= Validator.isNull(ariaRole) ? "menuitem" : ariaRole %>" title="<liferay-ui:message key="<%= title %>" />">
 					</c:when>
 					<c:otherwise>
 						<a aria-label="<%= ariaLabel %>" class="<%= anchorCssClass %>" <%= AUIUtil.buildData(anchorData) %> href="<%= href %>" id="<%= anchorId %>" role="<%= Validator.isNull(ariaRole) ? "menuitem" : ariaRole %>" title="<liferay-ui:message key="<%= title %>" />">
