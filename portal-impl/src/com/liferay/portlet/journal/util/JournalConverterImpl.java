@@ -503,7 +503,7 @@ public class JournalConverterImpl implements JournalConverter {
 
 		dynamicElementElement.addAttribute(
 			"type", _ddmTypesToJournalTypes.get(fieldType));
-		dynamicElementElement.addAttribute("index-type", indexType);
+		dynamicElementElement.addAttribute("indexType", indexType);
 
 		for (Locale locale : ddmField.getAvailableLocales()) {
 			Element dynamicContentElement = dynamicElementElement.addElement(
@@ -617,7 +617,7 @@ public class JournalConverterImpl implements JournalConverter {
 
 		removeAttribute(dynamicElementElement, "indexType");
 		
-		dynamicElementElement.addAttribute("index-type", indexType);
+		dynamicElementElement.addAttribute("indexType", indexType);
 		
 		// Type
 
