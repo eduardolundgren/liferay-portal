@@ -24,12 +24,14 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.XMLSchema;
 import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.xml.XMLSchemaImpl;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
@@ -303,11 +305,19 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		expectedDDMStructure.setXsd(
 			readText("test-ddm-structure-all-fields.xml"));
 
+		String actualXSD = JournalConverterUtil.getDDMXSD(
+			readText("test-journal-structure-all-fields.xml"));
+
+		XMLSchemaImpl xmlSchema = new XMLSchemaImpl();
+		xmlSchema.setSchemaLanguage("http://www.w3.org/2001/XMLSchema");
+		xmlSchema.setSystemId("http://www.liferay.com/dtd/liferay-ddm-structure_6_2_0.xsd");
+
+		//test to make sure schema validation is successful
+		SAXReaderUtil.read(actualXSD, new XMLSchemaImpl());
+
 		DDMStructure actualDDMStructure = new DDMStructureImpl();
 
-		actualDDMStructure.setXsd(
-			JournalConverterUtil.getDDMXSD(
-				readText("test-journal-structure-all-fields.xml")));
+		actualDDMStructure.setXsd(actualXSD);
 
 		Assert.assertEquals(
 			expectedDDMStructure.getFieldsMap(),
