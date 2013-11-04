@@ -931,7 +931,7 @@ release was successful.</echo>
 				<var name="java.security.config" value="" />
 			</then>
 			<else>
-				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy=@app.server.geronimo.dir@/etc/server.policy" />
+				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy==@app.server.geronimo.dir@/etc/server.policy" />
 			</else>
 		</if>
 
@@ -1030,12 +1030,13 @@ release was successful.</echo>
 			</then>
 			<else>
 				<replace file="${app.server.glassfish.instance.dir}/config/domain.xml">
+					<replacefilter token="@java.security.manager.option@" value="${java.security.manager.option}" />
 					<replacetoken><![CDATA[<jvm-options>-Xmx512m</jvm-options>]]></replacetoken>
 					<replacevalue>
 						<![CDATA[
 							<jvm-options>-Dfile.encoding=UTF8</jvm-options>
 							<jvm-options>-Djava.net.preferIPv4Stack=true</jvm-options>
-							<jvm-options>${java.security.manager.option}</jvm-options>
+							<jvm-options>@java.security.manager.option@</jvm-options>
 							<jvm-options>-Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false</jvm-options>
 							<jvm-options>-Duser.timezone=GMT</jvm-options>
 							<jvm-options>-Xmx1024m</jvm-options>
@@ -1230,7 +1231,7 @@ release was successful.</echo>
 						<var name="java.security.config" value="" />
 					</then>
 					<else>
-						<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy=${app.server.jboss.dir}/bin/server.policy -Djboss.home.dir=${app.server.jboss.dir}" />
+						<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy==${app.server.jboss.dir}/bin/server.policy -Djboss.home.dir=${app.server.jboss.dir}" />
 					</else>
 				</if>
 
@@ -1246,10 +1247,11 @@ release was successful.</echo>
 				</replace>
 
 				<replace file="${app.server.jboss.bin.dir}/standalone.conf.bat">
+					<replacefilter token="@java.security.config@" value="${java.security.config}" />
 					<replacetoken><![CDATA[:JAVA_OPTS_SET]]></replacetoken>
 					<replacevalue>
 						<![CDATA[
-							set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true ${java.security.config} -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
+							set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true @java.security.config@ -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
 
 							:JAVA_OPTS_SET
 						]]>
@@ -1444,7 +1446,7 @@ release was successful.</echo>
 				<var name="java.security.config" value="" />
 			</then>
 			<else>
-				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy=${app.server.jetty.dir}/lib/policy/server.policy -Djetty.home=${app.server.jetty.dir}" />
+				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy==${app.server.jetty.dir}/lib/policy/server.policy -Djetty.home=${app.server.jetty.dir}" />
 			</else>
 		</if>
 
@@ -1627,15 +1629,16 @@ release was successful.</echo>
 				<var name="java.security.config" value="" />
 			</then>
 			<else>
-				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy=$JONAS_ROOT/conf/java.policy" />
+				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy==$JONAS_ROOT/conf/java.policy" />
 			</else>
 		</if>
 
 		<replace file="${app.server.jonas.bin.dir}/setenv">
+			<replacefilter token="@java.security.config@" value="${java.security.config}" />
 			<replacetoken><![CDATA[export JAVA_OPTS]]></replacetoken>
 			<replacevalue>
 				<![CDATA[
-					JAVA_OPTS="-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true ${java.security.config} -Djonas.felix.configuration.file=\"$JONAS_ROOT/conf/felix-config.properties\" -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
+					JAVA_OPTS="-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true @java.security.config@ -Djonas.felix.configuration.file=\"$JONAS_ROOT/conf/felix-config.properties\" -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
 
 					export JAVA_OPTS
 				]]>
@@ -1643,12 +1646,13 @@ release was successful.</echo>
 		</replace>
 
 		<replace file="${app.server.jonas.bin.dir}/setenv.bat">
+			<replacefilter token="@java.security.config@" value="${java.security.config}" />
 			<replacetoken><![CDATA[set JONAS_CLASSPATH=%JONAS_BASE%\conf;%JONAS_CLASSPATH%]]></replacetoken>
 			<replacevalue>
 				<![CDATA[
 					set JONAS_CLASSPATH=%JONAS_BASE%\conf;%JONAS_CLASSPATH%
 
-					set "JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true ${java.security.config} -Djava.security.policy=%JONAS_ROOT%/conf/java.policy -Djonas.felix.configuration.file=%JONAS_ROOT%/conf/felix-config.properties -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
+					set "JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true @java.security.config@ -Djonas.felix.configuration.file=%JONAS_ROOT%/conf/felix-config.properties -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
 				]]>
 			</replacevalue>
 		</replace>
@@ -1701,13 +1705,14 @@ release was successful.</echo>
 				<var name="java.security.config" value="" />
 			</then>
 			<else>
-				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy=${app.server.resin.dir}/conf/server.policy" />
+				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy==${app.server.resin.dir}/conf/server.policy" />
 			</else>
 		</if>
 
 		<replace file="${app.server.resin.dir}/conf/resin.properties">
+			<replacefilter token="@java.security.config@" value="${java.security.config}" />
 			<replacetoken><![CDATA[# jvm_args  : -Xmx2048m -XX:MaxPermSize=256m]]></replacetoken>
-			<replacevalue><![CDATA[jvm_args  : -Dfile.encoding=UTF-8 -Dcaucho.environment.class.loader=com.liferay.support.resin.EnvironmentClassLoader -Djava.net.preferIPv4Stack=true ${java.security.config} -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m]]></replacevalue>
+			<replacevalue><![CDATA[jvm_args  : -Dfile.encoding=UTF-8 -Dcaucho.environment.class.loader=com.liferay.support.resin.EnvironmentClassLoader -Djava.net.preferIPv4Stack=true @java.security.config@ -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m]]></replacevalue>
 		</replace>
 
 		<replace file="${app.server.resin.dir}/conf/resin.xml">
@@ -1814,7 +1819,7 @@ release was successful.</echo>
 				<var name="java.security.config" value="" />
 			</then>
 			<else>
-				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy==$CATALINA_BASE/conf/catalina.policy" />
+				<var name="java.security.config" value="${java.security.manager.option} -Djava.security.policy===$CATALINA_BASE/conf/catalina.policy" />
 			</else>
 		</if>
 
@@ -1823,7 +1828,7 @@ release was successful.</echo>
 			tofile="${app.server.tomcat.bin.dir}/setenv.bat"
 		>
 			<filterset>
-				<filter token="java.security.manager.option" value="${java.security.config}" />
+				<filter token="java.security.config" value="${java.security.config}" />
 				<filter token="java.version" value="${jdk.windows.version}" />
 			</filterset>
 		</copy>
@@ -1833,7 +1838,7 @@ release was successful.</echo>
 			tofile="${app.server.tomcat.bin.dir}/setenv.sh"
 		>
 			<filterset>
-				<filter token="java.security.manager.option" value="${java.security.config}" />
+				<filter token="java.security.config" value="${java.security.config}" />
 			</filterset>
 		</copy>
 
@@ -2008,6 +2013,7 @@ closeTemplate()
 				</exec>
 
 				<replace file="${app.server.weblogic.instance.dir}/startWebLogic.cmd">
+					<replacefilter token="@java.security.manager.option@" value="${java.security.manager.option}" />
 					<replacetoken><![CDATA[SETLOCAL]]></replacetoken>
 					<replacevalue>
 						<![CDATA[
@@ -2017,7 +2023,7 @@ closeTemplate()
 
 							set "MW_HOME=${app.server.weblogic.dir.windows}"
 
-							set "JAVA_OPTIONS=%JAVA_OPTIONS% -Dfile.encoding=UTF-8 ${java.security.manager.option} -da:org.apache.lucene... -da:org.aspectj..."
+							set "JAVA_OPTIONS=%JAVA_OPTIONS% -Dfile.encoding=UTF-8 @java.security.manager.option@ -da:org.apache.lucene... -da:org.aspectj..."
 						]]>
 					</replacevalue>
 				</replace>
@@ -2097,6 +2103,7 @@ closeTemplate()
 				</exec>
 
 				<replace file="${app.server.weblogic.instance.dir}/startWebLogic.sh">
+					<replacefilter token="@java.security.manager.option@" value="${java.security.manager.option}" />
 					<replacetoken><![CDATA[# Any changes to this script may be lost when adding extensions to this configuration.]]></replacetoken>
 					<replacevalue>
 						<![CDATA[
@@ -2106,7 +2113,7 @@ closeTemplate()
 
 							export MW_HOME="${app.server.weblogic.dir}"
 
-							export JAVA_OPTIONS="${JAVA_OPTIONS} ${java.security.manager.option} -da:org.apache.lucene... -da:org.aspectj..."
+							export JAVA_OPTIONS="${JAVA_OPTIONS} @java.security.manager.option@ -da:org.apache.lucene... -da:org.aspectj..."
 						]]>
 					</replacevalue>
 				</replace>

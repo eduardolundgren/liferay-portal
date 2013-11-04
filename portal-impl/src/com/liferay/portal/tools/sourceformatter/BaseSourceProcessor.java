@@ -1070,6 +1070,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	protected static final String MAIN_RELEASE_VERSION_6_2_0 = "6.2.0";
 
+	protected static final String MAIN_RELEASE_VERSION_7_0_0 = "7.0.0";
+
 	protected static FileImpl fileUtil = FileImpl.getInstance();
 	protected static Pattern languageKeyPattern = Pattern.compile(
 		"LanguageUtil.(?:get|format)\\([^;%]+|Liferay.Language.get\\('([^']+)");
@@ -1102,7 +1104,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		_autoFix = autoFix;
 
-		this.mainReleaseVersion = mainReleaseVersion;
+		BaseSourceProcessor.mainReleaseVersion = mainReleaseVersion;
 
 		_excludes = StringUtil.split(
 			GetterUtil.getString(

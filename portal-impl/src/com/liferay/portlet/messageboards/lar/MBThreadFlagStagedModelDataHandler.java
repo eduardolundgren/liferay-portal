@@ -23,7 +23,9 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBThread;
@@ -98,6 +100,13 @@ public class MBThreadFlagStagedModelDataHandler
 			PortletDataContext portletDataContext, MBThreadFlag threadFlag)
 		throws Exception {
 
+		User user = UserLocalServiceUtil.fetchUserByUuidAndCompanyId(
+			threadFlag.getUserUuid(), portletDataContext.getCompanyId());
+
+		if (user == null) {
+			return;
+		}
+
 		Element element = portletDataContext.getImportDataStagedModelElement(
 			threadFlag);
 
@@ -126,15 +135,13 @@ public class MBThreadFlagStagedModelDataHandler
 			return;
 		}
 
-		long userId = portletDataContext.getUserId(threadFlag.getUserUuid());
-
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			threadFlag);
 
 		serviceContext.setUuid(threadFlag.getUuid());
 
 		MBThreadFlagLocalServiceUtil.addThreadFlag(
-			userId, thread, serviceContext);
+			user.getUserId(), thread, serviceContext);
 	}
 
 }

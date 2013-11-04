@@ -741,6 +741,13 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 
 		<antcall target="propertiesdoc-cmd">
 			<param name="properties.dest.dir" value="${properties.dest.dir}" />
+			<param name="properties.file" value="definitions/liferay-plugin-package_7_0_0.properties" />
+			<param name="properties.title" value="Liferay Plugin Package 7.0 Properties" />
+			<param name="properties.toc" value="true" />
+		</antcall>
+
+		<antcall target="propertiesdoc-cmd">
+			<param name="properties.dest.dir" value="${properties.dest.dir}" />
 			<param name="properties.file" value="portal-impl/src/portal.properties" />
 			<param name="properties.title" value="Portal Properties" />
 			<param name="properties.toc" value="true" />

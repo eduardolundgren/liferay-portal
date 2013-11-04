@@ -159,6 +159,10 @@ public class SourceFormatter {
 			_mainReleaseVersion =
 				BaseSourceProcessor.MAIN_RELEASE_VERSION_6_2_0;
 		}
+		else if (releaseInfoVersion.startsWith("7.0")) {
+			_mainReleaseVersion =
+				BaseSourceProcessor.MAIN_RELEASE_VERSION_7_0_0;
+		}
 		else {
 			throw new Exception(
 				"Invalid release information: " + ReleaseInfo.getVersion());

@@ -12,26 +12,21 @@
  * details.
  */
 
-package com.liferay.portal.deploy;
+package com.liferay.portal.deploy.messaging;
 
 import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployDir;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.NamedThreadFactory;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.messaging.BaseMessageListener;
+import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.util.StreamUtil;
-import com.liferay.portal.kernel.util.Time;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -39,56 +34,24 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @author Shuyang Zhou
  */
-public class RequiredPluginsUtil {
+public class RequiredPluginsMessageListener extends BaseMessageListener {
 
-	public static synchronized void onUndeployCheckRequiredPlugins() {
+	@Override
+	protected void doReceive(Message message) throws Exception {
+		if (_firstMessage) {
 
-		// During an undeploy event, we synchronously and immediately check for
-		// required plugins. We also schedule a required plugins check in case
-		// the required plugins failed to deploy.
+			// Ignore the first message to give the portal time to fully load
 
-		_unschedule(false);
+			_firstMessage = false;
 
-		checkRequiredPlugins();
+			return;
+		}
 
-		schedule();
-	}
-
-	public static synchronized void startCheckingRequiredPlugins() {
-		schedule();
-	}
-
-	public static synchronized void stopCheckingRequiredPlugins() {
-		_unschedule(true);
-	}
-
-	protected static void schedule() {
-		_scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
-			new NamedThreadFactory(
-				RequiredPluginsUtil.class.getName(), Thread.NORM_PRIORITY,
-				null));
-
-		_scheduledExecutorService.scheduleWithFixedDelay(
-			new Runnable() {
-
-				@Override
-				public void run() {
-					checkRequiredPlugins();
-				}
-
-			},
-			Time.MINUTE, Time.MINUTE, TimeUnit.MILLISECONDS);
-	}
-
-	protected synchronized static void checkRequiredPlugins() {
 		List<String[]> levelsRequiredDeploymentContexts =
 			DeployManagerUtil.getLevelsRequiredDeploymentContexts();
 		List<String[]> levelsRequiredDeploymentWARFileNames =
 			DeployManagerUtil.getLevelsRequiredDeploymentWARFileNames();
-
-		boolean deployed = false;
 
 		for (int i = 0; i < levelsRequiredDeploymentContexts.size(); i++) {
 			String[] levelRequiredDeploymentContexts =
@@ -106,8 +69,6 @@ public class RequiredPluginsUtil {
 					continue;
 				}
 
-				deployed = true;
-
 				String levelRequiredDeploymentWARFileName =
 					levelRequiredDeploymentWARFileNames[j];
 
@@ -117,8 +78,9 @@ public class RequiredPluginsUtil {
 							levelRequiredDeploymentWARFileName);
 				}
 
-				ClassLoader classLoader =
-					PortalClassLoaderUtil.getClassLoader();
+				Class<?> clazz = getClass();
+
+				ClassLoader classLoader = clazz.getClassLoader();
 
 				InputStream inputStream = classLoader.getResourceAsStream(
 					"com/liferay/portal/deploy/dependencies/plugins" +
@@ -140,50 +102,18 @@ public class RequiredPluginsUtil {
 					continue;
 				}
 
-				try {
-					StreamUtil.transfer(
-						inputStream,
-						new FileOutputStream(
-							autoDeployDir.getDeployDir() + "/" +
-								levelRequiredDeploymentWARFileNames[j]));
-				}
-				catch (IOException ioe) {
-					_log.error("Unable to write file", ioe);
-				}
+				StreamUtil.transfer(
+					inputStream,
+					new FileOutputStream(
+						autoDeployDir.getDeployDir() + "/" +
+							levelRequiredDeploymentWARFileNames[j]));
 			}
-		}
-
-		if (!deployed) {
-
-			// If all the required plugins were already in place, then we can
-			// safely unschedule our required plugins check to conserve
-			// processing power. Removal of plugins would trigger an undeploy
-			// event which would restart the scheduled required plugins check.
-
-			_unschedule(false);
 		}
 	}
 
-	private static void _unschedule(boolean awaitTermination) {
-		if (_scheduledExecutorService != null) {
-			_scheduledExecutorService.shutdownNow();
+	private static Log _log = LogFactoryUtil.getLog(
+		RequiredPluginsMessageListener.class);
 
-			if (awaitTermination) {
-				try {
-					_scheduledExecutorService.awaitTermination(
-						1, TimeUnit.MINUTES);
-				}
-				catch (InterruptedException ie) {
-					_log.error(ie, ie);
-				}
-			}
-
-			_scheduledExecutorService = null;
-		}
-	}
-
-	private static Log _log = LogFactoryUtil.getLog(RequiredPluginsUtil.class);
-
-	private static ScheduledExecutorService _scheduledExecutorService;
+	private boolean _firstMessage = true;
 
 }
