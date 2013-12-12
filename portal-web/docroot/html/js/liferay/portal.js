@@ -119,6 +119,7 @@
 						cssClass: 'tooltip-help',
 						opacity: 1,
 						visible: false,
+						stickyTooltip: true,
 						zIndex: Liferay.zIndex.TOOLTIP
 					}
 				).render();

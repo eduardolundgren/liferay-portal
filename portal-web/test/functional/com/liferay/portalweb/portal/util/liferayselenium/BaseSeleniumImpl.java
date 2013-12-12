@@ -26,6 +26,8 @@ import com.thoughtworks.selenium.Selenium;
 
 import java.lang.reflect.Field;
 
+import java.util.Map;
+
 /**
  * @author Brian Wing Shun Chan
  */
@@ -401,6 +403,10 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
+	public void pauseLoggerCheck() throws Exception {
+	}
+
+	@Override
 	public void refreshAndWait() {
 		super.refresh();
 		super.waitForPageToLoad("30000");
@@ -476,6 +482,11 @@ public abstract class BaseSeleniumImpl
 
 	@Override
 	public void sendLogger(String id, String status) {
+	}
+
+	@Override
+	public void sendLogger(
+		String id, String status, Map<String, String> context) {
 	}
 
 	@Override

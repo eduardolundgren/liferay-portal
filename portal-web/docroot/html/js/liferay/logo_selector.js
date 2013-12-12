@@ -1,6 +1,8 @@
 AUI.add(
 	'liferay-logo-selector',
 	function(A) {
+		var Lang = A.Lang;
+
 		var DELETE_LOGO = 'DELETE_LOGO';
 
 		var MAP_DELETE_LOGO = {
@@ -18,7 +20,7 @@ AUI.add(
 						setter: function(value) {
 							var fn = function() {};
 
-							if (value && value !== '') {
+							if (Lang.isFunction(window[value])) {
 								fn = window[value] || fn;
 							}
 
@@ -29,7 +31,7 @@ AUI.add(
 					},
 
 					editLogoURL: {
-						value: '',
+						value: ''
 					},
 
 					logoDisplaySelector: {
@@ -60,7 +62,7 @@ AUI.add(
 						instance._portletNamespace = instance.get('portletNamespace');
 						instance._randomNamespace = instance.get('randomNamespace');
 
-						window[instance._portletNamespace + 'changeLogo'] = A.bind('_changeLogo', instance);
+						window[instance._randomNamespace + 'changeLogo'] = A.bind('_changeLogo', instance);
 					},
 
 					renderUI: function() {
@@ -74,6 +76,7 @@ AUI.add(
 						instance._avatar = contentBox.one('#' + randomNamespace + 'avatar');
 						instance._deleteLogoButton = contentBox.one('.delete-logo');
 						instance._deleteLogoInput = contentBox.one('#' + portletNamespace + 'deleteLogo');
+						instance._fileEntryIdInput = contentBox.one('#' + portletNamespace + 'fileEntryId');
 					},
 
 					bindUI: function() {
@@ -83,10 +86,14 @@ AUI.add(
 						instance.get('contentBox').delegate('click', instance._onDeleteLogoClick, '.delete-logo', instance);
 					},
 
-					_changeLogo: function(url) {
+					_changeLogo: function(url, fileEntryId) {
 						var instance = this;
 
 						instance.set('logoURL', url);
+
+						if (fileEntryId) {
+							instance._fileEntryIdInput.val(fileEntryId);
+						}
 					},
 
 					_onDeleteLogoClick: function(event) {

@@ -19,25 +19,27 @@
 
 	<#assign lineNumber = element.attributeValue("line-number")>
 
-	${selenium}.sendLogger(${lineId} + "${lineNumber}", "pending");
+	${selenium}.sendLogger(${lineId} + "${lineNumber}", "pending", commandScopeVariables);
 
 	<#if name == "echo">
 		<#assign message = element.attributeValue("message")>
 
-		<#if message?contains("${") && message?contains("}")>
-			<#assign message = message?replace("${", "\" + commandScopeVariables.get(\"")>
-
-			<#assign message = message?replace("}", "\") + \"")>
-		</#if>
-
-		${selenium}.echo("${message}");
+		${selenium}.echo(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(message)}", commandScopeVariables));
 
 		<#assign lineNumber = element.attributeValue("line-number")>
 
-		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 	<#elseif name == "execute">
 		<#if element.attributeValue("action")??>
 			<#assign action = element.attributeValue("action")>
+
+			<#if testCaseName??>
+				selenium
+			<#else>
+				liferaySelenium
+			</#if>
+
+			.pauseLoggerCheck();
 
 			<#if action?contains("#is")>
 				try {
@@ -70,12 +72,12 @@
 				finally {
 					<#assign lineNumber = element.attributeValue("line-number")>
 
-					${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+					${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 				}
 			<#else>
 				<#assign lineNumber = element.attributeValue("line-number")>
 
-				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 			</#if>
 		<#elseif element.attributeValue("macro")??>
 			<#assign macroElement = element>
@@ -84,7 +86,7 @@
 
 			<#assign lineNumber = element.attributeValue("line-number")>
 
-			${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+			${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 		<#elseif element.attributeValue("test-case")??>
 			<#assign testCaseElement = element>
 
@@ -92,18 +94,24 @@
 
 			<#assign lineNumber = element.attributeValue ("line-number")>
 
-			${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+			${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 		</#if>
 	<#elseif name == "fail">
 		<#assign message = element.attributeValue("message")>
 
-		<#if message?contains("${") && message?contains("}")>
-			<#assign message = message?replace("${", "\" + commandScopeVariables.get(\"")>
+		${selenium}.fail(RuntimeVariables.evaluateVariable("${message}", commandScopeVariables));
 
-			<#assign message = message?replace("}", "\") + \"")>
-		</#if>
+		<#assign lineNumber = element.attributeValue("line-number")>
 
-		${selenium}.fail("${message}");
+		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+	<#elseif name == "for">
+		executeScopeVariables = new HashMap<String, String>();
+
+		executeScopeVariables.putAll(commandScopeVariables);
+
+		<#assign forElement = element>
+
+		<#include "for_element.ftl">
 
 		<#assign lineNumber = element.attributeValue("line-number")>
 
@@ -131,7 +139,7 @@
 			else {
 				<#assign lineNumber = elseElement.attributeValue("line-number")>
 
-				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pending");
+				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pending", executeScopeVariables);
 
 				<#assign blockElement = elseElement>
 
@@ -139,10 +147,14 @@
 
 				<#assign lineNumber = elseElement.attributeValue("line-number")>
 
-				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", executeScopeVariables);
 			}
 		</#if>
 
+		<#assign lineNumber = element.attributeValue("line-number")>
+
+		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", executeScopeVariables);
+	<#elseif name == "property">
 		<#assign lineNumber = element.attributeValue("line-number")>
 
 		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
@@ -155,11 +167,13 @@
 
 		<#assign lineNumber = element.attributeValue("line-number")>
 
-		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 	<#elseif name == "while">
 		executeScopeVariables = new HashMap<String, String>();
 
 		executeScopeVariables.putAll(commandScopeVariables);
+
+		_whileCount = 0;
 
 		<#assign ifElement = element>
 
@@ -167,7 +181,7 @@
 
 		<#assign lineNumber = element.attributeValue("line-number")>
 
-		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
+		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass", commandScopeVariables);
 	</#if>
 </#list>
 

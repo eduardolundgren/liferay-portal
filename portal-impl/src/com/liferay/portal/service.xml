@@ -605,7 +605,6 @@
 		<column name="typeSettings" type="String" />
 		<column name="hidden" type="boolean" />
 		<column name="friendlyURL" type="String" />
-		<column name="iconImage" type="boolean" />
 		<column name="iconImageId" type="long" />
 		<column name="themeId" type="String" />
 		<column name="colorSchemeId" type="String" />
@@ -844,7 +843,6 @@
 		<column name="keywords" type="String" localized="true" />
 		<column name="robots" type="String" localized="true" />
 		<column name="typeSettings" type="String" />
-		<column name="iconImage" type="boolean" />
 		<column name="iconImageId" type="long" />
 		<column name="themeId" type="String" />
 		<column name="colorSchemeId" type="String" />
@@ -930,7 +928,6 @@
 		<!-- Other fields -->
 
 		<column name="privateLayout" type="boolean" />
-		<column name="logo" type="boolean" />
 		<column name="logoId" type="long" />
 		<column name="themeId" type="String" />
 		<column name="colorSchemeId" type="String" />
@@ -979,7 +976,6 @@
 		<column name="name" type="String" />
 		<column name="description" type="String" />
 		<column name="master" type="boolean" />
-		<column name="logo" type="boolean" />
 		<column name="logoId" type="long" />
 		<column name="themeId" type="String" />
 		<column name="colorSchemeId" type="String" />
@@ -1179,6 +1175,7 @@
 		<column name="countryId" type="long" />
 		<column name="statusId" type="int" />
 		<column name="comments" type="String" />
+		<column name="logoId" type="long" />
 
 		<!-- Relationships -->
 

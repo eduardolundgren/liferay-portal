@@ -31,49 +31,21 @@
 <#elseif ifConditionalElement.getName() == "contains">
 	<#assign string = ifConditionalElement.attributeValue("string")>
 
-	<#if string?contains("${") && string?contains("}")>
-		<#assign string = string?replace("${", "\" + commandScopeVariables.get(\"")>
-
-		<#assign string = string?replace("}", "\") + \"")>
-	</#if>
-
 	<#assign substring = ifConditionalElement.attributeValue("substring")>
 
-	<#if substring?contains("${") && substring?contains("}")>
-		<#assign substring = substring?replace("${", "\" + commandScopeVariables.get(\"")>
-
-		<#assign substring = substring?replace("}", "\") + \"")>
-	</#if>
-
-	("${string}").contains("${substring}")
+	(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(string)}", commandScopeVariables)).contains(
+		RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(substring)}", commandScopeVariables))
 <#elseif ifConditionalElement.getName() == "equals">
 	<#assign arg1 = ifConditionalElement.attributeValue("arg1")>
 
-	<#if arg1?contains("${") && arg1?contains("}")>
-		<#assign arg1 = arg1?replace("${", "\" + commandScopeVariables.get(\"")>
-
-		<#assign arg1 = arg1?replace("}", "\") + \"")>
-	</#if>
-
 	<#assign arg2 = ifConditionalElement.attributeValue("arg2")>
 
-	<#if arg2?contains("${") && arg2?contains("}")>
-		<#assign arg2 = arg2?replace("${", "\" + commandScopeVariables.get(\"")>
-
-		<#assign arg2 = arg2?replace("}", "\") + \"")>
-	</#if>
-
-	("${arg1}").equals("${arg2}")
+	(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(arg1)}", commandScopeVariables)).equals(
+		RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(arg2)}", commandScopeVariables))
 <#elseif ifConditionalElement.getName() == "isset">
 	<#assign var = ifConditionalElement.attributeValue("var")>
 
-	<#if var?contains("${") && var?contains("}")>
-		<#assign var = var?replace("${", "\" + commandScopeVariables.get(\"")>
-
-		<#assign var = var?replace("}", "\") + \"")>
-	</#if>
-
-	commandScopeVariables.containsKey("${var}")
+	RuntimeVariables.variableExists(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(var)}", commandScopeVariables), commandScopeVariables)
 <#elseif ifConditionalElement.getName() == "not">
 	!(
 		<#if ifConditionalElement.element("and")??>

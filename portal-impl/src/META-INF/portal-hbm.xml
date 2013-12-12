@@ -407,7 +407,6 @@
 		<property name="typeSettings" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="hidden" type="com.liferay.portal.dao.orm.hibernate.BooleanType" column="hidden_" />
 		<property name="friendlyURL" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-		<property name="iconImage" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="iconImageId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="themeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="colorSchemeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
@@ -491,7 +490,6 @@
 		<property name="keywords" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="robots" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="typeSettings" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-		<property name="iconImage" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="iconImageId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="themeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="colorSchemeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
@@ -513,7 +511,6 @@
 		<property name="createDate" type="org.hibernate.type.TimestampType" />
 		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
 		<property name="privateLayout" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
-		<property name="logo" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="logoId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="themeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="colorSchemeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
@@ -540,7 +537,6 @@
 		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="master" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
-		<property name="logo" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="logoId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="themeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="colorSchemeId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
@@ -626,6 +622,7 @@
 		<property name="countryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="statusId" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="comments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="logoId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
 	<class name="com.liferay.portal.model.impl.OrgGroupRoleImpl" table="OrgGroupRole">
 		<cache usage="read-write" />
@@ -1855,7 +1852,7 @@
 		<property name="classNameId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
-	<class name="com.liferay.portlet.expando.model.impl.ExpandoValueImpl" table="ExpandoValue">
+	<class name="com.liferay.portlet.expando.model.impl.ExpandoValueImpl" table="ExpandoValue" dynamic-update="true">
 		<cache usage="read-write" />
 		<id name="valueId" type="long">
 			<generator class="assigned" />
@@ -2488,7 +2485,7 @@
 		<property name="quantity" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="shippedDate" type="org.hibernate.type.TimestampType" />
 	</class>
-	<class name="com.liferay.portlet.social.model.impl.SocialActivityImpl" table="SocialActivity">
+	<class name="com.liferay.portlet.social.model.impl.SocialActivityImpl" table="SocialActivity" dynamic-update="true">
 		<cache usage="read-write" />
 		<id name="activityId" type="long">
 			<generator class="assigned" />

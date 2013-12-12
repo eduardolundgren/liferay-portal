@@ -17,16 +17,15 @@ package com.liferay.portlet.layoutsadmin.action;
 import com.liferay.portal.ImageTypeException;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.io.ByteArrayFileInputStream;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadException;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -44,9 +43,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.FileSizeException;
-
-import java.io.File;
-import java.io.InputStream;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 import java.util.Map;
 
@@ -164,24 +161,18 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 	@Override
 	protected void setThemeSettingProperties(
 		ActionRequest actionRequest, UnicodeProperties typeSettingsProperties,
-		String themeId, Map<String, ThemeSetting> themeSettings, String device,
+		Map<String, ThemeSetting> themeSettings, String device,
 		String deviceThemeId) {
 
 		for (String key : themeSettings.keySet()) {
 			ThemeSetting themeSetting = themeSettings.get(key);
 
-			String value = null;
+			String property =
+				device + "ThemeSettingsProperties--" + key +
+					StringPool.DOUBLE_DASH;
 
-			if (!themeId.equals(deviceThemeId)) {
-				value = themeSetting.getValue();
-			}
-			else {
-				String property =
-					device + "ThemeSettingsProperties--" + key +
-						StringPool.DOUBLE_DASH;
-
-				value = ParamUtil.getString(actionRequest, property);
-			}
+			String value = ParamUtil.getString(
+				actionRequest, property, themeSetting.getValue());
 
 			if (!value.equals(themeSetting.getValue())) {
 				typeSettingsProperties.setProperty(
@@ -208,14 +199,11 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
 			layoutSetId);
 
-		updateLogo(
-			actionRequest, liveGroupId, stagingGroupId, privateLayout,
-			layoutSet.isLogo());
+		updateLogo(actionRequest, liveGroupId, stagingGroupId, privateLayout);
 
 		updateLookAndFeel(
 			actionRequest, themeDisplay.getCompanyId(), liveGroupId,
-			stagingGroupId, privateLayout, layoutSet.getThemeId(),
-			layoutSet.getSettingsProperties());
+			stagingGroupId, privateLayout, layoutSet.getSettingsProperties());
 
 		updateMergePages(actionRequest, liveGroupId);
 
@@ -226,48 +214,35 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 
 	protected void updateLogo(
 			ActionRequest actionRequest, long liveGroupId, long stagingGroupId,
-			boolean privateLayout, boolean hasLogo)
+			boolean privateLayout)
 		throws Exception {
 
-		UploadPortletRequest uploadPortletRequest =
-			PortalUtil.getUploadPortletRequest(actionRequest);
+		boolean deleteLogo = ParamUtil.getBoolean(actionRequest, "deleteLogo");
 
-		boolean useLogo = ParamUtil.getBoolean(actionRequest, "useLogo");
+		byte[] logoBytes = null;
 
-		InputStream inputStream = null;
+		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
 
-		try {
-			File file = uploadPortletRequest.getFile("logoFileName");
+		if (fileEntryId > 0) {
+			FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
+				fileEntryId);
 
-			if (useLogo && !file.exists()) {
-				if (hasLogo) {
-					return;
-				}
-
-				throw new UploadException("No logo uploaded for use");
-			}
-
-			if ((file != null) && file.exists()) {
-				inputStream = new ByteArrayFileInputStream(file, 1024);
-			}
-
-			long groupId = liveGroupId;
-
-			if (stagingGroupId > 0) {
-				groupId = stagingGroupId;
-			}
-
-			LayoutSetServiceUtil.updateLogo(
-				groupId, privateLayout, useLogo, inputStream, false);
+			logoBytes = FileUtil.getBytes(fileEntry.getContentStream());
 		}
-		finally {
-			StreamUtil.cleanUp(inputStream);
+
+		long groupId = liveGroupId;
+
+		if (stagingGroupId > 0) {
+			groupId = stagingGroupId;
 		}
+
+		LayoutSetServiceUtil.updateLogo(
+			groupId, privateLayout, !deleteLogo, logoBytes);
 	}
 
 	protected void updateLookAndFeel(
 			ActionRequest actionRequest, long companyId, long liveGroupId,
-			long stagingGroupId, boolean privateLayout, String themeId,
+			long stagingGroupId, boolean privateLayout,
 			UnicodeProperties typeSettingsProperties)
 		throws Exception {
 
@@ -289,8 +264,8 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 					deviceWapTheme);
 
 				updateThemeSettingsProperties(
-					actionRequest, companyId, typeSettingsProperties, themeId,
-					device, deviceThemeId, deviceWapTheme);
+					actionRequest, companyId, typeSettingsProperties, device,
+					deviceThemeId, deviceWapTheme);
 			}
 
 			long groupId = liveGroupId;

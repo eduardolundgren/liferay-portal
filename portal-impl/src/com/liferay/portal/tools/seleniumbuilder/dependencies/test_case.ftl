@@ -48,6 +48,8 @@ public class ${seleniumBuilderContext.getTestCaseSimpleClassName(testCaseName)}
 		<#if rootElement.element("var")??>
 			<#assign varElements = rootElement.elements("var")>
 
+			definitionScopeVariables = new HashMap<String, String>();
+
 			<#assign context = "definitionScopeVariables">
 
 			<#list varElements as varElement>
@@ -65,6 +67,18 @@ public class ${seleniumBuilderContext.getTestCaseSimpleClassName(testCaseName)}
 		}
 
 		selenium.startLogger();
+
+		<#if rootElement.element("var")??>
+			<#assign varElements = rootElement.elements("var")>
+
+			<#list varElements as varElement>
+				<#assign lineNumber = varElement.attributeValue("line-number")>
+
+				selenium.sendLogger(currentTestCaseName + "${lineNumber}", "pending", ${context});
+
+				selenium.sendLogger(currentTestCaseName + "${lineNumber}", "pass", ${context});
+			</#list>
+		</#if>
 	}
 
 	<#assign methodNames = ["command", "set-up", "tear-down"]>
@@ -99,13 +113,13 @@ public class ${seleniumBuilderContext.getTestCaseSimpleClassName(testCaseName)}
 				</#list>
 
 				if (!nested) {
-					selenium.sendLogger(currentTestCaseName + commandName, "start");
+					selenium.sendLogger(currentTestCaseName + commandName, "start", commandScopeVariables);
 
-					selenium.sendLogger(currentTestCaseName + commandName, "pending");
+					selenium.sendLogger(currentTestCaseName + commandName, "pending", commandScopeVariables);
 
 					<#assign lineNumber = methodElement.attributeValue("line-number")>
 
-					selenium.sendLogger(testCaseName + "${lineNumber}", "pending");
+					selenium.sendLogger(testCaseName + "${lineNumber}", "pending", commandScopeVariables);
 				}
 
 				<#assign blockElement = methodElement>
@@ -117,7 +131,7 @@ public class ${seleniumBuilderContext.getTestCaseSimpleClassName(testCaseName)}
 				if (!nested) {
 					<#assign lineNumber = methodElement.attributeValue("line-number")>
 
-					selenium.sendLogger(currentTestCaseName + "${lineNumber}", "pass");
+					selenium.sendLogger(currentTestCaseName + "${lineNumber}", "pass", commandScopeVariables);
 				}
 			}
 		</#list>
@@ -181,5 +195,7 @@ public class ${seleniumBuilderContext.getTestCaseSimpleClassName(testCaseName)}
 	}
 
 	private static String testCaseName;
+
+	private int _whileCount;
 
 }

@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
@@ -517,6 +518,10 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
+	public void pauseLoggerCheck() throws Exception {
+	}
+
+	@Override
 	public void refreshAndWait() {
 		super.refresh();
 		super.waitForPageToLoad("30000");
@@ -585,6 +590,11 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void sendLogger(String id, String status) {
+	}
+
+	@Override
+	public void sendLogger(
+		String id, String status, Map<String, String> context) {
 	}
 
 	@Override

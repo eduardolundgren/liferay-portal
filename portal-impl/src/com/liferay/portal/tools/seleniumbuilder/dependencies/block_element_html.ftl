@@ -12,7 +12,7 @@
 	</#if>
 
 	<li id="${lineId}${lineNumber}">
-		<#if element.getName() == "echo" || element.getName() == "fail" || element.getName() == "var">
+		<#if element.getName() == "echo" || element.getName() == "fail" || element.getName() == "property" || element.getName() == "var">
 			<#assign displayElement = element>
 
 			<#include "element_whole_html.ftl">
@@ -34,6 +34,10 @@
 
 				<#assign void = testCaseNameStack.pop()>
 			</#if>
+		<#elseif element.getName() == "for">
+			<#assign forElement = element>
+
+			<#include "for_element_html.ftl">
 		<#elseif element.getName() == "if">
 			<#assign displayElement = element>
 
