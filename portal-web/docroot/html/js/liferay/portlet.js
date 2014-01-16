@@ -443,29 +443,17 @@
 							after: {
 								success: function() {
 									if (restore) {
-										
-										A.io.request(
-											themeDisplay.getPathMain() + '/portal/render_portlet',
-											{
-												after: {
-													success: function() {
-														var responseData = this.get('responseData');
-														
-														content.plug(A.Plugin.ParseContent);
-														
-														content.html(responseData);
-													}									
-												},
-												data: {
-													doAsUserId: doAsUserId,
-													p_l_id: plid,
-													p_p_id: portlet.portletId,
-													p_p_decorate: false
-													
-												}
-											}
-										);
-										
+										var data = {
+											doAsUserId: doAsUserId,
+											p_l_id: plid,
+											p_p_boundary: false,
+											p_p_decorate: false,
+											p_p_id: portlet.portletId
+										};
+
+										content.plug(A.Plugin.ParseContent);
+
+										content.load(themeDisplay.getPathMain() + '/portal/render_portlet?' + A.QueryString.stringify(data));
 									}
 								}
 							},
