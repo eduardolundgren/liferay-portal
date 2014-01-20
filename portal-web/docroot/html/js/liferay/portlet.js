@@ -440,13 +440,13 @@
 											doAsUserId: doAsUserId,
 											p_l_id: plid,
 											p_p_boundary: false,
-											p_p_decorate: false,
-											p_p_id: portlet.portletId
+											p_p_id: portlet.portletId,
+											p_p_isolated: true
 										};
 
-										content.plug(A.Plugin.ParseContent);
+										portlet.plug(A.Plugin.ParseContent);
 
-										content.load(themeDisplay.getPathMain() + '/portal/render_portlet?' + A.QueryString.stringify(data));
+										portlet.load(themeDisplay.getPathMain() + '/portal/render_portlet?' + A.QueryString.stringify(data));
 									}
 								}
 							},
