@@ -430,13 +430,6 @@
 						}
 					}
 
-					var html = '';
-					var portletBody = content.one('.portlet-body');
-
-					if (portletBody) {
-						html = portletBody.html();
-					}
-
 					A.io.request(
 						themeDisplay.getPathMain() + '/portal/update_layout',
 						{
