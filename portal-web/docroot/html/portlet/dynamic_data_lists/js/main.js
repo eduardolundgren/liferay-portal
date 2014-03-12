@@ -644,7 +644,14 @@ AUI.add(
 									return AArray.map(
 										val,
 										function(item, index, collection) {
-											var date = new Date(Lang.toInt(item));
+											var date;
+
+											if (Lang.trim(item) === STR_EMPTY) {
+												date = new Date();
+											}
+											else {
+												date = new Date(Lang.toInt(item));
+											}
 
 											date = DateMath.add(date, DateMath.MINUTES, date.getTimezoneOffset());
 
