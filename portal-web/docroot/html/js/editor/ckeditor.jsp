@@ -373,7 +373,16 @@ if (inlineEdit && (inlineEditSaveURL != null)) {
 				</c:if>
 
 				<c:if test="<%= Validator.isNotNull(onChangeMethod) %>">
-					setInterval(
+					if (Liferay.Surface && Liferay.Surface.app) {
+						Liferay.once(
+							'surfaceScreenDeactivate', 
+							function() {
+								clearInterval(window['<%= name %>ContentChangeHandle']);
+							}
+						);
+					}
+
+					window['<%= name %>ContentChangeHandle'] = setInterval(
 						function() {
 							try {
 								window['<%= name %>'].onChangeCallback();
