@@ -202,7 +202,7 @@ if (layout != null) {
 			'<%= PortletKeys.TAGS_ADMIN %>': true
 		},
 
-		getAllowedPortlets: function() {
+		getAllowedPortletIds: function() {
 			var instance = this;
 
 			return A.Array.filter(
@@ -244,16 +244,26 @@ if (layout != null) {
 		getPatternPortletURL: function(lifecycle) {
 			var instance = this;
 
-			var allowedPortlets = instance.getAllowedPortlets();
+			var allowedPortlets = instance.getAllowedPortletIds();
 
 			return new RegExp('p_p_id=(' + allowedPortlets.join('|') + ')&p_p_lifecycle=' + lifecycle);
+		},
+
+		getPortletBoundaryIds: function(portletIds) {
+			var instance = this;
+
+			return portletIds.map(
+				function(id) {
+					return 'p_p_id_' + id + '_';
+				}
+			);
 		},
 
 		getRedirect: function(portletURL) {
 			var instance = this;
 
 			var url = new A.Url(portletURL);
-			var namespace = instance.getNamespace(portletURL);
+			var namespace = instance.getPortletURLNamespace(portletURL);
 
 			return url.getParameter(namespace + 'redirect');
 		},
@@ -261,13 +271,7 @@ if (layout != null) {
 		getSurfaceIds: function() {
 			var instance = this;
 
-			var allowedPortlets = instance.getAllowedPortlets();
-
-			var surfaces = allowedPortlets.map(
-				function(id) {
-					return 'p_p_id_' + id + '_';
-				}
-			);
+			var surfaces = instance.getPortletBoundaryIds(Liferay.Surface.getAllowedPortletIds());
 
 			surfaces.push('breadcrumbs');
 
@@ -295,6 +299,21 @@ if (layout != null) {
 			url.setParameter(namespace + 'redirect', redirect.toString());
 
 			return url.toString();
+		},
+
+		resetAllPortlets: function() {
+			A.Array.each(
+				Liferay.Surface.getPortletBoundaryIds(Liferay.Portlet.list),
+				function(value, index, collection) {
+					var portlet = A.one('#' + value);
+
+					if (portlet) {
+						portlet.portletProcessed = false;
+					}
+				}
+			);
+
+			Liferay.Portlet.readyCounter = 0;
 		},
 
 		sendRedirect: function(redirect, title) {
@@ -489,6 +508,13 @@ if (layout != null) {
 			var portletId = event.portlet.portletId;
 
 			Liferay.Surface.app.addSurfaces('p_p_id_' + portletId + '_');
+		}
+	);
+
+	Liferay.on(
+		'surfaceStartNavigate',
+		function(event) {
+			Liferay.Surface.resetAllPortlets();
 		}
 	);
 </aui:script>
