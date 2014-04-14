@@ -185,11 +185,11 @@ if (layout != null) {
 	</c:if>
 </aui:script>
 
-<aui:script use="aui-surface-app,aui-surface-base,aui-surface-screen-html,aui-surface-screen-route,liferay-portlet-url">
+<aui:script use="aui-surface-app,aui-surface-base,aui-surface-screen-html,liferay-portlet-url">
 	A.config.filter = 'debug';
 	A.config.useBrowserConsole = true;
 
-	var Lang = A.Lang;
+	<%-- Surface Utils --%>
 
 	Liferay.Surface = {
 		app: null,
@@ -310,6 +310,8 @@ if (layout != null) {
 		}
 	};
 
+	<%-- Surface Screens --%>
+
 	Liferay.Surface.EventScreen = A.Component.create(
 		{
 			EXTENDS: A.HTMLScreen,
@@ -323,7 +325,7 @@ if (layout != null) {
 					Liferay.fire(
 						'surfaceScreenAfterFlip',
 						{
-							app: App,
+							app: Liferay.Surface.app,
 							screen: instance
 						}
 					);
@@ -335,7 +337,7 @@ if (layout != null) {
 					Liferay.fire(
 						'surfaceScreenBeforeFlip',
 						{
-							app: App,
+							app: Liferay.Surface.app,
 							screen: instance
 						}
 					);
@@ -347,7 +349,7 @@ if (layout != null) {
 					Liferay.fire(
 						'surfaceScreenDeactivate',
 						{
-							app: App,
+							app: Liferay.Surface.app,
 							screen: instance
 						}
 					);
@@ -359,7 +361,7 @@ if (layout != null) {
 					Liferay.fire(
 						'surfaceScreenDestructor',
 						{
-							app: App,
+							app: Liferay.Surface.app,
 							screen: instance
 						}
 					);
@@ -404,6 +406,8 @@ if (layout != null) {
 		}
 	);
 
+	<%-- Surface App --%>
+
 	Liferay.Surface.app = new A.SurfaceApp(
 		{
 			basePath: Liferay.Surface.getBasePath(),
@@ -423,7 +427,7 @@ if (layout != null) {
 					Liferay.fire(
 						'surfaceEndNavigate',
 						{
-							app: App,
+							app: Liferay.Surface.app,
 							path: event.path
 						}
 					);
@@ -440,7 +444,7 @@ if (layout != null) {
 					Liferay.fire(
 						'surfaceStartNavigate',
 						{
-							app: App,
+							app: Liferay.Surface.app,
 							path: event.path
 						}
 					);
@@ -452,70 +456,39 @@ if (layout != null) {
 		}
 	);
 
-	var App = Liferay.Surface.app;
+	<%-- Surface Screen Routes --%>
 
-	var screenRouteActionURL = new A.ScreenRoute(
-		{
-			path: function(url) {
-				if (!screenRouteActionURL._regExp) {
-					screenRouteActionURL._regExp = Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.ACTION_PHASE);
-				}
-
-				return url.search(screenRouteActionURL._regExp) > -1;
-			},
-
-			screen: Liferay.Surface.ActionURLScreen
-		}
-	);
-
-	var screenRouteRenderURL = new A.ScreenRoute(
-		{
-			path: function(url) {
-				if (!screenRouteRenderURL._regExp) {
-					screenRouteRenderURL._regExp = Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.RENDER_PHASE);
-				}
-
-				return url.search(screenRouteRenderURL._regExp) > -1;
-			},
-
-			screen: Liferay.Surface.RenderURLScreen
-		}
-	);
-
-	App.addScreens(
+	Liferay.Surface.app.addScreenRoutes(
 		[
-			screenRouteActionURL,
+			{
+				path: function(url) {
+					return url.search(Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.ACTION_PHASE)) > -1;
+				},
+				screen: Liferay.Surface.ActionURLScreen
+			},
 			{
 				path: Liferay.Surface.getPatternFriendlyURL(),
 				screen: Liferay.Surface.RenderURLScreen
 			},
-			screenRouteRenderURL
+			{
+				path: function(url) {
+					return url.search(Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.RENDER_PHASE)) > -1;
+				},
+				screen: Liferay.Surface.RenderURLScreen
+			}
 		]
 	);
 
-	App.addSurfaces(Liferay.Surface.getSurfaceIds());
+	Liferay.Surface.app.addSurfaces(Liferay.Surface.getSurfaceIds());
+
+	<%-- Surface Extras --%>
 
 	Liferay.on(
 		'addPortlet',
 		function(event) {
 			var portletId = event.portlet.portletId;
 
-			if (!Liferay.Surface.blacklist[portletId]) {
-				App.addSurfaces('p_p_id_' + portletId + '_');
-
-				screenRouteActionURL._regExp = null;
-				screenRouteRenderURL._regExp = null;
-			}
-		}
-	);
-
-	Liferay.on(
-		'closePortlet',
-		function(event) {
-			var portletId = event.portlet.portletId;
-
-			screenRouteActionURL._regExp = null;
-			screenRouteRenderURL._regExp = null;
+			Liferay.Surface.app.addSurfaces('p_p_id_' + portletId + '_');
 		}
 	);
 </aui:script>
