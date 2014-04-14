@@ -195,11 +195,11 @@ if (layout != null) {
 		app: null,
 
 		blacklist: {
-			15: true,
-			20: true,
-			99: true,
-			147: true,
-			'<%= PortletKeys.NESTED_PORTLETS %>': true
+			'<%= PortletKeys.ASSET_CATEGORIES_ADMIN %>': true,
+			'<%= PortletKeys.DOCUMENT_LIBRARY %>': true,
+			'<%= PortletKeys.JOURNAL %>': true,
+			'<%= PortletKeys.NESTED_PORTLETS %>': true,
+			'<%= PortletKeys.TAGS_ADMIN %>': true
 		},
 
 		getAllowedPortlets: function() {
