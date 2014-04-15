@@ -208,13 +208,7 @@ if (layout != null) {
 			return A.Array.filter(
 				Liferay.Portlet.list,
 				function(portletId) {
-					var lastIndexOf = portletId.lastIndexOf('_INSTANCE_');
-
-					if (lastIndexOf > 0) {
-						portletId = portletId.substr(0, lastIndexOf);
-					}
-
-					return !instance.blacklist[portletId];
+					return instance.isAllowedPortletId(portletId);
 				}
 			);
 		},
@@ -249,12 +243,16 @@ if (layout != null) {
 			return new RegExp('p_p_id=(' + allowedPortlets.join('|') + ')&p_p_lifecycle=' + lifecycle);
 		},
 
+		getPortletBoundaryId: function(portletId) {
+			return 'p_p_id_' + portletId + '_';
+		},
+
 		getPortletBoundaryIds: function(portletIds) {
 			var instance = this;
 
 			return portletIds.map(
-				function(id) {
-					return 'p_p_id_' + id + '_';
+				function(portletId) {
+					return instance.getPortletBoundaryId(portletId);
 				}
 			);
 		},
@@ -271,7 +269,7 @@ if (layout != null) {
 		getSurfaceIds: function() {
 			var instance = this;
 
-			var surfaces = instance.getPortletBoundaryIds(Liferay.Surface.getAllowedPortletIds());
+			var surfaces = instance.getPortletBoundaryIds(instance.getAllowedPortletIds());
 
 			surfaces.push('breadcrumbs');
 
@@ -288,12 +286,24 @@ if (layout != null) {
 			return false;
 		},
 
+		isAllowedPortletId: function(portletId) {
+			var instance = this;
+
+			var lastIndexOf = portletId.lastIndexOf('_INSTANCE_');
+
+			if (lastIndexOf > 0) {
+				portletId = portletId.substr(0, lastIndexOf);
+			}
+
+			return !instance.blacklist[portletId];
+		},
+
 		isolatePortletURLRedirect: function(portletURL) {
 			var instance = this;
 
 			var url = new A.Url(portletURL);
-			var namespace = Liferay.Surface.getNamespace(url.toString());
-			var redirect = new A.Url(Liferay.Surface.getRedirect(url.toString()));
+			var namespace = instance.getNamespace(url.toString());
+			var redirect = new A.Url(instance.getRedirect(url.toString()));
 
 			redirect.setParameter('p_p_isolated', true);
 			url.setParameter(namespace + 'redirect', redirect.toString());
@@ -302,8 +312,10 @@ if (layout != null) {
 		},
 
 		resetAllPortlets: function() {
+			var instance = this;
+
 			A.Array.each(
-				Liferay.Surface.getPortletBoundaryIds(Liferay.Portlet.list),
+				instance.getPortletBoundaryIds(Liferay.Portlet.list),
 				function(value, index, collection) {
 					var portlet = A.one('#' + value);
 
@@ -504,11 +516,26 @@ if (layout != null) {
 	<%-- Surface Extras --%>
 
 	Liferay.on(
-		'addPortlet',
+		'closePortlet',
 		function(event) {
-			var portletId = event.portlet.portletId;
+			var portletId = event.portletId;
 
-			Liferay.Surface.app.addSurfaces('p_p_id_' + portletId + '_');
+			var surfaceId = Liferay.Surface.getPortletBoundaryId(portletId);
+
+			delete Liferay.Surface.app.surfaces[surfaceId];
+		}
+	);
+
+	Liferay.on(
+		'portletReady',
+		function(event) {
+			var portletId = event.portletId;
+
+			var surfaceId = Liferay.Surface.getPortletBoundaryId(portletId);
+
+			if (Liferay.Surface.isAllowedPortletId(portletId) && !Liferay.Surface.app.surfaces[surfaceId]) {
+				Liferay.Surface.app.addSurfaces(surfaceId);
+			}
 		}
 	);
 
