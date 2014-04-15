@@ -263,7 +263,7 @@ if (layout != null) {
 			var instance = this;
 
 			var url = new A.Url(portletURL);
-			var namespace = instance.getPortletURLNamespace(portletURL);
+			var namespace = instance.getNamespace(portletURL);
 
 			return url.getParameter(namespace + 'redirect');
 		},
