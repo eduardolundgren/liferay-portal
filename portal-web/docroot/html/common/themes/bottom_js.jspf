@@ -308,7 +308,7 @@ if (layout != null) {
 					var portlet = A.one('#' + value);
 
 					if (portlet) {
-                        portlet.purge(true);
+						portlet.purge(true);
 						portlet.portletProcessed = false;
 					}
 				}
