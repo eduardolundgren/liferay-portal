@@ -185,7 +185,7 @@
 		%>
 
 		<c:choose>
-			<c:when test='<%= localized && (type.equals("text") || type.equals("textarea")) %>'>
+			<c:when test='<%= localized && (type.equals("editor") || type.equals("text") || type.equals("textarea")) %>'>
 				<liferay-ui:input-localized
 					autoFocus="<%= autoFocus %>"
 					availableLocales="<%= LanguageUtil.getAvailableLocales() %>"
@@ -200,7 +200,7 @@
 					onChange="<%= onChange %>"
 					onClick="<%= onClick %>"
 					placeholder="<%= placeholder %>"
-					type='<%= type.equals("text") ? "input" : "textarea" %>'
+					type='<%= type.equals("text") ? "input" : type %>'
 					xml="<%= valueString %>"
 				/>
 			</c:when>
