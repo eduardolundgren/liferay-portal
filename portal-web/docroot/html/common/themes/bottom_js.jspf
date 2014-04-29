@@ -195,13 +195,7 @@ if (layout != null) {
 		Liferay.Surface = {
 			app: null,
 
-			blacklist: {
-				'<%= PortletKeys.ASSET_CATEGORIES_ADMIN %>': true,
-				'<%= PortletKeys.DOCUMENT_LIBRARY %>': true,
-				'<%= PortletKeys.JOURNAL %>': true,
-				'<%= PortletKeys.NESTED_PORTLETS %>': true,
-				'<%= PortletKeys.TAGS_ADMIN %>': true
-			},
+			blacklist: {},
 
 			getAllowedPortletIds: function() {
 				var instance = this;
@@ -546,6 +540,21 @@ if (layout != null) {
 				Liferay.Surface.resetAllPortlets();
 			}
 		);
+
+		<%
+		List<Portlet> portletsList = PortletLocalServiceUtil.getPortlets(themeDisplay.getCompanyId());
+
+		for (Portlet portlet : portletsList) {
+			if (portlet.isActive() && portlet.isReady() && !portlet.isUndeployedPortlet() && !portlet.isSinglePageApplication()) {
+		%>
+
+			Liferay.Surface.blacklist['<%= portlet.getPortletId() %>'] = true;
+
+		<%
+			}
+		}
+		%>
+
 	</aui:script>
 
 	<div class="surface-loading-bar"></div>
