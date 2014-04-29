@@ -37,14 +37,6 @@ AUI.add(
 						return value;
 					},
 
-					_defChangeFn: function(event) {
-						var instance = this;
-
-						event.newVal.liferay = true;
-
-						instance._storeState(event.src, event.newVal, event._options);
-					},
-
 					_parse: A.cached(
 						function(str) {
 							return QueryString.parse(str, History.PAIR_SEPARATOR, History.VALUE_SEPARATOR);
