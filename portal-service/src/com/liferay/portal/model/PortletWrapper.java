@@ -1462,16 +1462,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Returns <code>true</code> if the portlet uses Single Page Application.
-	*
-	* @return <code>true</code> if the portlet uses Single Page Application
-	*/
-	@Override
-	public boolean getSinglePageApplication() {
-		return _portlet.getSinglePageApplication();
-	}
-
-	/**
 	* Returns <code>true</code> if users are shown that they do not have access
 	* to the portlet.
 	*
@@ -1492,6 +1482,16 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean getShowPortletInactive() {
 		return _portlet.getShowPortletInactive();
+	}
+
+	/**
+	* Returns <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @return <code>true</code> if the portlet uses Single Page Application
+	*/
+	@Override
+	public boolean getSinglePageApplication() {
+		return _portlet.getSinglePageApplication();
 	}
 
 	/**
@@ -2215,16 +2215,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Returns <code>true</code> if the portlet uses Single Page Application.
-	*
-	* @return <code>true</code> if the portlet uses Single Page Application
-	*/
-	@Override
-	public boolean isSinglePageApplication() {
-		return _portlet.isSinglePageApplication();
-	}
-
-	/**
 	* Returns <code>true</code> if users are shown that they do not have access
 	* to the portlet.
 	*
@@ -2245,6 +2235,16 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean isShowPortletInactive() {
 		return _portlet.isShowPortletInactive();
+	}
+
+	/**
+	* Returns <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @return <code>true</code> if the portlet uses Single Page Application
+	*/
+	@Override
+	public boolean isSinglePageApplication() {
+		return _portlet.isSinglePageApplication();
 	}
 
 	/**
@@ -3183,17 +3183,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Set to <code>true</code> if the portlet uses Single Page Application.
-	*
-	* @param singlePageApplication boolean value for whether or not the the
-	portlet uses Single Page Application
-	*/
-	@Override
-	public void setSinglePageApplication(boolean singlePageApplication) {
-		_portlet.setSinglePageApplication(singlePageApplication);
-	}
-
-	/**
 	* Set to <code>true</code> if users are shown that they do not have access
 	* to the portlet.
 	*
@@ -3214,6 +3203,17 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setShowPortletInactive(boolean showPortletInactive) {
 		_portlet.setShowPortletInactive(showPortletInactive);
+	}
+
+	/**
+	* Set to <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @param singlePageApplication boolean value for whether or not the the
+	portlet uses Single Page Application
+	*/
+	@Override
+	public void setSinglePageApplication(boolean singlePageApplication) {
+		_portlet.setSinglePageApplication(singlePageApplication);
 	}
 
 	/**

@@ -860,13 +860,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public boolean getScopeable();
 
 	/**
-	* Returns <code>true</code> if the portlet uses Single Page Application.
-	*
-	* @return <code>true</code> if the portlet uses Single Page Application
-	*/
-	public boolean getSinglePageApplication();
-
-	/**
 	* Returns <code>true</code> if users are shown that they do not have access
 	* to the portlet.
 	*
@@ -882,6 +875,13 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return <code>true</code> if users are shown that the portlet is inactive
 	*/
 	public boolean getShowPortletInactive();
+
+	/**
+	* Returns <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @return <code>true</code> if the portlet uses Single Page Application
+	*/
+	public boolean getSinglePageApplication();
 
 	/**
 	* Returns the names of the classes that represent social activity
@@ -1397,13 +1397,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public boolean isScopeable();
 
 	/**
-	* Returns <code>true</code> if the portlet uses Single Page Application.
-	*
-	* @return <code>true</code> if the portlet uses Single Page Application
-	*/
-	public boolean isSinglePageApplication();
-
-	/**
 	* Returns <code>true</code> if users are shown that they do not have access
 	* to the portlet.
 	*
@@ -1419,6 +1412,13 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return <code>true</code> if users are shown that the portlet is inactive
 	*/
 	public boolean isShowPortletInactive();
+
+	/**
+	* Returns <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @return <code>true</code> if the portlet uses Single Page Application
+	*/
+	public boolean isSinglePageApplication();
 
 	/**
 	* Returns <code>true</code> if the portlet is a static portlet that is
@@ -2113,14 +2113,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public void setScopeable(boolean scopeable);
 
 	/**
-	* Set to <code>true</code> if the portlet uses Single Page Application.
-	*
-	* @param singlePageApplication boolean value for whether or not the the
-	portlet uses Single Page Application
-	*/
-	public void setSinglePageApplication(boolean singlePageApplication);
-
-	/**
 	* Set to <code>true</code> if users are shown that they do not have access
 	* to the portlet.
 	*
@@ -2136,6 +2128,14 @@ public interface Portlet extends PortletModel, PersistedModel {
 	the portlet is inactive
 	*/
 	public void setShowPortletInactive(boolean showPortletInactive);
+
+	/**
+	* Set to <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @param singlePageApplication boolean value for whether or not the the
+	portlet uses Single Page Application
+	*/
+	public void setSinglePageApplication(boolean singlePageApplication);
 
 	/**
 	* Sets the names of the classes that represent social activity interpreters
