@@ -185,366 +185,368 @@ if (layout != null) {
 	</c:if>
 </aui:script>
 
-<aui:script use="aui-surface-app,aui-surface-base,aui-surface-screen-html,liferay-portlet-url">
-	A.config.filter = 'debug';
-	A.config.useBrowserConsole = true;
+<c:if test="<%= PropsValues.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED %>">
+	<aui:script use="aui-surface-app,aui-surface-base,aui-surface-screen-html,liferay-portlet-url">
+		A.config.filter = 'debug';
+		A.config.useBrowserConsole = true;
 
-	<%-- Surface Utils --%>
+		<%-- Surface Utils --%>
 
-	Liferay.Surface = {
-		app: null,
+		Liferay.Surface = {
+			app: null,
 
-		blacklist: {
-			'<%= PortletKeys.ASSET_CATEGORIES_ADMIN %>': true,
-			'<%= PortletKeys.DOCUMENT_LIBRARY %>': true,
-			'<%= PortletKeys.JOURNAL %>': true,
-			'<%= PortletKeys.NESTED_PORTLETS %>': true,
-			'<%= PortletKeys.TAGS_ADMIN %>': true
-		},
-
-		getAllowedPortletIds: function() {
-			var instance = this;
-
-			return A.Array.filter(
-				Liferay.Portlet.list,
-				function(portletId) {
-					return instance.isAllowedPortletId(portletId);
-				}
-			);
-		},
-
-		getBasePath: function() {
-			var instance = this;
-
-			var layoutRelativeURL = themeDisplay.getLayoutRelativeURL();
-
-			return layoutRelativeURL.substr(0, layoutRelativeURL.lastIndexOf('/'));
-		},
-
-		getNamespace: function(portletURL) {
-			var instance = this;
-
-			var url = new A.Url(portletURL);
-
-			return Liferay.Util.getPortletNamespace(url.getParameter('p_p_id'));
-		},
-
-		getPatternFriendlyURL: function() {
-			var instance = this;
-
-			return /\/-\//;
-		},
-
-		getPatternPortletURL: function(lifecycle) {
-			var instance = this;
-
-			var allowedPortlets = instance.getAllowedPortletIds();
-
-			return new RegExp('p_p_id=(' + allowedPortlets.join('|') + ')&p_p_lifecycle=' + lifecycle);
-		},
-
-		getPortletBoundaryId: function(portletId) {
-			return 'p_p_id_' + portletId + '_';
-		},
-
-		getPortletBoundaryIds: function(portletIds) {
-			var instance = this;
-
-			return portletIds.map(
-				function(portletId) {
-					return instance.getPortletBoundaryId(portletId);
-				}
-			);
-		},
-
-		getRedirect: function(portletURL) {
-			var instance = this;
-
-			var url = new A.Url(portletURL);
-			var namespace = instance.getNamespace(portletURL);
-
-			return url.getParameter(namespace + 'redirect');
-		},
-
-		getSurfaceIds: function() {
-			var instance = this;
-
-			var surfaces = instance.getPortletBoundaryIds(instance.getAllowedPortletIds());
-
-			surfaces.push('breadcrumbs');
-
-			return surfaces;
-		},
-
-		isActionURL: function(url) {
-			var instance = this;
-
-			if (url.indexOf('p_p_lifecycle=1') > -1) {
-				return true;
-			}
-
-			return false;
-		},
-
-		isAllowedPortletId: function(portletId) {
-			var instance = this;
-
-			var lastIndexOf = portletId.lastIndexOf('_INSTANCE_');
-
-			if (lastIndexOf > 0) {
-				portletId = portletId.substr(0, lastIndexOf);
-			}
-
-			return !instance.blacklist[portletId];
-		},
-
-		isolatePortletURLRedirect: function(portletURL) {
-			var instance = this;
-
-			var url = new A.Url(portletURL);
-			var namespace = instance.getNamespace(url.toString());
-			var redirect = new A.Url(instance.getRedirect(url.toString()));
-
-			redirect.setParameter('p_p_isolated', true);
-			url.setParameter(namespace + 'redirect', redirect.toString());
-
-			return url.toString();
-		},
-
-		resetAllPortlets: function() {
-			var instance = this;
-
-			A.Array.each(
-				instance.getPortletBoundaryIds(Liferay.Portlet.list),
-				function(value, index, collection) {
-					var portlet = A.one('#' + value);
-
-					if (portlet) {
-						portlet.purge(true);
-						portlet.portletProcessed = false;
-					}
-				}
-			);
-
-			Liferay.Portlet.readyCounter = 0;
-		},
-
-		sendRedirect: function(redirect, title) {
-			var instance = this;
-
-			if (redirect) {
-				var url = new A.Url(redirect);
-
-				url.removeParameter('p_p_isolated');
-
-				A.config.win.history.replaceState(null, title, url.toString());
-			}
-		}
-	};
-
-	<%-- Surface Screens --%>
-
-	Liferay.Surface.EventScreen = A.Component.create(
-		{
-			EXTENDS: A.HTMLScreen,
-
-			NAME: 'baseScreen',
-
-			prototype: {
-				afterFlip: function() {
-					var instance = this;
-
-					Liferay.fire(
-						'surfaceScreenAfterFlip',
-						{
-							app: Liferay.Surface.app,
-							screen: instance
-						}
-					);
-				},
-
-				beforeFlip: function() {
-					var instance = this;
-
-					Liferay.fire(
-						'surfaceScreenBeforeFlip',
-						{
-							app: Liferay.Surface.app,
-							screen: instance
-						}
-					);
-				},
-
-				deactivate: function() {
-					var instance = this;
-
-					Liferay.fire(
-						'surfaceScreenDeactivate',
-						{
-							app: Liferay.Surface.app,
-							screen: instance
-						}
-					);
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					Liferay.fire(
-						'surfaceScreenDestructor',
-						{
-							app: Liferay.Surface.app,
-							screen: instance
-						}
-					);
-				}
-			}
-		}
-	);
-
-	Liferay.Surface.ActionURLScreen = A.Component.create(
-		{
-			ATTRS: {
-				cacheable: {
-					value: false
-				},
-				method: {
-					value: 'POST'
-				}
+			blacklist: {
+				'<%= PortletKeys.ASSET_CATEGORIES_ADMIN %>': true,
+				'<%= PortletKeys.DOCUMENT_LIBRARY %>': true,
+				'<%= PortletKeys.JOURNAL %>': true,
+				'<%= PortletKeys.NESTED_PORTLETS %>': true,
+				'<%= PortletKeys.TAGS_ADMIN %>': true
 			},
 
-			EXTENDS: Liferay.Surface.EventScreen,
+			getAllowedPortletIds: function() {
+				var instance = this;
 
-			NAME: 'actionURLScreen'
-		}
-	);
-
-	Liferay.Surface.RenderURLScreen = A.Component.create(
-		{
-			ATTRS: {
-				cacheable: {
-					value: true
-				},
-				urlParams: {
-					value: {
-						p_p_isolated: true
+				return A.Array.filter(
+					Liferay.Portlet.list,
+					function(portletId) {
+						return instance.isAllowedPortletId(portletId);
 					}
-				}
+				);
 			},
 
-			EXTENDS: Liferay.Surface.EventScreen,
+			getBasePath: function() {
+				var instance = this;
 
-			NAME: 'renderURLScreen'
-		}
-	);
+				var layoutRelativeURL = themeDisplay.getLayoutRelativeURL();
 
-	<%-- Surface App --%>
-
-	Liferay.Surface.app = new A.SurfaceApp(
-		{
-			basePath: Liferay.Surface.getBasePath(),
-			linkSelector: 'a:not(.portlet-icon-back)',
-			on: {
-				endNavigate: function(event) {
-					var instance = this;
-
-					if (Liferay.Surface.isActionURL(event.path)) {
-						var redirect = Liferay.Surface.getRedirect(event.path);
-
-						var title = instance.get('title');
-
-						Liferay.Surface.sendRedirect(redirect, title);
-					}
-
-					Liferay.fire(
-						'surfaceEndNavigate',
-						{
-							app: Liferay.Surface.app,
-							path: event.path
-						}
-					);
-
-					A.one('body').removeClass('surface-loading');
-				},
-				startNavigate: function(event) {
-					var instance = this;
-
-					if (Liferay.Surface.isActionURL(event.path)) {
-						event.path = Liferay.Surface.isolatePortletURLRedirect(event.path);
-					}
-
-					Liferay.fire(
-						'surfaceStartNavigate',
-						{
-							app: Liferay.Surface.app,
-							path: event.path
-						}
-					);
-
-					A.one('body').addClass('surface-loading');
-				}
+				return layoutRelativeURL.substr(0, layoutRelativeURL.lastIndexOf('/'));
 			},
-			scrollToTop: false
-		}
-	);
 
-	<%-- Surface Screen Routes --%>
+			getNamespace: function(portletURL) {
+				var instance = this;
 
-	Liferay.Surface.app.addScreenRoutes(
-		[
+				var url = new A.Url(portletURL);
+
+				return Liferay.Util.getPortletNamespace(url.getParameter('p_p_id'));
+			},
+
+			getPatternFriendlyURL: function() {
+				var instance = this;
+
+				return /\/-\//;
+			},
+
+			getPatternPortletURL: function(lifecycle) {
+				var instance = this;
+
+				var allowedPortlets = instance.getAllowedPortletIds();
+
+				return new RegExp('p_p_id=(' + allowedPortlets.join('|') + ')&p_p_lifecycle=' + lifecycle);
+			},
+
+			getPortletBoundaryId: function(portletId) {
+				return 'p_p_id_' + portletId + '_';
+			},
+
+			getPortletBoundaryIds: function(portletIds) {
+				var instance = this;
+
+				return portletIds.map(
+					function(portletId) {
+						return instance.getPortletBoundaryId(portletId);
+					}
+				);
+			},
+
+			getRedirect: function(portletURL) {
+				var instance = this;
+
+				var url = new A.Url(portletURL);
+				var namespace = instance.getNamespace(portletURL);
+
+				return url.getParameter(namespace + 'redirect');
+			},
+
+			getSurfaceIds: function() {
+				var instance = this;
+
+				var surfaces = instance.getPortletBoundaryIds(instance.getAllowedPortletIds());
+
+				surfaces.push('breadcrumbs');
+
+				return surfaces;
+			},
+
+			isActionURL: function(url) {
+				var instance = this;
+
+				if (url.indexOf('p_p_lifecycle=1') > -1) {
+					return true;
+				}
+
+				return false;
+			},
+
+			isAllowedPortletId: function(portletId) {
+				var instance = this;
+
+				var lastIndexOf = portletId.lastIndexOf('_INSTANCE_');
+
+				if (lastIndexOf > 0) {
+					portletId = portletId.substr(0, lastIndexOf);
+				}
+
+				return !instance.blacklist[portletId];
+			},
+
+			isolatePortletURLRedirect: function(portletURL) {
+				var instance = this;
+
+				var url = new A.Url(portletURL);
+				var namespace = instance.getNamespace(url.toString());
+				var redirect = new A.Url(instance.getRedirect(url.toString()));
+
+				redirect.setParameter('p_p_isolated', true);
+				url.setParameter(namespace + 'redirect', redirect.toString());
+
+				return url.toString();
+			},
+
+			resetAllPortlets: function() {
+				var instance = this;
+
+				A.Array.each(
+					instance.getPortletBoundaryIds(Liferay.Portlet.list),
+					function(value, index, collection) {
+						var portlet = A.one('#' + value);
+
+						if (portlet) {
+							portlet.purge(true);
+							portlet.portletProcessed = false;
+						}
+					}
+				);
+
+				Liferay.Portlet.readyCounter = 0;
+			},
+
+			sendRedirect: function(redirect, title) {
+				var instance = this;
+
+				if (redirect) {
+					var url = new A.Url(redirect);
+
+					url.removeParameter('p_p_isolated');
+
+					A.config.win.history.replaceState(null, title, url.toString());
+				}
+			}
+		};
+
+		<%-- Surface Screens --%>
+
+		Liferay.Surface.EventScreen = A.Component.create(
 			{
-				path: function(url) {
-					return url.search(Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.ACTION_PHASE)) > -1;
-				},
-				screen: Liferay.Surface.ActionURLScreen
-			},
-			{
-				path: Liferay.Surface.getPatternFriendlyURL(),
-				screen: Liferay.Surface.RenderURLScreen
-			},
-			{
-				path: function(url) {
-					return url.search(Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.RENDER_PHASE)) > -1;
-				},
-				screen: Liferay.Surface.RenderURLScreen
+				EXTENDS: A.HTMLScreen,
+
+				NAME: 'baseScreen',
+
+				prototype: {
+					afterFlip: function() {
+						var instance = this;
+
+						Liferay.fire(
+							'surfaceScreenAfterFlip',
+							{
+								app: Liferay.Surface.app,
+								screen: instance
+							}
+						);
+					},
+
+					beforeFlip: function() {
+						var instance = this;
+
+						Liferay.fire(
+							'surfaceScreenBeforeFlip',
+							{
+								app: Liferay.Surface.app,
+								screen: instance
+							}
+						);
+					},
+
+					deactivate: function() {
+						var instance = this;
+
+						Liferay.fire(
+							'surfaceScreenDeactivate',
+							{
+								app: Liferay.Surface.app,
+								screen: instance
+							}
+						);
+					},
+
+					destructor: function() {
+						var instance = this;
+
+						Liferay.fire(
+							'surfaceScreenDestructor',
+							{
+								app: Liferay.Surface.app,
+								screen: instance
+							}
+						);
+					}
+				}
 			}
-		]
-	);
+		);
 
-	Liferay.Surface.app.addSurfaces(Liferay.Surface.getSurfaceIds());
+		Liferay.Surface.ActionURLScreen = A.Component.create(
+			{
+				ATTRS: {
+					cacheable: {
+						value: false
+					},
+					method: {
+						value: 'POST'
+					}
+				},
 
-	<%-- Surface Extras --%>
+				EXTENDS: Liferay.Surface.EventScreen,
 
-	Liferay.on(
-		'closePortlet',
-		function(event) {
-			var portletId = event.portletId;
-
-			var surfaceId = Liferay.Surface.getPortletBoundaryId(portletId);
-
-			delete Liferay.Surface.app.surfaces[surfaceId];
-		}
-	);
-
-	Liferay.on(
-		'portletReady',
-		function(event) {
-			var portletId = event.portletId;
-
-			var surfaceId = Liferay.Surface.getPortletBoundaryId(portletId);
-
-			if (Liferay.Surface.isAllowedPortletId(portletId) && !Liferay.Surface.app.surfaces[surfaceId]) {
-				Liferay.Surface.app.addSurfaces(surfaceId);
+				NAME: 'actionURLScreen'
 			}
-		}
-	);
+		);
 
-	Liferay.on(
-		'surfaceStartNavigate',
-		function(event) {
-			Liferay.Surface.resetAllPortlets();
-		}
-	);
-</aui:script>
+		Liferay.Surface.RenderURLScreen = A.Component.create(
+			{
+				ATTRS: {
+					cacheable: {
+						value: true
+					},
+					urlParams: {
+						value: {
+							p_p_isolated: true
+						}
+					}
+				},
 
-<div class="surface-loading-bar"></div>
+				EXTENDS: Liferay.Surface.EventScreen,
+
+				NAME: 'renderURLScreen'
+			}
+		);
+
+		<%-- Surface App --%>
+
+		Liferay.Surface.app = new A.SurfaceApp(
+			{
+				basePath: Liferay.Surface.getBasePath(),
+				linkSelector: 'a:not(.portlet-icon-back)',
+				on: {
+					endNavigate: function(event) {
+						var instance = this;
+
+						if (Liferay.Surface.isActionURL(event.path)) {
+							var redirect = Liferay.Surface.getRedirect(event.path);
+
+							var title = instance.get('title');
+
+							Liferay.Surface.sendRedirect(redirect, title);
+						}
+
+						Liferay.fire(
+							'surfaceEndNavigate',
+							{
+								app: Liferay.Surface.app,
+								path: event.path
+							}
+						);
+
+						A.one('body').removeClass('surface-loading');
+					},
+					startNavigate: function(event) {
+						var instance = this;
+
+						if (Liferay.Surface.isActionURL(event.path)) {
+							event.path = Liferay.Surface.isolatePortletURLRedirect(event.path);
+						}
+
+						Liferay.fire(
+							'surfaceStartNavigate',
+							{
+								app: Liferay.Surface.app,
+								path: event.path
+							}
+						);
+
+						A.one('body').addClass('surface-loading');
+					}
+				},
+				scrollToTop: false
+			}
+		);
+
+		<%-- Surface Screen Routes --%>
+
+		Liferay.Surface.app.addScreenRoutes(
+			[
+				{
+					path: function(url) {
+						return url.search(Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.ACTION_PHASE)) > -1;
+					},
+					screen: Liferay.Surface.ActionURLScreen
+				},
+				{
+					path: Liferay.Surface.getPatternFriendlyURL(),
+					screen: Liferay.Surface.RenderURLScreen
+				},
+				{
+					path: function(url) {
+						return url.search(Liferay.Surface.getPatternPortletURL(Liferay.PortletURL.RENDER_PHASE)) > -1;
+					},
+					screen: Liferay.Surface.RenderURLScreen
+				}
+			]
+		);
+
+		Liferay.Surface.app.addSurfaces(Liferay.Surface.getSurfaceIds());
+
+		<%-- Surface Extras --%>
+
+		Liferay.on(
+			'closePortlet',
+			function(event) {
+				var portletId = event.portletId;
+
+				var surfaceId = Liferay.Surface.getPortletBoundaryId(portletId);
+
+				delete Liferay.Surface.app.surfaces[surfaceId];
+			}
+		);
+
+		Liferay.on(
+			'portletReady',
+			function(event) {
+				var portletId = event.portletId;
+
+				var surfaceId = Liferay.Surface.getPortletBoundaryId(portletId);
+
+				if (Liferay.Surface.isAllowedPortletId(portletId) && !Liferay.Surface.app.surfaces[surfaceId]) {
+					Liferay.Surface.app.addSurfaces(surfaceId);
+				}
+			}
+		);
+
+		Liferay.on(
+			'surfaceStartNavigate',
+			function(event) {
+				Liferay.Surface.resetAllPortlets();
+			}
+		);
+	</aui:script>
+
+	<div class="surface-loading-bar"></div>
+</c:if>
