@@ -438,7 +438,7 @@ if (layout != null) {
 		Liferay.Surface.app = new A.SurfaceApp(
 			{
 				basePath: Liferay.Surface.getBasePath(),
-				linkSelector: 'a:not(.portlet-icon-back)',
+				linkSelector: 'a:not(.portlet-icon-back):not([data-resource-href])',
 				on: {
 					endNavigate: function(event) {
 						var instance = this;
