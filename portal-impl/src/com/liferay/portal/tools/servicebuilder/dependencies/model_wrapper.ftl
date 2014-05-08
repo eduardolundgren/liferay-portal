@@ -166,6 +166,33 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 		return false;
 	}
 
+	<#if entity.isHierarchicalTree()>
+		@Override
+		public long getNestedSetsTreeNodeLeft() {
+			return _${entity.varName}.getNestedSetsTreeNodeLeft();
+		}
+
+		@Override
+		public long getNestedSetsTreeNodeRight() {
+			return _${entity.varName}.getNestedSetsTreeNodeRight();
+		}
+
+		@Override
+		public long getNestedSetsTreeNodeScopeId() {
+			return _${entity.varName}.getNestedSetsTreeNodeScopeId();
+		}
+
+		@Override
+		public void setNestedSetsTreeNodeLeft(long nestedSetsTreeNodeLeft) {
+			_${entity.varName}.setNestedSetsTreeNodeLeft(nestedSetsTreeNodeLeft);
+		}
+
+		@Override
+		public void setNestedSetsTreeNodeRight(long nestedSetsTreeNodeRight) {
+			_${entity.varName}.setNestedSetsTreeNodeRight(nestedSetsTreeNodeRight);
+		}
+	</#if>
+
 	<#if entity.isStagedModel() && !hasGetStagedModelTypeMethod!false>
 		@Override
 		public StagedModelType getStagedModelType() {

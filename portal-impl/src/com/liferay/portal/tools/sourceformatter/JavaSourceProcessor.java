@@ -479,6 +479,77 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
+	protected void checkSystemEventAnnotations(String content, String fileName)
+		throws Exception {
+
+		if (!portalSource || !fileName.endsWith("PortletDataHandler.java")) {
+			return;
+		}
+
+		int pos = content.indexOf("setDeletionSystemEventStagedModelTypes");
+
+		if (pos == -1) {
+			return;
+		}
+
+		String deletionSystemEventStagedModelTypes = content.substring(
+			pos, content.indexOf(");", pos));
+
+		Matcher matcher = _stagedModelTypesPattern.matcher(
+			deletionSystemEventStagedModelTypes);
+
+		while (matcher.find()) {
+			String stagedModelTypeClassName = matcher.group(1);
+
+			pos = stagedModelTypeClassName.indexOf(".class");
+
+			if (pos == -1) {
+				pos = stagedModelTypeClassName.indexOf("Constants");
+			}
+
+			if (pos == -1) {
+				return;
+			}
+
+			String className = stagedModelTypeClassName.substring(0, pos);
+
+			Pattern packageNamePattern = Pattern.compile(
+				"import (com\\.liferay\\.[a-zA-Z\\.]*)\\.model\\." +
+					className + ";");
+
+			Matcher packageNameMatcher = packageNamePattern.matcher(content);
+
+			if (!packageNameMatcher.find()) {
+				return;
+			}
+
+			String packageName = packageNameMatcher.group(1);
+
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(BASEDIR);
+			sb.append("portal-impl/src/");
+			sb.append(
+				StringUtil.replace(
+					packageName, StringPool.PERIOD, StringPool.SLASH));
+			sb.append("/service/impl/");
+			sb.append(className);
+			sb.append("LocalServiceImpl.java");
+
+			String localServiceImplFileName = sb.toString();
+
+			String localServiceImplContent = fileUtil.read(
+				localServiceImplFileName);
+
+			if (!localServiceImplContent.contains("@SystemEvent")) {
+				processErrorMessage(
+					fileName,
+					"Missing deletion system event: " +
+						localServiceImplFileName);
+			}
+		}
+	}
+
 	protected void checkTestAnnotations(JavaTerm javaTerm, String fileName) {
 		int methodType = javaTerm.getType();
 
@@ -687,7 +758,13 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		Matcher matcher = _incorrectCloseCurlyBracePattern.matcher(content);
 
 		while (matcher.find()) {
-			String tabs = matcher.group(1);
+			String lastLine = StringUtil.trimLeading(matcher.group(1));
+
+			if (lastLine.startsWith("// ")) {
+				continue;
+			}
+
+			String tabs = matcher.group(2);
 			int tabCount = tabs.length();
 
 			int pos = matcher.start();
@@ -699,7 +776,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					continue;
 				}
 
-				String codeBlock = content.substring(pos + tabCount + 1);
+				String codeBlock = content.substring(
+					pos + tabCount + 1, matcher.end());
 
 				String firstLine = codeBlock.substring(
 					0, codeBlock.indexOf("\n"));
@@ -1115,6 +1193,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		checkLogLevel(newContent, fileName, "info");
 		checkLogLevel(newContent, fileName, "trace");
 		checkLogLevel(newContent, fileName, "warn");
+
+		// LPS-46632
+
+		checkSystemEventAnnotations(newContent, fileName);
 
 		// LPS-41205
 
@@ -2868,7 +2950,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private boolean _checkUnprocessedExceptions;
 	private Properties _hibernateSQLQueryExclusions;
 	private Pattern _incorrectCloseCurlyBracePattern = Pattern.compile(
-		"\n\n(\t+)}\n");
+		"\n(.+)\n\n(\t+)}\n");
 	private Pattern _incorrectLineBreakPattern = Pattern.compile(
 		"\t(catch |else |finally |for |if |try |while ).*\\{\n\n\t+\\w");
 	private Properties _javaTermSortExclusions;
@@ -2877,6 +2959,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		"\n\tprivate static Log _log = LogFactoryUtil.getLog\\(\n*" +
 			"\t*(.+)\\.class\\)");
 	private Properties _secureRandomExclusions;
+	private Pattern _stagedModelTypesPattern = Pattern.compile(
+		"StagedModelType\\(([a-zA-Z.]*(class|getClassName[\\(\\)]*))\\)");
 	private Properties _staticLogVariableExclusions;
 	private Properties _upgradeServiceUtilExclusions;
 
