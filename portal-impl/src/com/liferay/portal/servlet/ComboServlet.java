@@ -171,6 +171,8 @@ public class ComboServlet extends HttpServlet {
 
 			for (int i = 0; i < modulePaths.length; i++) {
 				String modulePath = modulePaths[i];
+				ModulePathContainer pathContainer = new ModulePathContainer(
+					modulePath);
 
 				if (!validateModuleExtension(modulePath)) {
 					response.setHeader(
@@ -184,7 +186,7 @@ public class ComboServlet extends HttpServlet {
 				byte[] bytes = new byte[0];
 
 				if (Validator.isNotNull(modulePath)) {
-					URL url = getResourceURL(modulePath);
+					URL url = getResourceURL(pathContainer);
 
 					if (url == null) {
 						response.setHeader(
@@ -196,7 +198,7 @@ public class ComboServlet extends HttpServlet {
 					}
 
 					bytes = getResourceContent(
-						request, response, url, modulePath, minifierType);
+						request, response, url, pathContainer, minifierType);
 				}
 
 				bytesArray[i] = bytes;
@@ -222,19 +224,11 @@ public class ComboServlet extends HttpServlet {
 
 	protected byte[] getResourceContent(
 			HttpServletRequest request, HttpServletResponse response,
-			URL resourceURL, String resourcePath, String minifierType)
+			URL resourceURL, ModulePathContainer modulePathContainer,
+			String minifierType)
 		throws IOException {
 
-		ModulePathContainer modulePathContainer = new ModulePathContainer(
-			resourcePath);
-
-		int colonIndex = resourcePath.indexOf(CharPool.COLON);
-
-		if (colonIndex > 0) {
-			resourcePath =
-				resourcePath.substring(0, colonIndex) +
-					resourcePath.substring(colonIndex + 1);
-		}
+		String resourcePath = modulePathContainer.getAbsoluteResourcePath();
 
 		String fileContentKey = resourcePath.concat(StringPool.QUESTION).concat(
 			minifierType);
@@ -339,9 +333,8 @@ public class ComboServlet extends HttpServlet {
 		return fileContentBag._fileContent;
 	}
 
-	protected URL getResourceURL(String modulePath) throws Exception {
-		ModulePathContainer modulePathContainer = new ModulePathContainer(
-			modulePath);
+	protected URL getResourceURL(ModulePathContainer modulePathContainer)
+		throws Exception {
 
 		ServletContext servletContext = getServletContext(
 			modulePathContainer.getModuleContextPath());
@@ -433,6 +426,10 @@ public class ComboServlet extends HttpServlet {
 	}
 
 	protected static class ModulePathContainer {
+
+		public String getAbsoluteResourcePath() {
+			return _moduleContextPath + _resourcePath;
+		}
 
 		public String getModuleContextPath() {
 			return _moduleContextPath;
