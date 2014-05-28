@@ -345,6 +345,8 @@ public interface PropsKeys {
 
 	public static final String BREADCRUMB_DISPLAY_STYLE_OPTIONS = "breadcrumb.display.style.options";
 
+	public static final String BREADCRUMB_DISPLAY_TEMPLATES_CONFIG = "breadcrumb.display.templates.config";
+
 	public static final String BREADCRUMB_SHOW_GUEST_GROUP = "breadcrumb.show.guest.group";
 
 	public static final String BREADCRUMB_SHOW_PARENT_GROUPS = "breadcrumb.show.parent.groups";
@@ -1134,6 +1136,8 @@ public interface PropsKeys {
 	public static final String JAVASCRIPT_FAST_LOAD = "javascript.fast.load";
 
 	public static final String JAVASCRIPT_LOG_ENABLED = "javascript.log.enabled";
+
+	public static final String JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED = "javascript.single.page.application.enabled";
 
 	public static final String JCR_INITIALIZE_ON_STARTUP = "jcr.initialize.on.startup";
 
@@ -2480,6 +2484,8 @@ public interface PropsKeys {
 	public static final String STRIP_JS_LANGUAGE_ATTRIBUTE_SUPPORT_ENABLED = "strip.js.language.attribute.support.enabled";
 
 	public static final String STRIP_MIME_TYPES = "strip.mime.types";
+
+	public static final String STRUTS_PORTLET_IGNORED_PARAMETERS_REGEXP = "struts.portlet.ignored.parameters.regexp";
 
 	public static final String STRUTS_PORTLET_REQUEST_PROCESSOR = "struts.portlet.request.processor";
 

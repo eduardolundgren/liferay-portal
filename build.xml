@@ -3,20 +3,6 @@
 <project name="portal" basedir="." default="compile" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="build-common.xml" />
 
-	<macrodef name="app-server-properties-reset">
-		<sequential>
-			<delete file="app.server.${user.name}.properties" />
-		</sequential>
-	</macrodef>
-
-	<macrodef name="app-server-properties-update">
-		<text name="properties" />
-
-		<sequential>
-			<echo file="app.server.${user.name}.properties">@{properties}</echo>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="setup-jrebel">
 		<sequential>
 			<echo file="${app.server.lib.global.dir}/rebel.xml"><![CDATA[<?xml version="1.0"?>
@@ -95,7 +81,10 @@
 
 			<propertyselector
 				casesensitive="false"
-				delimiter="," match="app\.(.+)\.dir"
+				delimiter=","
+				distinct="true"
+				match="app\.(server\.(geronimo|glassfish|jboss|jetty|jonas|resin|tcat|tcserver|tomcat|weblogic|websphere)).+\.dir"
+				override="true"
 				property="app.server.dir.property.list"
 				select="\1"
 			/>
@@ -407,8 +396,8 @@
 		<ant dir="util-taglib" target="compile" inheritAll="false" />
 
 		<ant dir="portal-impl" target="compile" inheritAll="false" />
-		<ant dir="portal-test" target="compile" inheritAll="false" />
 		<ant dir="portal-pacl" target="compile" inheritAll="false" />
+		<ant dir="portal-test" target="compile" inheritAll="false" />
 	</target>
 
 	<target name="compile-test">
@@ -458,6 +447,7 @@ ${app.server.tomcat.dir}, then run "ant -buildfile build-dist.xml unzip-tomcat".
 
 		<ant dir="portal-impl" target="deploy" inheritAll="false" />
 		<ant dir="portal-pacl" target="deploy" inheritAll="false" />
+		<ant dir="portal-test" target="deploy" inheritAll="false" />
 
 		<ant dir="portal-web" target="deploy" inheritAll="false" />
 
@@ -889,6 +879,7 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 
 		<ant dir="portal-impl" target="jar" inheritAll="false" />
 		<ant dir="portal-pacl" target="jar" inheritAll="false" />
+		<ant dir="portal-test" target="jar" inheritAll="false" />
 
 		<ant dir="portal-web" target="war" inheritAll="false" />
 

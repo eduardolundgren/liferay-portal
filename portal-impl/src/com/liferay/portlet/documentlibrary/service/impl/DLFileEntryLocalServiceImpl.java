@@ -2364,15 +2364,6 @@ public class DLFileEntryLocalServiceImpl
 					serviceContext.getModifiedDate(now));
 			}
 
-			// App helper
-
-			dlAppHelperLocalService.updateAsset(
-				userId, new LiferayFileEntry(dlFileEntry),
-				new LiferayFileVersion(dlFileVersion),
-				serviceContext.getAssetCategoryIds(),
-				serviceContext.getAssetTagNames(),
-				serviceContext.getAssetLinkEntryIds());
-
 			// File
 
 			if ((file != null) || (is != null)) {
@@ -2563,7 +2554,6 @@ public class DLFileEntryLocalServiceImpl
 		}
 
 		validateFileExtension(extension);
-		validateFileName(title);
 
 		DLStoreUtil.validate(title, false);
 
@@ -2599,12 +2589,6 @@ public class DLFileEntryLocalServiceImpl
 			if (extension.length() > maxLength) {
 				throw new FileExtensionException();
 			}
-		}
-	}
-
-	protected void validateFileName(String fileName) throws PortalException {
-		if (fileName.contains(StringPool.SLASH)) {
-			throw new FileNameException(fileName);
 		}
 	}
 

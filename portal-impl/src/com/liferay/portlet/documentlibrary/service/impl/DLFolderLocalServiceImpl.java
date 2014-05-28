@@ -784,8 +784,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 			dlFolderPersistence.update(dlFolder);
 
-			dlAppHelperLocalService.moveFolder(new LiferayFolder(dlFolder));
-
 			return dlFolder;
 		}
 		finally {
@@ -1012,11 +1010,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 					dlFolder, fileEntryTypeIds, defaultFileEntryTypeId,
 					serviceContext);
 			}
-
-			// App helper
-
-			dlAppHelperLocalService.updateFolder(
-				userId, new LiferayFolder(dlFolder), serviceContext);
 
 			return dlFolder;
 		}

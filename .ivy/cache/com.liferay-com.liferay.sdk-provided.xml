@@ -4,10 +4,10 @@
 	<info
 		organisation="com.liferay"
 		module="com.liferay.sdk"
-		revision="working@mbpro.local"
+		revision="working@mbpro.cherrydale.liferay.com"
 		conf="provided"
 		confs="default, internal, provided"
-		date="20140522153744"/>
+		date="20140523110042"/>
 	<dependencies>
 	</dependencies>
 </ivy-report>

@@ -49,6 +49,12 @@ public class RandomTestUtil {
 		return _random.nextBoolean();
 	}
 
+	public static byte[] randomBytes() throws Exception {
+		String string = randomString();
+
+		return string.getBytes();
+	}
+
 	public static int randomInt() throws Exception {
 		int value = _random.nextInt();
 

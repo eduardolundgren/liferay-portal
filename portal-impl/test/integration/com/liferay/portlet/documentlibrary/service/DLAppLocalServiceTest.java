@@ -14,9 +14,11 @@
 
 package com.liferay.portlet.documentlibrary.service;
 
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
@@ -27,7 +29,10 @@ import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 
 import org.junit.Assert;
@@ -64,6 +69,47 @@ public class DLAppLocalServiceTest {
 		Folder folder = addFolder(false);
 
 		Assert.assertTrue(folder != null);
+	}
+
+	@Test
+	public void testUpdateAssetWhenUpdatingFileEntry() throws Throwable {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN, "Old Title",
+			RandomTestUtil.randomString(), null, RandomTestUtil.randomBytes(),
+			serviceContext);
+
+		DLAppLocalServiceUtil.updateFileEntry(
+			TestPropsValues.getUserId(), fileEntry.getFileEntryId(),
+			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN, "New Title",
+			RandomTestUtil.randomString(), null, true,
+			RandomTestUtil.randomBytes(), serviceContext);
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
+			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
+
+		Assert.assertEquals("New Title", assetEntry.getTitle());
+	}
+
+	@Test
+	public void testUpdateAssetWhenUpdatingFolder() throws Throwable {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		Folder folder = addFolder(false, "Old Name");
+
+		DLAppLocalServiceUtil.updateFolder(
+			folder.getFolderId(), folder.getParentFolderId(), "New Name",
+			RandomTestUtil.randomString(), serviceContext);
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
+			DLFolderConstants.getClassName(), folder.getFolderId());
+
+		Assert.assertEquals("New Name", assetEntry.getTitle());
 	}
 
 	protected Folder addFolder(boolean rootFolder) throws Exception {

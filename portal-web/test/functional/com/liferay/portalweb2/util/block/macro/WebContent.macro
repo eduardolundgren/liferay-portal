@@ -1056,6 +1056,22 @@
 		<execute macro="RecycleBin#emptyCP" />
 	</command>
 
+	<command name="viewCategorizationCategoryCP">
+		<var name="key_webContentTitle" value="${webContentTitle}" />
+
+		<execute action="CPWebcontent#click" locator-key1="TOOLBAR_DISPLAY_STYLE_BUTTON" />
+		<execute action="CPWebcontent#assertClick" locator-key1="DISPLAY_STYLE_MENULIST_DESCRIPTIVE" value1="Descriptive" />
+		<execute action="CPWebcontent#assertTextEquals" locator-key1="ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
+		<execute action="CPWebcontent#click" locator-key1="ENTRY_DESCRIPTIVE_MENULIST_ARROW" />
+		<execute action="CPWebcontent#assertClick" locator-key1="ENTRY_MENULIST_EDIT" value1="Edit" />
+
+		<execute action="CPWebcontentEditwebcontent#click" locator-key1="MENU_CATEGORIZATION" />
+
+		<var name="key_categoryName" value="${categoryName}" />
+
+		<execute action="CPWebcontentCategorization#assertTextEquals" locator-key1="CATEGORY" value1="${categoryName}" />
+	</command>
+
 	<command name="viewCategorizationSelectionCP">
 		<var name="key_webContentTitle" value="${webContentTitle}" />
 
@@ -1068,6 +1084,21 @@
 		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="MENU_CATEGORIZATION" value1="Categorization" />
 
 		<execute action="CPWebcontentCategorization#assertTextPresent" locator-key1="TYPE_SELECT" value1="${categorizationType}" />
+	</command>
+
+	<command name="viewConversionLinksPGViaAP">
+		<var name="key_assetTitle" value="${webContentTitle}" />
+
+		<execute macro="WebContent#viewPGViaAP">
+			<var name="key_assetTitle" value="${webContentTitle}" />
+		</execute>
+
+		<for list="${documentTypes}" param="documentType">
+			<var name="documentTypeUppercase" value="${documentType?uppercase()}" />
+
+			<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="DOCUMENT_CONVERSION_${documentTypeUppercase}" value1="${documentTypeUppercase}" />
+			<execute action="PGAssetpublisherAsset#assertElementPresent" locator-key1="DOCUMENT_CONVERSION_${documentTypeUppercase}_ICON" />
+		</for>
 	</command>
 
 	<command name="viewCP">
@@ -1237,6 +1268,20 @@
 
 	<command name="viewNoContentPGViaWCD">
 		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ERROR_MESSAGE" value1="The selected web content no longer exists." />
+	</command>
+
+	<command name="viewNoConversionLinksPGViaAP">
+		<var name="key_assetTitle" value="${webContentTitle}" />
+
+		<execute macro="WebContent#viewPGViaAP">
+			<var name="key_assetTitle" value="${webContentTitle}" />
+		</execute>
+
+		<for list="${documentTypes}" param="documentType">
+			<var name="documentTypeUppercase" value="${documentType?uppercase()}" />
+
+			<execute action="PGAssetpublisherAsset#assertElementNotPresent" locator-key1="DOCUMENT_CONVERSION_${documentTypeUppercase}" />
+		</for>
 	</command>
 
 	<command name="viewNoEditWCViaWCD">

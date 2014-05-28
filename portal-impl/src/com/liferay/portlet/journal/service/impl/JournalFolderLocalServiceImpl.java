@@ -944,11 +944,10 @@ public class JournalFolderLocalServiceImpl
 
 		for (long ddmStructureId : ddmStructureIds) {
 			WorkflowDefinitionLink workflowDefinitionLink =
-				workflowDefinitionLinkLocalService.
-					fetchWorkflowDefinitionLink(
-						folder.getCompanyId(), folder.getGroupId(),
-						JournalFolder.class.getName(), folder.getFolderId(),
-						ddmStructureId);
+				workflowDefinitionLinkLocalService.fetchWorkflowDefinitionLink(
+					folder.getCompanyId(), folder.getGroupId(),
+					JournalFolder.class.getName(), folder.getFolderId(),
+					ddmStructureId);
 
 			if (workflowDefinitionLink == null) {
 				continue;

@@ -511,13 +511,13 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			localRepository.getRepositoryFileEntries(
 				folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		Folder folder = getFolder(folderId);
-
-		localRepository.deleteFolder(folderId);
-
 		for (FileEntry fileEntry : fileEntries) {
 			dlAppHelperLocalService.deleteFileEntry(fileEntry);
 		}
+
+		Folder folder = getFolder(folderId);
+
+		localRepository.deleteFolder(folderId);
 
 		dlAppHelperLocalService.deleteFolder(folder);
 	}
@@ -816,22 +816,28 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 				}
 			}
 
+			Folder folder = null;
+
 			if (sourceLocalRepository.getRepositoryId() ==
 					destinationLocalRepository.getRepositoryId()) {
 
 				// Move file entries within repository
 
-				Folder folder = sourceLocalRepository.moveFolder(
+				folder = sourceLocalRepository.moveFolder(
 					userId, folderId, parentFolderId, serviceContext);
+			}
+			else {
 
-				return folder;
+				// Move file entries between repositories
+
+				folder = moveFolders(
+					userId, folderId, parentFolderId, sourceLocalRepository,
+					destinationLocalRepository, serviceContext);
 			}
 
-			// Move file entries between repositories
+			dlAppHelperLocalService.moveFolder(folder);
 
-			return moveFolders(
-				userId, folderId, parentFolderId, sourceLocalRepository,
-				destinationLocalRepository, serviceContext);
+			return folder;
 		}
 		finally {
 			SystemEventHierarchyEntryThreadLocal.pop(Folder.class);
@@ -1308,8 +1314,13 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 		LocalRepository localRepository = getFolderLocalRepository(folderId);
 
-		return localRepository.updateFolder(
+		Folder folder = localRepository.updateFolder(
 			folderId, parentFolderId, name, description, serviceContext);
+
+		dlAppHelperLocalService.updateFolder(
+			serviceContext.getUserId(), folder, serviceContext);
+
+		return folder;
 	}
 
 	protected FileEntry copyFileEntry(

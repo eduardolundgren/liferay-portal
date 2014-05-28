@@ -33,6 +33,8 @@ boolean smallImage = BeanParamUtil.getBoolean(entry, request, "smallImage");
 
 boolean preview = ParamUtil.getBoolean(request, "preview");
 boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
+
+String portletId = portletDisplay.getRootPortletId();
 %>
 
 <c:if test="<%= showHeader %>">
@@ -83,7 +85,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	</c:if>
 
 	<c:if test="<%= entry != null %>">
-		<aui:workflow-status id="<%= String.valueOf(entry.getEntryId()) %>" status="<%= entry.getStatus() %>" />
+		<aui:workflow-status id="<%= String.valueOf(entry.getEntryId()) %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= entry.getStatus() %>" />
 	</c:if>
 
 	<aui:fieldset>
@@ -451,6 +453,16 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		},
 		['aui-io']
 	);
+
+	var clearSaveDraftHandle = function(event) {
+		if (event.portletId === '<%= portletId %>') {
+			<portlet:namespace />clearSaveDraftIntervalId();
+
+			Liferay.detach('destroyPortlet', clearSaveDraftHandle);
+		}
+	};
+
+	Liferay.on('destroyPortlet', clearSaveDraftHandle);
 </aui:script>
 
 <aui:script use="aui-base">
