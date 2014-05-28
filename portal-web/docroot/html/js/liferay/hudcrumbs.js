@@ -19,7 +19,7 @@ AUI.add(
 					},
 					scrollDelay: {
 						validator: Lang.isNumber,
-						value: 100
+						value: 50
 					},
 					width: {
 						validtor: Lang.isNumber,
@@ -40,7 +40,6 @@ AUI.add(
 						var breadcrumbs = instance.get('host');
 						var hudcrumbs = breadcrumbs.clone();
 						var region = breadcrumbs.get('region');
-						var scrollDelay = instance.get('scrollDelay');
 
 						hudcrumbs.resetId();
 
@@ -59,10 +58,10 @@ AUI.add(
 
 						instance._calculateDimensions();
 
-						instance._debouncedScrollFn = A.debounce(instance._onScroll, scrollDelay, instance);
+						instance._onScrollTask = A.debounce(instance._onScroll, instance.get('scrollDelay'), instance);
 
-						win.on('scroll', instance._debouncedScrollFn);
-						win.on('windowresize', A.bind(instance._calculateDimensions, instance));
+						win.on('scroll', instance._onScrollTask);
+						win.on('windowresize', instance._calculateDimensions, instance);
 
 						body.append(hudcrumbs);
 
@@ -78,7 +77,7 @@ AUI.add(
 
 						var win = instance._win;
 
-						win.detach('scroll', instance._debouncedScrollFn);
+						win.detach('scroll', instance._onScrollTask);
 						win.detach('windowresize', instance._calculateDimensions);
 					},
 
