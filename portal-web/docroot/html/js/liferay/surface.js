@@ -113,10 +113,13 @@ AUI.add(
 				var instance = this;
 
 				var url = new A.Url(portletURL);
+
 				var namespace = instance.getNamespace(url.toString());
+
 				var redirect = new A.Url(instance.getRedirect(url.toString()));
 
 				redirect.setParameter('p_p_isolated', true);
+
 				url.setParameter(namespace + 'redirect', redirect.toString());
 
 				return url.toString();

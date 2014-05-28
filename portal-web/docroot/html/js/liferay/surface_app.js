@@ -7,6 +7,7 @@ AUI.add(
 			{
 				basePath: Surface.getBasePath(),
 				linkSelector: 'a:not(.portlet-icon-back):not([data-navigation]):not([data-resource-href]):not([target="_blank"])',
+
 				on: {
 					endNavigate: function(event) {
 						var instance = this;
@@ -16,9 +17,7 @@ AUI.add(
 						if (!error && Surface.isActionURL(event.path)) {
 							var redirect = Surface.getRedirect(event.path);
 
-							var title = instance.get('title');
-
-							Surface.sendRedirect(redirect, title);
+							Surface.sendRedirect(redirect, instance.get('title'));
 						}
 
 						Liferay.fire(
@@ -30,8 +29,9 @@ AUI.add(
 							}
 						);
 
-						A.one('body').removeClass('lfr-surface-loading');
+						A.getBody().removeClass('lfr-surface-loading');
 					},
+
 					startNavigate: function(event) {
 						var instance = this;
 
@@ -47,7 +47,7 @@ AUI.add(
 							}
 						);
 
-						A.one('body').addClass('lfr-surface-loading');
+						A.getBody().addClass('lfr-surface-loading');
 					}
 				}
 			}
@@ -57,11 +57,7 @@ AUI.add(
 			[
 				{
 					path: function(url) {
-						if (url.search(Surface.getPatternPortletURL(Liferay.PortletURL.ACTION_PHASE)) > -1) {
-							return true;
-						}
-
-						return false;
+						return url.search(Surface.getPatternPortletURL(Liferay.PortletURL.ACTION_PHASE)) > -1;
 					},
 					screen: Surface.ActionURLScreen
 				},
@@ -71,11 +67,7 @@ AUI.add(
 				},
 				{
 					path: function(url) {
-						if (url.search(Surface.getPatternPortletURL(Liferay.PortletURL.RENDER_PHASE)) > -1) {
-							return true;
-						}
-
-						return false;
+						return url.search(Surface.getPatternPortletURL(Liferay.PortletURL.RENDER_PHASE)) > -1;
 					},
 					screen: Surface.RenderURLScreen
 				}
