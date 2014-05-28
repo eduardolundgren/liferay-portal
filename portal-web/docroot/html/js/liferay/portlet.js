@@ -2,8 +2,6 @@
 	var Util = Liferay.Util;
 	var AArray = A.Array;
 
-	var arrayIndexOf = AArray.indexOf;
-
 	var STR_HEAD = 'head';
 
 	var TPL_NOT_AJAXABLE = '<div class="alert alert-info">{0}</div>';
