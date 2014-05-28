@@ -3,7 +3,6 @@
 }
 
 .lfr-surface-loading-bar {
-	background: #2FA4F5;
 	display: none;
 	height: 2px;
 	left: 0;
@@ -11,4 +10,10 @@
 	right: 0;
 	top: 0;
 	z-index: 800;
+}
+
+/*Skin*/
+
+.lfr-surface-loading-bar {
+	background: #2FA4F5;
 }
