@@ -79,7 +79,7 @@ AUI.add(
 			getSurfaceIds: function() {
 				var instance = this;
 
-				var surfaces = instance.getPortletBoundaryIds(instance.getAllowedPortletIds());
+				var surfaces = instance.getPortletBoundaryIds(Liferay.Portlet.list);
 
 				surfaces.push('bottomJS');
 				surfaces.push('breadcrumbs');
