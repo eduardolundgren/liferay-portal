@@ -43,8 +43,20 @@ AUI.add(
 				return Liferay.Util.getPortletNamespace(url.getParameter('p_p_id'));
 			},
 
-			getPatternFriendlyURL: function() {
+			getPatternFriendlyURL: function(url) {
 				var instance = this;
+
+				if (!themeDisplay.isControlPanel()) {
+					var isFriendlyURLMaximized = (url.indexOf('/maximized') > -1);
+
+					if (themeDisplay.isStateMaximized() && !isFriendlyURLMaximized) {
+						return null;
+					}
+
+					if (!themeDisplay.isStateMaximized() && isFriendlyURLMaximized) {
+						return null;
+					}
+				}
 
 				return /\/-\//;
 			},
