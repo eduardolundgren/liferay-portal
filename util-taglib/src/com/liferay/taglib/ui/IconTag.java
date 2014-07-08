@@ -395,28 +395,6 @@ public class IconTag extends IncludeTag {
 		return "post";
 	}
 
-	protected String getOnClick() {
-		String onClick = StringPool.BLANK;
-
-		if (Validator.isNotNull(_onClick)) {
-			onClick = _onClick + StringPool.SEMICOLON;
-		}
-
-		if (isForcePost()) {
-			StringBundler sb = new StringBundler(8);
-
-			sb.append("event.preventDefault();");
-			sb.append(onClick);
-			sb.append("submitForm(document.hrefFm, '");
-			sb.append(getUrl());
-			sb.append("')");
-
-			onClick = sb.toString();
-		}
-
-		return onClick;
-	}
-
 	@Override
 	protected String getPage() {
 		return _PAGE;
@@ -435,14 +413,6 @@ public class IconTag extends IncludeTag {
 			new String[] {
 				StringPool.DASH, StringPool.BLANK
 			});
-	}
-
-	protected String getProcessedUrl() {
-		if (isForcePost()) {
-			return "javascript:;";
-		}
-
-		return _url;
 	}
 
 	protected String getSrc() {
@@ -580,13 +550,13 @@ public class IconTag extends IncludeTag {
 			String.valueOf(_localizeMessage));
 		request.setAttribute("liferay-ui:icon:message", getProcessedMessage());
 		request.setAttribute("liferay-ui:icon:method", getMethod());
-		request.setAttribute("liferay-ui:icon:onClick", getOnClick());
+		request.setAttribute("liferay-ui:icon:onClick", _onClick);
 		request.setAttribute("liferay-ui:icon:src", getSrc());
 		request.setAttribute("liferay-ui:icon:srcHover", getSrcHover());
 		request.setAttribute("liferay-ui:icon:target", _target);
 		request.setAttribute(
 			"liferay-ui:icon:toolTip", String.valueOf(_toolTip));
-		request.setAttribute("liferay-ui:icon:url", getProcessedUrl());
+		request.setAttribute("liferay-ui:icon:url", getUrl());
 		request.setAttribute(
 			"liferay-ui:icon:useDialog", String.valueOf(_useDialog));
 	}
