@@ -143,10 +143,10 @@ public class LayoutsTreeUtil {
 
 			LayoutTreeNode layoutTreeNode = new LayoutTreeNode(layout);
 
+			LayoutTreeNodes childLayoutTreeNodes = null;
+
 			if (_isExpandableLayout(
 					request, ancestorLayouts, expandedLayoutIds, layout)) {
-
-				LayoutTreeNodes childLayoutTreeNodes = null;
 
 				if (layout instanceof VirtualLayout) {
 					VirtualLayout virtualLayout = (VirtualLayout)layout;
@@ -163,19 +163,17 @@ public class LayoutsTreeUtil {
 						layout.getLayoutId(), incomplete, expandedLayoutIds,
 						treeId);
 				}
-
-				layoutTreeNode.setChildLayoutTreeNodes(childLayoutTreeNodes);
 			}
-			else if (layout.hasChildren()) {
-				List<Layout> children = LayoutServiceUtil.getLayouts(
-					groupId, privateLayout, layout.getLayoutId(), incomplete,
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-				LayoutTreeNodes childrenLayoutTreeNodes = new LayoutTreeNodes(
-					new ArrayList<LayoutTreeNode>(), children.size());
+			if (childLayoutTreeNodes == null) {
+				int childLayoutsCount = LayoutServiceUtil.getLayoutsCount(
+					groupId, privateLayout, layout.getLayoutId());
 
-				layoutTreeNode.setChildLayoutTreeNodes(childrenLayoutTreeNodes);
+				childLayoutTreeNodes = new LayoutTreeNodes(
+					new ArrayList<LayoutTreeNode>(), childLayoutsCount);
 			}
+
+			layoutTreeNode.setChildLayoutTreeNodes(childLayoutTreeNodes);
 
 			layoutTreeNodes.add(layoutTreeNode);
 		}
