@@ -618,7 +618,7 @@ public class PropsValues {
 
 	public static final boolean DL_FILE_EXTENSIONS_STRICT_CHECK = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_FILE_EXTENSIONS_STRICT_CHECK));
 
-	public static final long DL_FILE_INDEXING_MAX_SIZE = GetterUtil.getLong(PropsUtil.get(PropsKeys.DL_FILE_INDEXING_MAX_SIZE));
+	public static final int DL_FILE_INDEXING_MAX_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_FILE_INDEXING_MAX_SIZE));
 
 	public static final long DL_FILE_MAX_SIZE = GetterUtil.getLong(PropsUtil.get(PropsKeys.DL_FILE_MAX_SIZE));
 
@@ -1250,13 +1250,13 @@ public class PropsValues {
 
 	public static final String[] MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA);
 
-	public static final boolean MODULE_FRAMEWORK_WEB_EXTENDER_GENERATED_WABS_STORE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WEB_EXTENDER_GENERATED_WABS_STORE));
+	public static final boolean MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE));
 
-	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_GENERATED_WABS_STORE_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WEB_EXTENDER_GENERATED_WABS_STORE_DIR);
+	public static final String MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE_DIR);
 
-	public static final String[] MODULE_FRAMEWORK_WEB_EXTENDER_DEFAULT_SERVLET_PACKAGES = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_WEB_EXTENDER_DEFAULT_SERVLET_PACKAGES);
+	public static final String[] MODULE_FRAMEWORK_WEB_GENERATOR_DEFAULT_SERVLET_PACKAGES = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_DEFAULT_SERVLET_PACKAGES);
 
-	public static final String[] MODULE_FRAMEWORK_WEB_EXTENDER_EXCLUDED_PATHS = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_WEB_EXTENDER_EXCLUDED_PATHS);
+	public static final String[] MODULE_FRAMEWORK_WEB_GENERATOR_EXCLUDED_PATHS = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_EXCLUDED_PATHS);
 
 	public static boolean MONITORING_PORTAL_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_PORTAL_REQUEST));
 
@@ -1309,6 +1309,8 @@ public class PropsValues {
 	public static final String NTLM_SERVICE_ACCOUNT = PropsUtil.get(PropsKeys.NTLM_SERVICE_ACCOUNT);
 
 	public static final String NTLM_SERVICE_PASSWORD = PropsUtil.get(PropsKeys.NTLM_SERVICE_PASSWORD);
+
+	public static final String[] OBFUSCATED_PROPERTY_VALUES = PropsUtil.getArray(PropsKeys.OBFUSCATED_PROPERTY_VALUES);
 
 	public static final long[] OMNIADMIN_USERS = StringUtil.split(PropsUtil.get(PropsKeys.OMNIADMIN_USERS), 0L);
 
@@ -1441,8 +1443,6 @@ public class PropsValues {
 	public static final boolean PERMISSIONS_PROPAGATION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_PROPAGATION_ENABLED));
 
 	public static final int PERMISSIONS_ROLE_RESOURCE_PERMISSION_QUERY_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_ROLE_RESOURCE_PERMISSION_QUERY_THRESHOLD));
-
-	public static final int PERMISSIONS_THREAD_LOCAL_CACHE_MAX_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_THREAD_LOCAL_CACHE_MAX_SIZE));
 
 	public static boolean PERMISSIONS_VIEW_DYNAMIC_INHERITANCE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE));
 

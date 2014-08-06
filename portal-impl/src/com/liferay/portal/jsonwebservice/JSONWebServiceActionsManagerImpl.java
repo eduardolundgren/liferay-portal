@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -114,6 +115,11 @@ public class JSONWebServiceActionsManagerImpl
 
 		jsonWebServiceActionParameters.collectAll(
 			request, parameterPath, jsonRPCRequest, null);
+
+		if (jsonWebServiceActionParameters.getServiceContext() != null) {
+			ServiceContextThreadLocal.pushServiceContext(
+				jsonWebServiceActionParameters.getServiceContext());
+		}
 
 		String[] paths = _resolvePaths(request, path);
 
@@ -346,6 +352,22 @@ public class JSONWebServiceActionsManagerImpl
 
 			_log.warn(sb.toString());
 		}
+	}
+
+	@Override
+	public int registerService(String path, Object service) {
+		JSONWebServiceRegistrator jsonWebServiceRegistrator =
+			new JSONWebServiceRegistrator();
+
+		jsonWebServiceRegistrator.processBean(path, StringPool.BLANK, service);
+
+		int count = getJSONWebServiceActionsCount(path);
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Configured " + count + " actions for " + path);
+		}
+
+		return count;
 	}
 
 	@Override

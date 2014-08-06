@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.staging.StagingConstants;
 import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -44,7 +45,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.liveusers.LiveUsers;
 import com.liferay.portal.model.Group;
@@ -71,6 +71,7 @@ import com.liferay.portal.service.MembershipRequestServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -329,10 +330,11 @@ public class EditGroupAction extends PortletAction {
 	protected List<Team> getTeams(PortletRequest portletRequest)
 		throws Exception {
 
-		List<Team> teams = new UniqueList<Team>();
+		List<Team> teams = new ArrayList<Team>();
 
-		long[] teamsTeamIds = StringUtil.split(
-			ParamUtil.getString(portletRequest, "teamsTeamIds"), 0L);
+		long[] teamsTeamIds = ArrayUtil.unique(
+			StringUtil.split(
+				ParamUtil.getString(portletRequest, "teamsTeamIds"), 0L));
 
 		for (long teamsTeamId : teamsTeamIds) {
 			if (teamsTeamId == 0) {
@@ -517,6 +519,8 @@ public class EditGroupAction extends PortletAction {
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Group.class.getName(), actionRequest);
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		Group liveGroup = null;
 		String oldFriendlyURL = null;

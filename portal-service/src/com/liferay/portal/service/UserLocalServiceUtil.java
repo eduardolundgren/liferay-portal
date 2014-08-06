@@ -2305,15 +2305,32 @@ public class UserLocalServiceUtil {
 	* @throws PortalException if a user with the email address could not be
 	found
 	*/
-	public static void sendPassword(long companyId,
+	public static boolean sendPassword(long companyId,
 		java.lang.String emailAddress, java.lang.String fromName,
 		java.lang.String fromAddress, java.lang.String subject,
 		java.lang.String body,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		getService()
-			.sendPassword(companyId, emailAddress, fromName, fromAddress,
-			subject, body, serviceContext);
+		return getService()
+				   .sendPassword(companyId, emailAddress, fromName,
+			fromAddress, subject, body, serviceContext);
+	}
+
+	public static boolean sendPasswordByEmailAddress(long companyId,
+		java.lang.String emailAddress)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().sendPasswordByEmailAddress(companyId, emailAddress);
+	}
+
+	public static boolean sendPasswordByScreenName(long companyId,
+		java.lang.String screenName)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().sendPasswordByScreenName(companyId, screenName);
+	}
+
+	public static boolean sendPasswordByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().sendPasswordByUserId(userId);
 	}
 
 	/**

@@ -29,6 +29,7 @@ import com.thoughtworks.selenium.Selenium;
 
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import java.io.StringReader;
 
@@ -222,42 +223,73 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void clickAt(String locator, String coordString) {
-		if (locator.contains("x:")) {
-			String url = getHtmlNodeHref(locator);
+		clickAt(locator, coordString, true);
+	}
 
-			open(url);
+	public void clickAt(
+		String locator, String coordString, boolean scrollIntoView) {
+
+		int offsetX = 0;
+		int offsetY = 0;
+
+		if (coordString.contains(",")) {
+			String[] coords = coordString.split(",");
+
+			offsetX = GetterUtil.getInteger(coords[0]);
+			offsetY = GetterUtil.getInteger(coords[1]);
+		}
+
+		if ((offsetX == 0) && (offsetY == 0)) {
+			click(locator);
 		}
 		else {
+			WebElement bodyWebElement = getWebElement("//body");
+
+			WrapsDriver wrapsDriver = (WrapsDriver)bodyWebElement;
+
+			WebDriver webDriver = wrapsDriver.getWrappedDriver();
+
+			WebDriver.Options options = webDriver.manage();
+
+			WebDriver.Window window = options.window();
+
+			Point windowPoint = window.getPosition();
+
 			WebElement webElement = getWebElement(locator);
 
-			if (coordString.contains(",")) {
-				WrapsDriver wrapsDriver = (WrapsDriver)webElement;
+			Point webElementPoint = webElement.getLocation();
 
-				WebDriver webDriver = wrapsDriver.getWrappedDriver();
+			int clickDestinationX = 0;
+			int clickDestinationY = 0;
 
-				Actions actions = new Actions(webDriver);
+			if (scrollIntoView) {
+				scrollWebElementIntoView(webElement);
 
-				String[] coords = coordString.split(",");
-
-				int x = GetterUtil.getInteger(coords[0]);
-				int y = GetterUtil.getInteger(coords[1]);
-
-				actions.moveToElement(webElement, x, y);
-				actions.click();
-
-				Action action = actions.build();
-
-				action.perform();
+				clickDestinationX =
+					windowPoint.getX() + webElementPoint.getX() + offsetX;
+				clickDestinationY = windowPoint.getY() + offsetY;
 			}
 			else {
-				try {
-					webElement.click();
-				}
-				catch (Exception e) {
-					scrollWebElementIntoView(webElement);
+				clickDestinationX =
+					windowPoint.getX() + webElementPoint.getX() + offsetX;
+				clickDestinationY =
+					windowPoint.getY() + webElementPoint.getY() + offsetY;
+			}
 
-					webElement.click();
-				}
+			try {
+				Robot robot = new Robot();
+
+				robot.mouseMove(clickDestinationX, clickDestinationY);
+
+				robot.mousePress(KeyEvent.BUTTON1_MASK);
+
+				robot.delay(1500);
+
+				robot.mouseRelease(KeyEvent.BUTTON1_MASK);
+
+				robot.delay(1500);
+			}
+			catch (Exception e) {
 			}
 		}
 	}

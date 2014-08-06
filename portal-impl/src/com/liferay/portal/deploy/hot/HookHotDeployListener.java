@@ -67,7 +67,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -76,13 +75,11 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.language.LanguageResources;
-import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Release;
@@ -107,12 +104,8 @@ import com.liferay.portal.security.lang.DoPrivilegedBean;
 import com.liferay.portal.security.ldap.AttributesTransformer;
 import com.liferay.portal.security.membershippolicy.OrganizationMembershipPolicy;
 import com.liferay.portal.security.membershippolicy.RoleMembershipPolicy;
-import com.liferay.portal.security.membershippolicy.RoleMembershipPolicyFactoryImpl;
-import com.liferay.portal.security.membershippolicy.RoleMembershipPolicyFactoryUtil;
 import com.liferay.portal.security.membershippolicy.SiteMembershipPolicy;
 import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicy;
-import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyFactoryImpl;
-import com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyFactoryUtil;
 import com.liferay.portal.security.pwd.Toolkit;
 import com.liferay.portal.service.ReleaseLocalServiceUtil;
 import com.liferay.portal.service.ServiceWrapper;
@@ -151,9 +144,11 @@ import java.lang.reflect.Field;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -505,28 +500,6 @@ public class HookHotDeployListener
 			StoreFactory.setInstance(null);
 		}
 
-		if (portalProperties.containsKey(PropsKeys.MEMBERSHIP_POLICY_ROLES)) {
-			RoleMembershipPolicyFactoryImpl roleMembershipPolicyFactoryImpl =
-				(RoleMembershipPolicyFactoryImpl)
-					RoleMembershipPolicyFactoryUtil.
-						getRoleMembershipPolicyFactory();
-
-			roleMembershipPolicyFactoryImpl.setRoleMembershipPolicy(null);
-		}
-
-		if (portalProperties.containsKey(
-				PropsKeys.MEMBERSHIP_POLICY_USER_GROUPS)) {
-
-			UserGroupMembershipPolicyFactoryImpl
-				userGroupMembershipPolicyFactoryImpl =
-					(UserGroupMembershipPolicyFactoryImpl)
-						UserGroupMembershipPolicyFactoryUtil.
-							getUserGroupMembershipPolicyFactory();
-
-			userGroupMembershipPolicyFactoryImpl.setUserGroupMembershipPolicy(
-				null);
-		}
-
 		Set<String> liferayFilterClassNames =
 			LiferayFilterTracker.getClassNames();
 
@@ -598,18 +571,6 @@ public class HookHotDeployListener
 
 		initStrutsActions(servletContextName, portletClassLoader, rootElement);
 
-		// Begin backwards compatibility for 5.1.0
-
-		ModelListenersContainer modelListenersContainer =
-			_modelListenersContainerMap.get(servletContextName);
-
-		if (modelListenersContainer == null) {
-			modelListenersContainer = new ModelListenersContainer();
-
-			_modelListenersContainerMap.put(
-				servletContextName, modelListenersContainer);
-		}
-
 		List<Element> modelListenerElements = rootElement.elements(
 			"model-listener");
 
@@ -618,14 +579,9 @@ public class HookHotDeployListener
 			String modelListenerClassName = modelListenerElement.elementText(
 				"model-listener-class");
 
-			ModelListener<BaseModel<?>> modelListener = initModelListener(
+			initModelListener(
 				servletContextName, portletClassLoader, modelName,
 				modelListenerClassName);
-
-			if (modelListener != null) {
-				modelListenersContainer.registerModelListener(
-					modelName, modelListener);
-			}
 		}
 
 		List<Element> eventElements = rootElement.elements("event");
@@ -693,14 +649,6 @@ public class HookHotDeployListener
 
 		if (languagesContainer != null) {
 			languagesContainer.unregisterLanguages();
-		}
-
-		ModelListenersContainer modelListenersContainer =
-			_modelListenersContainerMap.remove(servletContextName);
-
-		if (modelListenersContainer != null) {
-			modelListenersContainer.unregisterModelListeners(
-				servletContextName);
 		}
 
 		Properties portalProperties = _portalPropertiesMap.remove(
@@ -1317,35 +1265,23 @@ public class HookHotDeployListener
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	protected ModelListener<BaseModel<?>> initModelListener(
+	protected void initModelListener(
 			String servletContextName, ClassLoader portletClassLoader,
 			String modelName, String modelListenerClassName)
 		throws Exception {
 
-		ModelListener<BaseModel<?>> modelListener =
-			(ModelListener<BaseModel<?>>)newInstance(
-				portletClassLoader, ModelListener.class,
-				modelListenerClassName);
+		ModelListener<?> modelListener = (ModelListener<?>)newInstance(
+			portletClassLoader, ModelListener.class, modelListenerClassName);
 
-		BasePersistence persistence = getPersistence(
-			servletContextName, modelName);
-
-		persistence.registerListener(modelListener);
-
-		return modelListener;
+		registerService(
+			servletContextName, modelListenerClassName, ModelListener.class,
+			modelListener);
 	}
 
 	protected void initModelListeners(
 			String servletContextName, ClassLoader portletClassLoader,
 			Properties portalProperties)
 		throws Exception {
-
-		ModelListenersContainer modelListenersContainer =
-			new ModelListenersContainer();
-
-		_modelListenersContainerMap.put(
-			servletContextName, modelListenersContainer);
 
 		for (Map.Entry<Object, Object> entry : portalProperties.entrySet()) {
 			String key = (String)entry.getKey();
@@ -1360,14 +1296,9 @@ public class HookHotDeployListener
 				(String)entry.getValue());
 
 			for (String modelListenerClassName : modelListenerClassNames) {
-				ModelListener<BaseModel<?>> modelListener = initModelListener(
+				initModelListener(
 					servletContextName, portletClassLoader, modelName,
 					modelListenerClassName);
-
-				if (modelListener != null) {
-					modelListenersContainer.registerModelListener(
-						modelName, modelListener);
-				}
 			}
 		}
 	}
@@ -1702,22 +1633,14 @@ public class HookHotDeployListener
 			String roleMembershipPolicyClassName = portalProperties.getProperty(
 				PropsKeys.MEMBERSHIP_POLICY_ROLES);
 
-			RoleMembershipPolicyFactoryImpl roleMembershipPolicyFactoryImpl =
-				(RoleMembershipPolicyFactoryImpl)
-					RoleMembershipPolicyFactoryUtil.
-						getRoleMembershipPolicyFactory();
-
 			RoleMembershipPolicy roleMembershipPolicy =
 				(RoleMembershipPolicy)newInstance(
 					portletClassLoader, RoleMembershipPolicy.class,
 					roleMembershipPolicyClassName);
 
-			roleMembershipPolicyFactoryImpl.setRoleMembershipPolicy(
-				roleMembershipPolicy);
-
-			if (PropsValues.MEMBERSHIP_POLICY_AUTO_VERIFY) {
-				roleMembershipPolicy.verifyPolicy();
-			}
+			registerService(
+				servletContextName, roleMembershipPolicyClassName,
+				RoleMembershipPolicy.class, roleMembershipPolicy);
 		}
 
 		if (portalProperties.containsKey(PropsKeys.MEMBERSHIP_POLICY_SITES)) {
@@ -1741,23 +1664,14 @@ public class HookHotDeployListener
 				portalProperties.getProperty(
 					PropsKeys.MEMBERSHIP_POLICY_USER_GROUPS);
 
-			UserGroupMembershipPolicyFactoryImpl
-				userGroupMembershipPolicyFactoryImpl =
-					(UserGroupMembershipPolicyFactoryImpl)
-						UserGroupMembershipPolicyFactoryUtil.
-							getUserGroupMembershipPolicyFactory();
-
 			UserGroupMembershipPolicy userGroupMembershipPolicy =
 				(UserGroupMembershipPolicy)newInstance(
 					portletClassLoader, UserGroupMembershipPolicy.class,
 					userGroupMembershipPolicyClassName);
 
-			userGroupMembershipPolicyFactoryImpl.setUserGroupMembershipPolicy(
-				userGroupMembershipPolicy);
-
-			if (PropsValues.MEMBERSHIP_POLICY_AUTO_VERIFY) {
-				userGroupMembershipPolicy.verifyPolicy();
-			}
+			registerService(
+				servletContextName, userGroupMembershipPolicyClassName,
+				UserGroupMembershipPolicy.class, userGroupMembershipPolicy);
 		}
 
 		if (portalProperties.containsKey(PropsKeys.PASSWORDS_TOOLKIT)) {
@@ -2628,8 +2542,6 @@ public class HookHotDeployListener
 		new HashMap<String, LanguagesContainer>();
 	private Map<String, StringArraysContainer> _mergeStringArraysContainerMap =
 		new HashMap<String, StringArraysContainer>();
-	private Map<String, ModelListenersContainer> _modelListenersContainerMap =
-		new HashMap<String, ModelListenersContainer>();
 	private Map<String, StringArraysContainer>
 		_overrideStringArraysContainerMap =
 			new HashMap<String, StringArraysContainer>();
@@ -2793,20 +2705,17 @@ public class HookHotDeployListener
 
 		@Override
 		public String[] getStringArray() {
-			List<String> mergedStringList = new UniqueList<String>();
+			Set<String> mergedStringSet = new LinkedHashSet<String>();
 
-			mergedStringList.addAll(ListUtil.fromArray(_portalStringArray));
+			mergedStringSet.addAll(Arrays.asList(_portalStringArray));
 
 			for (Map.Entry<String, String[]> entry :
 					_pluginStringArrayMap.entrySet()) {
 
-				String[] pluginStringArray = entry.getValue();
-
-				mergedStringList.addAll(ListUtil.fromArray(pluginStringArray));
+				mergedStringSet.addAll(Arrays.asList(entry.getValue()));
 			}
 
-			return mergedStringList.toArray(
-				new String[mergedStringList.size()]);
+			return mergedStringSet.toArray(new String[mergedStringSet.size()]);
 		}
 
 		@Override
@@ -2829,49 +2738,6 @@ public class HookHotDeployListener
 		private Map<String, String[]> _pluginStringArrayMap =
 			new HashMap<String, String[]>();
 		private String[] _portalStringArray;
-
-	}
-
-	private class ModelListenersContainer {
-
-		public void registerModelListener(
-			String modelName, ModelListener<BaseModel<?>> modelListener) {
-
-			List<ModelListener<BaseModel<?>>> modelListeners =
-				_modelListenersMap.get(modelName);
-
-			if (modelListeners == null) {
-				modelListeners = new ArrayList<ModelListener<BaseModel<?>>>();
-
-				_modelListenersMap.put(modelName, modelListeners);
-			}
-
-			modelListeners.add(modelListener);
-		}
-
-		@SuppressWarnings("rawtypes")
-		public void unregisterModelListeners(String servletContextName) {
-			for (Map.Entry<String, List<ModelListener<BaseModel<?>>>> entry :
-					_modelListenersMap.entrySet()) {
-
-				String modelName = entry.getKey();
-				List<ModelListener<BaseModel<?>>> modelListeners =
-					entry.getValue();
-
-				BasePersistence persistence = getPersistence(
-					servletContextName, modelName);
-
-				for (ModelListener<BaseModel<?>> modelListener :
-						modelListeners) {
-
-					persistence.unregisterListener(modelListener);
-				}
-			}
-		}
-
-		private Map<String, List<ModelListener<BaseModel<?>>>>
-			_modelListenersMap =
-				new HashMap<String, List<ModelListener<BaseModel<?>>>>();
 
 	}
 

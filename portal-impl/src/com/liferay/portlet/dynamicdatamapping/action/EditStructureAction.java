@@ -15,6 +15,7 @@
 package com.liferay.portlet.dynamicdatamapping.action;
 
 import com.liferay.portal.LocaleException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
@@ -36,12 +37,10 @@ import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
 import com.liferay.portlet.dynamicdatamapping.StructureDefinitionException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException;
 import com.liferay.portlet.dynamicdatamapping.StructureNameException;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONDeserializerUtil;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -203,18 +202,18 @@ public class EditStructureAction extends PortletAction {
 		}
 	}
 
-	protected DDMForm getDDMForm(ActionRequest actionRequest) throws Exception {
-		String definition = ParamUtil.getString(actionRequest, "definition");
-
-		return DDMFormJSONDeserializerUtil.deserialize(definition);
-	}
-
 	protected String getDefinition(ActionRequest actionRequest)
-		throws Exception {
+		throws PortalException {
 
-		DDMForm ddmForm = getDDMForm(actionRequest);
+		try {
+			String definition = ParamUtil.getString(
+				actionRequest, "definition");
 
-		return DDMFormXSDSerializerUtil.serialize(ddmForm);
+			return DDMXSDUtil.getXSD(definition);
+		}
+		catch (PortalException pe) {
+			throw new StructureDefinitionException(pe);
+		}
 	}
 
 	protected String getSaveAndContinueRedirect(

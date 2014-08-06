@@ -93,7 +93,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.QName;
 import com.liferay.portal.language.LanguageResources;
@@ -246,6 +245,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1113,14 +1113,14 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public long[] getAncestorSiteGroupIds(long groupId) throws PortalException {
-		List<Group> groups = doGetAncestorSiteGroups(groupId, false);
+		int i = 0;
+
+		Set<Group> groups = doGetAncestorSiteGroups(groupId, false);
 
 		long[] groupIds = new long[groups.size()];
 
-		for (int i = 0; i < groups.size(); i++) {
-			Group group = groups.get(i);
-
-			groupIds[i] = group.getGroupId();
+		for (Group group : groups) {
+			groupIds[i++] = group.getGroupId();
 		}
 
 		return groupIds;
@@ -1280,7 +1280,7 @@ public class PortalImpl implements Portal {
 			long userId, long companyId, long groupId, String portletId)
 		throws PortalException {
 
-		List<Group> groups = new UniqueList<Group>();
+		List<Group> groups = new ArrayList<Group>();
 
 		LinkedHashMap<String, Object> params =
 			new LinkedHashMap<String, Object>();
@@ -1311,7 +1311,7 @@ public class PortalImpl implements Portal {
 
 		List<Group> filteredGroups = new ArrayList<Group>();
 
-		for (Group group : groups) {
+		for (Group group : ListUtil.unique(groups)) {
 			if (group.hasStagingGroup()) {
 				Group stagingGroup = group.getStagingGroup();
 
@@ -1885,7 +1885,7 @@ public class PortalImpl implements Portal {
 	public List<Group> getCurrentAndAncestorSiteGroups(long groupId)
 		throws PortalException {
 
-		List<Group> groups = new UniqueList<Group>();
+		Set<Group> groups = new LinkedHashSet<Group>();
 
 		Group siteGroup = doGetCurrentSiteGroup(groupId);
 
@@ -1895,7 +1895,7 @@ public class PortalImpl implements Portal {
 
 		groups.addAll(doGetAncestorSiteGroups(groupId, false));
 
-		return groups;
+		return new ArrayList<Group>(groups);
 	}
 
 	@Override
@@ -5029,7 +5029,7 @@ public class PortalImpl implements Portal {
 			long companyId, long groupId, long userId)
 		throws PortalException {
 
-		List<Group> groups = new UniqueList<Group>();
+		Set<Group> groups = new LinkedHashSet<Group>();
 
 		Group siteGroup = doGetCurrentSiteGroup(groupId);
 
@@ -5083,10 +5083,10 @@ public class PortalImpl implements Portal {
 
 		long[] groupIds = new long[groups.size()];
 
-		for (int i = 0; i < groups.size(); i++) {
-			Group group = groups.get(i);
+		int i = 0;
 
-			groupIds[i] = group.getGroupId();
+		for (Group group : groups) {
+			groupIds[i++] = group.getGroupId();
 		}
 
 		return groupIds;
@@ -5112,16 +5112,16 @@ public class PortalImpl implements Portal {
 		}
 
 		return getSiteAdministrationURL(
-			request, themeDisplay, portlet.getPortletName());
+			request, themeDisplay, portlet.getPortletId());
 	}
 
 	@Override
 	public PortletURL getSiteAdministrationURL(
 		HttpServletRequest request, ThemeDisplay themeDisplay,
-		String portletName) {
+		String portletId) {
 
 		LiferayPortletURL siteAdministrationURL = PortletURLFactoryUtil.create(
-			request, portletName, themeDisplay.getPlid(),
+			request, portletId, themeDisplay.getPlid(),
 			PortletRequest.RENDER_PHASE);
 
 		siteAdministrationURL.setControlPanelCategory(
@@ -5144,7 +5144,7 @@ public class PortalImpl implements Portal {
 		}
 
 		return getSiteAdministrationURL(
-			portletResponse, themeDisplay, portlet.getPortletName());
+			portletResponse, themeDisplay, portlet.getPortletId());
 	}
 
 	@Override
@@ -7663,11 +7663,11 @@ public class PortalImpl implements Portal {
 		return StringPool.SLASH.concat(languageId);
 	}
 
-	protected List<Group> doGetAncestorSiteGroups(
+	protected Set<Group> doGetAncestorSiteGroups(
 			long groupId, boolean checkContentSharingWithChildrenEnabled)
 		throws PortalException {
 
-		List<Group> groups = new UniqueList<Group>();
+		Set<Group> groups = new LinkedHashSet<Group>();
 
 		long siteGroupId = getSiteGroupId(groupId);
 
@@ -7953,30 +7953,9 @@ public class PortalImpl implements Portal {
 
 		String portalURL = themeDisplay.getPortalURL();
 
-		boolean useGroupVirtualHostName = false;
+		if (isUseGroupVirtualHostName(
+				group, privateLayoutSet, themeDisplay, canonicalURL)) {
 
-		if (canonicalURL ||
-			!StringUtil.equalsIgnoreCase(
-				themeDisplay.getServerName(), _LOCALHOST)) {
-
-			useGroupVirtualHostName = true;
-		}
-
-		long refererPlid = themeDisplay.getRefererPlid();
-
-		if (refererPlid > 0) {
-			Layout refererLayout = LayoutLocalServiceUtil.fetchLayout(
-				refererPlid);
-
-			if ((refererLayout != null) &&
-				((refererLayout.getGroupId() != group.getGroupId()) ||
-				 (refererLayout.isPrivateLayout() != privateLayoutSet))) {
-
-				useGroupVirtualHostName = false;
-			}
-		}
-
-		if (useGroupVirtualHostName) {
 			String virtualHostname = getVirtualHostname(layoutSet);
 
 			String portalDomain = HttpUtil.getDomain(portalURL);
@@ -8190,14 +8169,8 @@ public class PortalImpl implements Portal {
 	}
 
 	protected String getValidPortalDomain(long companyId, String domain) {
-		for (String virtualHost : PropsValues.VIRTUAL_HOSTS_VALID_HOSTS) {
-			if (StringUtil.equalsIgnoreCase(domain, virtualHost) ||
-				StringUtil.wildcardMatches(
-					domain, virtualHost, CharPool.QUESTION, CharPool.STAR,
-					CharPool.PERCENT, false)) {
-
-				return domain;
-			}
+		if (isValidVirtualHost(domain)) {
+			return domain;
 		}
 
 		if (StringUtil.equalsIgnoreCase(domain, PropsValues.WEB_SERVER_HOST)) {
@@ -8314,6 +8287,45 @@ public class PortalImpl implements Portal {
 				panelSelectedPortlets);
 
 			return ArrayUtil.contains(panelSelectedPortletsArray, portletId);
+		}
+
+		return false;
+	}
+
+	protected boolean isUseGroupVirtualHostName(
+		Group group, boolean privateLayoutSet, ThemeDisplay themeDisplay,
+		boolean canonicalURL) {
+
+		if (!canonicalURL || isValidVirtualHost(themeDisplay.getServerName())) {
+			return false;
+		}
+
+		long refererPlid = themeDisplay.getRefererPlid();
+
+		if (refererPlid > 0) {
+			Layout refererLayout = LayoutLocalServiceUtil.fetchLayout(
+				refererPlid);
+
+			if ((refererLayout != null) &&
+				((refererLayout.getGroupId() != group.getGroupId()) ||
+				 (refererLayout.isPrivateLayout() != privateLayoutSet))) {
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	protected boolean isValidVirtualHost(String domain) {
+		for (String virtualHost : PropsValues.VIRTUAL_HOSTS_VALID_HOSTS) {
+			if (StringUtil.equalsIgnoreCase(domain, virtualHost) ||
+				StringUtil.wildcardMatches(
+					domain, virtualHost, CharPool.QUESTION, CharPool.STAR,
+					CharPool.PERCENT, false)) {
+
+				return true;
+			}
 		}
 
 		return false;

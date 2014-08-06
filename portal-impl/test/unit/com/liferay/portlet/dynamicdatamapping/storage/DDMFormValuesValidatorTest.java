@@ -86,8 +86,7 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		DDMForm ddmForm = createDDMForm();
 
-		DDMFormField ddmFormField = createTextDDMFormField(
-			"name", "", true, false, false);
+		DDMFormField ddmFormField = createTextDDMFormField("name");
 
 		addDDMFormFields(ddmForm, ddmFormField);
 
@@ -165,7 +164,8 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		DDMForm ddmForm = createDDMForm();
 
-		DDMFormField ddmFormField = createTextDDMFormField("name");
+		DDMFormField ddmFormField = createTextDDMFormField(
+			"name", "", false, false, false);
 
 		addDDMFormFields(ddmForm, ddmFormField);
 
@@ -173,7 +173,7 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.US);
 
-		localizedValue.addValue(LocaleUtil.US, "Joe");
+		localizedValue.addString(LocaleUtil.US, "Joe");
 
 		ddmFormValues.addDDMFormFieldValue(
 			createDDMFormFieldValue("name", localizedValue));
@@ -215,8 +215,7 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		DDMForm ddmForm = createDDMForm();
 
-		DDMFormField ddmFormField = createTextDDMFormField(
-			"name", "", true, false, false);
+		DDMFormField ddmFormField = createTextDDMFormField("name");
 
 		addDDMFormFields(ddmForm, ddmFormField);
 
@@ -224,8 +223,8 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.US);
 
-		localizedValue.addValue(LocaleUtil.BRAZIL, "Joao");
-		localizedValue.addValue(LocaleUtil.US, "Joe");
+		localizedValue.addString(LocaleUtil.BRAZIL, "Joao");
+		localizedValue.addString(LocaleUtil.US, "Joe");
 
 		ddmFormValues.addDDMFormFieldValue(
 			createDDMFormFieldValue("name", localizedValue));
@@ -239,8 +238,7 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		DDMForm ddmForm = createDDMForm();
 
-		DDMFormField ddmFormField = createTextDDMFormField(
-			"name", "", true, false, false);
+		DDMFormField ddmFormField = createTextDDMFormField("name");
 
 		addDDMFormFields(ddmForm, ddmFormField);
 
@@ -248,7 +246,7 @@ public class DDMFormValuesValidatorTest extends BaseDDMTestCase {
 
 		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.BRAZIL);
 
-		localizedValue.addValue(LocaleUtil.US, "Joe");
+		localizedValue.addString(LocaleUtil.US, "Joe");
 
 		ddmFormValues.addDDMFormFieldValue(
 			createDDMFormFieldValue("name", localizedValue));

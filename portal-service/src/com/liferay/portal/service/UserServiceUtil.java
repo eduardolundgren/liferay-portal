@@ -691,6 +691,23 @@ public class UserServiceUtil {
 		return getService().hasRoleUser(roleId, userId);
 	}
 
+	public static boolean sendPasswordByEmailAddress(long companyId,
+		java.lang.String emailAddress)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().sendPasswordByEmailAddress(companyId, emailAddress);
+	}
+
+	public static boolean sendPasswordByScreenName(long companyId,
+		java.lang.String screenName)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().sendPasswordByScreenName(companyId, screenName);
+	}
+
+	public static boolean sendPasswordByUserId(long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().sendPasswordByUserId(userId);
+	}
+
 	/**
 	* Sets the Spring bean ID for this bean.
 	*

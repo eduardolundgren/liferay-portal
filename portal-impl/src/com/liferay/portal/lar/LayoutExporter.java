@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.PortletDataHandlerStatusMessageSenderUtil;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.settings.Settings;
@@ -242,8 +243,6 @@ public class LayoutExporter {
 		StopWatch stopWatch = new StopWatch();
 
 		stopWatch.start();
-
-		LayoutCache layoutCache = new LayoutCache();
 
 		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
@@ -521,8 +520,8 @@ public class LayoutExporter {
 					companyId, portletId, parameterMap, type);
 
 			_portletExporter.exportPortlet(
-				portletDataContext, layoutCache, portletId, layout,
-				portletsElement, exportPermissions,
+				portletDataContext, portletId, layout, portletsElement,
+				exportPermissions,
 				exportPortletControlsMap.get(
 					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS),
 				exportPortletControlsMap.get(
@@ -682,6 +681,7 @@ public class LayoutExporter {
 	}
 
 	private LayoutExporter() {
+		XStreamAliasRegistryUtil.register(LayoutImpl.class, "Layout");
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(LayoutExporter.class);
