@@ -150,6 +150,13 @@
 		<execute action="DockbarEditpanel#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 	</command>
 
+	<command name="deleteLivePG">
+		<execute action="Dockbar#click" locator-key1="EDIT" />
+		<execute action="Dockbar#click" locator-key1="EDIT_LIVE_DELETE" />
+
+		<execute action="Home#confirm" locator-key1="PAGE_CONFIRM" value1="Are you sure you want to delete the selected page?" />
+	</command>
+
 	<command name="deletePG">
 		<var name="key_pageName" value="${pageName}" />
 
@@ -658,7 +665,15 @@
 	</command>
 
 	<command name="viewPG">
-		<execute action="Home#assertTextEquals" locator-key1="BREADCRUMB_2" value1="${pageName}" />
+		<if>
+			<equals arg1="${liferaySite}" arg2="true" />
+			<then>
+				<execute action="Home#assertTextEquals" locator-key1="BREADCRUMB_1" value1="${pageName}" />
+			</then>
+			<else>
+				<execute action="Home#assertTextEquals" locator-key1="BREADCRUMB_2" value1="${pageName}" />
+			</else>
+		</if>
 	</command>
 
 	<command name="viewSpecificPG">

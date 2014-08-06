@@ -32,6 +32,7 @@ import com.liferay.portal.PasswordExpiredException;
 import com.liferay.portal.RequiredUserException;
 import com.liferay.portal.ReservedUserEmailAddressException;
 import com.liferay.portal.ReservedUserScreenNameException;
+import com.liferay.portal.SendPasswordException;
 import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.UserIdException;
 import com.liferay.portal.UserLockoutException;
@@ -132,6 +133,7 @@ import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.security.pwd.RegExpToolkit;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.base.UserLocalServiceBaseImpl;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
@@ -3599,7 +3601,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         found
 	 */
 	@Override
-	public void sendPassword(
+	public boolean sendPassword(
 			long companyId, String emailAddress, String fromName,
 			String fromAddress, String subject, String body,
 			ServiceContext serviceContext)
@@ -3608,7 +3610,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
 		if (!company.isSendPassword() && !company.isSendPasswordResetLink()) {
-			return;
+			throw new SendPasswordException.MustBeEnabled(company);
 		}
 
 		emailAddress = StringUtil.toLowerCase(emailAddress.trim());
@@ -3716,30 +3718,25 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		Map<Locale, String> localizedSubjectMap = null;
 		Map<Locale, String> localizedBodyMap = null;
 
+		String prefix = null;
+
+		if (company.isSendPasswordResetLink()) {
+			prefix = "adminEmailPasswordReset";
+		}
+		else {
+			prefix = "adminEmailPasswordSent";
+		}
+
 		if (Validator.isNull(subject)) {
-			if (company.isSendPasswordResetLink()) {
-				localizedSubjectMap = LocalizationUtil.getLocalizationMap(
-					companyPortletPreferences, "adminEmailPasswordResetSubject",
-					PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT);
-			}
-			else {
-				localizedSubjectMap = LocalizationUtil.getLocalizationMap(
-					companyPortletPreferences, "adminEmailPasswordSentSubject",
-					PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_SUBJECT);
-			}
+			localizedSubjectMap = LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, prefix + "Subject",
+				PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT);
 		}
 
 		if (Validator.isNull(body)) {
-			if (company.isSendPasswordResetLink()) {
-				localizedBodyMap = LocalizationUtil.getLocalizationMap(
-					companyPortletPreferences, "adminEmailPasswordResetBody",
-					PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_BODY);
-			}
-			else {
-				localizedBodyMap = LocalizationUtil.getLocalizationMap(
-					companyPortletPreferences, "adminEmailPasswordSentBody",
-					PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_BODY);
-			}
+			localizedBodyMap = LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, prefix + "Body",
+				PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_BODY);
 		}
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
@@ -3764,6 +3761,40 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
 
 		subscriptionSender.flushNotificationsAsync();
+
+		return company.isSendPassword();
+	}
+
+	@Override
+	public boolean sendPasswordByEmailAddress(
+			long companyId, String emailAddress)
+		throws PortalException {
+
+		User user = userPersistence.findByC_EA(companyId, emailAddress);
+
+		return sendPassword(
+			user.getCompanyId(), user.getEmailAddress(), null, null, null, null,
+			ServiceContextThreadLocal.getServiceContext());
+	}
+
+	@Override
+	public boolean sendPasswordByScreenName(long companyId, String screenName)
+		throws PortalException {
+
+		User user = userPersistence.findByC_SN(companyId, screenName);
+
+		return sendPassword(
+			user.getCompanyId(), user.getEmailAddress(), null, null, null, null,
+			ServiceContextThreadLocal.getServiceContext());
+	}
+
+	@Override
+	public boolean sendPasswordByUserId(long userId) throws PortalException {
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		return sendPassword(
+			user.getCompanyId(), user.getEmailAddress(), null, null, null, null,
+			ServiceContextThreadLocal.getServiceContext());
 	}
 
 	/**

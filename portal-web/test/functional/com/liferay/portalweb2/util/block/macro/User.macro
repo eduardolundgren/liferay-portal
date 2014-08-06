@@ -986,6 +986,27 @@
 		<execute action="Myaccount#assertClick" locator-key1="MENU_USER_INFORMATION_DETAILS" value1="Details" />
 
 		<if>
+			<isset var="userFirstNameEdit" />
+			<then>
+				<execute action="Myaccount#type" locator-key1="DETAILS_FIRST_NAME_FIELD" value1="${userFirstNameEdit}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="userLastNameEdit" />
+			<then>
+				<execute action="Myaccount#type" locator-key1="DETAILS_LAST_NAME_FIELD" value1="${userLastNameEdit}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="userMiddleNameEdit" />
+			<then>
+				<execute action="Myaccount#type" locator-key1="DETAILS_MIDDLE_NAME_FIELD" value1="${userMiddleNameEdit}" />
+			</then>
+		</if>
+
+		<if>
 			<isset var="userScreenNameEdit" />
 			<then>
 				<execute action="Myaccount#type" locator-key1="DETAILS_SCREEN_NAME_FIELD" value1="${userScreenNameEdit}" />
@@ -1061,6 +1082,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1109,6 +1131,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1129,6 +1152,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1144,6 +1168,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1172,6 +1197,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1261,6 +1287,7 @@
 	<command name="impersonateCP">
 		<execute action="CPUsersandorganizations#assertClick" locator-key1="SEARCH_ALL_USERS" value1="All Users" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 
@@ -1445,6 +1472,7 @@
 	<command name="unassignRegularRoleCP">
 		<execute action="CPUsersandorganizations#assertClick" locator-key1="SEARCH_ALL_USERS" value1="All Users" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 
@@ -1468,6 +1496,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1485,6 +1514,7 @@
 		<if>
 			<equals arg1="${userEmailAddressVariation}" arg2="At" />
 			<then>
+				<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 				<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userEmailAddress}" />
 				<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 				<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No users were found." />
@@ -1492,6 +1522,7 @@
 			<elseif>
 				<equals arg1="${userEmailAddressVariation}" arg2="Period" />
 				<then>
+					<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 					<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userEmailAddress}" />
 					<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 					<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No users were found." />
@@ -1500,6 +1531,7 @@
 			<elseif>
 				<equals arg1="${userScreenNameVariation}" arg2="Invalid" />
 				<then>
+					<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 					<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 					<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 					<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No users were found." />
@@ -1508,6 +1540,7 @@
 			<else>
 				<var name="key_userScreenName" value="${userScreenName}" />
 
+				<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 				<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 				<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 				<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_FIRST_NAME" value1="${userFirstName}" />
@@ -1547,6 +1580,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_FIRST_NAME" value1="${userFirstName}" />
@@ -1565,6 +1599,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_FIRST_NAME" value1="${userFirstName}" />
@@ -1583,6 +1618,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_FIRST_NAME" value1="${userFirstName}" />
@@ -1601,6 +1637,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_FIRST_NAME" value1="${userFirstName}" />
@@ -1619,6 +1656,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />

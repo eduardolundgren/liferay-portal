@@ -965,6 +965,50 @@ public class UserServiceSoap {
 		}
 	}
 
+	public static boolean sendPasswordByEmailAddress(long companyId,
+		java.lang.String emailAddress) throws RemoteException {
+		try {
+			boolean returnValue = UserServiceUtil.sendPasswordByEmailAddress(companyId,
+					emailAddress);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static boolean sendPasswordByScreenName(long companyId,
+		java.lang.String screenName) throws RemoteException {
+		try {
+			boolean returnValue = UserServiceUtil.sendPasswordByScreenName(companyId,
+					screenName);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static boolean sendPasswordByUserId(long userId)
+		throws RemoteException {
+		try {
+			boolean returnValue = UserServiceUtil.sendPasswordByUserId(userId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Sets the users in the role, removing and adding users to the role as
 	* necessary.

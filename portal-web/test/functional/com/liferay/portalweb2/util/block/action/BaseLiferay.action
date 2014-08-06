@@ -147,6 +147,12 @@
 		</default>
 	</command>
 
+	<command name="assertValue">
+		<default>
+			<execute function="AssertValue#assertValue" />
+		</default>
+	</command>
+
 	<command name="assertVisible">
 		<default>
 			<description message="Assert that the ${locator1} is visible." />
@@ -359,6 +365,12 @@
 		</default>
 	</command>
 
+	<command name="setWindowSize">
+		<default>
+			<execute function="SetWindowSize#setWindowSize" />
+		</default>
+	</command>
+
 	<command name="sikuliAssertElementNotPresent">
 		<default>
 			<execute function="SikuliAssertElementNotPresent#sikuliAssertElementNotPresent" />
@@ -456,6 +468,14 @@
 			<description message="Type into the ${locator1} with the value ${value1}." />
 
 			<execute function="Type#type" />
+		</default>
+	</command>
+
+	<command name="typeScreen">
+		<default>
+			<description message="Type the value ${value1}." />
+
+			<execute function="TypeScreen#typeScreen" />
 		</default>
 	</command>
 

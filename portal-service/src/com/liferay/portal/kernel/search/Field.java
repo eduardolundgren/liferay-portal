@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -233,7 +234,7 @@ public class Field implements Serializable {
 	}
 
 	public void addField(Field field) {
-		_nestedFields.add(field);
+		_fields.add(field);
 	}
 
 	public float getBoost() {
@@ -241,7 +242,7 @@ public class Field implements Serializable {
 	}
 
 	public List<Field> getFields() {
-		return _nestedFields;
+		return _fields;
 	}
 
 	public Map<Locale, String> getLocalizedValues() {
@@ -302,6 +303,10 @@ public class Field implements Serializable {
 		return _numeric;
 	}
 
+	public boolean isSortable() {
+		return _sortable;
+	}
+
 	public boolean isTokenized() {
 		return _tokenized;
 	}
@@ -330,6 +335,10 @@ public class Field implements Serializable {
 		_parentField = parentField;
 	}
 
+	public void setSortable(boolean sortable) {
+		_sortable = sortable;
+	}
+
 	public void setTokenized(boolean tokenized) {
 		_tokenized = tokenized;
 	}
@@ -342,13 +351,85 @@ public class Field implements Serializable {
 		_values = values;
 	}
 
+	public static class NestedFieldBuilder {
+
+		public NestedFieldBuilder addNestedField(
+			String name, String... values) {
+
+			Field field = new Field(name);
+
+			field.addField(new Field("value", values));
+
+			_addField(field);
+
+			return this;
+		}
+
+		public NestedFieldBuilder endArray() {
+			return endField();
+		}
+
+		public NestedFieldBuilder endField() {
+			if (_nestedFieldsBuilderFields.size() > 1) {
+				_nestedFieldsBuilderFields.removeLast();
+			}
+
+			return this;
+		}
+
+		public Field getField() {
+			if (!_nestedFieldsBuilderFields.isEmpty()) {
+				return _nestedFieldsBuilderFields.getLast();
+			}
+
+			return null;
+		}
+
+		public NestedFieldBuilder startArray(String name) {
+			FieldArray fieldArray = new FieldArray(name);
+
+			return _startField(fieldArray);
+		}
+
+		public NestedFieldBuilder startField() {
+			return startField(null);
+		}
+
+		public NestedFieldBuilder startField(String name) {
+			Field field = new Field(name);
+
+			return _startField(field);
+		}
+
+		private void _addField(Field field) {
+			Field lastField = _nestedFieldsBuilderFields.getLast();
+
+			lastField.addField(field);
+		}
+
+		private NestedFieldBuilder _startField(Field field) {
+			if (!_nestedFieldsBuilderFields.isEmpty()) {
+				_addField(field);
+			}
+
+			_nestedFieldsBuilderFields.add(field);
+
+			return this;
+		}
+
+		private LinkedList<Field> _nestedFieldsBuilderFields =
+			new LinkedList<Field>();
+
+	}
+
 	private float _boost = 1;
+	private List<Field> _fields = new ArrayList<Field>();
 	private Map<Locale, String> _localizedValues;
 	private String _name;
-	private List<Field> _nestedFields = new ArrayList<Field>();
 	private boolean _numeric;
 	private Class<? extends Number> _numericClass;
 	private Field _parentField;
+	private boolean _sortable;
 	private boolean _tokenized;
 	private String[] _values;
 

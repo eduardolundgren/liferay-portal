@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatamapping.action;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -21,7 +22,6 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -45,6 +45,7 @@ import com.liferay.portlet.dynamicdatamapping.TemplateSmallImageSizeException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil;
 
 import java.io.File;
 
@@ -198,6 +199,25 @@ public class EditTemplateAction extends PortletAction {
 		}
 	}
 
+	protected String getFileScriptContent(
+			UploadPortletRequest uploadPortletRequest)
+		throws Exception {
+
+		File file = uploadPortletRequest.getFile("script");
+
+		if (file == null) {
+			return null;
+		}
+
+		String fileScriptContent = FileUtil.read(file);
+
+		if (Validator.isNotNull(fileScriptContent) && !isValidFile(file)) {
+			throw new TemplateScriptException();
+		}
+
+		return fileScriptContent;
+	}
+
 	protected String getSaveAndContinueRedirect(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			DDMTemplate template, String redirect)
@@ -237,22 +257,27 @@ public class EditTemplateAction extends PortletAction {
 	protected String getScript(UploadPortletRequest uploadPortletRequest)
 		throws Exception {
 
+		String fileScriptContent = getFileScriptContent(uploadPortletRequest);
+
+		if (Validator.isNotNull(fileScriptContent)) {
+			return fileScriptContent;
+		}
+
 		String scriptContent = ParamUtil.getString(
 			uploadPortletRequest, "scriptContent");
 
-		File file = uploadPortletRequest.getFile("script");
+		String type = ParamUtil.getString(uploadPortletRequest, "type");
 
-		if (file == null) {
-			return scriptContent;
+		if (type.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) {
+			try {
+				scriptContent = DDMXSDUtil.getXSD(scriptContent);
+			}
+			catch (PortalException pe) {
+				throw new TemplateScriptException();
+			}
 		}
 
-		String script = FileUtil.read(file);
-
-		if (Validator.isNotNull(script) && !isValidFile(file)) {
-			throw new TemplateScriptException();
-		}
-
-		return GetterUtil.getString(script, scriptContent);
+		return scriptContent;
 	}
 
 	protected boolean isValidFile(File file) {
