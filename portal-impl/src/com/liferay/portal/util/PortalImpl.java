@@ -109,6 +109,7 @@ import com.liferay.portal.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.model.LayoutQueryStringComposite;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutType;
+import com.liferay.portal.model.LayoutTypeController;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.Organization;
@@ -2556,8 +2557,11 @@ public class PortalImpl implements Portal {
 	public String getFirstPageLayoutTypes(HttpServletRequest request) {
 		StringBundler sb = new StringBundler();
 
-		for (String type : PropsValues.LAYOUT_TYPES) {
-			if (isLayoutFirstPageable(type)) {
+		for (String type : LayoutTypeControllerTracker.getTypes()) {
+			LayoutTypeController layoutTypeController =
+				LayoutTypeControllerTracker.getLayoutTypeController(type);
+
+			if (layoutTypeController.isFirstPageable()) {
 				sb.append(LanguageUtil.get(request, "layout.types." + type));
 				sb.append(StringPool.COMMA);
 				sb.append(StringPool.SPACE);
