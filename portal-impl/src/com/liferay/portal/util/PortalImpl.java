@@ -3005,21 +3005,6 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public String getLayoutEditPage(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(
-			layout.getType());
-
-		return layoutSettings.getEditPage();
-	}
-
-	@Override
-	public String getLayoutEditPage(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.getEditPage();
-	}
-
-	@Override
 	public String getLayoutFriendlyURL(Layout layout, ThemeDisplay themeDisplay)
 		throws PortalException {
 
@@ -3360,21 +3345,6 @@ public class PortalImpl implements Portal {
 		throws PortalException {
 
 		return getLayoutURL(themeDisplay.getLayout(), themeDisplay);
-	}
-
-	@Override
-	public String getLayoutViewPage(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(
-			layout.getType());
-
-		return layoutSettings.getViewPage();
-	}
-
-	@Override
-	public String getLayoutViewPage(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.getViewPage();
 	}
 
 	@Override
@@ -6599,46 +6569,6 @@ public class PortalImpl implements Portal {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean isLayoutFirstPageable(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
-
-		return layoutSettings.isFirstPageable();
-	}
-
-	@Override
-	public boolean isLayoutFirstPageable(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.isFirstPageable();
-	}
-
-	@Override
-	public boolean isLayoutFriendliable(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
-
-		return layoutSettings.isURLFriendliable();
-	}
-
-	@Override
-	public boolean isLayoutFriendliable(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.isURLFriendliable();
-	}
-
-	@Override
-	public boolean isLayoutParentable(Layout layout) {
-		return isLayoutParentable(layout.getType());
-	}
-
-	@Override
-	public boolean isLayoutParentable(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.isParentable();
 	}
 
 	@Override
