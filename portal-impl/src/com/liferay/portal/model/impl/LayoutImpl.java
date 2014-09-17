@@ -41,6 +41,7 @@ import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutType;
+import com.liferay.portal.model.LayoutTypeController;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.Theme;
@@ -76,6 +77,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.WindowState;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Represents a portal layout, providing access to the layout's URLs, parent
@@ -808,6 +810,20 @@ public class LayoutImpl extends LayoutBaseImpl {
 	}
 
 	@Override
+	public boolean includeLayoutContent(
+			HttpServletRequest request, HttpServletResponse response)
+		throws Exception {
+
+		LayoutType layoutType = getLayoutType();
+
+		LayoutTypeController layoutTypeController =
+			layoutType.getLayoutTypeController();
+
+		return layoutTypeController.includeLayoutContent(
+			request, response, this);
+	}
+
+	@Override
 	public boolean isChildSelected(boolean selectable, Layout layout)
 		throws PortalException {
 
@@ -1065,6 +1081,16 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean matches(HttpServletRequest request, String friendlyURL) {
+		LayoutType layoutType = getLayoutType();
+
+		LayoutTypeController layoutTypeController =
+			layoutType.getLayoutTypeController();
+
+		return layoutTypeController.matches(request, friendlyURL, this);
 	}
 
 	@Override
