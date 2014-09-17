@@ -80,9 +80,6 @@ import java.util.Set;
 public class LayoutTypePortletImpl
 	extends LayoutTypeImpl implements LayoutTypePortlet {
 
-	public static String generateInstanceId() {
-		return StringUtil.randomString(12);
-	}
 
 	public LayoutTypePortletImpl(Layout layout) {
 		super(layout);
@@ -1243,7 +1240,7 @@ public class LayoutTypePortletImpl
 			!PortletConstants.hasInstanceId(portletId)) {
 
 			portletId = PortletConstants.assemblePortletId(
-				portletId, generateInstanceId());
+				portletId, PortletConstants.generateInstanceId());
 		}
 
 		if (hasPortletId(portletId, strictHasPortlet)) {
@@ -1687,7 +1684,7 @@ public class LayoutTypePortletImpl
 				String instanceId = null;
 
 				if (PortletConstants.hasInstanceId(portletId)) {
-					instanceId = generateInstanceId();
+					instanceId = PortletConstants.generateInstanceId();
 				}
 
 				newPortletId = PortletConstants.assemblePortletId(
