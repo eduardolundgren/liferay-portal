@@ -36,6 +36,7 @@ import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.LayoutType;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -480,7 +481,9 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 		Layout parentLayout = layoutPersistence.findByG_P_L(
 			groupId, privateLayout, parentLayoutId);
 
-		if (!PortalUtil.isLayoutParentable(parentLayout)) {
+		LayoutType parentLayoutType = parentLayout.getLayoutType();
+
+		if (!parentLayoutType.isParentable()) {
 			throw new LayoutParentLayoutIdException(
 				LayoutParentLayoutIdException.NOT_PARENTABLE);
 		}
@@ -517,8 +520,10 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			if (firstLayoutId == layoutId) {
 				Layout secondLayout = layouts.get(1);
 
+				LayoutType layoutType = secondLayout.getLayoutType();
+
 				if (Validator.isNull(secondLayout.getType()) ||
-					!PortalUtil.isLayoutFirstPageable(secondLayout.getType())) {
+					!layoutType.isFirstPageable()) {
 
 					throw new LayoutParentLayoutIdException(
 						LayoutParentLayoutIdException.FIRST_LAYOUT_TYPE);

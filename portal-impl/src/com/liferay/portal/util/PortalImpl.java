@@ -2954,9 +2954,7 @@ public class PortalImpl implements Portal {
 
 		variables.putAll(typeSettingsProperties);
 
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
-
-		return layoutSettings.getURL(variables);
+		return layoutType.getURL(variables);
 	}
 
 	@Override
@@ -3026,7 +3024,9 @@ public class PortalImpl implements Portal {
 	public String getLayoutFriendlyURL(Layout layout, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		if (!isLayoutFriendliable(layout)) {
+		LayoutType layoutType = layout.getLayoutType();
+
+		if (!layoutType.isURLFriendliable()) {
 			return null;
 		}
 
@@ -6648,9 +6648,9 @@ public class PortalImpl implements Portal {
 			return false;
 		}
 
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
+		LayoutType layoutType = layout.getLayoutType();
 
-		return layoutSettings.isSitemapable();
+		return layoutType.isSitemapable();
 	}
 
 	@Override
