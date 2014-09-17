@@ -29,11 +29,13 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -300,6 +302,7 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 
 		if (Validator.isNotNull(friendlyURL)) {
+			try {
 			LayoutFriendlyURLComposite layoutFriendlyURLComposite =
 				PortalUtil.getLayoutFriendlyURLComposite(
 					group.getGroupId(), _private, friendlyURL, params,
@@ -333,6 +336,23 @@ public class FriendlyURLServlet extends HttpServlet {
 
 					return new Object[] {redirect, Boolean.TRUE};
 				}
+			}
+			}
+			catch (NoSuchLayoutException nsle) {
+				List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+					group.getGroupId(), _private,
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+				for (Layout curLayout : layouts) {
+					if (curLayout.matches(request, friendlyURL)) {
+						String redirect = PortalUtil.getLayoutActualURL(
+							curLayout, mainPath);
+
+						return new Object[] {redirect, Boolean.FALSE};
+					}
+				}
+
+				throw nsle;
 			}
 		}
 
