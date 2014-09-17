@@ -55,6 +55,7 @@ import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.LayoutClone;
 import com.liferay.portal.util.LayoutCloneFactory;
+import com.liferay.portal.util.LayoutTypePortletFactoryUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
@@ -565,7 +566,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	@Override
 	public LayoutType getLayoutType() {
 		if (_layoutType == null) {
-			_layoutType = new LayoutTypePortletImpl(this);
+			_layoutType = LayoutTypePortletFactoryUtil.create(this);
 		}
 
 		return _layoutType;

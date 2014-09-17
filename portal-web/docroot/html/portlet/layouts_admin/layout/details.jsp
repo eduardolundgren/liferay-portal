@@ -20,7 +20,7 @@
 Group group = layoutsAdminDisplayContext.getGroup();
 Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
-LayoutTypePortletImpl selLayoutTypePortlet = new LayoutTypePortletImpl(selLayout);
+LayoutType selLayoutType = selLayout.getLayoutType();
 
 Locale defaultLocale = LocaleUtil.getDefault();
 String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);

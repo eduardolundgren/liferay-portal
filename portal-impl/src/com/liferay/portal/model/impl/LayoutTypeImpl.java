@@ -23,8 +23,11 @@ import com.liferay.portal.model.LayoutType;
  */
 public class LayoutTypeImpl implements LayoutType {
 
-	public LayoutTypeImpl(Layout layout) {
-		setLayout(layout);
+	public LayoutTypeImpl(
+		Layout layout, LayoutTypeController layoutTypeController) {
+
+		_layout = layout;
+		_layoutTypeController = layoutTypeController;
 	}
 
 	@Override
@@ -50,8 +53,12 @@ public class LayoutTypeImpl implements LayoutType {
 	}
 
 	@Override
+
+	/**
+	 * @deprecated As of 7.0.0 with no replacement. This method has no effect.
+	 */
+	@Override
 	public void setLayout(Layout layout) {
-		_layout = layout;
 	}
 
 	@Override
@@ -61,6 +68,6 @@ public class LayoutTypeImpl implements LayoutType {
 		typeSettingsProperties.setProperty(key, value);
 	}
 
-	private Layout _layout;
+	private final Layout _layout;
 
 }

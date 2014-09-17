@@ -35,6 +35,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutTemplate;
+import com.liferay.portal.model.LayoutTypeController;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.Plugin;
@@ -52,6 +53,7 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
+import com.liferay.portal.util.LayoutTypePortletFactoryUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
@@ -80,9 +82,10 @@ import java.util.Set;
 public class LayoutTypePortletImpl
 	extends LayoutTypeImpl implements LayoutTypePortlet {
 
+	public LayoutTypePortletImpl(
+		Layout layout, LayoutTypeController layoutTypeController) {
 
-	public LayoutTypePortletImpl(Layout layout) {
-		super(layout);
+		super(layout, layoutTypeController);
 
 		if (_nestedPortletsNamespace == null) {
 			_nestedPortletsNamespace = PortalUtil.getPortletNamespace(
@@ -1429,7 +1432,8 @@ public class LayoutTypePortletImpl
 		}
 
 		LayoutTypePortletImpl defaultLayoutTypePortletImpl =
-			new LayoutTypePortletImpl(getLayout());
+			(LayoutTypePortletImpl)LayoutTypePortletFactoryUtil.create(
+				getLayout());
 
 		defaultLayoutTypePortletImpl._embeddedPortlets = _embeddedPortlets;
 		defaultLayoutTypePortletImpl._layoutSetPrototypeLayout =
