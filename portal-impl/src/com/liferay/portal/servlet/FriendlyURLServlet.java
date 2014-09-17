@@ -303,40 +303,42 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		if (Validator.isNotNull(friendlyURL)) {
 			try {
-			LayoutFriendlyURLComposite layoutFriendlyURLComposite =
-				PortalUtil.getLayoutFriendlyURLComposite(
-					group.getGroupId(), _private, friendlyURL, params,
-					requestContext);
+				LayoutFriendlyURLComposite layoutFriendlyURLComposite =
+					PortalUtil.getLayoutFriendlyURLComposite(
+						group.getGroupId(), _private, friendlyURL, params,
+						requestContext);
 
-			Layout layout = layoutFriendlyURLComposite.getLayout();
+				Layout layout = layoutFriendlyURLComposite.getLayout();
 
-			String layoutFriendlyURLCompositeFriendlyURL =
-				layoutFriendlyURLComposite.getFriendlyURL();
+				String layoutFriendlyURLCompositeFriendlyURL =
+					layoutFriendlyURLComposite.getFriendlyURL();
 
-			pos = layoutFriendlyURLCompositeFriendlyURL.indexOf(
-				Portal.FRIENDLY_URL_SEPARATOR);
+				pos = layoutFriendlyURLCompositeFriendlyURL.indexOf(
+					Portal.FRIENDLY_URL_SEPARATOR);
 
-			if (pos != 0) {
-				if (pos != -1) {
-					layoutFriendlyURLCompositeFriendlyURL =
-						layoutFriendlyURLCompositeFriendlyURL.substring(0, pos);
+				if (pos != 0) {
+					if (pos != -1) {
+						layoutFriendlyURLCompositeFriendlyURL =
+							layoutFriendlyURLCompositeFriendlyURL.substring(
+								0, pos);
+					}
+
+					Locale locale = PortalUtil.getLocale(request);
+
+					if (!StringUtil.equalsIgnoreCase(
+							layoutFriendlyURLCompositeFriendlyURL,
+							layout.getFriendlyURL(locale))) {
+
+						Locale originalLocale = setAlternativeLayoutFriendlyURL(
+							request, layout,
+							layoutFriendlyURLCompositeFriendlyURL);
+
+						String redirect = PortalUtil.getLocalizedFriendlyURL(
+							request, layout, locale, originalLocale);
+
+						return new Object[] {redirect, Boolean.TRUE};
+					}
 				}
-
-				Locale locale = PortalUtil.getLocale(request);
-
-				if (!StringUtil.equalsIgnoreCase(
-						layoutFriendlyURLCompositeFriendlyURL,
-						layout.getFriendlyURL(locale))) {
-
-					Locale originalLocale = setAlternativeLayoutFriendlyURL(
-						request, layout, layoutFriendlyURLCompositeFriendlyURL);
-
-					String redirect = PortalUtil.getLocalizedFriendlyURL(
-						request, layout, locale, originalLocale);
-
-					return new Object[] {redirect, Boolean.TRUE};
-				}
-			}
 			}
 			catch (NoSuchLayoutException nsle) {
 				List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
