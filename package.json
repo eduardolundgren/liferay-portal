@@ -1,7 +1,7 @@
 {
-  "name": "liferay-frontend-web-tests",
-  "version": "0.0.1",
-  "description": "Liferay Portal JavaScript Tests",
+  "name": "liferay-portal",
+  "version": "7.0.x",
+  "description": "Liferay Portal",
   "dependencies": {},
   "devDependencies": {
     "chai": "^1.10.0",
@@ -19,10 +19,6 @@
     "mocha": "^2.1.0",
     "properties": "^1.2.1",
     "sinon": "^1.12.2"
-  },
-  "scripts": {
-    "test": "node_modules/karma/bin/karma start --singleRun",
-    "watch": "node_modules/karma/bin/karma start --auto-watch --no-single-run"
   },
   "repository": {
     "type": "git",

@@ -80,7 +80,7 @@ defaultConfig.files = [
 ];
 
 properties.read(
-	'../../../portal-impl/src/portal.properties',
+	'portal-impl/src/portal.properties',
 	function(data) {
 		var props = data[0];
 

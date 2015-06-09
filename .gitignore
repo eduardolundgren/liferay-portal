@@ -61,9 +61,10 @@ cobertura.ser
 
 /modules/frontend/*/test/coverage
 /modules/frontend/*/test/junit
-/modules/frontend/*/node_modules
 
 /nbproject/private
+
+/node_modules
 
 /osgi/bootstrap/classes
 /osgi/bootstrap/osgi-bootstrap.jar

@@ -2,16 +2,18 @@
 <!DOCTYPE project>
 
 <project>
-	<import file="../../../tools/sdk/build-common-osgi-plugin.xml" />
-	<import file="../../../tools/sdk/build-node.xml" />
+	<property name="portal.root.dir" value="../../.." />
+
+	<import file="${portal.root.dir}/tools/sdk/build-common-osgi-plugin.xml" />
+	<import file="${portal.root.dir}/tools/sdk/build-node.xml" />
 
 	<property name="auto.deploy.dir" value="${liferay.home}/osgi/modules" />
 
 	<property name="alloy.bootstrap.version" value="3.2.0-2" />
 	<property name="alloy.version" value="3.0.1" />
-	<property name="third.party.dir" value="../../../portal-web/third-party" />
+	<property name="third.party.dir" value="${portal.root.dir}/portal-web/third-party" />
 
-	<import file="../../../tools/sdk/build-common-osgi-plugin.xml" />
+	<import file="${portal.root.dir}/tools/sdk/build-common-osgi-plugin.xml" />
 
 	<property name="auto.deploy.dir" value="${liferay.home}/osgi/portal" />
 
@@ -202,28 +204,28 @@
 	<target name="test-js" depends="download-node">
 		<node-execute
 			command="npm"
-			command.args="install"
-			working.dir="${basedir}"
+			node.args="install"
+			working.dir="${portal.root.dir}"
 		/>
 
 		<node-execute
-			command="npm"
-			command.args="test"
-			working.dir="${basedir}"
+			command="node"
+			node.args="node_modules/karma/bin/karma start ${basedir}/karma.conf.js --singleRun"
+			working.dir="${portal.root.dir}"
 		/>
 	</target>
 
 	<target name="watch-js" depends="download-node">
 		<node-execute
 			command="npm"
-			command.args="install"
-			working.dir="${basedir}"
+			node.args="install"
+			working.dir="${portal.root.dir}"
 		/>
 
 		<node-execute
 			command="npm"
-			command.args="run watch"
-			working.dir="${basedir}"
+			node.args="node_modules/karma/bin/karma start --auto-watch --no-single-run"
+			working.dir="${portal.root.dir}"
 		/>
 	</target>
 </project>
