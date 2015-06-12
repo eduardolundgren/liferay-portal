@@ -1,6 +1,6 @@
 {
   "name": "liferay-portal",
-  "version": "7.0.x",
+  "version": "7.0.0",
   "description": "Liferay Portal",
   "dependencies": {},
   "devDependencies": {
