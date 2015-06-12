@@ -25,6 +25,9 @@ var defaultConfig = {
 			{
 				type: 'json',
 				file: 'coverage.json'
+			},
+			{
+				"type": "text-summary"
 			}
 		]
 	},
