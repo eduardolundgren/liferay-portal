@@ -5,16 +5,19 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "^1.10.0",
+    "isparta": "^3.0.3",
     "karma": "^0.12.31",
+    "karma-babel-preprocessor": "^5.1.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.7",
-    "karma-coverage": "^0.2.7",
+    "karma-coverage": "^0.4.2",
     "karma-junit-reporter": "^0.2.2",
     "karma-mocha": "^0.1.10",
     "karma-sinon": "^1.0.4",
+    "karma-source-map-support": "^1.0.0",
     "mocha": "^2.1.0",
     "properties": "^1.2.1",
-    "sinon": "^1.12.2"
+    "sinon": "^1.14.2"
   },
   "repository": {
     "type": "git",

@@ -1,23 +1,25 @@
 'use strict';
 
+var isparta = require('isparta');
 var properties = require('./test/src/properties.js');
 
-// Karma configuration
-
 var defaultConfig = {
-	// enable / disable watching file and executing tests whenever any file changes
-	autoWatch: false,
-
-	// base path that will be used to resolve all patterns (eg. files, exclude)
-	basePath: './',
+	babelPreprocessor: {
+		options: {
+			sourceMap: 'both'
+		}
+	},
 
 	browsers: ['Chrome'],
 
-	// enable / disable colors in the output (reporters and logs)
-	colors: true,
-
 	coverageReporter: {
 		dir: 'test/coverage',
+		instrumenters: {
+			'isparta': isparta
+		},
+		instrumenter: {
+			'**/*.js': 'isparta'
+		},
 		reporters: [
 			{
 				type: 'html'
@@ -27,47 +29,31 @@ var defaultConfig = {
 				file: 'coverage.json'
 			},
 			{
+				subdir: 'lcov',
+				type: 'lcov'
+			},
+			{
 				"type": "text-summary"
 			}
 		]
 	},
 
-	// list of files to exclude
-	exclude: [],
-
-	// frameworks to use
-	// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-	frameworks: ['chai', 'mocha', 'sinon'],
+	frameworks: ['chai', 'mocha', 'sinon', 'source-map-support'],
 
     junitReporter: {
-      outputFile: 'test/junit/test-results.xml',
-      suite: ''
+		outputFile: 'test/junit/test-results.xml'
     },
 
-	// level of logging
-	// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-	logLevel: 'info',
-
-	// web server port
-	port: 9876,
-
-	// preprocess matching files before serving them to the browser
-	// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 	preprocessors: {
-		'src/META-INF/resources/html/js/liferay/*.js': ['coverage']
+		'src/META-INF/resources/html/js/liferay/*.js': ['coverage'],
+		// 'test/src/*/main.js': ['babel', 'commonjs']
 	},
 
-	// test results reporter to use
-	// possible values: 'dots', 'progress'
-	// available reporters: https://npmjs.org/browse/keyword/karma-reporter
 	reporters: ['coverage', 'progress', 'junit'],
 
-	// Continuous Integration mode
-	// if true, Karma captures browsers, runs the tests and exits
 	singleRun: true
 };
 
-// list of files / patterns to load in the browser
 defaultConfig.files = [
 	'test/src/mock_base.js',
 	{
