@@ -26,8 +26,6 @@ import javax.management.ObjectName;
  */
 public class ServerDetector {
 
-	public static final String GERONIMO_ID = "geronimo";
-
 	public static final String GLASSFISH_ID = "glassfish";
 
 	public static final String JBOSS_ID = "jboss";
@@ -65,10 +63,7 @@ public class ServerDetector {
 
 		serverDetector._serverId = serverId;
 
-		if (serverId.equals(GERONIMO_ID)) {
-			serverDetector._geronimo = true;
-		}
-		else if (serverId.equals(GLASSFISH_ID)) {
+		if (serverId.equals(GLASSFISH_ID)) {
 			serverDetector._glassfish = true;
 		}
 		else if (serverId.equals(JBOSS_ID)) {
@@ -100,10 +95,6 @@ public class ServerDetector {
 		}
 
 		_instance = serverDetector;
-	}
-
-	public static boolean isGeronimo() {
-		return getInstance()._geronimo;
 	}
 
 	public static boolean isGlassfish() {
@@ -203,11 +194,7 @@ public class ServerDetector {
 	}
 
 	private void _init() {
-		if (_isGeronimo()) {
-			_serverId = GERONIMO_ID;
-			_geronimo = true;
-		}
-		else if (_isGlassfish()) {
+		if (_isGlassfish()) {
 			_serverId = GLASSFISH_ID;
 			_glassfish = true;
 		}
@@ -270,10 +257,6 @@ public class ServerDetector {
 		}*/
 	}
 
-	private boolean _isGeronimo() {
-		return _hasSystemProperty("org.apache.geronimo.home.dir");
-	}
-
 	private boolean _isGlassfish() {
 		return _hasSystemProperty("com.sun.aas.instanceRoot");
 	}
@@ -287,7 +270,8 @@ public class ServerDetector {
 			for (MBeanServer mBeanServer :
 					MBeanServerFactory.findMBeanServer(null)) {
 
-				String defaultDomain = mBeanServer.getDefaultDomain();
+				String defaultDomain = GetterUtil.getString(
+					mBeanServer.getDefaultDomain(), "jboss");
 
 				if (defaultDomain.equals("jboss")) {
 					ObjectName objectName = new ObjectName(
@@ -345,7 +329,6 @@ public class ServerDetector {
 
 	private static ServerDetector _instance;
 
-	private boolean _geronimo;
 	private boolean _glassfish;
 	private boolean _jBoss;
 	private boolean _jBoss5;

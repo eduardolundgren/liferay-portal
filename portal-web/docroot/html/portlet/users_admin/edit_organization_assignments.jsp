@@ -24,7 +24,9 @@ int cur = ParamUtil.getInteger(request, SearchContainer.DEFAULT_CUR_PARAM);
 
 String redirect = ParamUtil.getString(request, "redirect");
 
-Organization organization = (Organization)request.getAttribute(WebKeys.ORGANIZATION);
+long organizationId = ParamUtil.getLong(request, "organizationId");
+
+Organization organization = OrganizationServiceUtil.fetchOrganization(organizationId);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -73,9 +75,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "assign-
 		searchContainer="<%= new UserSearch(renderRequest, portletURL) %>"
 		var="userSearchContainer"
 	>
-		<liferay-ui:search-form
-			page="/html/portlet/users_admin/user_search.jsp"
-		/>
+		<liferay-ui:user-search-form />
 
 		<%
 		UserSearchTerms searchTerms = (UserSearchTerms)userSearchContainer.getSearchTerms();

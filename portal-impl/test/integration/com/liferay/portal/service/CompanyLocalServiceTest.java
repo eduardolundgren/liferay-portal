@@ -24,8 +24,17 @@ import com.liferay.portal.NoSuchShardException;
 import com.liferay.portal.NoSuchVirtualHostException;
 import com.liferay.portal.RequiredCompanyException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Account;
@@ -40,17 +49,11 @@ import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.persistence.PasswordPolicyUtil;
 import com.liferay.portal.service.persistence.PortalPreferencesUtil;
 import com.liferay.portal.service.persistence.PortletUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -65,6 +68,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.PortletPreferences;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -140,8 +145,8 @@ public class CompanyLocalServiceTest {
 		Group companyStagingGroup = GroupLocalServiceUtil.addGroup(
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			companyGroup.getClassName(), companyGroup.getClassPK(),
-			companyGroup.getGroupId(), companyGroup.getDescriptiveName(),
-			companyGroup.getDescription(), companyGroup.getType(),
+			companyGroup.getGroupId(), RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(), companyGroup.getType(),
 			companyGroup.isManualMembership(),
 			companyGroup.getMembershipRestriction(),
 			companyGroup.getFriendlyURL(), false, companyGroup.isActive(),
@@ -357,9 +362,9 @@ public class CompanyLocalServiceTest {
 		CompanyLocalServiceUtil.deleteCompany(company);
 
 		for (long companyId : PortalInstances.getCompanyIds()) {
-			if (companyId == company.getCompanyId()) {
-				Assert.fail("Company instance was not deleted");
-			}
+			Assert.assertNotEquals(
+				"Company instance was not deleted", company.getCompanyId(),
+				companyId);
 		}
 	}
 
@@ -427,6 +432,23 @@ public class CompanyLocalServiceTest {
 		VirtualHostLocalServiceUtil.getVirtualHost(company.getWebId());
 	}
 
+	@Test
+	public void testDeleteCompanyWithLDAPPasswordPolicyEnabled()
+		throws Exception {
+
+		Company company = addCompany();
+
+		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
+			company.getCompanyId(), true);
+
+		portletPreferences.setValue(
+			PropsKeys.LDAP_PASSWORD_POLICY_ENABLED, "true");
+
+		portletPreferences.store();
+
+		CompanyLocalServiceUtil.deleteCompany(company);
+	}
+
 	@Test(expected = RequiredCompanyException.class)
 	public void testDeleteDefaultCompany() throws Exception {
 		long companyId = PortalInstances.getDefaultCompanyId();
@@ -473,7 +495,7 @@ public class CompanyLocalServiceTest {
 	@Test
 	public void testUpdateInvalidVirtualHostNames() throws Exception {
 		testUpdateVirtualHostNames(
-			new String[] {StringPool.BLANK, "localhost", ".abc",}, true);
+			new String[] {StringPool.BLANK, "localhost", ".abc"}, true);
 	}
 
 	@Test
@@ -515,7 +537,7 @@ public class CompanyLocalServiceTest {
 			long companyId, long userId, String name)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), name);
 
@@ -533,7 +555,8 @@ public class CompanyLocalServiceTest {
 		throws Exception {
 
 		return UserTestUtil.addUser(
-			companyId, userId, RandomTestUtil.randomString(), false,
+			companyId, userId,
+			RandomTestUtil.randomString(NumericStringRandomizerBumper.INSTANCE),
 			LocaleUtil.getDefault(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), new long[] {groupId},
 			serviceContext);
@@ -566,14 +589,10 @@ public class CompanyLocalServiceTest {
 					account.getTickerSymbol(), account.getIndustry(),
 					account.getType(), account.getSize());
 
-				if (expectFailure) {
-					Assert.fail();
-				}
+				Assert.assertFalse(expectFailure);
 			}
 			catch (AccountNameException ane) {
-				if (!expectFailure) {
-					Assert.fail();
-				}
+				Assert.assertTrue(expectFailure);
 			}
 		}
 	}
@@ -615,9 +634,8 @@ public class CompanyLocalServiceTest {
 			}
 		}
 		catch (CompanyMxException cme) {
-			if (valid || !mailMxUpdate) {
-				Assert.fail();
-			}
+			Assert.assertFalse(valid);
+			Assert.assertTrue(mailMxUpdate);
 		}
 		finally {
 			CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
@@ -638,14 +656,10 @@ public class CompanyLocalServiceTest {
 					company.getCompanyId(), virtualHostName, company.getMx(),
 					company.getMaxUsers(), company.getActive());
 
-				if (expectFailure) {
-					Assert.fail();
-				}
+				Assert.assertFalse(expectFailure);
 			}
 			catch (CompanyVirtualHostException cvhe) {
-				if (!expectFailure) {
-					Assert.fail();
-				}
+				Assert.assertTrue(expectFailure);
 			}
 		}
 

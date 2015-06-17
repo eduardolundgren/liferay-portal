@@ -19,13 +19,10 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTypePortlet;
-import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.PortletPreferencesIds;
-import com.liferay.portal.model.Team;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
+import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
-import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -43,8 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ActionUtil
-	extends com.liferay.portlet.rolesadmin.action.ActionUtil {
+public class ActionUtil {
 
 	public static void copyPreferences(
 			HttpServletRequest request, Layout targetLayout,
@@ -154,49 +150,36 @@ public class ActionUtil
 		return getGroup(request);
 	}
 
-	public static void getMembershipRequest(HttpServletRequest request)
+	public static void removePortletIds(
+			HttpServletRequest request, Layout layout)
 		throws Exception {
 
-		long membershipRequestId = ParamUtil.getLong(
-			request, "membershipRequestId");
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		MembershipRequest membershipRequest = null;
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet)layout.getLayoutType();
 
-		if (membershipRequestId > 0) {
-			membershipRequest =
-				MembershipRequestLocalServiceUtil.getMembershipRequest(
-					membershipRequestId);
+		List<String> portletIds = layoutTypePortlet.getPortletIds();
+
+		for (String portletId : portletIds) {
+			layoutTypePortlet.removePortletId(
+				themeDisplay.getUserId(), portletId);
 		}
 
-		request.setAttribute(WebKeys.MEMBERSHIP_REQUEST, membershipRequest);
+		LayoutServiceUtil.updateLayout(
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getTypeSettings());
 	}
 
-	public static void getMembershipRequest(PortletRequest portletRequest)
+	public static void removePortletIds(
+			PortletRequest portletRequest, Layout layout)
 		throws Exception {
 
 		HttpServletRequest request = PortalUtil.getHttpServletRequest(
 			portletRequest);
 
-		getMembershipRequest(request);
-	}
-
-	public static void getTeam(HttpServletRequest request) throws Exception {
-		long teamId = ParamUtil.getLong(request, "teamId");
-
-		Team team = null;
-
-		if (teamId > 0) {
-			team = TeamLocalServiceUtil.getTeam(teamId);
-		}
-
-		request.setAttribute(WebKeys.TEAM, team);
-	}
-
-	public static void getTeam(PortletRequest portletRequest) throws Exception {
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
-
-		getTeam(request);
+		removePortletIds(request, layout);
 	}
 
 }

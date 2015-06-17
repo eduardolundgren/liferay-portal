@@ -17,6 +17,7 @@ package com.liferay.portlet.documentlibrary.trash;
 import com.liferay.portal.InvalidRepositoryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.Repository;
+import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.trash.TrashActionKeys;
@@ -25,12 +26,13 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.RepositoryServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.asset.DLFolderAssetRenderer;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
@@ -213,7 +215,7 @@ public class DLFolderTrashHandler extends DLBaseTrashHandler {
 		if ((dlFolder == null) ||
 			((dlFolder.getParentFolderId() > 0) &&
 			 (DLFolderLocalServiceUtil.fetchFolder(
-				dlFolder.getParentFolderId()) == null))) {
+				 dlFolder.getParentFolderId()) == null))) {
 
 			return false;
 		}
@@ -305,12 +307,28 @@ public class DLFolderTrashHandler extends DLBaseTrashHandler {
 
 			throw ree;
 		}
+
+		DLFileEntry duplicateDLFileEntry =
+			DLFileEntryLocalServiceUtil.fetchFileEntry(
+				dlFolder.getGroupId(), containerModelId, originalTitle);
+
+		if (duplicateDLFileEntry != null) {
+			RestoreEntryException ree = new RestoreEntryException(
+				RestoreEntryException.DUPLICATE);
+
+			ree.setDuplicateEntryId(duplicateDLFileEntry.getFileEntryId());
+			ree.setOldName(duplicateDLFileEntry.getTitle());
+			ree.setOverridable(false);
+			ree.setTrashEntryId(trashEntryId);
+
+			throw ree;
+		}
 	}
 
 	@Override
 	protected Repository getRepository(long classPK) throws PortalException {
-		Repository repository = RepositoryServiceUtil.getRepositoryImpl(
-			classPK, 0, 0);
+		Repository repository = RepositoryProviderUtil.getFolderRepository(
+			classPK);
 
 		if (!repository.isCapabilityProvided(TrashCapability.class)) {
 			throw new InvalidRepositoryException(

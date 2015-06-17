@@ -86,8 +86,6 @@ public class SetupWizardSampleDataUtil {
 			(LayoutTypePortlet)extranetLayout.getLayoutType();
 
 		layoutTypePortlet.addPortletId(
-			0, PortletKeys.SEARCH, "column-1", -1, false);
-		layoutTypePortlet.addPortletId(
 			0, PortletKeys.MESSAGE_BOARDS, "column-2", -1, false);
 
 		LayoutLocalServiceUtil.updateLayout(
@@ -102,8 +100,6 @@ public class SetupWizardSampleDataUtil {
 
 		layoutTypePortlet = (LayoutTypePortlet)intranetLayout.getLayoutType();
 
-		layoutTypePortlet.addPortletId(
-			0, PortletKeys.SEARCH, "column-1", -1, false);
 		layoutTypePortlet.addPortletId(
 			0, PortletKeys.MESSAGE_BOARDS, "column-2", -1, false);
 
@@ -205,7 +201,7 @@ public class SetupWizardSampleDataUtil {
 		}
 	}
 
-	private static Object[][] _ORGANIZATION_ARRAYS = {
+	private static final Object[][] _ORGANIZATION_ARRAYS = {
 		{
 			"Chicago", 19014L, 19L, OrganizationConstants.TYPE_LOCATION, "ORD"
 		},
@@ -260,7 +256,7 @@ public class SetupWizardSampleDataUtil {
 		}
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		SetupWizardSampleDataUtil.class);
 
 }

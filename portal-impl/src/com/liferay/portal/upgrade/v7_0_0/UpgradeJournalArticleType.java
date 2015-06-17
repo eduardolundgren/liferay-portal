@@ -93,7 +93,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 			Map<String, Long> bitwiseValues = getBitwiseValues(
 				AssetCategory.class.getName());
 
-			List<String> actionIds = new ArrayList<String>();
+			List<String> actionIds = new ArrayList<>();
 
 			actionIds.add(ActionKeys.VIEW);
 
@@ -187,7 +187,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 			Map<String, Long> bitwiseValues = getBitwiseValues(
 				AssetVocabulary.class.getName());
 
-			List<String> actionIds = new ArrayList<String>();
+			List<String> actionIds = new ArrayList<>();
 
 			actionIds.add(ActionKeys.VIEW);
 
@@ -234,7 +234,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 
 			rs = ps.executeQuery();
 
-			List<String> types = new ArrayList<String>();
+			List<String> types = new ArrayList<>();
 
 			while (rs.next()) {
 				types.add(rs.getString("type_"));
@@ -402,7 +402,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 					assetVocabularySettingsHelper.toString());
 
 				Map<String, Long> journalArticleTypesToAssetCategoryIds =
-					new HashMap<String, Long>();
+					new HashMap<>();
 
 				int i = 1;
 
@@ -427,7 +427,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeJournalArticleType.class);
 
 }

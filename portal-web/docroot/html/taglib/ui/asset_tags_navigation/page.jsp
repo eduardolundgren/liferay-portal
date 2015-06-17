@@ -97,10 +97,10 @@ private String _buildTagsNavigation(long scopeGroupId, long siteGroupId, String 
 			int count = 0;
 
 			if (classNameId > 0) {
-				count = AssetTagServiceUtil.getTagsCount(scopeGroupId, classNameId, tagName);
+				count = AssetTagServiceUtil.getVisibleAssetsTagsCount(scopeGroupId, classNameId, tagName);
 			}
 			else {
-				count = AssetTagServiceUtil.getTagsCount(scopeGroupId, tagName);
+				count = AssetTagServiceUtil.getVisibleAssetsTagsCount(scopeGroupId, tagName);
 			}
 
 			if (!showZeroAssetCount && (count == 0)) {
@@ -124,10 +124,10 @@ private String _buildTagsNavigation(long scopeGroupId, long siteGroupId, String 
 		int count = 0;
 
 		if (classNameId > 0) {
-			count = AssetTagServiceUtil.getTagsCount(scopeGroupId, classNameId, tagName);
+			count = AssetTagServiceUtil.getVisibleAssetsTagsCount(scopeGroupId, classNameId, tagName);
 		}
 		else {
-			count = AssetTagServiceUtil.getTagsCount(scopeGroupId, tagName);
+			count = AssetTagServiceUtil.getVisibleAssetsTagsCount(scopeGroupId, tagName);
 		}
 
 		int popularity = (int)(1 + ((maxCount - (maxCount - (count - minCount))) * multiplier));
@@ -146,7 +146,6 @@ private String _buildTagsNavigation(long scopeGroupId, long siteGroupId, String 
 			sb.append("<a class=\"tag-selected\" href=\"");
 		}
 		else {
-			portletURL.setParameter("resetCur", Boolean.TRUE.toString());
 			portletURL.setParameter("tag", tagName);
 
 			sb.append("<a href=\"");

@@ -15,14 +15,16 @@
 package com.liferay.sync.engine.documentlibrary.handler;
 
 import com.liferay.sync.engine.documentlibrary.event.Event;
+import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.filesystem.Watcher;
-import com.liferay.sync.engine.filesystem.WatcherRegistry;
+import com.liferay.sync.engine.filesystem.util.WatcherRegistry;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
 import com.liferay.sync.engine.util.StreamUtil;
@@ -34,7 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileTime;
 
 import java.util.List;
 
@@ -86,9 +87,120 @@ public class DownloadFileHandler extends BaseHandler {
 			return;
 		}
 
-		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
+		SyncFile syncFile = getLocalSyncFile();
 
-		SyncFileService.deleteSyncFile(syncFile, false);
+		if ((Boolean)getParameterValue("patch")) {
+			FileEventUtil.downloadFile(getSyncAccountId(), syncFile);
+		}
+		else {
+			SyncFileService.deleteSyncFile(syncFile, false);
+		}
+	}
+
+	@Override
+	public boolean handlePortalException(String exception) throws Exception {
+		SyncFile syncFile = getLocalSyncFile();
+
+		if (_logger.isDebugEnabled()) {
+			_logger.debug(
+				"Handling exception {} file path {}", exception,
+				syncFile.getFilePathName());
+		}
+
+		if (exception.equals(
+				"com.liferay.portlet.documentlibrary." +
+					"NoSuchFileVersionException") &&
+			(Boolean)getParameterValue("patch")) {
+
+			FileEventUtil.downloadFile(getSyncAccountId(), syncFile, false);
+
+			return true;
+		}
+
+		if (exception.equals(
+				"com.liferay.portlet.documentlibrary." +
+					"NoSuchFileEntryException") ||
+			exception.equals(
+				"com.liferay.portlet.documentlibrary.NoSuchFileException")) {
+
+			SyncFileService.deleteSyncFile(syncFile, false);
+
+			return true;
+		}
+
+		return super.handlePortalException(exception);
+	}
+
+	protected void copyFile(
+			SyncFile syncFile, Path filePath, InputStream inputStream)
+		throws Exception {
+
+		Watcher watcher = WatcherRegistry.getWatcher(getSyncAccountId());
+
+		List<String> downloadedFilePathNames =
+			watcher.getDownloadedFilePathNames();
+
+		try {
+			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+				getSyncAccountId());
+
+			Path tempFilePath = FileUtil.getFilePath(
+				syncAccount.getFilePathName(), ".data",
+				String.valueOf(syncFile.getSyncFileId()));
+
+			boolean exists = Files.exists(filePath);
+
+			if (exists) {
+				Files.copy(
+					filePath, tempFilePath,
+					StandardCopyOption.REPLACE_EXISTING);
+			}
+
+			if ((Boolean)getParameterValue("patch")) {
+				IODeltaUtil.patch(tempFilePath, inputStream);
+			}
+			else {
+				Files.copy(
+					inputStream, tempFilePath,
+					StandardCopyOption.REPLACE_EXISTING);
+			}
+
+			downloadedFilePathNames.add(filePath.toString());
+
+			if (exists) {
+				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_UPDATE);
+			}
+			else {
+				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
+			}
+
+			FileKeyUtil.writeFileKey(
+				tempFilePath, String.valueOf(syncFile.getSyncFileId()), false);
+
+			FileUtil.setModifiedTime(tempFilePath, syncFile.getModifiedTime());
+
+			Files.move(
+				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
+				StandardCopyOption.REPLACE_EXISTING);
+
+			syncFile.setState(SyncFile.STATE_SYNCED);
+
+			SyncFileService.update(syncFile);
+
+			IODeltaUtil.checksums(syncFile);
+		}
+		catch (FileSystemException fse) {
+			downloadedFilePathNames.remove(filePath.toString());
+
+			String message = fse.getMessage();
+
+			if (message.contains("File name too long")) {
+				syncFile.setState(SyncFile.STATE_ERROR);
+				syncFile.setUiEvent(SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
+
+				SyncFileService.update(syncFile);
+			}
+		}
 	}
 
 	@Override
@@ -111,22 +223,13 @@ public class DownloadFileHandler extends BaseHandler {
 
 		InputStream inputStream = null;
 
-		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
+		SyncFile syncFile = getLocalSyncFile();
 
-		syncFile = SyncFileService.fetchSyncFile(syncFile.getSyncFileId());
-
-		if ((syncFile == null) ||
-			(syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
-
+		if (isUnsynced(syncFile)) {
 			return;
 		}
 
 		Path filePath = Paths.get(syncFile.getFilePathName());
-
-		Watcher watcher = WatcherRegistry.getWatcher(getSyncAccountId());
-
-		List<String> downloadedFilePathNames =
-			watcher.getDownloadedFilePathNames();
 
 		try {
 			HttpEntity httpEntity = httpResponse.getEntity();
@@ -142,68 +245,23 @@ public class DownloadFileHandler extends BaseHandler {
 
 			};
 
-			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-				getSyncAccountId());
-
-			Path tempFilePath = FileUtil.getFilePath(
-				syncAccount.getFilePathName(), ".data",
-				String.valueOf(syncFile.getSyncFileId()));
-
-			if (Files.exists(filePath)) {
-				Files.copy(
-					filePath, tempFilePath,
-					StandardCopyOption.REPLACE_EXISTING);
-			}
-
-			if ((Boolean)getParameterValue("patch")) {
-				IODeltaUtil.patch(tempFilePath, inputStream);
-			}
-			else {
-				Files.copy(
-					inputStream, tempFilePath,
-					StandardCopyOption.REPLACE_EXISTING);
-			}
-
-			downloadedFilePathNames.add(filePath.toString());
-
-			FileTime fileTime = FileTime.fromMillis(syncFile.getModifiedTime());
-
-			Files.setLastModifiedTime(tempFilePath, fileTime);
-
-			Files.move(
-				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
-				StandardCopyOption.REPLACE_EXISTING);
-
-			if (syncFile.getFileKey() == null) {
-				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
-			}
-			else {
-				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_UPDATE);
-			}
-
-			syncFile.setState(SyncFile.STATE_SYNCED);
-
-			SyncFileService.update(syncFile);
-
-			SyncFileService.updateFileKeySyncFile(syncFile);
-
-			IODeltaUtil.checksums(syncFile);
-		}
-		catch (FileSystemException fse) {
-			downloadedFilePathNames.remove(filePath.toString());
-
-			String message = fse.getMessage();
-
-			if (message.contains("File name too long")) {
-				syncFile.setState(SyncFile.STATE_ERROR);
-				syncFile.setUiEvent(SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
-
-				SyncFileService.update(syncFile);
-			}
+			copyFile(syncFile, filePath, inputStream);
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
 		}
+	}
+
+	protected boolean isUnsynced(SyncFile syncFile) {
+		syncFile = SyncFileService.fetchSyncFile(syncFile.getSyncFileId());
+
+		if ((syncFile == null) ||
+			(syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

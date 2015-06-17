@@ -76,7 +76,6 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -187,7 +186,7 @@ public class OrganizationLocalServiceImpl
 	@Override
 	public Organization addOrganization(
 			long userId, long parentOrganizationId, String name, String type,
-			boolean recursable, long regionId, long countryId, int statusId,
+			boolean recursable, long regionId, long countryId, long statusId,
 			String comments, boolean site, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -228,7 +227,7 @@ public class OrganizationLocalServiceImpl
 	@Override
 	public Organization addOrganization(
 			long userId, long parentOrganizationId, String name, String type,
-			long regionId, long countryId, int statusId, String comments,
+			long regionId, long countryId, long statusId, String comments,
 			boolean site, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -237,7 +236,6 @@ public class OrganizationLocalServiceImpl
 		User user = userPersistence.findByPrimaryKey(userId);
 		parentOrganizationId = getParentOrganizationId(
 			user.getCompanyId(), parentOrganizationId);
-		Date now = new Date();
 
 		validate(
 			user.getCompanyId(), parentOrganizationId, name, type, countryId,
@@ -255,16 +253,6 @@ public class OrganizationLocalServiceImpl
 		organization.setCompanyId(user.getCompanyId());
 		organization.setUserId(user.getUserId());
 		organization.setUserName(user.getFullName());
-
-		if (serviceContext != null) {
-			organization.setCreateDate(serviceContext.getCreateDate(now));
-			organization.setModifiedDate(serviceContext.getModifiedDate(now));
-		}
-		else {
-			organization.setCreateDate(now);
-			organization.setModifiedDate(now);
-		}
-
 		organization.setParentOrganizationId(parentOrganizationId);
 		organization.setTreePath(organization.buildTreePath());
 		organization.setName(name);
@@ -299,8 +287,8 @@ public class OrganizationLocalServiceImpl
 
 		Group group = groupLocalService.addGroup(
 			userId, parentGroupId, Organization.class.getName(), organizationId,
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, name, null,
-			GroupConstants.TYPE_SITE_PRIVATE, false,
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, getLocalizationMap(name),
+			null, GroupConstants.TYPE_SITE_PRIVATE, false,
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, site, true,
 			null);
 
@@ -538,7 +526,7 @@ public class OrganizationLocalServiceImpl
 			return Collections.emptyList();
 		}
 
-		List<Organization> organizations = new ArrayList<Organization>(
+		List<Organization> organizations = new ArrayList<>(
 			organizationIds.size());
 
 		for (Long organizationId : organizationIds) {
@@ -694,7 +682,7 @@ public class OrganizationLocalServiceImpl
 	public List<Organization> getOrganizations(long[] organizationIds)
 		throws PortalException {
 
-		List<Organization> organizations = new ArrayList<Organization>(
+		List<Organization> organizations = new ArrayList<>(
 			organizationIds.length);
 
 		for (long organizationId : organizationIds) {
@@ -745,7 +733,7 @@ public class OrganizationLocalServiceImpl
 		if (organizationId ==
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
 
-			return new ArrayList<Organization>();
+			return new ArrayList<>();
 		}
 
 		Organization organization = organizationPersistence.findByPrimaryKey(
@@ -765,7 +753,7 @@ public class OrganizationLocalServiceImpl
 	public List<Organization> getSuborganizations(
 		List<Organization> organizations) {
 
-		List<Organization> allSuborganizations = new ArrayList<Organization>();
+		List<Organization> allSuborganizations = new ArrayList<>();
 
 		for (int i = 0; i < organizations.size(); i++) {
 			Organization organization = organizations.get(i);
@@ -821,7 +809,7 @@ public class OrganizationLocalServiceImpl
 		List<Organization> allOrganizations,
 		List<Organization> availableOrganizations) {
 
-		List<Organization> subsetOrganizations = new ArrayList<Organization>();
+		List<Organization> subsetOrganizations = new ArrayList<>();
 
 		for (Organization organization : allOrganizations) {
 			if (availableOrganizations.contains(organization)) {
@@ -833,19 +821,25 @@ public class OrganizationLocalServiceImpl
 	}
 
 	/**
-	 * Returns all the organization IDs associated with the user. If
-	 * <code>includeAdministrative</code> is <code>true</code>, the result
-	 * includes those organization IDs that are indirectly associated to the
-	 * user because he is an administrator or owner of the organization.
+	 * Returns all the IDs of organizations with which the user is explicitly
+	 * associated, optionally including the IDs of organizations that the user
+	 * administers or owns.
+	 *
+	 * <p>
+	 * A user is considered to be <i>explicitly</i> associated with an
+	 * organization if his account is individually created within the
+	 * organization or if the user is later added to it.
+	 * </p>
 	 *
 	 * @param  userId the primary key of the user
-	 * @param  includeAdministrative whether to include organizations that are
-	 *         indirectly associated to the user because he is an administrator
-	 *         or owner of the organization
-	 * @return the organization IDs of organizations associated with the user
+	 * @param  includeAdministrative whether to include the IDs of organizations
+	 *         that the user administers or owns, even if he's not a member of
+	 *         the organizations
+	 * @return the IDs of organizations with which the user is explicitly
+	 *         associated, optionally including the IDs of organizations that
+	 *         the user administers or owns
 	 * @throws PortalException if a user with the primary key could not be found
 	 *         or if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long[] getUserOrganizationIds(
@@ -880,16 +874,23 @@ public class OrganizationLocalServiceImpl
 	}
 
 	/**
-	 * Returns all the organizations associated with the user. If
-	 * <code>includeAdministrative</code> is <code>true</code>, the result
-	 * includes those organizations that are indirectly associated to the user
-	 * because he is an administrator or owner of the organization.
+	 * Returns all the organizations with which the user is explicitly
+	 * associated, optionally including the organizations that the user
+	 * administers or owns.
+	 *
+	 * <p>
+	 * A user is considered to be <i>explicitly</i> associated with an
+	 * organization if his account is individually created within the
+	 * organization or if the user is later added as a member.
+	 * </p>
 	 *
 	 * @param  userId the primary key of the user
-	 * @param  includeAdministrative whether to include organizations that are
-	 *         indirectly associated to the user because he is an administrator
-	 *         or owner of the organization
-	 * @return the organizations associated with the user
+	 * @param  includeAdministrative whether to include the IDs of organizations
+	 *         that the user administers or owns, even if he's not a member of
+	 *         the organizations
+	 * @return the organizations with which the user is explicitly associated,
+	 *         optionally including the organizations that the user administers
+	 *         or owns
 	 * @throws PortalException if a user with the primary key could not be found
 	 */
 	@Override
@@ -901,7 +902,7 @@ public class OrganizationLocalServiceImpl
 			return getUserOrganizations(userId);
 		}
 
-		Set<Organization> organizations = new HashSet<Organization>(
+		Set<Organization> organizations = new HashSet<>(
 			getUserOrganizations(userId));
 
 		List<UserGroupRole> userGroupRoles =
@@ -925,7 +926,7 @@ public class OrganizationLocalServiceImpl
 			}
 		}
 
-		return new ArrayList<Organization>(organizations);
+		return new ArrayList<>(organizations);
 	}
 
 	/**
@@ -1003,10 +1004,9 @@ public class OrganizationLocalServiceImpl
 			return userPersistence.containsOrganization(userId, organizationId);
 		}
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
-		List<Organization> organizationsTree = new ArrayList<Organization>();
+		List<Organization> organizationsTree = new ArrayList<>();
 
 		Organization organization = organizationPersistence.findByPrimaryKey(
 			organizationId);
@@ -1493,9 +1493,7 @@ public class OrganizationLocalServiceImpl
 				regionId, countryId, params, andOperator, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, null);
 
-			Hits hits = indexer.search(searchContext);
-
-			return hits.getLength();
+			return (int)indexer.searchCount(searchContext);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -1563,9 +1561,7 @@ public class OrganizationLocalServiceImpl
 				regionId, countryId, params, andOperator, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, null);
 
-			Hits hits = indexer.search(searchContext);
-
-			return hits.getLength();
+			return (int)indexer.searchCount(searchContext);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -1631,7 +1627,7 @@ public class OrganizationLocalServiceImpl
 				hits);
 
 			if (organizations != null) {
-				return new BaseModelSearchResult<Organization>(
+				return new BaseModelSearchResult<>(
 					organizations, hits.getLength());
 			}
 		}
@@ -1715,7 +1711,7 @@ public class OrganizationLocalServiceImpl
 			Organization.class.getName(), organization.getOrganizationId(),
 			organization.getUuid(), 0, assetCategoryIds, assetTagNames, false,
 			null, null, null, null, organization.getName(), StringPool.BLANK,
-			null, null, null, 0, 0, null, false);
+			null, null, null, 0, 0, null);
 	}
 
 	/**
@@ -1752,7 +1748,7 @@ public class OrganizationLocalServiceImpl
 	public Organization updateOrganization(
 			long companyId, long organizationId, long parentOrganizationId,
 			String name, String type, boolean recursable, long regionId,
-			long countryId, int statusId, String comments, boolean site,
+			long countryId, long statusId, String comments, boolean site,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -1792,7 +1788,7 @@ public class OrganizationLocalServiceImpl
 	public Organization updateOrganization(
 			long companyId, long organizationId, long parentOrganizationId,
 			String name, String type, long regionId, long countryId,
-			int statusId, String comments, boolean logo, byte[] logoBytes,
+			long statusId, String comments, boolean logo, byte[] logoBytes,
 			boolean site, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -1811,7 +1807,6 @@ public class OrganizationLocalServiceImpl
 		long oldParentOrganizationId = organization.getParentOrganizationId();
 		String oldName = organization.getName();
 
-		organization.setModifiedDate(new Date());
 		organization.setParentOrganizationId(parentOrganizationId);
 		organization.setTreePath(organization.buildTreePath());
 		organization.setName(name);
@@ -1871,10 +1866,11 @@ public class OrganizationLocalServiceImpl
 
 		if (createSite || !oldName.equals(name) || organizationGroup) {
 			groupLocalService.updateGroup(
-				group.getGroupId(), parentGroupId, name, group.getDescription(),
-				group.getType(), group.isManualMembership(),
-				group.getMembershipRestriction(), group.getFriendlyURL(),
-				group.isInheritContent(), group.isActive(), null);
+				group.getGroupId(), parentGroupId, getLocalizationMap(name),
+				group.getDescriptionMap(), group.getType(),
+				group.isManualMembership(), group.getMembershipRestriction(),
+				group.getFriendlyURL(), group.isInheritContent(),
+				group.isActive(), null);
 		}
 
 		if (group.isSite() != site) {
@@ -1953,14 +1949,14 @@ public class OrganizationLocalServiceImpl
 	 *             information was invalid
 	 * @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
 	 *             long, long, String, String, long, long, int, String, boolean,
-	 *             boolean, byte[], ServiceContext)}
+	 *             byte[], boolean, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
 	public Organization updateOrganization(
 			long companyId, long organizationId, long parentOrganizationId,
 			String name, String type, long regionId, long countryId,
-			int statusId, String comments, boolean site,
+			long statusId, String comments, boolean site,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -2024,8 +2020,7 @@ public class OrganizationLocalServiceImpl
 
 		searchContext.setAndSearch(andSearch);
 
-		Map<String, Serializable> attributes =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> attributes = new HashMap<>();
 
 		attributes.put("city", city);
 		attributes.put("country", country);
@@ -2179,7 +2174,7 @@ public class OrganizationLocalServiceImpl
 
 	protected void validate(
 			long companyId, long organizationId, long parentOrganizationId,
-			String name, String type, long countryId, int statusId)
+			String name, String type, long countryId, long statusId)
 		throws PortalException {
 
 		if (!ArrayUtil.contains(PropsValues.ORGANIZATIONS_TYPES, type)) {
@@ -2269,7 +2264,7 @@ public class OrganizationLocalServiceImpl
 
 	protected void validate(
 			long companyId, long parentOrganizationId, String name, String type,
-			long countryId, int statusId)
+			long countryId, long statusId)
 		throws PortalException {
 
 		validate(

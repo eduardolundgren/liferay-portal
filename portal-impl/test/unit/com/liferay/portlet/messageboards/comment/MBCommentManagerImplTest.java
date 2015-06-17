@@ -15,13 +15,13 @@
 package com.liferay.portlet.messageboards.comment;
 
 import com.liferay.portal.kernel.comment.DuplicateCommentException;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBMessageDisplay;
 import com.liferay.portlet.messageboards.model.MBThread;
@@ -57,7 +57,7 @@ public class MBCommentManagerImplTest extends Mockito {
 	public void testAddComment() throws Exception {
 		_mbCommentManagerImpl.addComment(
 			_USER_ID, _GROUP_ID, _CLASS_NAME, _ENTRY_ID, _BODY,
-			_serviceContext);
+			_serviceContextFunction);
 
 		Mockito.verify(
 			_mbMessageLocalService
@@ -121,9 +121,7 @@ public class MBCommentManagerImplTest extends Mockito {
 
 		_mbCommentManagerImpl.addComment(
 			_USER_ID, _GROUP_ID, _CLASS_NAME, _ENTRY_ID, _BODY,
-			_serviceContext);
-
-		Assert.fail();
+			_serviceContextFunction);
 	}
 
 	@Test
@@ -132,7 +130,7 @@ public class MBCommentManagerImplTest extends Mockito {
 
 		_mbCommentManagerImpl.addComment(
 			_USER_ID, _GROUP_ID, _CLASS_NAME, _ENTRY_ID, _BODY,
-			_serviceContext);
+			_serviceContextFunction);
 
 		Mockito.verify(
 			_mbMessageLocalService
@@ -222,7 +220,7 @@ public class MBCommentManagerImplTest extends Mockito {
 				Matchers.anyLong(), Matchers.anyString(), Matchers.anyLong(),
 				Matchers.anyString(), Matchers.anyLong(), Matchers.anyLong(),
 				Matchers.anyLong(), Matchers.anyString(), Matchers.anyString(),
-				(ServiceContext)Matchers.any()
+				Matchers.<ServiceContext>any()
 			)
 		).thenReturn(
 			_mbMessage

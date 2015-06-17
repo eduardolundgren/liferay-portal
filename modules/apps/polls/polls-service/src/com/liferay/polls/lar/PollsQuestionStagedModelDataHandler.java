@@ -18,28 +18,38 @@ import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Shinn Lok
  * @author Mate Thurzo
  */
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class PollsQuestionStagedModelDataHandler
 	extends BaseStagedModelDataHandler<PollsQuestion> {
 
 	public static final String[] CLASS_NAMES = {PollsQuestion.class.getName()};
+
+	@Override
+	public void deleteStagedModel(PollsQuestion question)
+		throws PortalException {
+
+		PollsQuestionLocalServiceUtil.deleteQuestion(question);
+	}
 
 	@Override
 	public void deleteStagedModel(
@@ -50,24 +60,8 @@ public class PollsQuestionStagedModelDataHandler
 			uuid, groupId);
 
 		if (question != null) {
-			PollsQuestionLocalServiceUtil.deleteQuestion(question);
+			deleteStagedModel(question);
 		}
-	}
-
-	@Override
-	public PollsQuestion fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<PollsQuestion> questions =
-			PollsQuestionLocalServiceUtil.getPollsQuestionsByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<PollsQuestion>());
-
-		if (ListUtil.isEmpty(questions)) {
-			return null;
-		}
-
-		return questions.get(0);
 	}
 
 	@Override
@@ -76,6 +70,16 @@ public class PollsQuestionStagedModelDataHandler
 
 		return PollsQuestionLocalServiceUtil.fetchPollsQuestionByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<PollsQuestion> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return PollsQuestionLocalServiceUtil.
+			getPollsQuestionsByUuidAndCompanyId(
+				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new StagedModelModifiedDateComparator<PollsQuestion>());
 	}
 
 	@Override

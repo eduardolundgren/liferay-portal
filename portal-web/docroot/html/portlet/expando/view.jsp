@@ -49,7 +49,7 @@ Collections.sort(customAttributesDisplays, new CustomAttributesDisplayComparator
 		/>
 
 		<portlet:renderURL var="rowURL">
-			<portlet:param name="struts_action" value="/expando/view_attributes" />
+			<portlet:param name="mvcPath" value="/html/portlet/expando/view_attributes.jsp" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="modelResource" value="<%= customAttributesDisplay.getClassName() %>" />
 		</portlet:renderURL>
@@ -59,7 +59,7 @@ Collections.sort(customAttributesDisplays, new CustomAttributesDisplayComparator
 			name="resource"
 		>
 			<liferay-ui:icon
-		   		iconCssClass="<%= customAttributesDisplay.getIconCssClass() %>"
+				iconCssClass="<%= customAttributesDisplay.getIconCssClass() %>"
 				label="<%= true %>"
 				message="<%= ResourceActionsUtil.getModelResource(locale, customAttributesDisplay.getClassName()) %>"
 			/>

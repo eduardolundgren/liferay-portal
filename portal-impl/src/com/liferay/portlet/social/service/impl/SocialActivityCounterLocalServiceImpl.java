@@ -353,8 +353,7 @@ public class SocialActivityCounterLocalServiceImpl
 		User assetEntryUser = userPersistence.findByPrimaryKey(
 			assetEntry.getUserId());
 
-		List<SocialActivityCounter> activityCounters =
-			new ArrayList<SocialActivityCounter>();
+		List<SocialActivityCounter> activityCounters = new ArrayList<>();
 
 		for (SocialActivityCounterDefinition activityCounterDefinition :
 				activityDefinition.getActivityCounterDefinitions()) {
@@ -960,8 +959,7 @@ public class SocialActivityCounterLocalServiceImpl
 		for (SocialActivityCounter activityCounter : activityCounters) {
 			if (userId != activityCounter.getClassPK()) {
 				userId = activityCounter.getClassPK();
-				activityCountersMap =
-					new HashMap<String, SocialActivityCounter>();
+				activityCountersMap = new HashMap<>();
 
 				Tuple userActivityCounter = new Tuple(
 					userId, activityCountersMap);
@@ -1307,9 +1305,7 @@ public class SocialActivityCounterLocalServiceImpl
 		throws PortalException {
 
 		String lockKey = StringUtil.merge(
-			new Object[] {
-				groupId, classNameId, classPK, name, ownerType
-			},
+			new Object[] {groupId, classNameId, classPK, name, ownerType},
 			StringPool.POUND);
 
 		LockProtectedAction<SocialActivityCounter> lockProtectedAction =
@@ -1388,17 +1384,17 @@ public class SocialActivityCounterLocalServiceImpl
 			lockProtectedAction.getReturnValue());
 	}
 
-	private SocialActivityCounterDefinition
+	private final SocialActivityCounterDefinition
 		_assetActivitiesActivityCounterDefinition =
 			new SocialActivityCounterDefinition(
 				SocialActivityCounterConstants.NAME_ASSET_ACTIVITIES,
 				SocialActivityCounterConstants.TYPE_ASSET);
-	private SocialActivityCounterDefinition
+	private final SocialActivityCounterDefinition
 		_userAchievementsActivityCounterDefinition =
 			new SocialActivityCounterDefinition(
 				SocialActivityCounterConstants.NAME_USER_ACHIEVEMENTS,
 				SocialActivityCounterConstants.TYPE_ACTOR);
-	private SocialActivityCounterDefinition
+	private final SocialActivityCounterDefinition
 		_userActivitiesActivityCounterDefinition =
 			new SocialActivityCounterDefinition(
 				SocialActivityCounterConstants.NAME_USER_ACTIVITIES,

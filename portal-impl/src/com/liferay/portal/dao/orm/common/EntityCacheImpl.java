@@ -245,12 +245,12 @@ public class EntityCacheImpl
 	}
 
 	@Override
-	public void notifyCacheAdded(String name) {
+	public void notifyCacheAdded(String portalCacheName) {
 	}
 
 	@Override
-	public void notifyCacheRemoved(String name) {
-		_portalCaches.remove(name);
+	public void notifyCacheRemoved(String portalCacheName) {
+		_portalCaches.remove(portalCacheName);
 	}
 
 	@Override
@@ -440,9 +440,7 @@ public class EntityCacheImpl
 
 	private MultiVMPool _multiVMPool;
 	private final ConcurrentMap<String, PortalCache<Serializable, Serializable>>
-		_portalCaches =
-			new ConcurrentHashMap
-				<String, PortalCache<Serializable, Serializable>>();
+		_portalCaches = new ConcurrentHashMap<>();
 
 	private static class CacheKey implements Externalizable {
 

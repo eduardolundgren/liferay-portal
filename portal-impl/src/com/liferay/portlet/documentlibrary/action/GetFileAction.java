@@ -14,7 +14,9 @@
 
 package com.liferay.portlet.documentlibrary.action;
 
+import com.liferay.portal.kernel.flash.FlashMagicBytesUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -35,7 +37,6 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
@@ -231,7 +232,7 @@ public class GetFileAction extends PortletAction {
 			}
 		}
 		else {
-			DLFileShortcut fileShortcut = DLAppServiceUtil.getFileShortcut(
+			FileShortcut fileShortcut = DLAppServiceUtil.getFileShortcut(
 				fileShortcutId);
 
 			fileEntryId = fileShortcut.getToFileEntryId();
@@ -283,6 +284,15 @@ public class GetFileAction extends PortletAction {
 				contentType = MimeTypesUtil.getContentType(fileName);
 			}
 		}
+
+		FlashMagicBytesUtil.Result flashMagicBytesUtilResult =
+			FlashMagicBytesUtil.check(is);
+
+		if (flashMagicBytesUtilResult.isFlash()) {
+			fileName = FileUtil.stripExtension(fileName) + ".swf";
+		}
+
+		is = flashMagicBytesUtilResult.getInputStream();
 
 		ServletResponseUtil.sendFile(
 			request, response, fileName, is, contentLength, contentType);

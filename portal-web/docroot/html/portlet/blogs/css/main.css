@@ -1,3 +1,8 @@
+@import "bourbon";
+@import "mixins";
+
+@import url(common_main.css);
+
 .portlet-blogs {
 	.taglib-custom-attributes-list {
 		margin-bottom: 1em;
@@ -9,7 +14,7 @@
 
 	.edit-entry {
 		h3 {
-			color: #2B4256;
+			color: #2B4259;
 			font-size: 22px;
 			margin-top: 0;
 		}
@@ -24,21 +29,24 @@
 	}
 
 	.entry-author {
-		border-right: 1px solid #999;
 		color: #999;
 		float: left;
-		font-weight: bold;
 		line-height: 20px;
-		margin-right: 10px;
-		padding-right: 10px;
+		vertical-align: middle;
 	}
 
-	.entry-body {
-		margin-bottom: 10px;
+	.taglib-user-display {
+		color: #999;
+		display: inline;
+		padding: 0;
+	}
+
+	.edit-actions {
+		padding-left: 0;
 	}
 
 	.entry-abstract-wrapper {
-		color: #2B4256;
+		color: #2B4259;
 
 		.entry-abstract-options {
 			margin-top: 20px;
@@ -73,49 +81,123 @@
 		}
 	}
 
-	.entry-date {
-		color: #999;
+	.read-more {
+		font-size: 14px;
+		margin-bottom: 40px;
 	}
 
-	.entry-footer:after {
-		clear: both;
-		content: '';
-		display: block;
-		height: 0;
-		visibility: hidden;
-	}
+	.entry-footer {
+		margin-bottom: 60px;
+		margin-top: 80px;
+		vertical-align: middle;
 
-	.taglib-asset-categories-summary, .taglib-asset-tags-summary {
-		border-left: 1px solid #999;
-		padding-left: 10px;
-	}
+		.entry-social, .flags, .social-bookmarks {
+			display: inline-block;
 
-	.alloy-editor-placeholder {
-		color: #2B4256;
-		padding-left: 10px;
+			&:before {
+				background: #EDEEF0;
+				content: '';
+				display: inline-block;
+				height: 20px;
+				margin: 0 40px;
+				vertical-align: middle;
+				width: 1px;
 
-		&:empty:not(:focus) {
-			background: transparent;
-			border-left: 2px solid #DBDDE1;
-			color: #B0B4BB;
+				@include respond-to(phone, tablet) {
+					margin: 0 15px;
+				}
+			}
 		}
 
-		&.readonly {
-			color: #CCC;
+		.entry-social {
+			.ratings {
+				display: inline-block;
+
+				.taglib-ratings {
+					display: inline-block;
+					vertical-align: middle;
+
+					&.stars {
+						margin-top: 0;
+
+						.liferay-rating-score {
+							padding-left: 0;
+						}
+					}
+				}
+			}
+
+			.taglib-flags {
+				color: #999;
+				vertical-align: middle;
+			}
+
+			.taglib-social-bookmarks {
+				display: inline-block;
+				margin-top: 0;
+				vertical-align: middle;
+			}
+
+			@include respond-to(phone, tablet) {
+				clear: both;
+				display: block;
+
+				&:before {
+					display: none;
+				}
+			}
+		}
+
+		&:after {
+			content: '';
+			display: inline;
+			line-height: 60px;
 		}
 	}
 
-	.entry-title, .entry-subtitle, .entry-content {
-		margin-left: 24px;
+	.comments {
+		margin-top: 60px;
+	}
+
+	.edit-entry {
+		.entry-status {
+			padding-left: 30px;
+		}
+
+		.entry-title, .entry-subtitle, .entry-body {
+			margin-left: 24px;
+		}
+
+		.entry-body {
+			padding-bottom: 60px;
+		}
+
+		.entry-subtitle {
+			margin-bottom: 30px;
+		}
+
+		.entry-cover-image-caption {
+			font-size: 12px;
+			margin-bottom: 35px;
+
+			.alloy-editor {
+				color: #868889;
+				padding-left: 0;
+
+				&.alloy-editor-placeholder:empty:not(:focus) {
+					border-left-width: 0;
+				}
+			}
+		}
 	}
 
 	.entry-title {
 		display: block;
-		font-weight: bold;
 
 		h2 {
-			font-size: 30px;
-			margin-bottom: 30px;
+			font-size: 26px;
+			font-weight: bold;
+			margin-bottom: 24px;
 
 			.alloy-editor-placeholder {
 				color: #32A8E6;
@@ -125,36 +207,9 @@
 				}
 			}
 		}
-	}
 
-	.entry-subtitle {
-		color: #2B4256;
-		font-size: 27px;
-		margin-bottom: 30px;
-	}
-
-	.entry-content {
-		font-size: 21px;
-		padding-bottom: 60px;
-
-		p {
-			margin-bottom: 30px;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-
-		.uploading-image-container {
-			display: inline-block;
-
-			.progressbar {
-				height: 20px;
-			}
-		}
-
-		.uploading-image {
-			opacity: 0.4;
+		a {
+			font-weight: bold;
 		}
 	}
 
@@ -173,30 +228,117 @@
 		}
 	}
 
-	.entry-navigation {
-		background: #EEE;
-		border-top: 1px solid #B0B4BB;
-		margin: 15px 0 0;
-		overflow: hidden;
-		padding: 5px;
+	.entry-navigation, .entry-metadata {
+		h2 {
+			color: #868896;
+			display: block;
+			font-size: 20px;
+			font-weight: 400;
+			margin-bottom: 16px;
+			margin-top: 0;
+		}
+	}
 
-		.previous {
-			float: left;
+	.entry-tags, .entry-categories, .entry-links {
+		margin-bottom: 60px;
+	}
+
+	.entry-navigation {
+		border-bottom: 1px solid #EDEEF0;
+		border-top: 1px solid #EDEEF0;
+		padding: 60px 0;
+		width: 100%;
+
+		a:hover {
+			text-decoration: none;
+
+			h3 {
+				text-decoration: underline;
+			}
 		}
 
-		.next {
+		h2 {
+			@include ellipsis;
+		}
+
+		h3 {
+			color: #2B4259;
+			font-size: 20px;
+			font-weight: bold;
+			margin-bottom: 16px;
+			margin-top: 0;
+
+			@include ellipsis;
+		}
+
+		.entry-content {
+			display: block;
+			overflow: hidden;
+
+			.entry-content-body {
+				color: #555;
+				display: block;
+				font-size: 18px;
+				font-weight: 400;
+				margin-bottom: 0;
+			}
+		}
+
+		.small-image {
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+			display: block;
 			float: right;
+			height: 140px;
+			margin-left: 60px;
+			width: 140px;
+		}
+
+		.taglib-user-display {
+			display: block;
+			margin-top: 28px;
+			overflow: hidden;
+
+			@include respond-to(phone, tablet) {
+				margin-top: 0;
+			}
+		}
+
+		.previous-entry {
+			.previous-entry-content {
+				padding-right: 60px;
+			}
+
+			&.has-next-entry .previous-entry-content {
+				border-right: 1px solid #EDEEF0;
+
+				@include respond-to(phone) {
+					border-right-width: 0;
+				}
+			}
+		}
+
+		.next-entry {
+			> h2, .next-entry-content {
+				margin-left: 30px;
+
+				@include respond-to(phone) {
+					margin-left: 0;
+				}
+			}
+
+			> h2 {
+				@include respond-to(phone) {
+					margin-top: 60px;
+				}
+			}
 		}
 	}
 
 	.lfr-blogs-cover-image-selector {
-		margin: 20px 0 60px;
-	}
-
-	.preview {
-		background: #FFC;
-		border: 1px dotted gray;
-		padding: 3px;
+		margin: 0 0 10px;
+		padding-top: 10px;
 	}
 
 	.search-form {
@@ -208,34 +350,13 @@
 		float: right;
 	}
 
-	.stats {
-		color: #999;
-		float: left;
-		padding-right: 10px;
-	}
-
 	.subscribe {
 		margin-bottom: 1.5em;
 		text-align: right;
 	}
 
-	.taglib-flags {
-		border-left: 1px solid #999;
-		color: #999;
-		padding-left: 10px;
-		padding-right: 10px;
-	}
-
 	.taglib-page-iterator .lfr-pagination {
 		margin-top: 25px;
-	}
-
-	.taglib-ratings.stars {
-		float: left;
-	}
-
-	.taglib-social-bookmarks {
-		float: right;
 	}
 
 	.form-search:after {

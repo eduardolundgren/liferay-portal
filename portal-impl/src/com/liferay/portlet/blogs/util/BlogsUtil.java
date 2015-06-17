@@ -14,8 +14,8 @@
 
 package com.liferay.portlet.blogs.util;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.comment.CommentManager;
+import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.dao.search.SearchContainerResults;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -26,8 +26,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ModelHintsUtil;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryServiceUtil;
@@ -53,13 +53,8 @@ public class BlogsUtil {
 
 	public static final String DISPLAY_STYLE_TITLE = "title";
 
-	public static CommentManager getCommentManager() {
-		return (CommentManager)PortalBeanLocatorUtil.locate(
-			CommentManager.class.getName());
-	}
-
 	public static int getCommentsCount(BlogsEntry entry) {
-		CommentManager commentManager = getCommentManager();
+		CommentManager commentManager = CommentManagerUtil.getCommentManager();
 
 		return commentManager.getCommentsCount(
 			BlogsEntry.class.getName(), entry.getEntryId());
@@ -72,8 +67,7 @@ public class BlogsUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$BLOGS_ENTRY_CONTENT$]",
@@ -151,8 +145,11 @@ public class BlogsUtil {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -178,8 +175,7 @@ public class BlogsUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$BLOGS_ENTRY_USER_ADDRESS$]",
@@ -205,8 +201,12 @@ public class BlogsUtil {
 			LanguageUtil.get(
 				themeDisplay.getLocale(),
 				"the-company-name-associated-with-the-blog"));
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -224,6 +224,7 @@ public class BlogsUtil {
 			BlogsEntry.class.getName(), searchContainer);
 
 		assetEntryQuery.setExcludeZeroViewCount(false);
+		assetEntryQuery.setOrderByCol1("publishDate");
 		assetEntryQuery.setVisible(Boolean.TRUE);
 
 		int total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
@@ -234,7 +235,7 @@ public class BlogsUtil {
 		List<AssetEntry> assetEntries = AssetEntryServiceUtil.getEntries(
 			assetEntryQuery);
 
-		return new SearchContainerResults<AssetEntry>(assetEntries, total);
+		return new SearchContainerResults<>(assetEntries, total);
 	}
 
 	public static String getUrlTitle(long entryId, String title) {

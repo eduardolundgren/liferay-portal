@@ -17,12 +17,15 @@ package com.liferay.portal.upload;
 import com.liferay.portal.kernel.memory.DeleteFileFinalizeAction;
 import com.liferay.portal.kernel.memory.FinalizeManager;
 import com.liferay.portal.kernel.upload.FileItem;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 
@@ -33,7 +36,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
  */
 public class LiferayFileItem extends DiskFileItem implements FileItem {
 
-	public static final int THRESHOLD_SIZE = GetterUtil.getInteger(
+	public static final long THRESHOLD_SIZE = GetterUtil.getLong(
 		PropsUtil.get(LiferayFileItem.class.getName() + ".threshold.size"));
 
 	public LiferayFileItem(
@@ -47,6 +50,17 @@ public class LiferayFileItem extends DiskFileItem implements FileItem {
 		_fileName = fileName;
 		_sizeThreshold = sizeThreshold;
 		_repository = repository;
+	}
+
+	@Override
+	public String getContentType() {
+		try {
+			return MimeTypesUtil.getContentType(
+				getInputStream(), getFileName());
+		}
+		catch (IOException ioe) {
+			return ContentTypes.APPLICATION_OCTET_STREAM;
+		}
 	}
 
 	@Override
@@ -154,7 +168,7 @@ public class LiferayFileItem extends DiskFileItem implements FileItem {
 
 	private String _encodedString;
 	private String _fileName;
-	private File _repository;
-	private int _sizeThreshold;
+	private final File _repository;
+	private final int _sizeThreshold;
 
 }

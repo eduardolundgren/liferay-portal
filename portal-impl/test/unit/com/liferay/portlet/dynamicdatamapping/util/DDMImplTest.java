@@ -18,6 +18,10 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayoutColumn;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayoutPage;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayoutRow;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
@@ -41,13 +45,37 @@ public class DDMImplTest extends BaseDDMTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		setUpDDMFormXSDDeserializerUtil();
-		setUpDDMFormXSDSerializerUtil();
+		setUpDDMFormFieldTypeRegistryUtil();
+		setUpDDMFormJSONDeserializerUtil();
+		setUpDDMFormJSONSerializerUtil();
 		setUpDDMStructureLocalServiceUtil();
+		setUpJSONFactoryUtil();
 		setUpHtmlUtil();
 		setUpLocaleUtil();
 		setUpPropsUtil();
 		setUpSAXReaderUtil();
+	}
+
+	@Test
+	public void testGetDefaultDDMFormLayout() {
+		DDMForm ddmForm = createDDMForm("Text1", "Text2");
+
+		DDMFormLayout ddmFormLayout = _ddmImpl.getDefaultDDMFormLayout(ddmForm);
+
+		List<DDMFormLayoutPage> ddmFormLayoutPages =
+			ddmFormLayout.getDDMFormLayoutPages();
+
+		Assert.assertEquals(1, ddmFormLayoutPages.size());
+
+		DDMFormLayoutPage ddmFormLayoutPage = ddmFormLayoutPages.get(0);
+
+		List<DDMFormLayoutRow> ddmFormLayoutRows =
+			ddmFormLayoutPage.getDDMFormLayoutRows();
+
+		Assert.assertEquals(2, ddmFormLayoutRows.size());
+
+		assertDefaultDDMFormLayoutRow("Text1", ddmFormLayoutRows.get(0));
+		assertDefaultDDMFormLayoutRow("Text2", ddmFormLayoutRows.get(1));
 	}
 
 	@Test
@@ -409,6 +437,96 @@ public class DDMImplTest extends BaseDDMTestCase {
 		}
 	}
 
+	@Test
+	public void testMergeFieldsWithMatchingFieldNames() throws Exception {
+		DDMForm ddmForm = createDDMForm();
+
+		DDMFormField textDDMFormField = createTextDDMFormField(
+			"Name", "", true, true, false);
+
+		List<DDMFormField> nestedDDMFormFields =
+			textDDMFormField.getNestedDDMFormFields();
+
+		nestedDDMFormFields.add(
+			createTextDDMFormField("NameNested", "", true, true, false));
+
+		addDDMFormFields(ddmForm, textDDMFormField);
+
+		DDMStructure ddmStructure = createStructure("Test Structure", ddmForm);
+
+		Field existingNameField = createField(
+			ddmStructure.getStructureId(), "Name",
+			createValuesList("Name 1", "Name 2"),
+			createValuesList("Nome 1", "Nome 2"));
+
+		Field existingNameNestedField = createField(
+			ddmStructure.getStructureId(), "NameNested",
+			createValuesList("Name nested 1", "Name nested 2"),
+			createValuesList("Nome nested 1", "Nome nested 2"));
+
+		Field existingFieldsDisplayField = createFieldsDisplayField(
+			ddmStructure.getStructureId(),
+			"Name_INSTANCE_rztm,NameNested_INSTANCE_ovho,Name_INSTANCE_krvx," +
+			"NameNested_INSTANCE_rght");
+
+		Fields existingFields = createFields(
+			existingNameField, existingNameNestedField,
+			existingFieldsDisplayField);
+
+		Field newNameField = createField(
+			ddmStructure.getStructureId(), "Name", null, null);
+
+		Field newNameNestedField = createField(
+			ddmStructure.getStructureId(), "NameNested", null, null);
+
+		Field newFieldsDisplayField = createFieldsDisplayField(
+			ddmStructure.getStructureId(),
+			"Name_INSTANCE_rztm,NameNested_INSTANCE_ovho,Name_INSTANCE_krvx," +
+			"NameNested_INSTANCE_rght");
+
+		Fields newFields = createFields(
+			newNameField, newNameNestedField, newFieldsDisplayField);
+
+		Fields actualFields = _ddmImpl.mergeFields(newFields, existingFields);
+
+		Field actualNameField = actualFields.get("Name");
+
+		testValues(
+			actualNameField.getValues(LocaleUtil.US), "Name 1", "Name 2");
+		testValues(
+			actualNameField.getValues(LocaleUtil.BRAZIL), "Nome 1", "Nome 2");
+
+		Field actualNameNestedField = actualFields.get("NameNested");
+
+		testValues(
+			actualNameNestedField.getValues(LocaleUtil.US), "Name nested 1",
+			"Name nested 2");
+		testValues(
+			actualNameNestedField.getValues(LocaleUtil.BRAZIL), "Nome nested 1",
+			"Nome nested 2");
+	}
+
+	protected void assertDefaultDDMFormLayoutRow(
+		String expectedDDMFormFieldName,
+		DDMFormLayoutRow actualDDMFormLayoutRow) {
+
+		List<DDMFormLayoutColumn> actualDDMFormLayoutColumns =
+			actualDDMFormLayoutRow.getDDMFormLayoutColumns();
+
+		Assert.assertEquals(1, actualDDMFormLayoutColumns.size());
+
+		DDMFormLayoutColumn actualDDMFormLayoutColumn =
+			actualDDMFormLayoutColumns.get(0);
+
+		List<String> actualDDMFormFieldNames =
+			actualDDMFormLayoutColumn.getDDMFormFieldNames();
+
+		Assert.assertEquals(
+			expectedDDMFormFieldName, actualDDMFormFieldNames.get(0));
+		Assert.assertEquals(
+			DDMFormLayoutColumn.FULL, actualDDMFormLayoutColumn.getSize());
+	}
+
 	protected void testValues(
 		List<Serializable> actualValues, String... expectedValues) {
 
@@ -419,6 +537,6 @@ public class DDMImplTest extends BaseDDMTestCase {
 		}
 	}
 
-	private DDMImpl _ddmImpl = new DDMImpl();
+	private final DDMImpl _ddmImpl = new DDMImpl();
 
 }

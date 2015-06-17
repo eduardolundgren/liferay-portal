@@ -14,22 +14,22 @@
 
 package com.liferay.portlet.messageboards.trash;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
-import com.liferay.portlet.trash.BaseTrashHandlerTestCase;
+import com.liferay.portlet.trash.test.BaseTrashHandlerTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -49,58 +49,123 @@ public class MBCategoryTrashHandlerTest extends BaseTrashHandlerTestCase {
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
-	public void testTrashAndDeleteDraft() throws Exception {
+	public void testTrashAndDeleteWithDraftStatus() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
-	public void testTrashAndRestoreDraft() throws Exception {
+	public void testTrashAndDeleteWithDraftStatusIndexable() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatus() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusIsNotVisible()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusRestoreStatus()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusRestoreUniqueTitle()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashDuplicate() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashMyBaseModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashRecentBaseModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionBaseModelAndDelete() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndDeleteIndexable() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionBaseModelAndRestore() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndRestoreIndexable()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndRestoreIsVisible()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModelAndRestore() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIsNotVisible() throws Exception {
 	}
 
 	@Override
@@ -202,11 +267,6 @@ public class MBCategoryTrashHandlerTest extends BaseTrashHandlerTestCase {
 
 	@Override
 	protected boolean isAssetableParentModel() {
-		return false;
-	}
-
-	@Override
-	protected boolean isIndexableBaseModel() {
 		return false;
 	}
 

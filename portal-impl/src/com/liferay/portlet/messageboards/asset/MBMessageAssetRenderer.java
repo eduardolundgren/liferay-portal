@@ -37,8 +37,6 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -189,10 +187,7 @@ public class MBMessageAssetRenderer
 
 		if (_message.isDiscussion()) {
 			return MBDiscussionPermission.contains(
-				permissionChecker, _message.getCompanyId(),
-				_message.getGroupId(), _message.getClassName(),
-				_message.getClassPK(), _message.getMessageId(),
-				_message.getUserId(), ActionKeys.UPDATE);
+				permissionChecker, _message.getMessageId(), ActionKeys.UPDATE);
 		}
 		else {
 			return MBMessagePermission.contains(
@@ -206,10 +201,7 @@ public class MBMessageAssetRenderer
 
 		if (_message.isDiscussion()) {
 			return MBDiscussionPermission.contains(
-				permissionChecker, _message.getCompanyId(),
-				_message.getGroupId(), _message.getClassName(),
-				_message.getClassPK(), _message.getMessageId(),
-				_message.getUserId(), ActionKeys.VIEW);
+				permissionChecker, _message.getMessageId(), ActionKeys.VIEW);
 		}
 		else {
 			return MBMessagePermission.contains(
@@ -224,14 +216,14 @@ public class MBMessageAssetRenderer
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_ABSTRACT) ||
 			template.equals(TEMPLATE_FULL_CONTENT)) {
 
-			renderRequest.setAttribute(
+			portletRequest.setAttribute(
 				WebKeys.MESSAGE_BOARDS_MESSAGE, _message);
 
 			return "/html/portlet/message_boards/asset/" + template + ".jsp";

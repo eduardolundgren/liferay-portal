@@ -16,7 +16,13 @@ package com.liferay.portlet.documentlibrary.trash;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -28,14 +34,8 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.WorkflowedModel;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileRank;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
@@ -49,7 +49,8 @@ import com.liferay.portlet.documentlibrary.service.DLFileRankLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
-import com.liferay.portlet.trash.BaseTrashHandlerTestCase;
+import com.liferay.portlet.trash.test.BaseTrashHandlerTestCase;
+import com.liferay.portlet.trash.test.WhenIsIndexableBaseModel;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.List;
@@ -66,7 +67,8 @@ import org.junit.Test;
  * @author Eudaldo Alonso
  */
 @Sync
-public class DLFileEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
+public class DLFileEntryTrashHandlerTest
+	extends BaseTrashHandlerTestCase implements WhenIsIndexableBaseModel {
 
 	@ClassRule
 	@Rule
@@ -110,10 +112,28 @@ public class DLFileEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 		trashDLFileRank();
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModel() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModelAndRestore() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIsNotVisible() throws Exception {
 	}
 
 	@Override
@@ -142,9 +162,14 @@ public class DLFileEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 			long groupId, long folderId, boolean approved)
 		throws Exception {
 
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			groupId, folderId, RandomTestUtil.randomString() + ".txt",
-			getSearchKeywords(), approved);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		FileEntry fileEntry = DLAppTestUtil.addFileEntryWithWorkflow(
+			TestPropsValues.getUserId(), groupId, folderId,
+			RandomTestUtil.randomString() + ".txt", getSearchKeywords(),
+			approved, serviceContext);
 
 		return (DLFileEntry)fileEntry.getModel();
 	}
@@ -218,9 +243,10 @@ public class DLFileEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 			Group group, long parentBaseModelId, ServiceContext serviceContext)
 		throws Exception {
 
-		Folder folder = DLAppTestUtil.addFolder(
+		Folder folder = DLAppServiceUtil.addFolder(
 			group.getGroupId(), parentBaseModelId,
-			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH));
+			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
+			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
 	}

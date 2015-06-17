@@ -20,7 +20,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.RSSUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
@@ -30,6 +32,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.journal.DuplicateFeedIdException;
 import com.liferay.portlet.journal.FeedContentFieldException;
@@ -40,9 +43,7 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.model.JournalFeedConstants;
 import com.liferay.portlet.journal.service.base.JournalFeedLocalServiceBaseImpl;
-import com.liferay.util.RSSUtil;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,6 @@ public class JournalFeedLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		feedId = StringUtil.toUpperCase(feedId.trim());
-		Date now = new Date();
 
 		validate(
 			user.getCompanyId(), groupId, feedId, autoFeedId, name,
@@ -86,8 +86,6 @@ public class JournalFeedLocalServiceImpl
 		feed.setCompanyId(user.getCompanyId());
 		feed.setUserId(user.getUserId());
 		feed.setUserName(user.getFullName());
-		feed.setCreateDate(serviceContext.getCreateDate(now));
-		feed.setModifiedDate(serviceContext.getModifiedDate(now));
 		feed.setFeedId(feedId);
 		feed.setName(name);
 		feed.setDescription(description);
@@ -300,7 +298,6 @@ public class JournalFeedLocalServiceImpl
 			feed.getCompanyId(), groupId, name, ddmStructureKey,
 			targetLayoutFriendlyUrl, contentField);
 
-		feed.setModifiedDate(serviceContext.getModifiedDate(null));
 		feed.setName(name);
 		feed.setDescription(description);
 		feed.setDDMStructureKey(ddmStructureKey);
@@ -339,21 +336,52 @@ public class JournalFeedLocalServiceImpl
 		}
 
 		try {
-			DDMStructure ddmStructure =
-				ddmStructureLocalService.getStructure(
-					groupId,
-					classNameLocalService.getClassNameId(JournalArticle.class),
-					ddmStructureKey);
+			DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
+				groupId,
+				classNameLocalService.getClassNameId(JournalArticle.class),
+				ddmStructureKey);
 
 			DDMForm ddmForm = ddmStructure.getDDMForm();
 
 			Map<String, DDMFormField> ddmFormFieldsMap =
 				ddmForm.getDDMFormFieldsMap(true);
 
-			return ddmFormFieldsMap.containsKey(contentField);
+			if (ddmFormFieldsMap.containsKey(contentField)) {
+				return true;
+			}
+
+			return isValidStructureOptionValue(ddmFormFieldsMap, contentField);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
+		}
+
+		return false;
+	}
+
+	protected boolean isValidStructureOptionValue(
+		Map<String, DDMFormField> ddmFormFieldsMap, String contentField) {
+
+		for (DDMFormField ddmFormField : ddmFormFieldsMap.values()) {
+			String ddmFormFieldType = ddmFormField.getType();
+
+			if (!(ddmFormFieldType.equals("radio") ||
+				  ddmFormFieldType.equals("select"))) {
+
+				continue;
+			}
+
+			DDMFormFieldOptions ddmFormFieldOptions =
+				ddmFormField.getDDMFormFieldOptions();
+
+			for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
+				optionValue =
+					ddmFormField.getName() + StringPool.UNDERLINE + optionValue;
+
+				if (contentField.equals(optionValue)) {
+					return true;
+				}
+			}
 		}
 
 		return false;

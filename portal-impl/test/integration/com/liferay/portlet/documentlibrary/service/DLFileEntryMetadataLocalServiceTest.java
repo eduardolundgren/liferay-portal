@@ -14,36 +14,43 @@
 
 package com.liferay.portlet.documentlibrary.service;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.model.UnlocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.storage.Field;
-import com.liferay.portlet.dynamicdatamapping.storage.Fields;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMFormTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMFormValuesTestUtil;
 
 import java.io.ByteArrayInputStream;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,7 +80,10 @@ public class DLFileEntryMetadataLocalServiceTest {
 		byte[] testFileBytes = FileUtil.getBytes(
 			getClass(), "dependencies/ddmstructure.xml");
 
-		serviceContext.setAttribute("definition", new String(testFileBytes));
+		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(
+			new String(testFileBytes));
+
+		serviceContext.setAttribute("ddmForm", ddmForm);
 
 		User user = TestPropsValues.getUser();
 
@@ -88,16 +98,8 @@ public class DLFileEntryMetadataLocalServiceTest {
 
 		_ddmStructure = ddmStructures.get(0);
 
-		Map<String, Fields> fieldsMap = new HashMap<String, Fields>();
-
-		Fields fields = new Fields();
-
-		Field nameField = new Field(
-			_ddmStructure.getStructureId(), "date_an", new Date());
-
-		fields.put(nameField);
-
-		fieldsMap.put(_ddmStructure.getStructureKey(), fields);
+		Map<String, DDMFormValues> ddmFormValuesMap = setUpDDMFormValuesMap(
+			_ddmStructure.getStructureKey(), user.getLocale());
 
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
 			RandomTestUtil.randomBytes());
@@ -106,8 +108,8 @@ public class DLFileEntryMetadataLocalServiceTest {
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), null, RandomTestUtil.randomString(),
-			null, null, _dlFileEntryType.getFileEntryTypeId(), fieldsMap, null,
-			byteArrayInputStream, byteArrayInputStream.available(),
+			null, null, _dlFileEntryType.getFileEntryTypeId(), ddmFormValuesMap,
+			null, byteArrayInputStream, byteArrayInputStream.available(),
 			serviceContext);
 	}
 
@@ -169,6 +171,38 @@ public class DLFileEntryMetadataLocalServiceTest {
 				DDMStructureLocalServiceUtil.addDDMStructure(_ddmStructure);
 			}
 		}
+	}
+
+	protected Map<String, DDMFormValues> setUpDDMFormValuesMap(
+		String ddmStructureKey, Locale currentLocale) {
+
+		Set<Locale> availableLocales = DDMFormTestUtil.createAvailableLocales(
+			currentLocale);
+
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
+			availableLocales, currentLocale);
+
+		DDMFormField ddmFormField = new DDMFormField("date_an", "ddm-date");
+
+		ddmFormField.setDataType("date");
+
+		ddmForm.addDDMFormField(ddmFormField);
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm, availableLocales, currentLocale);
+
+		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
+
+		ddmFormFieldValue.setName("date_an");
+		ddmFormFieldValue.setValue(new UnlocalizedValue(""));
+
+		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+
+		Map<String, DDMFormValues> ddmFormValuesMap = new HashMap<>();
+
+		ddmFormValuesMap.put(ddmStructureKey, ddmFormValues);
+
+		return ddmFormValuesMap;
 	}
 
 	private DDMStructure _ddmStructure;

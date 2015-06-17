@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.persistence.GroupFinder;
 import com.liferay.portal.service.persistence.GroupPersistence;
-import com.liferay.portal.service.persistence.LockFinder;
-import com.liferay.portal.service.persistence.LockPersistence;
 import com.liferay.portal.service.persistence.RepositoryPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
@@ -95,7 +93,7 @@ public abstract class DLFolderServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the document library folder remote service
 	 */
-	public com.liferay.portlet.documentlibrary.service.DLFolderService getDLFolderService() {
+	public DLFolderService getDLFolderService() {
 		return dlFolderService;
 	}
 
@@ -104,8 +102,7 @@ public abstract class DLFolderServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param dlFolderService the document library folder remote service
 	 */
-	public void setDLFolderService(
-		com.liferay.portlet.documentlibrary.service.DLFolderService dlFolderService) {
+	public void setDLFolderService(DLFolderService dlFolderService) {
 		this.dlFolderService = dlFolderService;
 	}
 
@@ -236,61 +233,6 @@ public abstract class DLFolderServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setGroupFinder(GroupFinder groupFinder) {
 		this.groupFinder = groupFinder;
-	}
-
-	/**
-	 * Returns the lock local service.
-	 *
-	 * @return the lock local service
-	 */
-	public com.liferay.portal.service.LockLocalService getLockLocalService() {
-		return lockLocalService;
-	}
-
-	/**
-	 * Sets the lock local service.
-	 *
-	 * @param lockLocalService the lock local service
-	 */
-	public void setLockLocalService(
-		com.liferay.portal.service.LockLocalService lockLocalService) {
-		this.lockLocalService = lockLocalService;
-	}
-
-	/**
-	 * Returns the lock persistence.
-	 *
-	 * @return the lock persistence
-	 */
-	public LockPersistence getLockPersistence() {
-		return lockPersistence;
-	}
-
-	/**
-	 * Sets the lock persistence.
-	 *
-	 * @param lockPersistence the lock persistence
-	 */
-	public void setLockPersistence(LockPersistence lockPersistence) {
-		this.lockPersistence = lockPersistence;
-	}
-
-	/**
-	 * Returns the lock finder.
-	 *
-	 * @return the lock finder
-	 */
-	public LockFinder getLockFinder() {
-		return lockFinder;
-	}
-
-	/**
-	 * Sets the lock finder.
-	 *
-	 * @param lockFinder the lock finder
-	 */
-	public void setLockFinder(LockFinder lockFinder) {
-		this.lockFinder = lockFinder;
 	}
 
 	/**
@@ -1071,8 +1013,8 @@ public abstract class DLFolderServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFolderLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFolderLocalService dlFolderLocalService;
-	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFolderService.class)
-	protected com.liferay.portlet.documentlibrary.service.DLFolderService dlFolderService;
+	@BeanReference(type = DLFolderService.class)
+	protected DLFolderService dlFolderService;
 	@BeanReference(type = DLFolderPersistence.class)
 	protected DLFolderPersistence dlFolderPersistence;
 	@BeanReference(type = DLFolderFinder.class)
@@ -1087,12 +1029,6 @@ public abstract class DLFolderServiceBaseImpl extends BaseServiceImpl
 	protected GroupPersistence groupPersistence;
 	@BeanReference(type = GroupFinder.class)
 	protected GroupFinder groupFinder;
-	@BeanReference(type = com.liferay.portal.service.LockLocalService.class)
-	protected com.liferay.portal.service.LockLocalService lockLocalService;
-	@BeanReference(type = LockPersistence.class)
-	protected LockPersistence lockPersistence;
-	@BeanReference(type = LockFinder.class)
-	protected LockFinder lockFinder;
 	@BeanReference(type = com.liferay.portal.service.RepositoryLocalService.class)
 	protected com.liferay.portal.service.RepositoryLocalService repositoryLocalService;
 	@BeanReference(type = com.liferay.portal.service.RepositoryService.class)

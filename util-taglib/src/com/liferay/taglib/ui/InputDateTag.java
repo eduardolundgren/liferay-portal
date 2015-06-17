@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.taglib.BaseValidatorTagSupport;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -59,8 +60,16 @@ public class InputDateTag extends BaseValidatorTagSupport {
 		_firstDayOfWeek = firstDayOfWeek;
 	}
 
+	public void setFirstEnabledDate(Date firstEnabledDate) {
+		_firstEnabledDate = firstEnabledDate;
+	}
+
 	public void setFormName(String formName) {
 		_formName = formName;
+	}
+
+	public void setLastEnabledDate(Date lastEnabledDate) {
+		_lastEnabledDate = lastEnabledDate;
 	}
 
 	public void setMonthAndYearParam(String monthAndYearParam) {
@@ -99,8 +108,10 @@ public class InputDateTag extends BaseValidatorTagSupport {
 		_dayValue = 0;
 		_disabled = false;
 		_disableNamespace = false;
-		_firstDayOfWeek = Calendar.SUNDAY - 1;
+		_firstDayOfWeek = Calendar.SUNDAY - 2;
+		_firstEnabledDate = null;
 		_formName = "fm";
+		_lastEnabledDate = null;
 		_monthAndYearParam = StringPool.BLANK;
 		_monthParam = null;
 		_monthValue = -1;
@@ -130,7 +141,11 @@ public class InputDateTag extends BaseValidatorTagSupport {
 		request.setAttribute(
 			"liferay-ui:input-date:firstDayOfWeek",
 			String.valueOf(_firstDayOfWeek));
+		request.setAttribute(
+			"liferay-ui:input-date:firstEnabledDate", _firstEnabledDate);
 		request.setAttribute("liferay-ui:input-date:formName", _formName);
+		request.setAttribute(
+			"liferay-ui:input-date:lastEnabledDate", _lastEnabledDate);
 		request.setAttribute(
 			"liferay-ui:input-date:monthAndYearParam", _monthAndYearParam);
 		request.setAttribute("liferay-ui:input-date:monthParam", _monthParam);
@@ -152,8 +167,10 @@ public class InputDateTag extends BaseValidatorTagSupport {
 	private int _dayValue;
 	private boolean _disabled;
 	private boolean _disableNamespace;
-	private int _firstDayOfWeek = Calendar.SUNDAY - 1;
+	private int _firstDayOfWeek = Calendar.SUNDAY - 2;
+	private Date _firstEnabledDate;
 	private String _formName = "fm";
+	private Date _lastEnabledDate;
 	private String _monthAndYearParam = StringPool.BLANK;
 	private String _monthParam;
 	private int _monthValue = -1;

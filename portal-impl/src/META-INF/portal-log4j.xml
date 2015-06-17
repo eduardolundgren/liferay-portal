@@ -80,24 +80,12 @@
 		<priority value="WARN" />
 	</category>
 
-	<category name="com.liferay.portal.cache">
+	<category name="com.liferay.portal.bootstrap.ModuleFrameworkImpl">
 		<priority value="WARN" />
 	</category>
 
-	<category name="com.liferay.portal.cache.ehcache.EhcachePortalCacheManager">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.portal.cache.ehcache.LiferayBootstrapCacheLoaderFactory">
-		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.portal.cache.ehcache.LiferayCacheEventListenerFactory">
-		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.portal.cache.ehcache.LiferayCacheManagerPeerProviderFactory">
-		<priority value="INFO" />
+	<category name="com.liferay.portal.cache">
+		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.portal.captcha.CaptchaImpl">
@@ -152,7 +140,7 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.dao.shard.ShardDataSourceTargetSource">
+	<category name="com.liferay.portal.dao.shard.DefaultShardDataSourceTargetSource">
 		<priority value="INFO" />
 	</category>
 
@@ -332,12 +320,12 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portal.kernel.search.BaseSpellCheckIndexWriter">
-		<priority value="INFO" />
-	</category>
-
 	<category name="com.liferay.portal.kernel.search.HitsOpenSearchImpl">
 		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.search.suggest.BaseSpellCheckIndexWriter">
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portal.kernel.servlet.PipingServletResponse">
@@ -420,11 +408,11 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.model.Image">
+	<category name="com.liferay.portal.model.DefaultModelHintsImpl">
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.model.ModelHintsImpl">
+	<category name="com.liferay.portal.model.Image">
 		<priority value="ERROR" />
 	</category>
 
@@ -444,10 +432,6 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.scheduler.quartz.PortalJobStore">
-		<priority value="ERROR" />
-	</category>
-
 	<category name="com.liferay.portal.scripting.ruby.RubyExecutor">
 		<priority value="ERROR" />
 	</category>
@@ -457,10 +441,6 @@
 	</category>
 
 	<category name="com.liferay.portal.search.lucene">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.portal.search.lucene.LuceneFileExtractor">
 		<priority value="ERROR" />
 	</category>
 
@@ -480,15 +460,7 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.security.auth.CASAutoLogin">
-		<priority value="WARN" />
-	</category>
-
 	<category name="com.liferay.portal.security.auth.LDAPAuth">
-		<priority value="WARN" />
-	</category>
-
-	<category name="com.liferay.portal.security.auth.OpenSSOAutoLogin">
 		<priority value="WARN" />
 	</category>
 
@@ -690,10 +662,6 @@
 
 	<category name="com.liferay.portal.servlet.LanguageServlet">
 		<priority value="WARN" />
-	</category>
-
-	<category name="com.liferay.portal.servlet.LuceneServlet">
-		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portal.servlet.MainServlet">
@@ -948,7 +916,7 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.xml.SAXReaderImpl">
+	<category name="com.liferay.portal.xml.SAXReaderFactory">
 		<priority value="WARN" />
 	</category>
 
@@ -1008,8 +976,8 @@
 		<priority value="WARN" />
 	</category>
 
-	<category name="com.liferay.portlet.documentlibrary.store.StoreFactory">
-		<priority value="WARN" />
+	<category name="com.liferay.portlet.documentlibrary.store">
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portlet.documentlibrary.util">
@@ -1094,14 +1062,6 @@
 
 	<category name="com.liferay.portlet.webproxy">
 		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.portlet.wiki.action.ExportPageAction">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.portlet.wiki.importers">
-		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.resourcesimporter">
@@ -1281,10 +1241,6 @@
 	</category>
 
 	<category name="org.jabsorb">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="org.jamwiki.Environment">
 		<priority value="ERROR" />
 	</category>
 

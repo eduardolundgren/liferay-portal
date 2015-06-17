@@ -15,20 +15,14 @@
 package com.liferay.portal.repository.external;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.repository.BaseRepository;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryException;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
-import com.liferay.portal.kernel.repository.cmis.CMISRepositoryHandler;
-import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.model.ClassName;
-import com.liferay.portal.repository.cmis.CMISRepository;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
-import com.liferay.portal.repository.proxy.BaseRepositoryProxyBean;
 import com.liferay.portal.repository.util.ExternalRepositoryFactoryUtil;
 import com.liferay.portal.service.ClassNameLocalService;
 import com.liferay.portal.service.CompanyLocalService;
@@ -37,6 +31,8 @@ import com.liferay.portal.service.RepositoryLocalService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portlet.asset.service.AssetEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalService;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 
 /**
  * @author Adolfo Pérez
@@ -93,35 +89,6 @@ public class LegacyExternalRepositoryFactory implements RepositoryFactory {
 				e);
 		}
 
-		CMISRepositoryHandler cmisRepositoryHandler = null;
-
-		if (baseRepository instanceof CMISRepositoryHandler) {
-			cmisRepositoryHandler = (CMISRepositoryHandler)baseRepository;
-		}
-		else if (baseRepository instanceof BaseRepositoryProxyBean) {
-			BaseRepositoryProxyBean baseRepositoryProxyBean =
-				(BaseRepositoryProxyBean)baseRepository;
-
-			ClassLoaderBeanHandler classLoaderBeanHandler =
-				(ClassLoaderBeanHandler)ProxyUtil.getInvocationHandler(
-					baseRepositoryProxyBean.getProxyBean());
-
-			Object bean = classLoaderBeanHandler.getBean();
-
-			if (bean instanceof CMISRepositoryHandler) {
-				cmisRepositoryHandler = (CMISRepositoryHandler)bean;
-			}
-		}
-
-		if (cmisRepositoryHandler != null) {
-			CMISRepository cmisRepository = new CMISRepository(
-				cmisRepositoryHandler);
-
-			cmisRepositoryHandler.setCmisRepository(cmisRepository);
-
-			setupRepository(repositoryId, repository, cmisRepository);
-		}
-
 		setupRepository(repositoryId, repository, baseRepository);
 
 		if (!ExportImportThreadLocal.isImportInProcess()) {
@@ -151,6 +118,7 @@ public class LegacyExternalRepositoryFactory implements RepositoryFactory {
 		baseRepository.setCompanyId(repository.getCompanyId());
 		baseRepository.setCompanyLocalService(_companyLocalService);
 		baseRepository.setDLAppHelperLocalService(_dlAppHelperLocalService);
+		baseRepository.setDLFolderLocalService(_dlFolderLocalService);
 		baseRepository.setGroupId(repository.getGroupId());
 		baseRepository.setRepositoryEntryLocalService(
 			_repositoryEntryLocalService);
@@ -171,6 +139,9 @@ public class LegacyExternalRepositoryFactory implements RepositoryFactory {
 
 	@BeanReference(type = DLAppHelperLocalService.class)
 	private DLAppHelperLocalService _dlAppHelperLocalService;
+
+	@BeanReference(type = DLFolderLocalService.class)
+	private DLFolderLocalService _dlFolderLocalService;
 
 	@BeanReference(type = RepositoryEntryLocalService.class)
 	private RepositoryEntryLocalService _repositoryEntryLocalService;

@@ -16,6 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVersion>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DDMStructureVersionCacheModel)) {
+			return false;
+		}
+
+		DDMStructureVersionCacheModel ddmStructureVersionCacheModel = (DDMStructureVersionCacheModel)obj;
+
+		if (structureVersionId == ddmStructureVersionCacheModel.structureVersionId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, structureVersionId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("{structureVersionId=");
 		sb.append(structureVersionId);
@@ -59,6 +84,8 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		sb.append(structureId);
 		sb.append(", version=");
 		sb.append(version);
+		sb.append(", parentStructureId=");
+		sb.append(parentStructureId);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", description=");
@@ -69,6 +96,14 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		sb.append(storageType);
 		sb.append(", type=");
 		sb.append(type);
+		sb.append(", status=");
+		sb.append(status);
+		sb.append(", statusByUserId=");
+		sb.append(statusByUserId);
+		sb.append(", statusByUserName=");
+		sb.append(statusByUserName);
+		sb.append(", statusDate=");
+		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -106,6 +141,8 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 			ddmStructureVersionImpl.setVersion(version);
 		}
 
+		ddmStructureVersionImpl.setParentStructureId(parentStructureId);
+
 		if (name == null) {
 			ddmStructureVersionImpl.setName(StringPool.BLANK);
 		}
@@ -135,14 +172,33 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		}
 
 		ddmStructureVersionImpl.setType(type);
+		ddmStructureVersionImpl.setStatus(status);
+		ddmStructureVersionImpl.setStatusByUserId(statusByUserId);
+
+		if (statusByUserName == null) {
+			ddmStructureVersionImpl.setStatusByUserName(StringPool.BLANK);
+		}
+		else {
+			ddmStructureVersionImpl.setStatusByUserName(statusByUserName);
+		}
+
+		if (statusDate == Long.MIN_VALUE) {
+			ddmStructureVersionImpl.setStatusDate(null);
+		}
+		else {
+			ddmStructureVersionImpl.setStatusDate(new Date(statusDate));
+		}
 
 		ddmStructureVersionImpl.resetOriginalValues();
+
+		ddmStructureVersionImpl.setDDMForm(_ddmForm);
 
 		return ddmStructureVersionImpl;
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
 		structureVersionId = objectInput.readLong();
 		groupId = objectInput.readLong();
 		companyId = objectInput.readLong();
@@ -151,11 +207,18 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		createDate = objectInput.readLong();
 		structureId = objectInput.readLong();
 		version = objectInput.readUTF();
+		parentStructureId = objectInput.readLong();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
 		definition = objectInput.readUTF();
 		storageType = objectInput.readUTF();
 		type = objectInput.readInt();
+		status = objectInput.readInt();
+		statusByUserId = objectInput.readLong();
+		statusByUserName = objectInput.readUTF();
+		statusDate = objectInput.readLong();
+
+		_ddmForm = (com.liferay.portlet.dynamicdatamapping.model.DDMForm)objectInput.readObject();
 	}
 
 	@Override
@@ -182,6 +245,8 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		else {
 			objectOutput.writeUTF(version);
 		}
+
+		objectOutput.writeLong(parentStructureId);
 
 		if (name == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -212,6 +277,19 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		}
 
 		objectOutput.writeInt(type);
+		objectOutput.writeInt(status);
+		objectOutput.writeLong(statusByUserId);
+
+		if (statusByUserName == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(statusByUserName);
+		}
+
+		objectOutput.writeLong(statusDate);
+
+		objectOutput.writeObject(_ddmForm);
 	}
 
 	public long structureVersionId;
@@ -222,9 +300,15 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 	public long createDate;
 	public long structureId;
 	public String version;
+	public long parentStructureId;
 	public String name;
 	public String description;
 	public String definition;
 	public String storageType;
 	public int type;
+	public int status;
+	public long statusByUserId;
+	public String statusByUserName;
+	public long statusDate;
+	public com.liferay.portlet.dynamicdatamapping.model.DDMForm _ddmForm;
 }

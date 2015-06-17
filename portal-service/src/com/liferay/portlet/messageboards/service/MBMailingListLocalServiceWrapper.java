@@ -218,6 +218,13 @@ public class MBMailingListLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portlet.messageboards.model.MBMailingList fetchCategoryMailingList(
+		long groupId, long categoryId) {
+		return _mbMailingListLocalService.fetchCategoryMailingList(groupId,
+			categoryId);
+	}
+
+	@Override
 	public com.liferay.portlet.messageboards.model.MBMailingList fetchMBMailingList(
 		long mailingListId) {
 		return _mbMailingListLocalService.fetchMBMailingList(mailingListId);
@@ -262,7 +269,7 @@ public class MBMailingListLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _mbMailingListLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

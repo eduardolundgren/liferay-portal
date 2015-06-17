@@ -14,18 +14,19 @@
 
 package com.liferay.portlet.layoutsetprototypes.lar;
 
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
-import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
+import com.liferay.portal.lar.test.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
@@ -37,11 +38,10 @@ import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutPrototypeLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,7 +96,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 		List<Layout> layouts = _layouts.get(clazz.getSimpleName());
 
 		if (layouts == null) {
-			layouts = new ArrayList<Layout>();
+			layouts = new ArrayList<>();
 
 			_layouts.put(clazz.getSimpleName(), layouts);
 		}
@@ -119,7 +119,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 			clazz.getSimpleName());
 
 		if (layoutFriendlyURLs == null) {
-			layoutFriendlyURLs = new ArrayList<LayoutFriendlyURL>();
+			layoutFriendlyURLs = new ArrayList<>();
 
 			_layoutFriendlyURLs.put(clazz.getSimpleName(), layoutFriendlyURLs);
 		}
@@ -289,7 +289,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 
 		ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(inputStream);
 
-		Document document = SAXReaderUtil.read(
+		Document document = UnsecureSAXReaderUtil.read(
 			zipReader.getEntryAsString("manifest.xml"));
 
 		Element rootElement = document.getRootElement();
@@ -298,7 +298,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 
 		List<Element> elements = layoutElement.elements();
 
-		List<Layout> importedLayouts = new ArrayList<Layout>(elements.size());
+		List<Layout> importedLayouts = new ArrayList<>(elements.size());
 
 		for (Element element : elements) {
 			String layoutPrototypeUuid = element.attributeValue(
@@ -412,10 +412,9 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 	}
 
 	private final Map<String, List<LayoutFriendlyURL>> _layoutFriendlyURLs =
-		new HashMap<String, List<LayoutFriendlyURL>>();
+		new HashMap<>();
 	private LayoutPrototype _layoutPrototype;
-	private final Map<String, List<Layout>> _layouts =
-		new HashMap<String, List<Layout>>();
+	private final Map<String, List<Layout>> _layouts = new HashMap<>();
 	private LayoutSetPrototype _layoutSetPrototype;
 
 }

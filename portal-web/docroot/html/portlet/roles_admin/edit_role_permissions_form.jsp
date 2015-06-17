@@ -24,7 +24,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
-Role role = (Role)request.getAttribute(WebKeys.ROLE);
+long roleId = ParamUtil.getLong(request, "roleId");
+
+Role role = RoleServiceUtil.fetchRole(roleId);
 
 String portletResource = ParamUtil.getString(request, "portletResource");
 
@@ -115,7 +117,7 @@ if (Validator.isNotNull(portletResource)) {
 		</div>
 	</c:if>
 
-	<c:if test="<%= portletResource.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES) %>">
+	<c:if test="<%= portletResource.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATE) %>">
 		<h4><liferay-ui:message key="related-application-permissions" /></h4>
 
 		<div>

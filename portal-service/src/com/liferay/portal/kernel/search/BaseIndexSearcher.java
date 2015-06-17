@@ -16,7 +16,11 @@ package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.suggest.QuerySuggester;
+import com.liferay.portal.kernel.search.suggest.Suggester;
+import com.liferay.portal.kernel.search.suggest.SuggesterResults;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +90,22 @@ public abstract class BaseIndexSearcher
 	}
 
 	@Override
+	public SuggesterResults suggest(
+			SearchContext searchContext, Suggester suggester)
+		throws SearchException {
+
+		if (_querySuggester == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("No query suggester configured");
+			}
+
+			return new SuggesterResults();
+		}
+
+		return _querySuggester.suggest(searchContext, suggester);
+	}
+
+	@Override
 	public String[] suggestKeywordQueries(SearchContext searchContext, int max)
 		throws SearchException {
 
@@ -98,6 +118,26 @@ public abstract class BaseIndexSearcher
 		}
 
 		return _querySuggester.suggestKeywordQueries(searchContext, max);
+	}
+
+	protected void populateUID(Document document, QueryConfig queryConfig) {
+		Field uidField = document.getField(Field.UID);
+
+		if (uidField != null) {
+			return;
+		}
+
+		if (Validator.isNull(queryConfig.getAlternateUidFieldName())) {
+			return;
+		}
+
+		String uidValue = document.get(queryConfig.getAlternateUidFieldName());
+
+		if (Validator.isNotNull(uidValue)) {
+			uidField = new Field(Field.UID, uidValue);
+
+			document.add(uidField);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

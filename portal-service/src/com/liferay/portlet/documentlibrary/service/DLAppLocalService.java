@@ -44,6 +44,11 @@ public interface DLAppLocalService extends BaseLocalService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLAppLocalServiceUtil} to access the d l app local service. Add custom service methods to {@link com.liferay.portlet.documentlibrary.service.impl.DLAppLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public com.liferay.portal.kernel.repository.model.FileEntry addFileEntry(
+		long userId, long repositoryId, long folderId,
+		java.lang.String sourceFileName, java.lang.String mimeType,
+		byte[] bytes, com.liferay.portal.service.ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Adds a file entry and associated metadata based on a byte array.
@@ -83,7 +88,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		java.lang.String title, java.lang.String description,
 		java.lang.String changeLog, byte[] bytes,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a file entry and associated metadata based on a {@link java.io.File}
@@ -124,7 +129,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		java.lang.String title, java.lang.String description,
 		java.lang.String changeLog, java.io.File file,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a file entry and associated metadata based on an {@link InputStream}
@@ -166,7 +171,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		java.lang.String title, java.lang.String description,
 		java.lang.String changeLog, java.io.InputStream is, long size,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the file rank to the existing file entry. This method is only
@@ -198,10 +203,10 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the parent folder or file entry could not be
 	found, or if the file shortcut's information was invalid
 	*/
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut addFileShortcut(
 		long userId, long repositoryId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a folder.
@@ -223,7 +228,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		long userId, long repositoryId, long parentFolderId,
 		java.lang.String name, java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Delete all data associated to the given repository. This method is only
@@ -232,11 +237,9 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @param repositoryId the primary key of the data's repository
 	* @throws PortalException if the repository could not be found
 	*/
-	public void deleteAll(long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteAll(long repositoryId) throws PortalException;
 
-	public void deleteAllRepositories(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteAllRepositories(long groupId) throws PortalException;
 
 	/**
 	* Deletes the file entry.
@@ -244,8 +247,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @param fileEntryId the primary key of the file entry
 	* @throws PortalException if the file entry could not be found
 	*/
-	public void deleteFileEntry(long fileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteFileEntry(long fileEntryId) throws PortalException;
 
 	/**
 	* Deletes the file ranks associated to a given file entry. This method is
@@ -267,12 +269,12 @@ public interface DLAppLocalService extends BaseLocalService {
 	* Deletes the file shortcut. This method is only supported by the Liferay
 	* repository.
 	*
-	* @param dlFileShortcut the file shortcut
+	* @param fileShortcut the file shortcut
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	public void deleteFileShortcut(
-		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		com.liferay.portal.kernel.repository.model.FileShortcut fileShortcut)
+		throws PortalException;
 
 	/**
 	* Deletes the file shortcut. This method is only supported by the Liferay
@@ -282,7 +284,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	public void deleteFileShortcut(long fileShortcutId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes all file shortcuts associated to the file entry. This method is
@@ -293,7 +295,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	be found
 	*/
 	public void deleteFileShortcuts(long toFileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the folder and all of its subfolders and file entries.
@@ -301,8 +303,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @param folderId the primary key of the folder
 	* @throws PortalException if the folder could not be found
 	*/
-	public void deleteFolder(long folderId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteFolder(long folderId) throws PortalException;
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -320,8 +321,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.FileEntry getFileEntry(
-		long fileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long fileEntryId) throws PortalException;
 
 	/**
 	* Returns the file entry with the title in the folder.
@@ -335,7 +335,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.FileEntry getFileEntry(
 		long groupId, long folderId, java.lang.String title)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns the file entry with the UUID and group.
@@ -347,8 +347,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.FileEntry getFileEntryByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String uuid, long groupId) throws PortalException;
 
 	/**
 	* Returns the file ranks from the user. This method is only supported by
@@ -371,9 +370,8 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut getFileShortcut(
-		long fileShortcutId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public com.liferay.portal.kernel.repository.model.FileShortcut getFileShortcut(
+		long fileShortcutId) throws PortalException;
 
 	/**
 	* Returns the file version with the primary key.
@@ -384,8 +382,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.FileVersion getFileVersion(
-		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long fileVersionId) throws PortalException;
 
 	/**
 	* Returns the folder with the primary key.
@@ -396,8 +393,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.Folder getFolder(
-		long folderId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long folderId) throws PortalException;
 
 	/**
 	* Returns the folder with the name in the parent folder.
@@ -411,7 +407,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.Folder getFolder(
 		long repositoryId, long parentFolderId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns the mount folder of the repository with the primary key. This
@@ -424,8 +420,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.repository.model.Folder getMountFolder(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long repositoryId) throws PortalException;
 
 	/**
 	* Moves the file entry to the new folder.
@@ -441,7 +436,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntry(
 		long userId, long fileEntryId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
@@ -452,7 +447,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryFromTrash(
 		long userId, long fileEntryId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
@@ -460,13 +455,12 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryToTrash(
-		long userId, long fileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long userId, long fileEntryId) throws PortalException;
 
 	public com.liferay.portal.kernel.repository.model.Folder moveFolder(
 		long userId, long folderId, long parentFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
@@ -475,7 +469,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*/
 	@java.lang.Deprecated
 	public void restoreFileEntryFromTrash(long userId, long fileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -494,8 +488,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the user or group could not be found
 	*/
 	public void subscribeFileEntryType(long userId, long groupId,
-		long fileEntryTypeId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long fileEntryTypeId) throws PortalException;
 
 	/**
 	* Subscribe the user to document changes in the folder. This method is only
@@ -507,7 +500,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the user or group could not be found
 	*/
 	public void subscribeFolder(long userId, long groupId, long folderId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Unsubscribe the user from changes in documents of the file entry type.
@@ -519,8 +512,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the user or group could not be found
 	*/
 	public void unsubscribeFileEntryType(long userId, long groupId,
-		long fileEntryTypeId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long fileEntryTypeId) throws PortalException;
 
 	/**
 	* Unsubscribe the user from document changes in the folder. This method is
@@ -532,7 +524,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the user or group could not be found
 	*/
 	public void unsubscribeFolder(long userId, long groupId, long folderId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the file entry's asset replacing its asset categories, tags, and
@@ -550,8 +542,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
 		com.liferay.portal.kernel.repository.model.FileVersion fileVersion,
 		long[] assetCategoryIds, java.lang.String[] assetTagNames,
-		long[] assetLinkEntryIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long[] assetLinkEntryIds) throws PortalException;
 
 	/**
 	* Updates a file entry and associated metadata based on a byte array
@@ -594,7 +585,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		java.lang.String description, java.lang.String changeLog,
 		boolean majorVersion, byte[] bytes,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates a file entry and associated metadata based on a {@link
@@ -638,7 +629,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		java.lang.String description, java.lang.String changeLog,
 		boolean majorVersion, java.io.File file,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates a file entry and associated metadata based on an {@link
@@ -682,7 +673,7 @@ public interface DLAppLocalService extends BaseLocalService {
 		java.lang.String description, java.lang.String changeLog,
 		boolean majorVersion, java.io.InputStream is, long size,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates a file rank to the existing file entry. This method is only
@@ -714,21 +705,28 @@ public interface DLAppLocalService extends BaseLocalService {
 	* @throws PortalException if the file shortcut, folder, or file entry could
 	not be found
 	*/
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut updateFileShortcut(
 		long userId, long fileShortcutId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates all file shortcuts to the existing file entry to the new file
 	* entry. This method is only supported by the Liferay repository.
 	*
-	* @param toRepositoryId the primary key of the repository
 	* @param oldToFileEntryId the primary key of the old file entry pointed to
 	* @param newToFileEntryId the primary key of the new file entry to point to
 	*/
+	public void updateFileShortcuts(long oldToFileEntryId, long newToFileEntryId)
+		throws PortalException;
+
+	/**
+	* Deprecated as of 7.0.0, replaced by {@link #updateFileShortcuts(long,
+	*            long)}
+	*/
+	@java.lang.Deprecated
 	public void updateFileShortcuts(long toRepositoryId, long oldToFileEntryId,
-		long newToFileEntryId);
+		long newToFileEntryId) throws PortalException;
 
 	/**
 	* Updates the folder.
@@ -757,5 +755,5 @@ public interface DLAppLocalService extends BaseLocalService {
 		long folderId, long parentFolderId, java.lang.String name,
 		java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 }

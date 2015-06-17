@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchVirtualHostException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -57,7 +56,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see VirtualHostPersistence
- * @see VirtualHostUtil
+ * @see com.liferay.portal.service.persistence.VirtualHostUtil
  * @generated
  */
 @ProviderType
@@ -93,11 +92,11 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 			new String[] { String.class.getName() });
 
 	/**
-	 * Returns the virtual host where hostname = &#63; or throws a {@link com.liferay.portal.NoSuchVirtualHostException} if it could not be found.
+	 * Returns the virtual host where hostname = &#63; or throws a {@link NoSuchVirtualHostException} if it could not be found.
 	 *
 	 * @param hostname the hostname
 	 * @return the matching virtual host
-	 * @throws com.liferay.portal.NoSuchVirtualHostException if a matching virtual host could not be found
+	 * @throws NoSuchVirtualHostException if a matching virtual host could not be found
 	 */
 	@Override
 	public VirtualHost findByHostname(String hostname)
@@ -330,12 +329,12 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 			new String[] { Long.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the virtual host where companyId = &#63; and layoutSetId = &#63; or throws a {@link com.liferay.portal.NoSuchVirtualHostException} if it could not be found.
+	 * Returns the virtual host where companyId = &#63; and layoutSetId = &#63; or throws a {@link NoSuchVirtualHostException} if it could not be found.
 	 *
 	 * @param companyId the company ID
 	 * @param layoutSetId the layout set ID
 	 * @return the matching virtual host
-	 * @throws com.liferay.portal.NoSuchVirtualHostException if a matching virtual host could not be found
+	 * @throws NoSuchVirtualHostException if a matching virtual host could not be found
 	 */
 	@Override
 	public VirtualHost findByC_L(long companyId, long layoutSetId)
@@ -597,10 +596,6 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(VirtualHostImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(VirtualHostImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -740,7 +735,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	 *
 	 * @param virtualHostId the primary key of the virtual host
 	 * @return the virtual host that was removed
-	 * @throws com.liferay.portal.NoSuchVirtualHostException if a virtual host with the primary key could not be found
+	 * @throws NoSuchVirtualHostException if a virtual host with the primary key could not be found
 	 */
 	@Override
 	public VirtualHost remove(long virtualHostId)
@@ -753,7 +748,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	 *
 	 * @param primaryKey the primary key of the virtual host
 	 * @return the virtual host that was removed
-	 * @throws com.liferay.portal.NoSuchVirtualHostException if a virtual host with the primary key could not be found
+	 * @throws NoSuchVirtualHostException if a virtual host with the primary key could not be found
 	 */
 	@Override
 	public VirtualHost remove(Serializable primaryKey)
@@ -821,8 +816,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	}
 
 	@Override
-	public VirtualHost updateImpl(
-		com.liferay.portal.model.VirtualHost virtualHost) {
+	public VirtualHost updateImpl(VirtualHost virtualHost) {
 		virtualHost = toUnwrappedModel(virtualHost);
 
 		boolean isNew = virtualHost.isNew();
@@ -890,7 +884,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	 *
 	 * @param primaryKey the primary key of the virtual host
 	 * @return the virtual host
-	 * @throws com.liferay.portal.NoSuchVirtualHostException if a virtual host with the primary key could not be found
+	 * @throws NoSuchVirtualHostException if a virtual host with the primary key could not be found
 	 */
 	@Override
 	public VirtualHost findByPrimaryKey(Serializable primaryKey)
@@ -910,11 +904,11 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	}
 
 	/**
-	 * Returns the virtual host with the primary key or throws a {@link com.liferay.portal.NoSuchVirtualHostException} if it could not be found.
+	 * Returns the virtual host with the primary key or throws a {@link NoSuchVirtualHostException} if it could not be found.
 	 *
 	 * @param virtualHostId the primary key of the virtual host
 	 * @return the virtual host
-	 * @throws com.liferay.portal.NoSuchVirtualHostException if a virtual host with the primary key could not be found
+	 * @throws NoSuchVirtualHostException if a virtual host with the primary key could not be found
 	 */
 	@Override
 	public VirtualHost findByPrimaryKey(long virtualHostId)
@@ -1085,7 +1079,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	 * Returns a range of all the virtual hosts.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.VirtualHostModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link VirtualHostModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of virtual hosts
@@ -1101,7 +1095,7 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	 * Returns an ordered range of all the virtual hosts.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.VirtualHostModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link VirtualHostModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of virtual hosts
@@ -1259,7 +1253,6 @@ public class VirtualHostPersistenceImpl extends BasePersistenceImpl<VirtualHost>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "virtualHost.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No VirtualHost exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No VirtualHost exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(VirtualHostPersistenceImpl.class);
 	private static final VirtualHost _nullVirtualHost = new VirtualHostImpl() {
 			@Override

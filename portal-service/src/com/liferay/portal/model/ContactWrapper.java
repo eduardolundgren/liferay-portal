@@ -181,13 +181,13 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 			setLastName(lastName);
 		}
 
-		Integer prefixId = (Integer)attributes.get("prefixId");
+		Long prefixId = (Long)attributes.get("prefixId");
 
 		if (prefixId != null) {
 			setPrefixId(prefixId);
 		}
 
-		Integer suffixId = (Integer)attributes.get("suffixId");
+		Long suffixId = (Long)attributes.get("suffixId");
 
 		if (suffixId != null) {
 			setSuffixId(suffixId);
@@ -332,7 +332,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @return the birthday of this contact
 	*/
 	@Override
-	public java.util.Date getBirthday() {
+	public Date getBirthday() {
 		return _contact.getBirthday();
 	}
 
@@ -392,7 +392,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @return the create date of this contact
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _contact.getCreateDate();
 	}
 
@@ -542,7 +542,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @return the modified date of this contact
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _contact.getModifiedDate();
 	}
 
@@ -592,7 +592,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @return the prefix ID of this contact
 	*/
 	@Override
-	public int getPrefixId() {
+	public long getPrefixId() {
 		return _contact.getPrefixId();
 	}
 
@@ -637,7 +637,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @return the suffix ID of this contact
 	*/
 	@Override
-	public int getSuffixId() {
+	public long getSuffixId() {
 		return _contact.getSuffixId();
 	}
 
@@ -757,7 +757,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @param birthday the birthday of this contact
 	*/
 	@Override
-	public void setBirthday(java.util.Date birthday) {
+	public void setBirthday(Date birthday) {
 		_contact.setBirthday(birthday);
 	}
 
@@ -817,7 +817,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @param createDate the create date of this contact
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_contact.setCreateDate(createDate);
 	}
 
@@ -852,8 +852,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_contact.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -975,7 +974,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @param modifiedDate the modified date of this contact
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_contact.setModifiedDate(modifiedDate);
 	}
 
@@ -1030,7 +1029,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @param prefixId the prefix ID of this contact
 	*/
 	@Override
-	public void setPrefixId(int prefixId) {
+	public void setPrefixId(long prefixId) {
 		_contact.setPrefixId(prefixId);
 	}
 
@@ -1075,7 +1074,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	* @param suffixId the suffix ID of this contact
 	*/
 	@Override
-	public void setSuffixId(int suffixId) {
+	public void setSuffixId(long suffixId) {
 		_contact.setSuffixId(suffixId);
 	}
 
@@ -1130,7 +1129,7 @@ public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Contact> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Contact> toCacheModel() {
 		return _contact.toCacheModel();
 	}
 

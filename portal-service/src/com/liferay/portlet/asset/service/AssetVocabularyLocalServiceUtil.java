@@ -59,38 +59,22 @@ public class AssetVocabularyLocalServiceUtil {
 	}
 
 	public static com.liferay.portlet.asset.model.AssetVocabulary addVocabulary(
-		long userId, java.lang.String title,
+		long userId, long groupId, java.lang.String title,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().addVocabulary(userId, title, serviceContext);
+		return getService().addVocabulary(userId, groupId, title, serviceContext);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetVocabulary addVocabulary(
-		long userId, java.lang.String title,
+		long userId, long groupId, java.lang.String title,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String settings,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .addVocabulary(userId, title, titleMap, descriptionMap,
-			settings, serviceContext);
-	}
-
-	/**
-	* @deprecated As of 6.1.0
-	*/
-	@Deprecated
-	public static com.liferay.portlet.asset.model.AssetVocabulary addVocabulary(
-		long userId,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		java.lang.String settings,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .addVocabulary(userId, titleMap, descriptionMap, settings,
-			serviceContext);
+				   .addVocabulary(userId, groupId, title, titleMap,
+			descriptionMap, settings, serviceContext);
 	}
 
 	public static void addVocabularyResources(
@@ -368,7 +352,7 @@ public class AssetVocabularyLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -428,6 +412,12 @@ public class AssetVocabularyLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getVocabularies(
+		com.liferay.portal.kernel.search.Hits hits)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getVocabularies(hits);
+	}
+
+	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getVocabularies(
 		long[] vocabularyIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getVocabularies(vocabularyIds);
@@ -476,22 +466,6 @@ public class AssetVocabularyLocalServiceUtil {
 		return getService()
 				   .updateVocabulary(vocabularyId, title, titleMap,
 			descriptionMap, settings, serviceContext);
-	}
-
-	/**
-	* @deprecated As of 6.1.0
-	*/
-	@Deprecated
-	public static com.liferay.portlet.asset.model.AssetVocabulary updateVocabulary(
-		long vocabularyId,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		java.lang.String settings,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .updateVocabulary(vocabularyId, titleMap, descriptionMap,
-			settings, serviceContext);
 	}
 
 	public static AssetVocabularyLocalService getService() {

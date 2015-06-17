@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -98,7 +96,7 @@ public class LoginUtil {
 			throw new AuthException();
 		}
 		else {
-			Map<String, String[]> headerMap = new HashMap<String, String[]>();
+			Map<String, String[]> headerMap = new HashMap<>();
 
 			Enumeration<String> enu1 = request.getHeaderNames();
 
@@ -107,7 +105,7 @@ public class LoginUtil {
 
 				Enumeration<String> enu2 = request.getHeaders(name);
 
-				List<String> headers = new ArrayList<String>();
+				List<String> headers = new ArrayList<>();
 
 				while (enu2.hasMoreElements()) {
 					String value = enu2.nextElement();
@@ -120,7 +118,7 @@ public class LoginUtil {
 			}
 
 			Map<String, String[]> parameterMap = request.getParameterMap();
-			Map<String, Object> resultsMap = new HashMap<String, Object>();
+			Map<String, Object> resultsMap = new HashMap<>();
 
 			if (Validator.isNull(authType)) {
 				authType = company.getAuthType();
@@ -149,6 +147,12 @@ public class LoginUtil {
 			}
 
 			if (authResult != Authenticator.SUCCESS) {
+				User user = UserLocalServiceUtil.fetchUser(userId);
+
+				if (user != null) {
+					UserLocalServiceUtil.checkLockout(user);
+				}
+
 				throw new AuthException();
 			}
 		}
@@ -163,8 +167,7 @@ public class LoginUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
@@ -443,7 +446,7 @@ public class LoginUtil {
 		String[] protectedAttributeNames =
 			PropsValues.SESSION_PHISHING_PROTECTED_ATTRIBUTES;
 
-		Map<String, Object> protectedAttributes = new HashMap<String, Object>();
+		Map<String, Object> protectedAttributes = new HashMap<>();
 
 		for (String protectedAttributeName : protectedAttributeNames) {
 			Object protectedAttributeValue = session.getAttribute(
@@ -457,17 +460,7 @@ public class LoginUtil {
 				protectedAttributeName, protectedAttributeValue);
 		}
 
-		try {
-			session.invalidate();
-		}
-		catch (IllegalStateException ise) {
-
-			// This only happens in Geronimo
-
-			if (_log.isWarnEnabled()) {
-				_log.warn(ise.getMessage());
-			}
-		}
+		session.invalidate();
 
 		session = request.getSession(true);
 
@@ -527,8 +520,7 @@ public class LoginUtil {
 		Map<String, UserTracker> sessionUsers = LiveUsers.getSessionUsers(
 			companyId);
 
-		List<UserTracker> userTrackers = new ArrayList<UserTracker>(
-			sessionUsers.values());
+		List<UserTracker> userTrackers = new ArrayList<>(sessionUsers.values());
 
 		for (UserTracker userTracker : userTrackers) {
 			if (userId != userTracker.getUserId()) {
@@ -552,7 +544,5 @@ public class LoginUtil {
 				DestinationNames.LIVE_USERS, jsonObject.toString());
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(LoginUtil.class);
 
 }

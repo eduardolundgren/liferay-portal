@@ -17,9 +17,9 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -70,10 +70,9 @@ public class ThreadLocalDistributorTest {
 		threadLocalDistributor.setClassLoader(getClassLoader());
 		threadLocalDistributor.setThreadLocalSources(_keyValuePairs);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ThreadLocalDistributor.class.getName(), Level.WARNING);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ThreadLocalDistributor.class.getName(), Level.WARNING)) {
 
 			// With log
 
@@ -124,9 +123,6 @@ public class ThreadLocalDistributorTest {
 
 			Assert.assertEquals(1, threadLocals.size());
 			Assert.assertSame(TestClass._threadLocal, threadLocals.get(0));
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -208,8 +204,7 @@ public class ThreadLocalDistributorTest {
 		return clazz.getClassLoader();
 	}
 
-	private final List<KeyValuePair> _keyValuePairs =
-		new ArrayList<KeyValuePair>();
+	private final List<KeyValuePair> _keyValuePairs = new ArrayList<>();
 
 	private static class TestClass {
 
@@ -217,7 +212,7 @@ public class ThreadLocalDistributorTest {
 		private static ThreadLocal<?> _nullValue;
 
 		private static final ThreadLocal<String> _threadLocal =
-			new ThreadLocal<String>();
+			new ThreadLocal<>();
 
 		@SuppressWarnings("unused")
 		private ThreadLocal<?> _nonStatic;

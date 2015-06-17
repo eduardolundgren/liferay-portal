@@ -27,9 +27,7 @@ import com.liferay.portal.service.ResourceTypePermissionLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -185,9 +183,12 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		String sql, String className, String classPKField, String userIdField,
 		long[] groupIds, String bridgeJoin) {
 
+		String groupIdField = classPKField.substring(
+			0, classPKField.lastIndexOf(CharPool.PERIOD));
+
 		return replacePermissionCheck(
-			sql, className, classPKField, userIdField, null, groupIds,
-			bridgeJoin);
+			sql, className, classPKField, userIdField,
+			groupIdField.concat(".groupId"), groupIds, bridgeJoin);
 	}
 
 	@Override
@@ -231,7 +232,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 	protected Set<Long> getOwnerResourceBlockIds(
 		long companyId, long[] groupIds, String className) {
 
-		Set<Long> resourceBlockIds = new HashSet<Long>();
+		Set<Long> resourceBlockIds = new HashSet<>();
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -251,7 +252,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 
 		if (ownerResourceBlockIds.size() <
 				PropsValues.
-					PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD) {
+					PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD) {
 
 			return StringUtil.merge(ownerResourceBlockIds);
 		}
@@ -272,7 +273,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 	protected Set<Long> getResourceBlockIds(
 		long companyId, long[] groupIds, String className) {
 
-		Set<Long> resourceBlockIds = new HashSet<Long>();
+		Set<Long> resourceBlockIds = new HashSet<>();
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -302,7 +303,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 	}
 
 	protected long[] getRoleIds(long[] groupIds) {
-		Set<Long> roleIds = new HashSet<Long>();
+		Set<Long> roleIds = new HashSet<>();
 
 		for (long groupId : groupIds) {
 			for (long roleId : getRoleIds(groupId)) {
@@ -376,7 +377,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 
 		if (userResourceBlockIds.size() <
 				PropsValues.
-					PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD) {
+					PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD) {
 
 			return StringUtil.merge(userResourceBlockIds);
 		}
@@ -544,72 +545,29 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 
 		permissionJoin += CustomSQLUtil.get(JOIN_RESOURCE_PERMISSION);
 
-		StringBundler sb = new StringBundler();
+		StringBundler sb = new StringBundler(9);
 
-		sb.append("(((InlineSQLResourcePermission.primKey = CAST_TEXT(");
+		sb.append("((InlineSQLResourcePermission.primKey = CAST_TEXT(");
 		sb.append(classPKField);
-		sb.append(")) AND ((");
+		sb.append(StringPool.CLOSE_PARENTHESIS);
 
-		boolean hasPreviousViewableGroup = false;
+		if (Validator.isNotNull(groupIdField) && (groupIds.length > 0)) {
+			sb.append(") AND (");
 
-		List<Long> viewableGroupIds = new ArrayList<Long>();
+			sb.append(groupIdField);
 
-		for (int j = 0; j < groupIds.length; j++) {
-			long groupId = groupIds[j];
-
-			if (!permissionChecker.hasPermission(
-					groupId, className, 0, ActionKeys.VIEW)) {
-
-				if ((j > 0) && hasPreviousViewableGroup) {
-					sb.append(" OR ");
-				}
-
-				hasPreviousViewableGroup = true;
-
-				sb.append(StringPool.OPEN_PARENTHESIS);
-
-				if (Validator.isNull(groupIdField)) {
-					sb.append(
-						classPKField.substring(
-							0, classPKField.lastIndexOf(CharPool.PERIOD)));
-					sb.append(".groupId = ");
-				}
-				else {
-					sb.append(groupIdField);
-					sb.append(" = ");
-				}
-
-				sb.append(groupId);
+			if (groupIds.length > 1) {
+				sb.append(" IN (");
+				sb.append(StringUtil.merge(groupIds));
 				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 			else {
-				viewableGroupIds.add(groupId);
+				sb.append(" = ");
+				sb.append(groupIds[0]);
 			}
 		}
 
-		sb.append(StringPool.CLOSE_PARENTHESIS);
-
-		if (!viewableGroupIds.isEmpty()) {
-			for (Long viewableGroupId : viewableGroupIds) {
-				sb.append(" OR (");
-
-				if (Validator.isNull(groupIdField)) {
-					sb.append(
-						classPKField.substring(
-							0, classPKField.lastIndexOf(CharPool.PERIOD)));
-					sb.append(".groupId = ");
-				}
-				else {
-					sb.append(groupIdField);
-					sb.append(" = ");
-				}
-
-				sb.append(viewableGroupId);
-				sb.append(StringPool.CLOSE_PARENTHESIS);
-			}
-		}
-
-		sb.append(")))");
+		sb.append("))");
 
 		String roleIdsOrOwnerIdSQL = getRoleIdsOrOwnerIdSQL(
 			permissionChecker, groupIds, userIdField);

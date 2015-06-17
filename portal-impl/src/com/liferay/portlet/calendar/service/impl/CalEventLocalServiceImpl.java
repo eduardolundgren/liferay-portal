@@ -147,7 +147,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long groupId = serviceContext.getScopeGroupId();
-		Date now = new Date();
 
 		Locale locale = null;
 		TimeZone timeZone = null;
@@ -192,8 +191,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		event.setCompanyId(user.getCompanyId());
 		event.setUserId(user.getUserId());
 		event.setUserName(user.getFullName());
-		event.setCreateDate(serviceContext.getCreateDate(now));
-		event.setModifiedDate(serviceContext.getModifiedDate(now));
 		event.setTitle(title);
 		event.setDescription(description);
 		event.setLocation(location);
@@ -444,7 +441,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 	@Override
 	public File exportEvent(long userId, long eventId) throws PortalException {
-		List<CalEvent> events = new ArrayList<CalEvent>();
+		List<CalEvent> events = new ArrayList<>();
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
@@ -518,10 +515,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		// Time zone sensitive
 
-		List<CalEvent> timeZoneSensitiveEvents =
-			calEventFinder.findByG_SD_T(
-				groupId, CalendarUtil.getGTDate(cal),
-				CalendarUtil.getLTDate(cal), true, types);
+		List<CalEvent> timeZoneSensitiveEvents = calEventFinder.findByG_SD_T(
+			groupId, CalendarUtil.getGTDate(cal), CalendarUtil.getLTDate(cal),
+			true, types);
 
 		// Time zone insensitive
 
@@ -532,14 +528,13 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 			cal.get(Calendar.DATE));
 
-		List<CalEvent> timeZoneInsensitiveEvents =
-			calEventFinder.findByG_SD_T(
-				groupId, CalendarUtil.getGTDate(tzICal),
-				CalendarUtil.getLTDate(tzICal), false, types);
+		List<CalEvent> timeZoneInsensitiveEvents = calEventFinder.findByG_SD_T(
+			groupId, CalendarUtil.getGTDate(tzICal),
+			CalendarUtil.getLTDate(tzICal), false, types);
 
 		// Create new list
 
-		events = new ArrayList<CalEvent>();
+		events = new ArrayList<>();
 
 		events.addAll(timeZoneSensitiveEvents);
 		events.addAll(timeZoneInsensitiveEvents);
@@ -640,7 +635,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 				cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 				cal.get(Calendar.DATE));
 
-			List<CalEvent> repeatingEvents = new ArrayList<CalEvent>();
+			List<CalEvent> repeatingEvents = new ArrayList<>();
 
 			for (CalEvent event : events) {
 				TZSRecurrence recurrence = event.getRecurrenceObj();
@@ -737,7 +732,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			event.getEventId(), event.getUuid(), 0, assetCategoryIds,
 			assetTagNames, true, null, null, null, ContentTypes.TEXT_HTML,
 			event.getTitle(), event.getDescription(), null, null, null, 0, 0,
-			null, false);
+			null);
 
 		assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
@@ -796,7 +791,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
-		event.setModifiedDate(serviceContext.getModifiedDate(null));
 		event.setTitle(title);
 		event.setDescription(description);
 		event.setLocation(location);
@@ -1257,7 +1251,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					dateFormatDateTime.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
-					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName)
 				});
 
 			body = StringUtil.replace(
@@ -1273,7 +1267,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					dateFormatDateTime.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
-					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName)
 				});
 
 			if ((remindBy == CalEventConstants.REMIND_BY_EMAIL) ||
@@ -1679,7 +1673,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		if (Recur.DAILY.equals(frequency)) {
 			recurrence.setFrequency(Recurrence.DAILY);
 
-			List<DayAndPosition> dayPosList = new ArrayList<DayAndPosition>();
+			List<DayAndPosition> dayPosList = new ArrayList<>();
 
 			List<WeekDay> weekDays = recur.getDayList();
 
@@ -1696,7 +1690,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		else if (Recur.WEEKLY.equals(frequency)) {
 			recurrence.setFrequency(Recurrence.WEEKLY);
 
-			List<DayAndPosition> dayPosList = new ArrayList<DayAndPosition>();
+			List<DayAndPosition> dayPosList = new ArrayList<>();
 
 			List<WeekDay> weekDays = recur.getDayList();
 
@@ -1775,7 +1769,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 	private static final long _CALENDAR_EVENT_CHECK_INTERVAL =
 		PropsValues.CALENDAR_EVENT_CHECK_INTERVAL * Time.MINUTE;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		CalEventLocalServiceImpl.class);
 
 }

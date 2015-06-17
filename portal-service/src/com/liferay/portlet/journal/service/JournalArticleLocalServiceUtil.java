@@ -44,6 +44,25 @@ public class JournalArticleLocalServiceUtil {
 	/**
 	* Adds a web content article with additional parameters.
 	*
+	* <p>
+	* The web content articles hold HTML content wrapped in XML. The XML lets
+	* you specify the article's default locale and available locales. Here is a
+	* content example:
+	* </p>
+	*
+	* <p>
+	* <pre>
+	* <code>
+	* &lt;?xml version='1.0' encoding='UTF-8'?&gt;
+	* &lt;root default-locale="en_US" available-locales="en_US"&gt;
+	*     &lt;static-content language-id="en_US"&gt;
+	*         &lt;![CDATA[&lt;p&gt;&lt;b&gt;&lt;i&gt;test&lt;i&gt; content&lt;b&gt;&lt;/p&gt;]]&gt;
+	*     &lt;/static-content&gt;
+	* &lt;/root&gt;
+	* </code>
+	* </pre>
+	* </p>
+	*
 	* @param userId the primary key of the web content article's creator/owner
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
@@ -62,9 +81,7 @@ public class JournalArticleLocalServiceUtil {
 	* @param titleMap the web content article's locales and localized titles
 	* @param descriptionMap the web content article's locales and localized
 	descriptions
-	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	* @param content the HTML content wrapped in XML
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -112,9 +129,9 @@ public class JournalArticleLocalServiceUtil {
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
-	IDs, asset tag names, asset link entry IDs, the "urlTitle"
-	attribute, and workflow actions for the web content article. Can
-	also set whether to add the default guest and group permissions.
+	IDs, asset tag names, asset link entry IDs, URL title, and
+	workflow actions for the web content article. Can also set
+	whether to add the default guest and group permissions.
 	* @return the web content article
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -161,8 +178,11 @@ public class JournalArticleLocalServiceUtil {
 	* @param descriptionMap the web content article's locales and localized
 	descriptions
 	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	see the content example in the {@link #addArticle(long, long,
+	long, long, long, String, boolean, double, Map, Map, String,
+	String, String, String, int, int, int, int, int, int, int, int,
+	int, int, boolean, int, int, int, int, int, boolean, boolean,
+	boolean, String, File, Map, String, ServiceContext)} description.
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -171,9 +191,9 @@ public class JournalArticleLocalServiceUtil {
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
-	IDs, asset tag names, asset link entry IDs, the "urlTitle"
-	attribute, and workflow actions for the web content article. Can
-	also set whether to add the default guest and group permissions.
+	IDs, asset tag names, asset link entry IDs, URL title, and
+	workflow actions for the web content article. Can also set
+	whether to add the default guest and group permissions.
 	* @return the web content article
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -678,6 +698,11 @@ public class JournalArticleLocalServiceUtil {
 			articleURL, serviceContext);
 	}
 
+	public static com.liferay.portlet.journal.model.JournalArticle fetchArticle(
+		long groupId, java.lang.String articleId) {
+		return getService().fetchArticle(groupId, articleId);
+	}
+
 	/**
 	* Returns the web content article matching the group, article ID, and
 	* version.
@@ -692,6 +717,16 @@ public class JournalArticleLocalServiceUtil {
 	public static com.liferay.portlet.journal.model.JournalArticle fetchArticle(
 		long groupId, java.lang.String articleId, double version) {
 		return getService().fetchArticle(groupId, articleId, version);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalArticle fetchArticleByUrlTitle(
+		long groupId, java.lang.String urlTitle) {
+		return getService().fetchArticleByUrlTitle(groupId, urlTitle);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalArticle fetchDisplayArticle(
+		long groupId, java.lang.String articleId) {
+		return getService().fetchDisplayArticle(groupId, articleId);
 	}
 
 	public static com.liferay.portlet.journal.model.JournalArticle fetchJournalArticle(
@@ -765,6 +800,12 @@ public class JournalArticleLocalServiceUtil {
 	public static com.liferay.portlet.journal.model.JournalArticle fetchLatestArticle(
 		long resourcePrimKey, int[] statuses) {
 		return getService().fetchLatestArticle(resourcePrimKey, statuses);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalArticle fetchLatestArticleByUrlTitle(
+		long groupId, java.lang.String urlTitle, int status) {
+		return getService()
+				   .fetchLatestArticleByUrlTitle(groupId, urlTitle, status);
 	}
 
 	/**
@@ -1721,8 +1762,14 @@ public class JournalArticleLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	public static java.util.List<com.liferay.portlet.journal.model.JournalArticle> getIndexableArticlesByDDMStructureKey(
+		java.lang.String[] ddmStructureKeys) {
+		return getService()
+				   .getIndexableArticlesByDDMStructureKey(ddmStructureKeys);
 	}
 
 	/**
@@ -2279,14 +2326,46 @@ public class JournalArticleLocalServiceUtil {
 	* @param articleId the primary key of the web content article
 	* @param newFolderId the primary key of the web content article's new
 	folder
+	* @return the updated web content article, which was moved to a new
+	folder
+	* @throws PortalException if a matching web content article could not
+	be found
+	* @deprecated As of 7.0.0, replaced by {@link #moveArticle(long, String,
+	long, ServiceContext)}
+	*/
+	@Deprecated
+	public static com.liferay.portlet.journal.model.JournalArticle moveArticle(
+		long groupId, java.lang.String articleId, long newFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().moveArticle(groupId, articleId, newFolderId);
+	}
+
+	/**
+	* Moves the web content article matching the group and article ID to a new
+	* folder.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param articleId the primary key of the web content article
+	* @param newFolderId the primary key of the web content article's new
+	folder
+	* @param serviceContext the service context to be applied. Can set the
+	user ID, language ID, portlet preferences, portlet request,
+	portlet response, theme display, and can set whether to add the
+	default command update for the web content article. With respect
+	to social activities, by setting the service context's command to
+	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
+	invocation is considered a web content update activity; otherwise
+	it is considered a web content add activity.
 	* @return the updated web content article, which was moved to a new folder
 	* @throws PortalException if a matching web content article could not be
 	found
 	*/
 	public static com.liferay.portlet.journal.model.JournalArticle moveArticle(
-		long groupId, java.lang.String articleId, long newFolderId)
+		long groupId, java.lang.String articleId, long newFolderId,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().moveArticle(groupId, articleId, newFolderId);
+		return getService()
+				   .moveArticle(groupId, articleId, newFolderId, serviceContext);
 	}
 
 	/**
@@ -3350,17 +3429,20 @@ public class JournalArticleLocalServiceUtil {
 	* @param articleId the primary key of the web content article
 	* @param version the web content article's version
 	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	see the content example in the {@link #addArticle(long, long,
+	long, long, long, String, boolean, double, Map, Map, String,
+	String, String, String, int, int, int, int, int, int, int, int,
+	int, int, boolean, int, int, int, int, int, boolean, boolean,
+	boolean, String, File, Map, String, ServiceContext)} description.
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
-	asset tag names, asset link entry IDs, workflow actions, the and
-	"urlTitle" attributes, and can set whether to add the default
-	command update for the web content article. With respect to
-	social activities, by setting the service context's command to
-	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
-	invocation is considered a web content update activity; otherwise
-	it is considered a web content add activity.
+	asset tag names, asset link entry IDs, workflow actions, URL
+	title, and can set whether to add the default command update for
+	the web content article. With respect to social activities, by
+	setting the service context's command to {@link
+	com.liferay.portal.kernel.util.Constants#UPDATE}, the invocation
+	is considered a web content update activity; otherwise it is
+	considered a web content add activity.
 	* @return the updated web content article
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
@@ -3389,8 +3471,11 @@ public class JournalArticleLocalServiceUtil {
 	* @param descriptionMap the web content article's locales and localized
 	descriptions
 	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	see the content example in the {@link #addArticle(long, long,
+	long, long, long, String, boolean, double, Map, Map, String,
+	String, String, String, int, int, int, int, int, int, int, int,
+	int, int, boolean, int, int, int, int, int, boolean, boolean,
+	boolean, String, File, Map, String, ServiceContext)} description.
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
@@ -3444,13 +3529,13 @@ public class JournalArticleLocalServiceUtil {
 	<code>null</code>)
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
-	asset tag names, asset link entry IDs, workflow actions, the and
-	"urlTitle" attributes, and can set whether to add the default
-	command update for the web content article. With respect to
-	social activities, by setting the service context's command to
-	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
-	invocation is considered a web content update activity; otherwise
-	it is considered a web content add activity.
+	asset tag names, asset link entry IDs, workflow actions, URL
+	title , and can set whether to add the default command update for
+	the web content article. With respect to social activities, by
+	setting the service context's command to {@link
+	com.liferay.portal.kernel.util.Constants#UPDATE}, the invocation
+	is considered a web content update activity; otherwise it is
+	considered a web content add activity.
 	* @return the updated web content article
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
@@ -3501,19 +3586,22 @@ public class JournalArticleLocalServiceUtil {
 	* @param descriptionMap the web content article's locales and localized
 	descriptions
 	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	see the content example in the {@link #addArticle(long, long,
+	long, long, long, String, boolean, double, Map, Map, String,
+	String, String, String, int, int, int, int, int, int, int, int,
+	int, int, boolean, int, int, int, int, int, boolean, boolean,
+	boolean, String, File, Map, String, ServiceContext)} description.
 	* @param layoutUuid the unique string identifying the web content
 	article's display page
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
-	asset tag names, asset link entry IDs, workflow actions, the and
-	"urlTitle" attributes, and can set whether to add the default
-	command update for the web content article. With respect to
-	social activities, by setting the service context's command to
-	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
-	invocation is considered a web content update activity; otherwise
-	it is considered a web content add activity.
+	asset tag names, asset link entry IDs, workflow actions, URL
+	title, and can set whether to add the default command update for
+	the web content article. With respect to social activities, by
+	setting the service context's command to {@link
+	com.liferay.portal.kernel.util.Constants#UPDATE}, the invocation
+	is considered a web content update activity; otherwise it is
+	considered a web content add activity.
 	* @return the updated web content article
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
@@ -3560,12 +3648,14 @@ public class JournalArticleLocalServiceUtil {
 	* @param title the translated web content article title
 	* @param description the translated web content article description
 	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	see the content example in the {@link #addArticle(long, long,
+	long, long, long, String, boolean, double, Map, Map, String,
+	String, String, String, int, int, int, int, int, int, int, int,
+	int, int, boolean, int, int, int, int, int, boolean, boolean,
+	boolean, String, File, Map, String, ServiceContext)} description.
 	* @param images the web content's images
 	* @param serviceContext the service context to be applied. Can set the
-	modification date and "urlTitle" attribute for the web content
-	article.
+	modification date and URL title for the web content article.
 	* @return the updated web content article
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
@@ -3613,8 +3703,11 @@ public class JournalArticleLocalServiceUtil {
 	* @param articleId the primary key of the web content article
 	* @param version the web content article's version
 	* @param content the HTML content wrapped in XML. For more information,
-	see the content example in the class description for {@link
-	JournalArticleLocalServiceImpl}.
+	see the content example in the {@link #addArticle(long, long,
+	long, long, long, String, boolean, double, Map, Map, String,
+	String, String, String, int, int, int, int, int, int, int, int,
+	int, int, boolean, int, int, int, int, int, boolean, boolean,
+	boolean, String, File, Map, String, ServiceContext)} description.
 	* @return the updated web content article
 	* @throws PortalException if a matching web content article could not be
 	found

@@ -29,7 +29,6 @@ import com.liferay.portlet.mobiledevicerules.model.MDRRule;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup;
 import com.liferay.portlet.mobiledevicerules.service.base.MDRRuleGroupLocalServiceBaseImpl;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +49,6 @@ public class MDRRuleGroupLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(
 			serviceContext.getUserId());
-		Date now = new Date();
 
 		long ruleGroupId = counterLocalService.increment();
 
@@ -59,8 +57,6 @@ public class MDRRuleGroupLocalServiceImpl
 		ruleGroup.setUuid(serviceContext.getUuid());
 		ruleGroup.setGroupId(groupId);
 		ruleGroup.setCompanyId(serviceContext.getCompanyId());
-		ruleGroup.setCreateDate(serviceContext.getCreateDate(now));
-		ruleGroup.setModifiedDate(serviceContext.getModifiedDate(now));
 		ruleGroup.setUserId(user.getUserId());
 		ruleGroup.setUserName(user.getFullName());
 		ruleGroup.setNameMap(nameMap);
@@ -134,7 +130,8 @@ public class MDRRuleGroupLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public void deleteRuleGroup(MDRRuleGroup ruleGroup) {
 
 		// Rule group
@@ -182,8 +179,20 @@ public class MDRRuleGroupLocalServiceImpl
 	}
 
 	@Override
+	public List<MDRRuleGroup> getRuleGroups(
+		long[] groupIds, int start, int end) {
+
+		return mdrRuleGroupPersistence.findByGroupId(groupIds, start, end);
+	}
+
+	@Override
 	public int getRuleGroupsCount(long groupId) {
 		return mdrRuleGroupPersistence.countByGroupId(groupId);
+	}
+
+	@Override
+	public int getRuleGroupsCount(long[] groupIds) {
+		return mdrRuleGroupPersistence.countByGroupId(groupIds);
 	}
 
 	/**
@@ -195,8 +204,7 @@ public class MDRRuleGroupLocalServiceImpl
 	public List<MDRRuleGroup> search(
 		long groupId, String name, boolean andOperator, int start, int end) {
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("includeGlobalScope", Boolean.TRUE);
 
@@ -223,8 +231,7 @@ public class MDRRuleGroupLocalServiceImpl
 		long groupId, String keywords, boolean andOperator, int start,
 		int end) {
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("includeGlobalScope", Boolean.TRUE);
 
@@ -250,8 +257,7 @@ public class MDRRuleGroupLocalServiceImpl
 	public int searchByKeywordsCount(
 		long groupId, String keywords, boolean andOperator) {
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("includeGlobalScope", Boolean.TRUE);
 
@@ -273,8 +279,7 @@ public class MDRRuleGroupLocalServiceImpl
 	@Deprecated
 	@Override
 	public int searchCount(long groupId, String name, boolean andOperator) {
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("includeGlobalScope", Boolean.TRUE);
 
@@ -300,7 +305,6 @@ public class MDRRuleGroupLocalServiceImpl
 		MDRRuleGroup ruleGroup = mdrRuleGroupPersistence.findByPrimaryKey(
 			ruleGroupId);
 
-		ruleGroup.setModifiedDate(serviceContext.getModifiedDate(null));
 		ruleGroup.setNameMap(nameMap);
 		ruleGroup.setDescriptionMap(descriptionMap);
 

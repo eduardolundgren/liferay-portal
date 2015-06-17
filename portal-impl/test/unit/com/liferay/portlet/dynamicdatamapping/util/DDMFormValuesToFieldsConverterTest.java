@@ -55,12 +55,14 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		setUpDDMFormFieldTypeRegistryUtil();
 		setUpAvailableLocales();
+		setUpDDMFormJSONDeserializerUtil();
+		setUpDDMFormJSONSerializerUtil();
 		setUpDDMFormValuesToFieldsConverterUtil();
-		setUpDDMFormXSDDeserializerUtil();
-		setUpDDMFormXSDSerializerUtil();
 		setUpDDMStructureLocalServiceUtil();
 		setUpHtmlUtil();
+		setUpJSONFactoryUtil();
 		setUpPropsUtil();
 		setUpSAXReaderUtil();
 	}
@@ -90,10 +92,10 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 
 		ddmFormValues.addDDMFormFieldValue(titleDDMFormFieldValue);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LocaleUtil.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LocaleUtil.class.getName(), Level.WARNING)) {
 
-		try {
 			Fields fields = DDMFormValuesToFieldsConverterUtil.convert(
 				ddmStructure, ddmFormValues);
 
@@ -121,9 +123,6 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 
 			Assert.assertEquals(
 				"Boolean_INSTANCE_rztm", fieldsDisplayField.getValue());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -242,10 +241,10 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 
 		ddmFormValues.addDDMFormFieldValue(joeDDMFormFieldValue);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LocaleUtil.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LocaleUtil.class.getName(), Level.WARNING)) {
 
-		try {
 			Fields fields = DDMFormValuesToFieldsConverterUtil.convert(
 				ddmStructure, ddmFormValues);
 
@@ -287,9 +286,6 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 				"Name_INSTANCE_rght,Phone_INSTANCE_latb,Phone_INSTANCE_jewp," +
 				"Phone_INSTANCE_mkar", fieldsDisplayField.getValue());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
@@ -325,10 +321,10 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 
 		ddmFormFieldValues.add(nameDDMFormFieldValue3);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LocaleUtil.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LocaleUtil.class.getName(), Level.WARNING)) {
 
-		try {
 			Fields fields = DDMFormValuesToFieldsConverterUtil.convert(
 				ddmStructure, ddmFormValues);
 
@@ -356,9 +352,6 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 			Assert.assertEquals(
 				"Name_INSTANCE_rztm,Name_INSTANCE_uayd,Name_INSTANCE_pamh",
 				fieldsDisplayField.getValue());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -389,10 +382,10 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 
 		ddmFormValues.addDDMFormFieldValue(contentDDMFormFieldValue);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LocaleUtil.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LocaleUtil.class.getName(), Level.WARNING)) {
 
-		try {
 			Fields fields = DDMFormValuesToFieldsConverterUtil.convert(
 				ddmStructure, ddmFormValues);
 
@@ -427,14 +420,11 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 				"Title_INSTANCE_rztm,Content_INSTANCE_ovho",
 				fieldsDisplayField.getValue());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Override
 	protected List<Serializable> createValuesList(String... valuesString) {
-		List<Serializable> values = new ArrayList<Serializable>();
+		List<Serializable> values = new ArrayList<>();
 
 		for (String valueString : valuesString) {
 			values.add(valueString);
@@ -444,7 +434,7 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 	}
 
 	protected void setUpAvailableLocales() {
-		_availableLocales = new LinkedHashSet<Locale>();
+		_availableLocales = new LinkedHashSet<>();
 
 		_availableLocales.add(LocaleUtil.BRAZIL);
 		_availableLocales.add(LocaleUtil.US);

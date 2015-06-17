@@ -15,23 +15,25 @@
 package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.lar.BasePortletDataHandler;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.exportimport.lar.BasePortletDataHandler;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataHandlerBoolean;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
+import com.liferay.portlet.exportimport.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portlet.messageboards.model.MBBan;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.model.MBThreadFlag;
 import com.liferay.portlet.messageboards.model.impl.MBBanImpl;
 import com.liferay.portlet.messageboards.model.impl.MBCategoryImpl;
 import com.liferay.portlet.messageboards.model.impl.MBMessageImpl;
 import com.liferay.portlet.messageboards.model.impl.MBThreadFlagImpl;
+import com.liferay.portlet.messageboards.model.impl.MBThreadImpl;
 import com.liferay.portlet.messageboards.service.MBBanLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
@@ -59,6 +61,7 @@ public class MBPortletDataHandler extends BasePortletDataHandler {
 			new StagedModelType(MBBan.class),
 			new StagedModelType(MBCategory.class),
 			new StagedModelType(MBMessage.class),
+			new StagedModelType(MBThread.class),
 			new StagedModelType(MBThreadFlag.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
@@ -77,6 +80,7 @@ public class MBPortletDataHandler extends BasePortletDataHandler {
 		XStreamAliasRegistryUtil.register(MBBanImpl.class, "MBBan");
 		XStreamAliasRegistryUtil.register(MBCategoryImpl.class, "MBCategory");
 		XStreamAliasRegistryUtil.register(MBMessageImpl.class, "MBMessage");
+		XStreamAliasRegistryUtil.register(MBThreadImpl.class, "MBThread");
 		XStreamAliasRegistryUtil.register(
 			MBThreadFlagImpl.class, "MBThreadFlag");
 	}
@@ -241,6 +245,12 @@ public class MBPortletDataHandler extends BasePortletDataHandler {
 				portletDataContext);
 
 		messageActionableDynamicQuery.performCount();
+
+		ActionableDynamicQuery threadActionableDynamicQuery =
+			MBThreadLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
+
+		threadActionableDynamicQuery.performCount();
 
 		ActionableDynamicQuery threadFlagActionableDynamicQuery =
 			MBThreadFlagLocalServiceUtil.getExportActionableDynamicQuery(

@@ -16,6 +16,8 @@ package com.liferay.portlet.usergroupsadmin.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
@@ -23,11 +25,12 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
@@ -39,16 +42,14 @@ import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 /**
  * @author Hugo Huijser
  */
+@OSGiBeanProperties
 public class UserGroupIndexer extends BaseIndexer {
 
-	public static final String[] CLASS_NAMES = {UserGroup.class.getName()};
-
-	public static final String PORTLET_ID = PortletKeys.USER_GROUPS_ADMIN;
+	public static final String CLASS_NAME = UserGroup.class.getName();
 
 	public UserGroupIndexer() {
 		setCommitImmediately(true);
@@ -60,18 +61,14 @@ public class UserGroupIndexer extends BaseIndexer {
 	}
 
 	@Override
-	public String[] getClassNames() {
-		return CLASS_NAMES;
-	}
-
-	@Override
-	public String getPortletId() {
-		return PORTLET_ID;
+	public String getClassName() {
+		return CLASS_NAME;
 	}
 
 	@Override
 	public void postProcessSearchQuery(
-			BooleanQuery searchQuery, SearchContext searchContext)
+			BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
+			SearchContext searchContext)
 		throws Exception {
 
 		addSearchTerm(searchQuery, searchContext, "description", false);
@@ -100,7 +97,7 @@ public class UserGroupIndexer extends BaseIndexer {
 	protected Document doGetDocument(Object obj) throws Exception {
 		UserGroup userGroup = (UserGroup)obj;
 
-		Document document = getBaseModelDocument(PORTLET_ID, userGroup);
+		Document document = getBaseModelDocument(CLASS_NAME, userGroup);
 
 		document.addKeyword(Field.COMPANY_ID, userGroup.getCompanyId());
 		document.addText(Field.DESCRIPTION, userGroup.getDescription());
@@ -125,20 +122,14 @@ public class UserGroupIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet, PortletURL portletURL,
+		Document document, Locale locale, String snippet,
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		String title = document.get("name");
 
 		String content = null;
 
-		String userGroupId = document.get(Field.USER_GROUP_ID);
-
-		portletURL.setParameter(
-			"struts_action", "/users_admin/edit_user_group");
-		portletURL.setParameter("userGroupId", userGroupId);
-
-		return new Summary(title, content, portletURL);
+		return new Summary(title, content);
 	}
 
 	@Override
@@ -154,8 +145,7 @@ public class UserGroupIndexer extends BaseIndexer {
 		else if (obj instanceof long[]) {
 			long[] userGroupIds = (long[])obj;
 
-			Map<Long, Collection<Document>> documentsMap =
-				new HashMap<Long, Collection<Document>>();
+			Map<Long, Collection<Document>> documentsMap = new HashMap<>();
 
 			for (long userGroupId : userGroupIds) {
 				UserGroup userGroup = UserGroupLocalServiceUtil.fetchUserGroup(
@@ -172,7 +162,7 @@ public class UserGroupIndexer extends BaseIndexer {
 				Collection<Document> documents = documentsMap.get(companyId);
 
 				if (documents == null) {
-					documents = new ArrayList<Document>();
+					documents = new ArrayList<>();
 
 					documentsMap.put(companyId, documents);
 				}
@@ -216,11 +206,6 @@ public class UserGroupIndexer extends BaseIndexer {
 		reindexUserGroups(companyId);
 	}
 
-	@Override
-	protected String getPortletId(SearchContext searchContext) {
-		return PORTLET_ID;
-	}
-
 	protected void reindexUserGroups(long companyId) throws PortalException {
 		final ActionableDynamicQuery actionableDynamicQuery =
 			UserGroupLocalServiceUtil.getActionableDynamicQuery();
@@ -230,14 +215,22 @@ public class UserGroupIndexer extends BaseIndexer {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
+				public void performAction(Object object) {
 					UserGroup userGroup = (UserGroup)object;
 
-					Document document = getDocument(userGroup);
+					try {
+						Document document = getDocument(userGroup);
 
-					actionableDynamicQuery.addDocument(document);
+						actionableDynamicQuery.addDocument(document);
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index user group " +
+									userGroup.getUserGroupId(),
+								pe);
+						}
+					}
 				}
 
 			});
@@ -245,5 +238,8 @@ public class UserGroupIndexer extends BaseIndexer {
 
 		actionableDynamicQuery.performActions();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserGroupIndexer.class);
 
 }

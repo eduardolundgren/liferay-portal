@@ -35,6 +35,8 @@ public class SyncAccount extends StateAwareModel {
 
 	public static final int UI_EVENT_CONNECTION_EXCEPTION = 2;
 
+	public static final int UI_EVENT_MIN_BUILD_REQUIREMENT_FAILED = 7;
+
 	public static final int UI_EVENT_SYNC_ACCOUNT_FOLDER_MISSING = 3;
 
 	public static final int UI_EVENT_SYNC_SERVICES_NOT_ACTIVE = 6;
@@ -79,6 +81,18 @@ public class SyncAccount extends StateAwareModel {
 		return maxConnections;
 	}
 
+	public String getOAuthConsumerKey() {
+		return oAuthConsumerKey;
+	}
+
+	public String getOAuthConsumerSecret() {
+		return oAuthConsumerSecret;
+	}
+
+	public boolean getOAuthEnabled() {
+		return oAuthEnabled;
+	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -112,6 +126,10 @@ public class SyncAccount extends StateAwareModel {
 		return getActive();
 	}
 
+	public boolean isOAuthEnabled() {
+		return getOAuthEnabled();
+	}
+
 	public boolean isSocialOfficeInstalled() {
 		return getSocialOfficeInstalled();
 	}
@@ -134,6 +152,18 @@ public class SyncAccount extends StateAwareModel {
 
 	public void setMaxConnections(int maxConnections) {
 		this.maxConnections = maxConnections;
+	}
+
+	public void setOAuthConsumerKey(String oAuthConsumerKey) {
+		this.oAuthConsumerKey = oAuthConsumerKey;
+	}
+
+	public void setOAuthConsumerSecret(String oAuthConsumerSecret) {
+		this.oAuthConsumerSecret = oAuthConsumerSecret;
+	}
+
+	public void setOAuthEnabled(boolean oAuthEnabled) {
+		this.oAuthEnabled = oAuthEnabled;
 	}
 
 	public void setPassword(String password) {
@@ -171,6 +201,15 @@ public class SyncAccount extends StateAwareModel {
 
 	@DatabaseField(useGetSet = true)
 	protected int maxConnections;
+
+	@DatabaseField(useGetSet = true, width = 16777216)
+	protected String oAuthConsumerKey;
+
+	@DatabaseField(useGetSet = true, width = 16777216)
+	protected String oAuthConsumerSecret;
+
+	@DatabaseField(useGetSet = true)
+	protected boolean oAuthEnabled;
 
 	@DatabaseField(useGetSet = true, width = 16777216)
 	protected String password;

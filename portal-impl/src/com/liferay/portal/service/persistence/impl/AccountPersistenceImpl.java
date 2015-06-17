@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchAccountException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,11 +34,14 @@ import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.impl.AccountImpl;
 import com.liferay.portal.model.impl.AccountModelImpl;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.AccountPersistence;
 
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,7 +58,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see AccountPersistence
- * @see AccountUtil
+ * @see com.liferay.portal.service.persistence.AccountUtil
  * @generated
  */
 @ProviderType
@@ -127,10 +129,6 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(AccountImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(AccountImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -186,7 +184,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 *
 	 * @param accountId the primary key of the account
 	 * @return the account that was removed
-	 * @throws com.liferay.portal.NoSuchAccountException if a account with the primary key could not be found
+	 * @throws NoSuchAccountException if a account with the primary key could not be found
 	 */
 	@Override
 	public Account remove(long accountId) throws NoSuchAccountException {
@@ -198,7 +196,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 *
 	 * @param primaryKey the primary key of the account
 	 * @return the account that was removed
-	 * @throws com.liferay.portal.NoSuchAccountException if a account with the primary key could not be found
+	 * @throws NoSuchAccountException if a account with the primary key could not be found
 	 */
 	@Override
 	public Account remove(Serializable primaryKey)
@@ -265,10 +263,34 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	}
 
 	@Override
-	public Account updateImpl(com.liferay.portal.model.Account account) {
+	public Account updateImpl(Account account) {
 		account = toUnwrappedModel(account);
 
 		boolean isNew = account.isNew();
+
+		AccountModelImpl accountModelImpl = (AccountModelImpl)account;
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (account.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				account.setCreateDate(now);
+			}
+			else {
+				account.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!accountModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				account.setModifiedDate(now);
+			}
+			else {
+				account.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
+		}
 
 		Session session = null;
 
@@ -341,7 +363,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 *
 	 * @param primaryKey the primary key of the account
 	 * @return the account
-	 * @throws com.liferay.portal.NoSuchAccountException if a account with the primary key could not be found
+	 * @throws NoSuchAccountException if a account with the primary key could not be found
 	 */
 	@Override
 	public Account findByPrimaryKey(Serializable primaryKey)
@@ -361,11 +383,11 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	}
 
 	/**
-	 * Returns the account with the primary key or throws a {@link com.liferay.portal.NoSuchAccountException} if it could not be found.
+	 * Returns the account with the primary key or throws a {@link NoSuchAccountException} if it could not be found.
 	 *
 	 * @param accountId the primary key of the account
 	 * @return the account
-	 * @throws com.liferay.portal.NoSuchAccountException if a account with the primary key could not be found
+	 * @throws NoSuchAccountException if a account with the primary key could not be found
 	 */
 	@Override
 	public Account findByPrimaryKey(long accountId)
@@ -535,7 +557,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 * Returns a range of all the accounts.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.AccountModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AccountModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of accounts
@@ -551,7 +573,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 * Returns an ordered range of all the accounts.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.AccountModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AccountModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of accounts
@@ -711,7 +733,6 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	private static final String _SQL_COUNT_ACCOUNT = "SELECT COUNT(account) FROM Account account";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "account.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Account exists with the primary key ";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(AccountPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"type", "size"

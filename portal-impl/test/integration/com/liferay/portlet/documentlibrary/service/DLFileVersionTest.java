@@ -18,26 +18,29 @@ import com.liferay.portal.events.AddDefaultDocumentLibraryStructuresAction;
 import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
+import com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMImpl;
+import com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.model.ExpandoTable;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
@@ -233,7 +236,7 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
 			_fileVersion.getMimeType(), _fileVersion.getTitle(),
 			_fileVersion.getDescription(), _fileVersion.getChangeLog(), false,
-			_DATA_VERSION_1, getServiceContext());
+			_DATA_VERSION_1, _serviceContext);
 
 		Assert.assertEquals(
 			DLFileEntryConstants.VERSION_DEFAULT, fileEntry.getVersion());
@@ -275,13 +278,9 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 	protected Field createFieldsDisplayField(
 		DDMStructure ddmStructure, Set<String> fieldNames) {
 
-		List<String> fieldsDisplayValues = new ArrayList<String>();
+		List<String> fieldsDisplayValues = new ArrayList<>();
 
 		for (String fieldName : fieldNames) {
-			if (ddmStructure.isFieldPrivate(fieldName)) {
-				continue;
-			}
-
 			fieldsDisplayValues.add(
 				fieldName + DDMImpl.INSTANCE_SEPARATOR +
 				StringUtil.randomString());
@@ -322,10 +321,6 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 			Set<String> fieldNames = ddmStructure.getFieldNames();
 
 			for (String fieldName : fieldNames) {
-				if (ddmStructure.isFieldPrivate(fieldName)) {
-					continue;
-				}
-
 				Field field = createField(ddmStructure, fieldName);
 
 				fields.put(field);
@@ -336,8 +331,13 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 
 			fields.put(fieldsDisplayField);
 
+			DDMFormValues ddmFormValues =
+				FieldsToDDMFormValuesConverterUtil.convert(
+					ddmStructure, fields);
+
 			serviceContext.setAttribute(
-				Fields.class.getName() + ddmStructure.getStructureId(), fields);
+				DDMFormValues.class.getName() + ddmStructure.getStructureId(),
+				ddmFormValues);
 		}
 
 		return serviceContext;
@@ -366,8 +366,13 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 		List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
 
 		for (DDMStructure ddmStructure : ddmStructures) {
-			Fields fields = (Fields)_serviceContext.getAttribute(
-				Fields.class.getName() + ddmStructure.getStructureId());
+			DDMFormValues ddmFormValues =
+				(DDMFormValues)_serviceContext.getAttribute(
+					DDMFormValues.class.getName() +
+					ddmStructure.getStructureId());
+
+			Fields fields = DDMFormValuesToFieldsConverterUtil.convert(
+				ddmStructure, ddmFormValues);
 
 			for (Field field : fields) {
 				String type = field.getType();
@@ -377,8 +382,12 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 				}
 			}
 
+			ddmFormValues = FieldsToDDMFormValuesConverterUtil.convert(
+				ddmStructure, fields);
+
 			_serviceContext.setAttribute(
-				Fields.class.getName() + ddmStructure.getStructureId(), fields);
+				DDMFormValues.class.getName() + ddmStructure.getStructureId(),
+				ddmFormValues);
 		}
 	}
 

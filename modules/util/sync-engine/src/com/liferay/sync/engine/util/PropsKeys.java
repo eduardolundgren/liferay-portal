@@ -19,6 +19,18 @@ package com.liferay.sync.engine.util;
  */
 public interface PropsKeys {
 
+	public static final String SYNC_BATCH_EVENTS_ENABLED =
+		"sync.batch.events.enabled";
+
+	public static final String SYNC_BATCH_EVENTS_MAX_COUNT =
+		"sync.batch.events.max.count";
+
+	public static final String SYNC_BATCH_EVENTS_MAX_FILE_SIZE =
+		"sync.batch.events.max.file.size";
+
+	public static final String SYNC_BATCH_EVENTS_MAX_TOTAL_FILE_SIZE =
+		"sync.batch.events.max.total.file.size";
+
 	public static final String SYNC_CONFIGURATION_DIRECTORY =
 		"sync.configuration.directory";
 
@@ -60,8 +72,18 @@ public interface PropsKeys {
 	public static final String SYNC_NOTIFICATION_FIELD_NAMES_PREFIX =
 		"sync.notification.field.names";
 
-	public static final String SYNC_PRODUCT_NAME = "sync.product.name";
+	public static final String SYNC_OAUTH_ACCESS_TOKEN_URL =
+		"sync.oauth.access.token.url";
 
-	public static final String SYNC_UPDATE_CHECK_URL = "sync.update.check.url";
+	public static final String SYNC_OAUTH_AUTHORIZATION_URL =
+		"sync.oauth.authorization.url";
+
+	public static final String SYNC_OAUTH_REQUEST_TOKEN_URL =
+		"sync.oauth.request.token.url";
+
+	public static final String SYNC_OAUTH_WEBSITE_URL =
+		"sync.oauth.website.url";
+
+	public static final String SYNC_PRODUCT_NAME = "sync.product.name";
 
 }

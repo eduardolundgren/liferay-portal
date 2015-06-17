@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -42,8 +43,7 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
 import com.liferay.portlet.dynamicdatamapping.util.DDMFieldsCounter;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -214,16 +214,16 @@ public class VerifyJournal extends VerifyProcess {
 		long folderId = GetterUtil.getLong(pathArray[3]);
 		String title = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[4]));
 
-		DLFileEntry dlFileEntry = DLFileEntryLocalServiceUtil.fetchFileEntry(
-			groupId, folderId, title);
+		try {
+			FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
+				groupId, folderId, title);
 
-		if (dlFileEntry == null) {
-			return;
+			Node node = dynamicContentElement.node(0);
+
+			node.setText(path + StringPool.SLASH + fileEntry.getUuid());
 		}
-
-		Node node = dynamicContentElement.node(0);
-
-		node.setText(path + StringPool.SLASH + dlFileEntry.getUuid());
+		catch (PortalException pe) {
+		}
 	}
 
 	protected void updateDynamicElements(JournalArticle article)
@@ -282,16 +282,19 @@ public class VerifyJournal extends VerifyProcess {
 		}
 	}
 
-	protected void updateImageElement(Element element, String name, int index)
-		throws PortalException {
-
+	protected void updateImageElement(Element element, String name, int index) {
 		Element dynamicContentElement = element.element("dynamic-content");
 
 		long articleImageId = GetterUtil.getLong(
 			dynamicContentElement.attributeValue("id"));
 
 		JournalArticleImage articleImage =
-			JournalArticleImageLocalServiceUtil.getArticleImage(articleImageId);
+			JournalArticleImageLocalServiceUtil.fetchJournalArticleImage(
+				articleImageId);
+
+		if (articleImage == null) {
+			return;
+		}
 
 		articleImage.setElName(name + StringPool.UNDERLINE + index);
 
@@ -531,17 +534,27 @@ public class VerifyJournal extends VerifyProcess {
 				JournalArticle article =
 					JournalArticleLocalServiceUtil.getArticle(id);
 
-				Document document = SAXReaderUtil.read(article.getContent());
+				try {
+					Document document = SAXReaderUtil.read(
+						article.getContent());
 
-				Element rootElement = document.getRootElement();
+					Element rootElement = document.getRootElement();
 
-				for (Element element : rootElement.elements()) {
-					updateElement(article.getGroupId(), element);
+					for (Element element : rootElement.elements()) {
+						updateElement(article.getGroupId(), element);
+					}
+
+					article.setContent(document.asXML());
+
+					JournalArticleLocalServiceUtil.updateJournalArticle(
+						article);
 				}
-
-				article.setContent(document.asXML());
-
-				JournalArticleLocalServiceUtil.updateJournalArticle(article);
+				catch (Exception e) {
+					_log.error(
+						"Unable to update content for article " +
+							article.getId(),
+						e);
+				}
 			}
 		}
 		finally {
@@ -769,8 +782,9 @@ public class VerifyJournal extends VerifyProcess {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(VerifyJournal.class);
+	private static final Log _log = LogFactoryUtil.getLog(VerifyJournal.class);
 
-	private static Pattern _friendlyURLPattern = Pattern.compile("[^a-z0-9_-]");
+	private static final Pattern _friendlyURLPattern = Pattern.compile(
+		"[^a-z0-9_-]");
 
 }

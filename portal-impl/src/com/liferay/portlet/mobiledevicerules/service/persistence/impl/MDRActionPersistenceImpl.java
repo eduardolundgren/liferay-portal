@@ -16,7 +16,6 @@ package com.liferay.portlet.mobiledevicerules.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -33,6 +32,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.mobiledevicerules.NoSuchActionException;
@@ -44,6 +45,7 @@ import com.liferay.portlet.mobiledevicerules.service.persistence.MDRActionPersis
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,7 +62,7 @@ import java.util.Set;
  *
  * @author Edward C. Han
  * @see MDRActionPersistence
- * @see MDRActionUtil
+ * @see com.liferay.portlet.mobiledevicerules.service.persistence.MDRActionUtil
  * @generated
  */
 @ProviderType
@@ -119,7 +121,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns a range of all the m d r actions where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -136,7 +138,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns an ordered range of all the m d r actions where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -263,7 +265,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByUuid_First(String uuid,
@@ -312,7 +314,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByUuid_Last(String uuid,
@@ -369,7 +371,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction[] findByUuid_PrevAndNext(long actionId, String uuid,
@@ -615,12 +617,12 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 			new String[] { String.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the m d r action where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.portlet.mobiledevicerules.NoSuchActionException} if it could not be found.
+	 * Returns the m d r action where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchActionException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @return the matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByUUID_G(String uuid, long groupId)
@@ -897,7 +899,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns a range of all the m d r actions where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -916,7 +918,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns an ordered range of all the m d r actions where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1054,7 +1056,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByUuid_C_First(String uuid, long companyId,
@@ -1110,7 +1112,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByUuid_C_Last(String uuid, long companyId,
@@ -1173,7 +1175,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction[] findByUuid_C_PrevAndNext(long actionId, String uuid,
@@ -1456,7 +1458,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns a range of all the m d r actions where ruleGroupInstanceId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param ruleGroupInstanceId the rule group instance ID
@@ -1474,7 +1476,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns an ordered range of all the m d r actions where ruleGroupInstanceId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param ruleGroupInstanceId the rule group instance ID
@@ -1591,7 +1593,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param ruleGroupInstanceId the rule group instance ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByRuleGroupInstanceId_First(long ruleGroupInstanceId,
@@ -1642,7 +1644,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param ruleGroupInstanceId the rule group instance ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a matching m d r action could not be found
+	 * @throws NoSuchActionException if a matching m d r action could not be found
 	 */
 	@Override
 	public MDRAction findByRuleGroupInstanceId_Last(long ruleGroupInstanceId,
@@ -1700,7 +1702,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * @param ruleGroupInstanceId the rule group instance ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction[] findByRuleGroupInstanceId_PrevAndNext(long actionId,
@@ -1955,10 +1957,6 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(MDRActionImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(MDRActionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -2070,7 +2068,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 *
 	 * @param actionId the primary key of the m d r action
 	 * @return the m d r action that was removed
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction remove(long actionId) throws NoSuchActionException {
@@ -2082,7 +2080,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 *
 	 * @param primaryKey the primary key of the m d r action
 	 * @return the m d r action that was removed
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction remove(Serializable primaryKey)
@@ -2150,8 +2148,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	}
 
 	@Override
-	public MDRAction updateImpl(
-		com.liferay.portlet.mobiledevicerules.model.MDRAction mdrAction) {
+	public MDRAction updateImpl(MDRAction mdrAction) {
 		mdrAction = toUnwrappedModel(mdrAction);
 
 		boolean isNew = mdrAction.isNew();
@@ -2162,6 +2159,28 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 			String uuid = PortalUUIDUtil.generate();
 
 			mdrAction.setUuid(uuid);
+		}
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (mdrAction.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				mdrAction.setCreateDate(now);
+			}
+			else {
+				mdrAction.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!mdrActionModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				mdrAction.setModifiedDate(now);
+			}
+			else {
+				mdrAction.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
 		}
 
 		Session session = null;
@@ -2295,7 +2314,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 *
 	 * @param primaryKey the primary key of the m d r action
 	 * @return the m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction findByPrimaryKey(Serializable primaryKey)
@@ -2315,11 +2334,11 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	}
 
 	/**
-	 * Returns the m d r action with the primary key or throws a {@link com.liferay.portlet.mobiledevicerules.NoSuchActionException} if it could not be found.
+	 * Returns the m d r action with the primary key or throws a {@link NoSuchActionException} if it could not be found.
 	 *
 	 * @param actionId the primary key of the m d r action
 	 * @return the m d r action
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchActionException if a m d r action with the primary key could not be found
+	 * @throws NoSuchActionException if a m d r action with the primary key could not be found
 	 */
 	@Override
 	public MDRAction findByPrimaryKey(long actionId)
@@ -2490,7 +2509,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns a range of all the m d r actions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of m d r actions
@@ -2506,7 +2525,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 * Returns an ordered range of all the m d r actions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRActionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of m d r actions
@@ -2669,7 +2688,6 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "mdrAction.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MDRAction exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MDRAction exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(MDRActionPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "type"

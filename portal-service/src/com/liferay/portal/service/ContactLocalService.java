@@ -60,15 +60,14 @@ public interface ContactLocalService extends BaseLocalService,
 	public com.liferay.portal.model.Contact addContact(long userId,
 		java.lang.String className, long classPK,
 		java.lang.String emailAddress, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
 		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,
 		java.lang.String jabberSn, java.lang.String msnSn,
 		java.lang.String mySpaceSn, java.lang.String skypeSn,
 		java.lang.String twitterSn, java.lang.String ymSn,
-		java.lang.String jobTitle)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String jobTitle) throws PortalException;
 
 	/**
 	* Creates a new contact with the primary key. Does not add the contact to the database.
@@ -97,7 +96,7 @@ public interface ContactLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portal.model.Contact deleteContact(long contactId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @throws PortalException
@@ -105,7 +104,7 @@ public interface ContactLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -194,7 +193,7 @@ public interface ContactLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.Contact getContact(long contactId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Contact> getContacts(
@@ -230,8 +229,7 @@ public interface ContactLocalService extends BaseLocalService,
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -253,13 +251,12 @@ public interface ContactLocalService extends BaseLocalService,
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.liferay.portal.model.Contact updateContact(long contactId,
 		java.lang.String emailAddress, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
 		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,
 		java.lang.String jabberSn, java.lang.String msnSn,
 		java.lang.String mySpaceSn, java.lang.String skypeSn,
 		java.lang.String twitterSn, java.lang.String ymSn,
-		java.lang.String jobTitle)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String jobTitle) throws PortalException;
 }

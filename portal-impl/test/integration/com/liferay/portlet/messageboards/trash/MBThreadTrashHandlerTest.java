@@ -14,20 +14,25 @@
 
 package com.liferay.portlet.messageboards.trash;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.messageboards.model.MBCategory;
+import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBMessageConstants;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBCategoryServiceUtil;
@@ -35,9 +40,13 @@ import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 import com.liferay.portlet.messageboards.util.test.MBTestUtil;
-import com.liferay.portlet.trash.BaseTrashHandlerTestCase;
+import com.liferay.portlet.trash.test.BaseTrashHandlerTestCase;
+import com.liferay.portlet.trash.test.WhenIsIndexableBaseModel;
+
+import java.io.InputStream;
 
 import java.util.Calendar;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -50,7 +59,8 @@ import org.junit.Test;
  * @author Eduardo Garcia
  */
 @Sync
-public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
+public class MBThreadTrashHandlerTest
+	extends BaseTrashHandlerTestCase implements WhenIsIndexableBaseModel {
 
 	@ClassRule
 	@Rule
@@ -58,6 +68,24 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
+
+	@Ignore
+	@Override
+	@Test
+	public void testAddBaseModelWithDraftStatus() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testAddBaseModelWithDraftStatusIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testAddBaseModelWithDraftStatusIsNotVisible() throws Exception {
+	}
 
 	@Test
 	public void testCategoryMessageCount() throws Exception {
@@ -95,46 +123,111 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 			getMessageCount((Long)parentBaseModel.getPrimaryKeyObj()));
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
-	public void testTrashAndDeleteDraft() throws Exception {
+	public void testTrashAndDeleteWithDraftStatus() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
-	public void testTrashAndRestoreDraft() throws Exception {
+	public void testTrashAndDeleteWithDraftStatusIndexable() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatus() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusIsNotVisible()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusRestoreStatus()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashAndRestoreWithDraftStatusRestoreUniqueTitle()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashDuplicate() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionBaseModelAndDelete() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndDeleteIndexable() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionBaseModelAndRestore() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndRestoreIndexable()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndRestoreIsVisible()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModelAndRestore() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIsNotVisible() throws Exception {
 	}
 
 	@Override
@@ -145,9 +238,10 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 
 		MBCategory category = (MBCategory)parentBaseModel;
 
-		MBMessage message = MBTestUtil.addMessage(
-			category.getGroupId(), category.getCategoryId(),
-			getSearchKeywords(), approved, serviceContext);
+		MBMessage message = MBTestUtil.addMessageWithWorkflow(
+			serviceContext.getUserId(), category.getGroupId(),
+			category.getCategoryId(), getSearchKeywords(), getSearchKeywords(),
+			approved, serviceContext);
 
 		return message.getThread();
 	}
@@ -157,8 +251,12 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 			boolean approved, ServiceContext serviceContext)
 		throws Exception {
 
-		MBMessage message = MBTestUtil.addMessage(
-			serviceContext.getScopeGroupId());
+		MBMessage message = MBMessageLocalServiceUtil.addMessage(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			serviceContext.getScopeGroupId(),
+			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 
 		return message.getThread();
 	}
@@ -214,7 +312,9 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 			Group group, long parentBaseModelId, ServiceContext serviceContext)
 		throws Exception {
 
-		return MBTestUtil.addCategory(group.getGroupId(), parentBaseModelId);
+		return MBCategoryLocalServiceUtil.addCategory(
+			TestPropsValues.getUserId(), parentBaseModelId,
+			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 	}
 
 	@Override
@@ -222,7 +322,10 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 			Group group, ServiceContext serviceContext)
 		throws Exception {
 
-		return MBTestUtil.addCategory(serviceContext);
+		return MBCategoryLocalServiceUtil.addCategory(
+			TestPropsValues.getUserId(),
+			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
+			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 	}
 
 	@Override
@@ -301,9 +404,17 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 	protected void replyMessage(BaseModel<?> baseModel) throws Exception {
 		MBThread thread = (MBThread)baseModel;
 
-		MBTestUtil.addMessage(
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				thread.getGroupId(), TestPropsValues.getUserId());
+
+		MBMessageLocalServiceUtil.addMessage(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
 			thread.getGroupId(), thread.getCategoryId(), thread.getThreadId(),
-			thread.getRootMessageId());
+			thread.getRootMessageId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), MBMessageConstants.DEFAULT_FORMAT,
+			Collections.<ObjectValuePair<String, InputStream>>emptyList(),
+			false, 0.0, false, serviceContext);
 	}
 
 	@Override

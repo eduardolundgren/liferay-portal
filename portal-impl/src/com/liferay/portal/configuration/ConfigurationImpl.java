@@ -124,6 +124,8 @@ public class ConfigurationImpl
 	@Override
 	public void clearCache() {
 		_values.clear();
+
+		_properties = null;
 	}
 
 	@Override
@@ -275,13 +277,8 @@ public class ConfigurationImpl
 		Properties componentPropertiesProperties =
 			componentProperties.getProperties();
 
-		for (Map.Entry<Object, Object> entry :
-				componentPropertiesProperties.entrySet()) {
-
-			String key = (String)entry.getKey();
-			String value = (String)entry.getValue();
-
-			_properties.setProperty(key, value);
+		for (String key : componentPropertiesProperties.stringPropertyNames()) {
+			_properties.setProperty(key, componentProperties.getString(key));
 		}
 
 		return _properties;
@@ -459,15 +456,15 @@ public class ConfigurationImpl
 
 	private static final boolean _PRINT_DUPLICATE_CALLS_TO_GET = false;
 
-	private static Log _log = LogFactoryUtil.getLog(ConfigurationImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ConfigurationImpl.class);
 
-	private static String[] _emptyArray = new String[0];
-	private static Object _nullValue = new Object();
+	private static final String[] _emptyArray = new String[0];
+	private static final Object _nullValue = new Object();
 
-	private ComponentConfiguration _componentConfiguration;
-	private Set<String> _printedSources = new HashSet<String>();
+	private final ComponentConfiguration _componentConfiguration;
+	private final Set<String> _printedSources = new HashSet<>();
 	private Properties _properties;
-	private Map<String, Object> _values =
-		new ConcurrentHashMap<String, Object>();
+	private final Map<String, Object> _values = new ConcurrentHashMap<>();
 
 }

@@ -14,11 +14,13 @@
 
 package com.liferay.journal.content.web;
 
+import com.liferay.journal.content.web.constants.JournalContentPortletKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletLayoutListenerException;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -26,7 +28,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.layoutconfiguration.util.xml.PortletLogic;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.model.PortletInstance;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
@@ -54,7 +56,7 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_journal_content_web_portlet_JournalContentPortlet"
+		"javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT
 	},
 	service = PortletLayoutListener.class
 )
@@ -172,19 +174,24 @@ public class JournalContentPortletLayoutListener
 		}
 	}
 
+	@Override
+	public void updatePropertiesOnRemoveFromLayout(
+			String portletId, UnicodeProperties typeSettingsProperties)
+		throws PortletLayoutListenerException {
+	}
+
 	protected String getRuntimePortletId(String xml) throws Exception {
 		Document document = SAXReaderUtil.read(xml);
 
 		Element rootElement = document.getRootElement();
 
+		String portletName = rootElement.attributeValue("name");
 		String instanceId = rootElement.attributeValue("instance");
-		String portletId = rootElement.attributeValue("name");
 
-		if (Validator.isNotNull(instanceId)) {
-			portletId += PortletConstants.INSTANCE_SEPARATOR + instanceId;
-		}
+		PortletInstance portletInstance = new PortletInstance(
+			portletName, instanceId);
 
-		return portletId;
+		return portletInstance.getPortletInstanceKey();
 	}
 
 	protected String[] getRuntimePortletIds(
@@ -228,7 +235,7 @@ public class JournalContentPortletLayoutListener
 	protected Set<String> getRuntimePortletIds(String content)
 		throws Exception {
 
-		Set<String> portletIds = new LinkedHashSet<String>();
+		Set<String> portletIds = new LinkedHashSet<>();
 
 		for (int index = 0;;) {
 			index = content.indexOf(PortletLogic.OPEN_TAG, index);
@@ -262,7 +269,7 @@ public class JournalContentPortletLayoutListener
 		return portletIds;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		JournalContentPortletLayoutListener.class);
 
 }

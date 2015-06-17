@@ -14,12 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.action;
 
-import com.liferay.portal.DuplicateLockException;
 import com.liferay.portal.NoSuchRepositoryEntryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -59,7 +59,6 @@ import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
 import com.liferay.portlet.asset.model.AssetVocabulary;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.DLPortletInstanceSettings;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
@@ -78,6 +77,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException;
+import com.liferay.portlet.trash.service.TrashEntryServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.InputStream;
@@ -180,6 +180,9 @@ public class EditFileEntryAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteFileEntry(actionRequest, true);
+			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restoreTrashEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.REVERT)) {
 				revertFileEntry(actionRequest);
@@ -303,8 +306,8 @@ public class EditFileEntryAction extends PortletAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		List<KeyValuePair> validFileNameKVPs = new ArrayList<KeyValuePair>();
-		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<KeyValuePair>();
+		List<KeyValuePair> validFileNameKVPs = new ArrayList<>();
+		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<>();
 
 		String[] selectedFileNames = ParamUtil.getParameterValues(
 			actionRequest, "selectedFileName", new String[0], false);
@@ -383,17 +386,10 @@ public class EditFileEntryAction extends PortletAction {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				DLFileEntry.class.getName(), actionRequest);
 
-			FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
+			DLAppServiceUtil.addFileEntry(
 				repositoryId, folderId, selectedFileName, mimeType,
 				selectedFileName, description, changeLog, inputStream, size,
 				serviceContext);
-
-			AssetPublisherUtil.addAndStoreSelection(
-				actionRequest, DLFileEntry.class.getName(),
-				fileEntry.getFileEntryId(), -1);
-
-			AssetPublisherUtil.addRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), folderId);
 
 			validFileNameKVPs.add(
 				new KeyValuePair(selectedFileName, originalSelectedFileName));
@@ -717,7 +713,7 @@ public class EditFileEntryAction extends PortletAction {
 				DLPortletInstanceSettings.getInstance(
 					themeDisplay.getLayout(), portletDisplay.getId());
 
-			Set<String> extensions = new HashSet<String>();
+			Set<String> extensions = new HashSet<>();
 
 			String[] mimeTypes = dlPortletInstanceSettings.getMimeTypes();
 
@@ -925,6 +921,17 @@ public class EditFileEntryAction extends PortletAction {
 		}
 	}
 
+	protected void restoreTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] restoreTrashEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
+
+		for (long restoreTrashEntryId : restoreTrashEntryIds) {
+			TrashEntryServiceUtil.restoreEntry(restoreTrashEntryId);
+		}
+	}
+
 	protected void revertFileEntry(ActionRequest actionRequest)
 		throws Exception {
 
@@ -1024,10 +1031,6 @@ public class EditFileEntryAction extends PortletAction {
 					repositoryId, folderId, sourceFileName, contentType, title,
 					description, changeLog, inputStream, size, serviceContext);
 
-				AssetPublisherUtil.addAndStoreSelection(
-					actionRequest, DLFileEntry.class.getName(),
-					fileEntry.getFileEntryId(), -1);
-
 				if (cmd.equals(Constants.ADD_DYNAMIC)) {
 					JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -1054,9 +1057,6 @@ public class EditFileEntryAction extends PortletAction {
 					description, changeLog, majorVersion, inputStream, size,
 					serviceContext);
 			}
-
-			AssetPublisherUtil.addRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), folderId);
 
 			return fileEntry;
 		}

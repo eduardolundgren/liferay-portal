@@ -22,7 +22,6 @@ import com.liferay.counter.model.impl.CounterImpl;
 import com.liferay.counter.model.impl.CounterModelImpl;
 import com.liferay.counter.service.persistence.CounterPersistence;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -56,7 +55,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see CounterPersistence
- * @see CounterUtil
+ * @see com.liferay.counter.service.persistence.CounterUtil
  * @generated
  */
 @ProviderType
@@ -127,10 +126,6 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(CounterImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(CounterImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -186,7 +181,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	 *
 	 * @param name the primary key of the counter
 	 * @return the counter that was removed
-	 * @throws com.liferay.counter.NoSuchCounterException if a counter with the primary key could not be found
+	 * @throws NoSuchCounterException if a counter with the primary key could not be found
 	 */
 	@Override
 	public Counter remove(String name) throws NoSuchCounterException {
@@ -198,7 +193,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	 *
 	 * @param primaryKey the primary key of the counter
 	 * @return the counter that was removed
-	 * @throws com.liferay.counter.NoSuchCounterException if a counter with the primary key could not be found
+	 * @throws NoSuchCounterException if a counter with the primary key could not be found
 	 */
 	@Override
 	public Counter remove(Serializable primaryKey)
@@ -265,7 +260,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	}
 
 	@Override
-	public Counter updateImpl(com.liferay.counter.model.Counter counter) {
+	public Counter updateImpl(Counter counter) {
 		counter = toUnwrappedModel(counter);
 
 		boolean isNew = counter.isNew();
@@ -326,7 +321,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	 *
 	 * @param primaryKey the primary key of the counter
 	 * @return the counter
-	 * @throws com.liferay.counter.NoSuchCounterException if a counter with the primary key could not be found
+	 * @throws NoSuchCounterException if a counter with the primary key could not be found
 	 */
 	@Override
 	public Counter findByPrimaryKey(Serializable primaryKey)
@@ -346,11 +341,11 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	}
 
 	/**
-	 * Returns the counter with the primary key or throws a {@link com.liferay.counter.NoSuchCounterException} if it could not be found.
+	 * Returns the counter with the primary key or throws a {@link NoSuchCounterException} if it could not be found.
 	 *
 	 * @param name the primary key of the counter
 	 * @return the counter
-	 * @throws com.liferay.counter.NoSuchCounterException if a counter with the primary key could not be found
+	 * @throws NoSuchCounterException if a counter with the primary key could not be found
 	 */
 	@Override
 	public Counter findByPrimaryKey(String name) throws NoSuchCounterException {
@@ -521,7 +516,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	 * Returns a range of all the counters.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.counter.model.impl.CounterModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link CounterModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of counters
@@ -537,7 +532,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	 * Returns an ordered range of all the counters.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.counter.model.impl.CounterModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link CounterModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of counters
@@ -692,7 +687,6 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 	private static final String _SQL_COUNT_COUNTER = "SELECT COUNT(counter) FROM Counter counter";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "counter.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Counter exists with the primary key ";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(CounterPersistenceImpl.class);
 	private static final Counter _nullCounter = new CounterImpl() {
 			@Override

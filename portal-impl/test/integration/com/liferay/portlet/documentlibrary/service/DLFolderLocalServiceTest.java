@@ -15,20 +15,24 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -57,8 +61,14 @@ public class DLFolderLocalServiceTest {
 
 	@Test
 	public void testGetNoAssetEntries() throws Exception {
-		Folder folder = DLAppTestUtil.addFolder(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		Folder folder = DLAppServiceUtil.addFolder(
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 
 		DLFolder dlFolder = DLFolderLocalServiceUtil.getDLFolder(
 			folder.getFolderId());
@@ -68,9 +78,15 @@ public class DLFolderLocalServiceTest {
 
 		Assert.assertNotNull(assetEntry);
 
+		List<DLFolder> noAssetDLFolders =
+			DLFolderLocalServiceUtil.getNoAssetFolders();
+
 		AssetEntryLocalServiceUtil.deleteAssetEntry(assetEntry);
 
-		List<DLFolder> dlFolders = DLFolderLocalServiceUtil.getNoAssetFolders();
+		List<DLFolder> dlFolders = new ArrayList<>(
+			DLFolderLocalServiceUtil.getNoAssetFolders());
+
+		dlFolders.removeAll(noAssetDLFolders);
 
 		Assert.assertEquals(1, dlFolders.size());
 		Assert.assertEquals(dlFolder, dlFolders.get(0));

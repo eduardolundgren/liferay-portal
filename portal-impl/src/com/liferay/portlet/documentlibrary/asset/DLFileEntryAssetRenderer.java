@@ -34,7 +34,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
-import com.liferay.portlet.asset.model.DDMFieldReader;
+import com.liferay.portlet.asset.model.DDMFormValuesReader;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
@@ -45,12 +45,9 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -89,8 +86,8 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
-	public DDMFieldReader getDDMFieldReader() {
-		return new DLFileEntryDDMFieldReader(_fileEntry, _fileVersion);
+	public DDMFormValuesReader getDDMFormValuesReader() {
+		return new DLFileEntryDDMFormValuesReader(_fileEntry, _fileVersion);
 	}
 
 	@Override
@@ -227,12 +224,15 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public PortletURL getURLExport(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse)
+		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createActionURL();
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
+			getControlPanelPlid(liferayPortletRequest),
+			PortletKeys.DOCUMENT_LIBRARY, PortletRequest.ACTION_PHASE);
 
-		portletURL.setParameter("struts_action", "/asset_publisher/get_file");
+		portletURL.setParameter("struts_action", "/document_library/get_file");
 		portletURL.setParameter(
 			"groupId", String.valueOf(_fileEntry.getRepositoryId()));
 		portletURL.setParameter(
@@ -335,17 +335,17 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_ABSTRACT) ||
 			template.equals(TEMPLATE_FULL_CONTENT)) {
 
-			renderRequest.setAttribute(
+			portletRequest.setAttribute(
 				WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY, _fileEntry);
 
-			String version = ParamUtil.getString(renderRequest, "version");
+			String version = ParamUtil.getString(portletRequest, "version");
 
 			if ((getAssetRendererType() == AssetRendererFactory.TYPE_LATEST) ||
 				Validator.isNotNull(version)) {
@@ -354,11 +354,11 @@ public class DLFileEntryAssetRenderer
 					_fileVersion = _fileEntry.getFileVersion(version);
 				}
 
-				renderRequest.setAttribute(
+				portletRequest.setAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
 			}
 			else {
-				renderRequest.setAttribute(
+				portletRequest.setAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION,
 					_fileEntry.getFileVersion());
 			}
@@ -369,18 +369,6 @@ public class DLFileEntryAssetRenderer
 		else {
 			return null;
 		}
-	}
-
-	@Override
-	public void setAddToPagePreferences(
-			PortletPreferences preferences, String portletId,
-			ThemeDisplay themeDisplay)
-		throws Exception {
-
-		preferences.setValue("showAssetTitle", Boolean.FALSE.toString());
-		preferences.setValue("showExtraInfo", Boolean.FALSE.toString());
-
-		super.setAddToPagePreferences(preferences, portletId, themeDisplay);
 	}
 
 	private final FileEntry _fileEntry;

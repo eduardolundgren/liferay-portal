@@ -25,14 +25,9 @@
 		if (themeDisplay.isShowMyAccountIcon() && (themeDisplay.getURLMyAccount() != null)) {
 			String myAccountURL = String.valueOf(themeDisplay.getURLMyAccount());
 
-			if (PropsValues.DOCKBAR_ADMINISTRATIVE_LINKS_SHOW_IN_POP_UP) {
-				signedInAs = "<a class=\"signed-in\" href=\"javascript:Liferay.Util.openWindow({dialog: {destroyOnHide: true}, title: '" + HtmlUtil.escapeJS(LanguageUtil.get(request, "my-account")) + "', uri: '" + HtmlUtil.escapeJS(myAccountURL) + "'});\">" + signedInAs + "</a>";
-			}
-			else {
-				myAccountURL = HttpUtil.setParameter(myAccountURL, "controlPanelCategory", PortletCategoryKeys.MY);
+			myAccountURL = HttpUtil.setParameter(myAccountURL, "controlPanelCategory", PortletCategoryKeys.MY);
 
-				signedInAs = "<a class=\"signed-in\" href=\"" + HtmlUtil.escape(myAccountURL) + "\">" + signedInAs + "</a>";
-			}
+			signedInAs = "<a class=\"signed-in\" href=\"" + HtmlUtil.escape(myAccountURL) + "\">" + signedInAs + "</a>";
 		}
 		%>
 
@@ -105,10 +100,20 @@
 			<liferay-ui:error exception="<%= CookieNotSupportedException.class %>" message="authentication-failed-please-enable-browser-cookies" />
 			<liferay-ui:error exception="<%= NoSuchUserException.class %>" message="authentication-failed" />
 			<liferay-ui:error exception="<%= PasswordExpiredException.class %>" message="your-password-has-expired" />
-			<liferay-ui:error exception="<%= UserEmailAddressException.class %>" message="authentication-failed" />
-			<liferay-ui:error exception="<%= UserLockoutException.PasswordPolicyLockout.class %>" message="this-account-has-been-locked" />
+			<liferay-ui:error exception="<%= UserEmailAddressException.MustNotBeNull.class %>" message="please-enter-an-email-address" />
+			<liferay-ui:error exception="<%= UserLockoutException.LDAPLockout.class %>" message="this-account-is-locked" />
+
+			<liferay-ui:error exception="<%= UserLockoutException.PasswordPolicyLockout.class %>">
+
+				<%
+				UserLockoutException.PasswordPolicyLockout ule = (UserLockoutException.PasswordPolicyLockout)errorException;
+				%>
+
+				<liferay-ui:message arguments="<%= ule.user.getUnlockDate() %>" key="this-account-is-locked-until-x" translateArguments="<%= false %>" />
+			</liferay-ui:error>
+
 			<liferay-ui:error exception="<%= UserPasswordException.class %>" message="authentication-failed" />
-			<liferay-ui:error exception="<%= UserScreenNameException.class %>" message="authentication-failed" />
+			<liferay-ui:error exception="<%= UserScreenNameException.MustNotBeNull.class %>" message="the-screen-name-cannot-be-blank" />
 
 			<aui:fieldset>
 

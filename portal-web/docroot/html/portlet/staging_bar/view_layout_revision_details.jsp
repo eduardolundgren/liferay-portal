@@ -46,7 +46,7 @@ else if (hasWorkflowTask) {
 	taglibHelpMessage = "you-are-currently-reviewing-this-page.-you-can-make-changes-and-send-them-to-the-next-step-in-the-workflow-when-ready";
 }
 else {
-	taglibHelpMessage = "a-new-version-will-be-created-automatically-if-this-page-is-modified";
+	taglibHelpMessage = "a-new-version-is-created-automatically-if-this-page-is-modified";
 }
 %>
 
@@ -132,9 +132,9 @@ else {
 			<%
 			long controlPanelPlid = PortalUtil.getControlPanelPlid(company.getCompanyId());
 
-			PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(controlPanelPlid, PortletKeys.MY_WORKFLOW_TASKS, PortletRequest.RENDER_PHASE);
+			PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(controlPanelPlid, PortletKeys.MY_WORKFLOW_TASK, PortletRequest.RENDER_PHASE);
 
-			portletURL.setParameter("struts_action", "/my_workflow_tasks/edit_workflow_task");
+			portletURL.setParameter("mvcPath", "/edit_workflow_task.jsp");
 
 			WorkflowTask workflowTask = StagingUtil.getWorkflowTask(user.getUserId(), layoutRevision);
 
@@ -188,7 +188,7 @@ else {
 			%>
 
 			<portlet:actionURL var="publishURL">
-				<portlet:param name="struts_action" value="/staging_bar/edit_layouts" />
+				<portlet:param name="struts_action" value="/staging_bar/edit_layout_revision" />
 				<portlet:param name="<%= Constants.CMD %>" value="update_layout_revision" />
 				<portlet:param name="redirect" value="<%= PortalUtil.getLayoutFullURL(themeDisplay) %>" />
 				<portlet:param name="layoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />

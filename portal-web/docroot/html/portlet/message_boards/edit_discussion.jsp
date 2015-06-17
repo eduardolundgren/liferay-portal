@@ -65,7 +65,9 @@ if (message != null) {
 	<aui:input name="parentMessageId" type="hidden" value="<%= parentMessageId %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_SAVE_DRAFT) %>" />
 
+	<liferay-ui:error exception="<%= CaptchaConfigurationException.class %>" message="a-captcha-error-occurred-please-contact-an-administrator" />
 	<liferay-ui:error exception="<%= CaptchaTextException.class %>" message="text-verification-failed" />
+	<liferay-ui:error exception="<%= DiscussionMaxCommentsException.class %>" message="maximum-number-of-comments-has-been-reached" />
 	<liferay-ui:error exception="<%= MessageBodyException.class %>" message="please-enter-a-valid-message" />
 
 	<aui:model-context bean="<%= message %>" model="<%= MBMessage.class %>" />

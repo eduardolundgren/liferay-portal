@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.resiliency.spi.remote;
 
-import com.liferay.portal.kernel.deploy.hot.DependencyManagementThreadLocal;
 import com.liferay.portal.kernel.io.Serializer;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
@@ -47,10 +46,9 @@ import com.liferay.portal.kernel.resiliency.spi.remote.RemoteSPI.RegisterCallbac
 import com.liferay.portal.kernel.resiliency.spi.remote.RemoteSPI.SPIShutdownHook;
 import com.liferay.portal.kernel.resiliency.spi.remote.RemoteSPI.UnregisterSPIProcessCallable;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.kernel.test.SwappableSecurityManager;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
 
@@ -62,14 +60,11 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ReflectPermission;
 
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
-
-import java.security.Permission;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -170,8 +165,7 @@ public class RemoteSPITest {
 		ConcurrentMap<String, Object> attributes =
 			ProcessContext.getAttributes();
 
-		SPI spi = ReflectionTestUtil.invokeBridge(
-			_mockRemoteSPI, "call", new Class<?>[0]);
+		SPI spi = _mockRemoteSPI.call();
 
 		Assert.assertSame(spi, UnicastRemoteObject.toStub(_mockRemoteSPI));
 
@@ -323,11 +317,7 @@ public class RemoteSPITest {
 		RegisterCallback registerCallback = new RegisterCallback(
 			uuid, _mockRemoteSPI);
 
-		Assert.assertSame(
-			_mockRemoteSPI,
-			ReflectionTestUtil.invokeBridge(
-				registerCallback, "call", new Class<?>[0]));
-
+		Assert.assertSame(_mockRemoteSPI, registerCallback.call());
 		Assert.assertSame(_mockRemoteSPI, takeSPIFutureTask.get());
 
 		// Interrupted on notify waiting
@@ -354,9 +344,6 @@ public class RemoteSPITest {
 
 	@Test
 	public void testSerialization() throws Exception {
-
-		// Clear out system properties
-
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			new UnsyncByteArrayOutputStream();
 
@@ -376,11 +363,8 @@ public class RemoteSPITest {
 		ObjectInputStream objectInputStream = new ObjectInputStream(
 			new UnsyncByteArrayInputStream(data));
 
-		Assert.assertTrue(DependencyManagementThreadLocal.isEnabled());
-
 		Object object = objectInputStream.readObject();
 
-		Assert.assertFalse(DependencyManagementThreadLocal.isEnabled());
 		Assert.assertSame(MockRemoteSPI.class, object.getClass());
 		Assert.assertEquals(
 			ExecutorIntraband.class.getName(),
@@ -402,37 +386,11 @@ public class RemoteSPITest {
 		Assert.assertEquals(
 			"false",
 			System.getProperty("portal:" + PropsKeys.CLUSTER_LINK_ENABLED));
-
-		// Unable to disable dependency management
-
-		objectInputStream = new ObjectInputStream(
-			new UnsyncByteArrayInputStream(data));
-
-		final SecurityException securityException = new SecurityException();
-
-		try (SwappableSecurityManager swappableSecurityManager =
-				new SwappableSecurityManager() {
-
-					@Override
-					public void checkPermission(Permission permission) {
-						if (permission instanceof ReflectPermission) {
-							throw securityException;
-						}
-					}
-
-				}) {
-
-			swappableSecurityManager.install();
-
-			objectInputStream.readObject();
-
-			Assert.fail();
-		}
-		catch (IOException ioe) {
-			Assert.assertEquals(
-				"Unable to disable dependency management", ioe.getMessage());
-			Assert.assertSame(securityException, ioe.getCause());
-		}
+		Assert.assertEquals(
+			"false",
+			System.getProperty(
+				"portal:" +
+					PropsKeys.HOT_DEPLOY_DEPENDENCY_MANAGEMENT_ENABLED));
 	}
 
 	@Test
@@ -489,18 +447,15 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.ALL);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.ALL)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -524,10 +479,10 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.ALL);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.ALL)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -555,9 +510,6 @@ public class RemoteSPITest {
 			Assert.assertEquals(
 				"Proceed with SPI shutdown", logRecord.getMessage());
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		assertUnexported();
 	}
@@ -582,18 +534,15 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.OFF)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		assertUnexported();
@@ -628,18 +577,15 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.OFF)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		Assert.assertNull(future.get());
@@ -666,10 +612,10 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.ALL);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.ALL)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -686,9 +632,6 @@ public class RemoteSPITest {
 
 			Assert.assertEquals(
 				"Proceed with SPI shutdown", logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		Assert.assertNull(future.get());
@@ -715,10 +658,10 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.ALL);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.ALL)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -735,9 +678,6 @@ public class RemoteSPITest {
 
 			Assert.assertEquals(
 				"MPI shutdown request received", logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		Assert.assertNull(future.get());
@@ -756,18 +696,15 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.ALL);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.ALL)) {
 
-		try {
 			spiShutdownHook.run();
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		assertUnexported();
@@ -782,18 +719,15 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.ALL);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.ALL)) {
 
-		try {
 			Assert.assertTrue(spiShutdownHook.shutdown(0, null));
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		assertUnexported();
@@ -808,10 +742,10 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.SEVERE)) {
 
-		try {
 			Assert.assertTrue(spiShutdownHook.shutdown(0, null));
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -836,9 +770,6 @@ public class RemoteSPITest {
 			Assert.assertSame(
 				NoSuchObjectException.class, throwable.getClass());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
@@ -850,18 +781,15 @@ public class RemoteSPITest {
 
 		SPIShutdownHook spiShutdownHook = _mockRemoteSPI.new SPIShutdownHook();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RemoteSPI.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RemoteSPI.class.getName(), Level.OFF)) {
 
-		try {
 			Assert.assertTrue(spiShutdownHook.shutdown(0, null));
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

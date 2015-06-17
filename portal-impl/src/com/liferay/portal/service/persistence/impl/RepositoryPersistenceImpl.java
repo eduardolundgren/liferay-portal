@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchRepositoryException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -38,11 +37,14 @@ import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.impl.RepositoryImpl;
 import com.liferay.portal.model.impl.RepositoryModelImpl;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.RepositoryPersistence;
 
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,7 +61,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see RepositoryPersistence
- * @see RepositoryUtil
+ * @see com.liferay.portal.service.persistence.RepositoryUtil
  * @generated
  */
 @ProviderType
@@ -118,7 +120,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns a range of all the repositories where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -135,7 +137,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns an ordered range of all the repositories where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -262,7 +264,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByUuid_First(String uuid,
@@ -311,7 +313,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByUuid_Last(String uuid,
@@ -368,7 +370,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository[] findByUuid_PrevAndNext(long repositoryId, String uuid,
@@ -614,12 +616,12 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			new String[] { String.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the repository where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.portal.NoSuchRepositoryException} if it could not be found.
+	 * Returns the repository where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchRepositoryException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @return the matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByUUID_G(String uuid, long groupId)
@@ -896,7 +898,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns a range of all the repositories where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -915,7 +917,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns an ordered range of all the repositories where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1053,7 +1055,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByUuid_C_First(String uuid, long companyId,
@@ -1109,7 +1111,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByUuid_C_Last(String uuid, long companyId,
@@ -1172,7 +1174,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository[] findByUuid_C_PrevAndNext(long repositoryId,
@@ -1453,7 +1455,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns a range of all the repositories where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1470,7 +1472,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns an ordered range of all the repositories where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1583,7 +1585,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByGroupId_First(long groupId,
@@ -1632,7 +1634,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByGroupId_Last(long groupId,
@@ -1689,7 +1691,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository[] findByGroupId_PrevAndNext(long repositoryId,
@@ -1912,13 +1914,13 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			});
 
 	/**
-	 * Returns the repository where groupId = &#63; and name = &#63; and portletId = &#63; or throws a {@link com.liferay.portal.NoSuchRepositoryException} if it could not be found.
+	 * Returns the repository where groupId = &#63; and name = &#63; and portletId = &#63; or throws a {@link NoSuchRepositoryException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param name the name
 	 * @param portletId the portlet ID
 	 * @return the matching repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a matching repository could not be found
+	 * @throws NoSuchRepositoryException if a matching repository could not be found
 	 */
 	@Override
 	public Repository findByG_N_P(long groupId, String name, String portletId)
@@ -2262,10 +2264,6 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(RepositoryImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(RepositoryImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -2422,7 +2420,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 *
 	 * @param repositoryId the primary key of the repository
 	 * @return the repository that was removed
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository remove(long repositoryId)
@@ -2435,7 +2433,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 *
 	 * @param primaryKey the primary key of the repository
 	 * @return the repository that was removed
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository remove(Serializable primaryKey)
@@ -2503,7 +2501,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	}
 
 	@Override
-	public Repository updateImpl(com.liferay.portal.model.Repository repository) {
+	public Repository updateImpl(Repository repository) {
 		repository = toUnwrappedModel(repository);
 
 		boolean isNew = repository.isNew();
@@ -2514,6 +2512,28 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			String uuid = PortalUUIDUtil.generate();
 
 			repository.setUuid(uuid);
+		}
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (repository.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				repository.setCreateDate(now);
+			}
+			else {
+				repository.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!repositoryModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				repository.setModifiedDate(now);
+			}
+			else {
+				repository.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
 		}
 
 		Session session = null;
@@ -2645,7 +2665,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 *
 	 * @param primaryKey the primary key of the repository
 	 * @return the repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository findByPrimaryKey(Serializable primaryKey)
@@ -2665,11 +2685,11 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	}
 
 	/**
-	 * Returns the repository with the primary key or throws a {@link com.liferay.portal.NoSuchRepositoryException} if it could not be found.
+	 * Returns the repository with the primary key or throws a {@link NoSuchRepositoryException} if it could not be found.
 	 *
 	 * @param repositoryId the primary key of the repository
 	 * @return the repository
-	 * @throws com.liferay.portal.NoSuchRepositoryException if a repository with the primary key could not be found
+	 * @throws NoSuchRepositoryException if a repository with the primary key could not be found
 	 */
 	@Override
 	public Repository findByPrimaryKey(long repositoryId)
@@ -2840,7 +2860,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns a range of all the repositories.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of repositories
@@ -2856,7 +2876,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 * Returns an ordered range of all the repositories.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link RepositoryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of repositories
@@ -3019,7 +3039,6 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "repository.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Repository exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Repository exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(RepositoryPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"

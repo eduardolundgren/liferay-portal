@@ -14,19 +14,18 @@
 
 package com.liferay.portal.cache.mvcc;
 
-import com.liferay.portal.cache.MockPortalCacheManager;
-import com.liferay.portal.cache.TestCacheListener;
-import com.liferay.portal.cache.TestCacheReplicator;
-import com.liferay.portal.cache.memory.MemoryPortalCache;
+import com.liferay.portal.cache.test.TestCacheListener;
+import com.liferay.portal.cache.test.TestCacheReplicator;
+import com.liferay.portal.cache.test.TestPortalCache;
 import com.liferay.portal.kernel.cache.LowLevelCache;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import java.io.Serializable;
 
@@ -55,19 +54,16 @@ public class MVCCPortalCacheTest {
 
 	@Before
 	public void setUp() {
-		_portalCache = new MemoryPortalCache<String, MVCCModel>(
-			new MockPortalCacheManager<String, MVCCModel>(
-				_PORTAL_CACHE_MANAGER_NAME),
-			_PORTAL_CACHE_NAME, 16);
+		_portalCache = new TestPortalCache<>(_PORTAL_CACHE_NAME);
 
-		_mvccPortalCache = new MVCCPortalCache<String, MVCCModel>(
+		_mvccPortalCache = new MVCCPortalCache<>(
 			(LowLevelCache<String, MVCCModel>)_portalCache);
 
-		_testCacheListener = new TestCacheListener<String, MVCCModel>();
+		_testCacheListener = new TestCacheListener<>();
 
 		_portalCache.registerCacheListener(_testCacheListener);
 
-		_testCacheReplicator = new TestCacheReplicator<String, MVCCModel>();
+		_testCacheReplicator = new TestCacheReplicator<>();
 
 		_portalCache.registerCacheListener(_testCacheReplicator);
 	}
@@ -77,18 +73,16 @@ public class MVCCPortalCacheTest {
 	public void testForHiddenBridge() {
 		@SuppressWarnings("rawtypes")
 		MVCCPortalCache mvccPortalCache = new MVCCPortalCache(
-			new MemoryPortalCache(
-				new MockPortalCacheManager(_PORTAL_CACHE_MANAGER_NAME),
-				_PORTAL_CACHE_NAME, 16));
+			new TestPortalCache(_PORTAL_CACHE_NAME));
 
 		Serializable key = _KEY_1;
-		Object value = new MockMVCCModel(_VERSION_1);
+		MVCCModel value = new MockMVCCModel(_VERSION_1);
 
 		mvccPortalCache.put(key, value);
 		mvccPortalCache.put(key, value, 10);
 	}
 
-	@AdviseWith(adviceClasses = {MemoryPortalCacheAdvice.class})
+	@AdviseWith(adviceClasses = {TestPortalCacheAdvice.class})
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testMVCCCacheWithAdvice() throws Exception {
@@ -97,7 +91,7 @@ public class MVCCPortalCacheTest {
 
 		// Concurrent put 1
 
-		MemoryPortalCacheAdvice.block();
+		TestPortalCacheAdvice.block();
 
 		Thread thread1 = new Thread() {
 
@@ -110,7 +104,7 @@ public class MVCCPortalCacheTest {
 
 		thread1.start();
 
-		MemoryPortalCacheAdvice.waitUntilBlock(1);
+		TestPortalCacheAdvice.waitUntilBlock(1);
 
 		Thread thread2 = new Thread() {
 
@@ -123,9 +117,9 @@ public class MVCCPortalCacheTest {
 
 		thread2.start();
 
-		MemoryPortalCacheAdvice.waitUntilBlock(2);
+		TestPortalCacheAdvice.waitUntilBlock(2);
 
-		MemoryPortalCacheAdvice.unblock(2);
+		TestPortalCacheAdvice.unblock(2);
 
 		thread1.join();
 		thread2.join();
@@ -145,7 +139,7 @@ public class MVCCPortalCacheTest {
 
 		// Concurrent put 2
 
-		MemoryPortalCacheAdvice.block();
+		TestPortalCacheAdvice.block();
 
 		thread1 = new Thread() {
 
@@ -159,7 +153,7 @@ public class MVCCPortalCacheTest {
 
 		thread1.start();
 
-		MemoryPortalCacheAdvice.waitUntilBlock(1);
+		TestPortalCacheAdvice.waitUntilBlock(1);
 
 		thread2 = new Thread() {
 
@@ -173,9 +167,9 @@ public class MVCCPortalCacheTest {
 
 		thread2.start();
 
-		MemoryPortalCacheAdvice.waitUntilBlock(2);
+		TestPortalCacheAdvice.waitUntilBlock(2);
 
-		MemoryPortalCacheAdvice.unblock(2);
+		TestPortalCacheAdvice.unblock(2);
 
 		thread1.join();
 		thread2.join();
@@ -202,7 +196,7 @@ public class MVCCPortalCacheTest {
 	}
 
 	@Aspect
-	public static class MemoryPortalCacheAdvice {
+	public static class TestPortalCacheAdvice {
 
 		public static void block() {
 			_semaphore = new Semaphore(0);
@@ -225,8 +219,9 @@ public class MVCCPortalCacheTest {
 		}
 
 		@Around(
-			"execution(protected * com.liferay.portal.cache.memory." +
-				"MemoryPortalCache.doPutIfAbsent(..))")
+			"execution(protected * com.liferay.portal.cache.test." +
+				"TestPortalCache.doPutIfAbsent(..))"
+		)
 		public Object doPutIfAbsent(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -240,8 +235,9 @@ public class MVCCPortalCacheTest {
 		}
 
 		@Around(
-			"execution(protected * com.liferay.portal.cache.memory." +
-				"MemoryPortalCache.doReplace(..))")
+			"execution(protected * com.liferay.portal.cache.test." +
+				"TestPortalCache.doReplace(..))"
+		)
 		public Object doReplace(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -360,9 +356,6 @@ public class MVCCPortalCacheTest {
 	private static final String _KEY_1 = "KEY_1";
 
 	private static final String _KEY_2 = "KEY_2";
-
-	private static final String _PORTAL_CACHE_MANAGER_NAME =
-		"PORTAL_CACHE_MANAGER_NAME";
 
 	private static final String _PORTAL_CACHE_NAME = "PORTAL_CACHE_NAME";
 

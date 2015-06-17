@@ -33,7 +33,7 @@ if (folder != null) {
 	DLUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 }
 
-DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, dlPortletInstanceSettings);
+DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlRequestHelper);
 %>
 
 <aui:form method="post" name="selectFolderFm">
@@ -41,10 +41,10 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 		title="home"
 	/>
 
-	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
+	<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
 
 	<aui:button-row>
-		<c:if test="<%= dlActionsDisplayContext.isAddFolderButtonVisible() && DLFolderPermission.contains(permissionChecker, repositoryId, folderId, ActionKeys.ADD_FOLDER) %>">
+		<c:if test="<%= dlVisualizationHelper.isAddFolderButtonVisible() && DLFolderPermission.contains(permissionChecker, repositoryId, folderId, ActionKeys.ADD_FOLDER) %>">
 			<portlet:renderURL var="editFolderURL">
 				<portlet:param name="struts_action" value="/document_library/edit_folder" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -77,11 +77,11 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 
 	<liferay-ui:search-container
 		iteratorURL="<%= portletURL %>"
-		total="<%= DLAppServiceUtil.getFoldersCount(repositoryId, folderId) %>"
+		total="<%= DLAppServiceUtil.getFoldersCount(repositoryId, folderId, dlVisualizationHelper.isMountFolderVisible()) %>"
 	>
 
 		<liferay-ui:search-container-results
-			results="<%= DLAppServiceUtil.getFolders(repositoryId, folderId, searchContainer.getStart(), searchContainer.getEnd()) %>"
+			results="<%= DLAppServiceUtil.getFolders(repositoryId, folderId, dlVisualizationHelper.isMountFolderVisible(), searchContainer.getStart(), searchContainer.getEnd()) %>"
 		/>
 
 		<liferay-ui:search-container-row

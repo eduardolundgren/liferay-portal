@@ -18,24 +18,53 @@ import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
+import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
 import com.liferay.portal.kernel.process.local.LocalProcessLauncher.ProcessContext;
 import com.liferay.portal.kernel.process.log.ProcessOutputStream;
 import com.liferay.portal.kernel.resiliency.mpi.MPIHelperUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.rule.PACLTestRule;
+import com.liferay.portal.test.rule.callback.LogAssertionTestCallback;
 import com.liferay.portal.util.InitUtil;
+import com.liferay.portal.util.PropsImpl;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
+import java.net.ProxySelector;
+import java.net.SocketAddress;
+import java.net.URI;
 import java.net.URL;
 
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Future;
+
+import javax.naming.Context;
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -87,6 +116,8 @@ public class PACLAggregateTest {
 		public void run(RunNotifier runNotifier) {
 			_runNotifier = runNotifier;
 
+			System.setProperty("catalina.base", ".");
+
 			super.run(runNotifier);
 		}
 
@@ -97,7 +128,7 @@ public class PACLAggregateTest {
 	protected ProcessConfig createProcessConfig() {
 		Builder builder = new Builder();
 
-		List<String> arguments = new ArrayList<String>();
+		List<String> arguments = new ArrayList<>();
 
 		arguments.add(_JVM_XMX);
 		arguments.add(_JVM_MAX_PERM_SIZE);
@@ -106,6 +137,7 @@ public class PACLAggregateTest {
 		URL url = PACLAggregateTest.class.getResource("security.policy");
 
 		arguments.add("-Djava.security.policy=" + url.getFile());
+		arguments.add("-Dliferay.mode=test");
 
 		boolean junitDebug = Boolean.getBoolean("junit.debug");
 
@@ -113,6 +145,16 @@ public class PACLAggregateTest {
 			arguments.add(_JPDA_OPTIONS);
 			arguments.add("-Djunit.debug=true");
 		}
+
+		arguments.add(
+			"-D" + PropsKeys.LIFERAY_LIB_PORTAL_DIR + "=" +
+				PropsValues.LIFERAY_LIB_PORTAL_DIR);
+		arguments.add(
+			"-Dportal:" + PropsKeys.CLUSTER_LINK_AUTODETECT_ADDRESS +
+				StringPool.EQUAL);
+		arguments.add(
+			"-Dportal:" + PropsKeys.MODULE_FRAMEWORK_PROPERTIES +
+				_OSGI_CONSOLE);
 
 		builder.setArguments(arguments);
 		builder.setBootstrapClassPath(System.getProperty("java.class.path"));
@@ -154,7 +196,7 @@ public class PACLAggregateTest {
 
 		ClassLoader classLoader = PACLAggregateTest.class.getClassLoader();
 
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		List<Class<?>> classes = new ArrayList<>();
 
 		for (File file : files) {
 			String fileName = file.getName();
@@ -174,6 +216,55 @@ public class PACLAggregateTest {
 	private static final String _JVM_MAX_PERM_SIZE = "-XX:MaxPermSize=256m";
 
 	private static final String _JVM_XMX = "-Xmx1024m";
+
+	private static final String _OSGI_CONSOLE = "osgi.console=localhost:11312";
+
+	private static class DummySocksProxySelector extends ProxySelector {
+
+		@Override
+		public void connectFailed(
+			URI uri, SocketAddress socketAddress, IOException ioe) {
+		}
+
+		@Override
+		public List<Proxy> select(URI uri) {
+			if (_socketAddresses.contains(
+					uri.getHost() + StringPool.COLON + uri.getPort())) {
+
+				return Collections.singletonList(
+					new Proxy(Type.SOCKS, new InetSocketAddress(0)));
+			}
+
+			return Collections.singletonList(Proxy.NO_PROXY);
+		}
+
+		private DummySocksProxySelector() throws ProcessException {
+			Properties properties = new Properties();
+
+			try {
+				properties.load(
+					PACLTestsProcessCallable.class.getResourceAsStream(
+						"test/dependencies/WEB-INF/liferay-plugin-package." +
+							"properties"));
+			}
+			catch (IOException ioe) {
+				throw new ProcessException(ioe);
+			}
+
+			for (String socketAddress :
+					StringUtil.split(
+						properties.getProperty(
+							"security-manager-sockets-connect"))) {
+
+				if (!socketAddress.startsWith("localhost")) {
+					_socketAddresses.add(socketAddress);
+				}
+			}
+		}
+
+		private final Set<String> _socketAddresses = new HashSet<>();
+
+	}
 
 	private static class NoticeBridgeRunListener
 		extends RunListener implements Serializable {
@@ -248,8 +339,44 @@ public class PACLAggregateTest {
 		implements ProcessCallable<Result> {
 
 		@Override
-		public Result call() {
+		public Result call() throws ProcessException {
+			ProxySelector.setDefault(new DummySocksProxySelector());
+
+			URL resource = PACLTestRule.class.getResource(
+				"pacl-test.properties");
+
+			if (resource != null) {
+				System.setProperty("external-properties", resource.getPath());
+			}
+
+			System.setProperty(
+				Context.INITIAL_CONTEXT_FACTORY,
+				"org.apache.naming.java.javaURLContextFactory");
+
+			System.setProperty("catalina.base", ".");
+
+			CaptureAppender captureAppender = null;
+
+			Path tempStatePath = null;
+
 			try {
+				tempStatePath = Files.createTempDirectory(null);
+
+				System.setProperty(
+					"portal:" + PropsKeys.MODULE_FRAMEWORK_STATE_DIR,
+					tempStatePath.toString());
+
+				com.liferay.portal.kernel.util.PropsUtil.setProps(
+					new PropsImpl());
+
+				SystemProperties.set(
+					"log4j.configure.on.startup", StringPool.FALSE);
+
+				Log4JUtil.configureLog4J(
+					PACLTestsProcessCallable.class.getClassLoader());
+
+				captureAppender = LogAssertionTestCallback.startAssert(null);
+
 				JUnitCore junitCore = new JUnitCore();
 
 				junitCore.addListener(new NoticeBridgeRunListener());
@@ -257,10 +384,51 @@ public class PACLAggregateTest {
 				return junitCore.run(
 					_classes.toArray(new Class<?>[_classes.size()]));
 			}
+			catch (IOException ioe) {
+				throw new ProcessException(ioe);
+			}
 			finally {
+				InitUtil.stopRuntime();
+
 				InitUtil.stopModuleFramework();
 
 				MPIHelperUtil.shutdown();
+
+				if (tempStatePath != null) {
+					try {
+						Files.walkFileTree(
+							tempStatePath,
+							new SimpleFileVisitor<Path>() {
+
+								@Override
+								public FileVisitResult postVisitDirectory(
+										Path path, IOException ioe)
+									throws IOException {
+
+									Files.delete(path);
+
+									return FileVisitResult.CONTINUE;
+								}
+
+								@Override
+								public FileVisitResult visitFile(
+										Path path,
+										BasicFileAttributes basicFileAttributes)
+									throws IOException {
+
+									Files.delete(path);
+
+									return FileVisitResult.CONTINUE;
+								}
+
+							});
+					}
+					catch (IOException ioe) {
+						throw new ProcessException(ioe);
+					}
+
+					LogAssertionTestCallback.endAssert(null, captureAppender);
+				}
 			}
 		}
 

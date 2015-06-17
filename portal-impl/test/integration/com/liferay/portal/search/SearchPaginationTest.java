@@ -23,19 +23,21 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,9 +78,10 @@ public class SearchPaginationTest {
 
 		for (int i = 0; i < _USERS_COUNT; i ++) {
 			User user = UserTestUtil.addUser(
-				RandomTestUtil.randomString(), false,
-				RandomTestUtil.randomString(), _randomLastName,
-				new long[] {TestPropsValues.getGroupId()});
+				RandomTestUtil.randomString(
+					NumericStringRandomizerBumper.INSTANCE),
+				LocaleUtil.getDefault(), RandomTestUtil.randomString(),
+				_randomLastName, new long[] {TestPropsValues.getGroupId()});
 
 			_users.add(user);
 		}
@@ -259,7 +262,7 @@ public class SearchPaginationTest {
 
 		Assert.assertEquals(expectedTotal, hits.getDocs().length);
 
-		List<User> returnedUsers = new ArrayList<User>();
+		List<User> returnedUsers = new ArrayList<>();
 
 		for (int i = 0; i < hits.getDocs().length; i++) {
 			Document doc = hits.doc(i);
@@ -298,6 +301,6 @@ public class SearchPaginationTest {
 	private String _randomLastName;
 
 	@DeleteAfterTestRun
-	private List<User> _users = new ArrayList<User>();
+	private final List<User> _users = new ArrayList<>();
 
 }

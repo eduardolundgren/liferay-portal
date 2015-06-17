@@ -28,7 +28,7 @@ public class ExternalRepositoryFactoryUtil {
 
 	/**
 	 * @deprecated As of 7.0.0 replaced by {@link
-	 *             com.liferay.portal.repository.registry.RepositoryClassDefinitionCatalogUtil#getExternalRepositoryClassNames(
+	 *             com.liferay.portal.repository.registry.RepositoryDefinitionCatalogUtil#getExternalRepositoryClassNames(
 	 *             )}
 	 */
 	@Deprecated
@@ -69,7 +69,6 @@ public class ExternalRepositoryFactoryUtil {
 	}
 
 	private static final ConcurrentHashMap<String, ExternalRepositoryFactory>
-		externalRepositoryFactories =
-			new ConcurrentHashMap<String, ExternalRepositoryFactory>();
+		externalRepositoryFactories = new ConcurrentHashMap<>();
 
 }

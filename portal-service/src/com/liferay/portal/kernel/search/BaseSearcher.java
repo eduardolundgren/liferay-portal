@@ -14,13 +14,14 @@
 
 package com.liferay.portal.kernel.search;
 
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 /**
  * @author Eudaldo Alonso
@@ -29,21 +30,22 @@ import javax.portlet.PortletURL;
 public abstract class BaseSearcher extends BaseIndexer {
 
 	@Override
+	public String getClassName() {
+		return StringPool.BLANK;
+	}
+
+	@Override
 	public IndexerPostProcessor[] getIndexerPostProcessors() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public String getPortletId() {
-		return null;
-	}
-
-	@Override
 	public void postProcessSearchQuery(
-			BooleanQuery searchQuery, SearchContext searchContext)
+			BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
+			SearchContext searchContext)
 		throws Exception {
 
-		String[] classNames = getClassNames();
+		String[] classNames = getSearchClassNames();
 
 		if (ArrayUtil.isEmpty(classNames)) {
 			return;
@@ -56,7 +58,8 @@ public abstract class BaseSearcher extends BaseIndexer {
 				continue;
 			}
 
-			indexer.postProcessSearchQuery(searchQuery, searchContext);
+			indexer.postProcessSearchQuery(
+				searchQuery, fullQueryBooleanFilter, searchContext);
 		}
 	}
 
@@ -80,11 +83,22 @@ public abstract class BaseSearcher extends BaseIndexer {
 	@Override
 	protected Summary doGetSummary(
 			Document document, Locale locale, String snippet,
-			PortletURL portletURL, PortletRequest portletRequest,
-			PortletResponse portletResponse)
+			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
 
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, added strictly to support backwards
+	 *             compatibility of {@link Indexer#postProcessSearchQuery(
+	 *             BooleanQuery, SearchContext)}
+	 */
+	@Deprecated
+	protected void doPostProcessSearchQuery(
+			Indexer indexer, BooleanQuery searchQuery,
+			SearchContext searchContext)
+		throws Exception {
 	}
 
 	@Override
@@ -100,11 +114,6 @@ public abstract class BaseSearcher extends BaseIndexer {
 	@Override
 	protected void doReindex(String[] ids) throws Exception {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	protected String getPortletId(SearchContext searchContext) {
-		return null;
 	}
 
 }

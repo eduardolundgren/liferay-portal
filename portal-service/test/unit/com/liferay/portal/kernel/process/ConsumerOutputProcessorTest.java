@@ -15,7 +15,7 @@
 package com.liferay.portal.kernel.process;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -51,23 +51,7 @@ public class ConsumerOutputProcessorTest extends BaseOutputProcessorTestCase {
 			new byte[1024]);
 
 		Assert.assertNull(
-			invokeProcessStdErr(
-				consumerOutputProcessor, unsyncByteArrayInputStream));
-		Assert.assertEquals(0, unsyncByteArrayInputStream.available());
-
-		unsyncByteArrayInputStream = new UnsyncByteArrayInputStream(
-			new byte[1024]);
-
-		Assert.assertNull(
 			consumerOutputProcessor.processStdOut(unsyncByteArrayInputStream));
-		Assert.assertEquals(0, unsyncByteArrayInputStream.available());
-
-		unsyncByteArrayInputStream = new UnsyncByteArrayInputStream(
-			new byte[1024]);
-
-		Assert.assertNull(
-			invokeProcessStdOut(
-				consumerOutputProcessor, unsyncByteArrayInputStream));
 		Assert.assertEquals(0, unsyncByteArrayInputStream.available());
 	}
 

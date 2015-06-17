@@ -29,11 +29,6 @@ public class AddDefaultDataAction extends SimpleAction {
 
 		addDefaultDocumentLibraryStructuresAction.run(ids);
 
-		SimpleAction addDefaultJournalStructuresAction =
-			new AddDefaultJournalStructuresAction();
-
-		addDefaultJournalStructuresAction.run(ids);
-
 		SimpleAction addDefaultLayoutPrototypesAction =
 			new AddDefaultLayoutPrototypesAction();
 
@@ -43,16 +38,6 @@ public class AddDefaultDataAction extends SimpleAction {
 			new AddDefaultLayoutSetPrototypesAction();
 
 		addDefaultLayoutSetPrototypesAction.run(ids);
-
-		SimpleAction addDefaultDDMStructuresAction =
-			new AddDefaultDDMStructuresAction();
-
-		addDefaultDDMStructuresAction.run(ids);
-
-		SimpleAction addDefaultDDMTemplatesAction =
-			new AddDefaultDDMTemplatesAction();
-
-		addDefaultDDMTemplatesAction.run(ids);
 	}
 
 }

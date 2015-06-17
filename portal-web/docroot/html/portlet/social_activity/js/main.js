@@ -7,13 +7,13 @@ AUI.add(
 
 		var Widget = A.Widget;
 
+		var COL_LIMIT_TYPE = [Liferay.Language.get('social-activity-limit-type-times-a-day'), Liferay.Language.get('social-activity-limit-type-times'), Liferay.Language.get('social-activity-limit-type-times-per-period')];
+
 		var CSS_SETTINGS_ICON_CLOSE = 'settings-icon-close';
 
 		var CSS_SETTINGS_ICON_EXPANDED = 'settings-icon-expanded';
 
 		var CSS_TOKEN = 'lfr-token';
-
-		var COL_LIMIT_TYPE = [Liferay.Language.get('social-activity-limit-type-times-a-day'), Liferay.Language.get('social-activity-limit-type-times'), Liferay.Language.get('social-activity-limit-type-times-per-period')];
 
 		var STR_ACTION_FIELD = 'action-field';
 
@@ -95,9 +95,9 @@ AUI.add(
 
 		var SELECTOR_SETTINGS_LIMIT = STR_DOT + STR_SETTINGS_LIMIT;
 
-		var SELECTOR_SOCIAL_ACTIVITY_ITEM = '.social-activity-item';
-
 		var SELECTOR_SOCIAL_ACTIVITY_CONTENT = '.social-activity-details';
+
+		var SELECTOR_SOCIAL_ACTIVITY_ITEM = '.social-activity-item';
 
 		var SELECTOR_UPDATE_SOCIAL_ACTIVITY_FORM = 'form.update-socialactivity-form';
 
@@ -107,17 +107,18 @@ AUI.add(
 
 		var TPL_BUTTON_HOLDER = '<button class="' + [STR_SETTINGS_BUTTON_HOLDER].join(STR_SPACE) + ' btn btn-submit">' + STR_SAVE + '</button>';
 
-		var TPL_BOUNDING_BOX_SETTINGS_FIELD = '<li class="' + [CSS_TOKEN, STR_SETTINGS_FIELD, STR_ACTION_FIELD].join(STR_SPACE) + '"></li>';
+		var TPL_BOUNDING_BOX_SETTINGS_FIELD = '<li class="' + [CSS_TOKEN, STR_ACTION_FIELD, STR_SETTINGS_FIELD].join(STR_SPACE) + '"></li>';
 
 		var TPL_CONTRIBUTION_INCREMENT = '<span class="contribution-increment"></span>';
 
 		var TPL_FIELD = new A.Template(
 			'<span class="settings-label">{labelText}</span>',
+
 			'<div class="settings-controls">',
 				'<div class="field-values">',
 					'<span class="field field-text">{firstText}</span>',
 
-					'<select id="{languageKey}_participationIncrement" class="settings-field-node">',
+					'<select class="settings-field-node" id="{languageKey}_participationIncrement">',
 						'<tpl for="participationIncrements">',
 							'<option {[ (values == parent.participationIncrement) ? "selected" : "" ]} title="{.}" value="{.}">{.}</option>',
 						'</tpl>',
@@ -125,14 +126,16 @@ AUI.add(
 
 					'<span class="field field-text">{secondText}</span>',
 
-					'<select id="{languageKey}_contributionIncrement" class="settings-field-node">',
+					'<select class="settings-field-node" id="{languageKey}_contributionIncrement">',
 						'<tpl for="contributionIncrements">',
 							'<option {[ (values == parent.contributionIncrement) ? "selected" : "" ]} title="{.}" value="{.}">{.}</option>',
 						'</tpl>',
 					'</select>',
 
-					'<span class="field field-text">{thirdText}</span> <span class="field field-text field-contribution-text">{fourthText}</span>',
+					'<span class="field field-text">{thirdText}</span> ',
+					'<span class="field field-contribution-text field-text">{fourthText}</span>',
 				'</div>',
+
 				'<tpl if="rows.length">',
 					'<div class="settings-field-buttons">',
 						'<tpl for="buttons">',
@@ -147,16 +150,19 @@ AUI.add(
 					'<tpl for="rows">',
 						'<div class="settings-limit-row">',
 							'<span class="field field-text">{limitFirstText}</span>',
-							'<select id="{parent.languageKey}_{type}LimitValue" class="settings-field-node">',
+
+							'<select class="settings-field-node" id="{parent.languageKey}_{type}LimitValue">',
 								'<tpl for="limitValues">',
 									'<option {[ (values == parent.limitValue) ? "selected" : "" ]} title="{.}" value="{.}">{.}</option>',
 								'</tpl>',
 							'</select>',
-							'<select id="{parent.languageKey}_{type}LimitPeriod" class="settings-field-node">',
+
+							'<select class="settings-field-node" id="{parent.languageKey}_{type}LimitPeriod">',
 								'<tpl for="limitPeriods">',
 									'<option {[ ($index == parent.limitPeriod) ? "selected" : "" ]} title="{.}" value="{$index}">{.}</option>',
 								'</tpl>',
 							'</select>',
+
 							'<tpl if="limitSecondText">',
 								'<span class="field field-text">{limitSecondText}.</span>',
 							'</tpl>',
@@ -169,12 +175,16 @@ AUI.add(
 		var TPL_SETTINGS_DISPLAY = new A.Template(
 			'<div class="settings-header yui3-widget-hd">',
 				'<div class="settings-header-label">{headerText}</div>',
+
 				'<ul class="settings-actions">',
 					'<li class="actions-conjunction hide">{conjunctionText}</li>',
 				'</ul>',
 			'</div>',
+
 			'<div class="settings-container-label">{containerText}</div>',
+
 			'<ul class="container-drop-box yui3-widget-bd"></ul>',
+
 			'<div class="btn-row yui3-widget-ft">',
 				'<button class="btn btn-primary btn-submit">{saveText}</button>',
 			'</div>'
@@ -272,22 +282,6 @@ AUI.add(
 						);
 					},
 
-					_revealSection: function(menuItem, getSocialActivitySettingMappingCallback) {
-						var instance = this;
-
-						var modelName = menuItem.attr(STR_DATA_MODEL_NAME);
-
-						menuItem.radioClass(STR_SELECTED);
-
-						instance._getSocialActivitySettingMapping(
-							themeDisplay.getScopeGroupIdOrLiveGroupId(),
-							modelName,
-							function(result) {
-								getSocialActivitySettingMappingCallback(result, modelName);
-							}
-						);
-					},
-
 					_addSettingsDisplay: function(config) {
 						var instance = this;
 
@@ -321,8 +315,8 @@ AUI.add(
 						Liferay.Service(
 							'/socialactivitysetting/get-json-activity-definitions',
 							{
-								groupId: groupId,
-								className: modelName
+								className: modelName,
+								groupId: groupId
 							},
 							callback
 						);
@@ -340,6 +334,22 @@ AUI.add(
 						submitForm(form);
 					},
 
+					_revealSection: function(menuItem, getSocialActivitySettingMappingCallback) {
+						var instance = this;
+
+						var modelName = menuItem.attr(STR_DATA_MODEL_NAME);
+
+						menuItem.radioClass(STR_SELECTED);
+
+						instance._getSocialActivitySettingMapping(
+							themeDisplay.getScopeGroupIdOrLiveGroupId(),
+							modelName,
+							function(result) {
+								getSocialActivitySettingMappingCallback(result, modelName);
+							}
+						);
+					},
+
 					_updateCheckboxStatus: function(event) {
 						var instance = this;
 
@@ -350,9 +360,9 @@ AUI.add(
 						Liferay.Service(
 							'/socialactivitysetting/update-activity-setting',
 							{
-								groupId: themeDisplay.getScopeGroupIdOrLiveGroupId(),
 								className: modelName,
-								enabled: currentTarget.attr('checked')
+								enabled: currentTarget.attr('checked'),
+								groupId: themeDisplay.getScopeGroupIdOrLiveGroupId()
 							}
 						);
 					},
@@ -360,7 +370,7 @@ AUI.add(
 					_updateSocialActivitySettings: function(form) {
 						var instance = this;
 
-						instance._settingsInput.val(A.JSON.stringify(instance._getJsonSettings(instance.settingsDisplay)));
+						instance._settingsInput.val(JSON.stringify(instance._getJsonSettings(instance.settingsDisplay)));
 					}
 				}
 			}
@@ -417,8 +427,7 @@ AUI.add(
 
 						var actionsNode = headerNode.one('.settings-actions');
 
-						A.each(
-							originalConfig.dataSet,
+						originalConfig.dataSet.forEach(
 							function(item, index) {
 								item.localizedName = activityDefinitionLanguageKeys[item.modelName + '.' + item.languageKey];
 
@@ -531,7 +540,7 @@ AUI.add(
 							instance._toggleField(event, true);
 						}
 						else {
-							var collapsed = !(currentTarget.hasClass(CSS_SETTINGS_ICON_EXPANDED));
+							var collapsed = !currentTarget.hasClass(CSS_SETTINGS_ICON_EXPANDED);
 
 							instance._toggleLimitFields(currentTarget.ancestor(SELECTOR_SETTINGS_FIELD), collapsed);
 						}

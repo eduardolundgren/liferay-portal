@@ -14,35 +14,65 @@
 
 package com.liferay.xsl.content.web.portlet.action;
 
+import aQute.bnd.annotation.metatype.Configurable;
+
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.xsl.content.web.configuration.XSLContentConfiguration;
+import com.liferay.xsl.content.web.constants.XSLContentPortletKeys;
+import com.liferay.xsl.content.web.util.XSLContentUtil;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
+import javax.servlet.ServletContext;
+
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Hugo Huijser
+ * @author Samuel Kong
  */
 @Component(
+	configurationPid = "com.liferay.xsl.content.web.configuration.XSLContentConfiguration",
 	immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_xsl_content_web_portlet_XSLContentPortlet"
+		"javax.portlet.name=" + XSLContentPortletKeys.XSL_CONTENT,
+		"valid.url.prefixes=@portlet_context_url@"
 	},
 	service = ConfigurationAction.class
 )
 public class XSLContentConfigurationAction extends DefaultConfigurationAction {
+
+	@Override
+	public String getJspPath(RenderRequest renderRequest) {
+		return "/configuration.jsp";
+	}
+
+	@Override
+	public void include(
+			PortletConfig portletConfig, RenderRequest renderRequest,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		renderRequest.setAttribute(
+			XSLContentConfiguration.class.getName(), _xslContentConfiguration);
+
+		super.include(portletConfig, renderRequest, renderResponse);
+	}
 
 	@Override
 	public void processAction(
@@ -55,18 +85,38 @@ public class XSLContentConfigurationAction extends DefaultConfigurationAction {
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	protected boolean hasAllowedProtocol(String xmlURL) {
-		try {
-			URL url = new URL(xmlURL);
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.xsl.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
 
-			String protocol = url.getProtocol();
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_xslContentConfiguration = Configurable.createConfigurable(
+			XSLContentConfiguration.class, properties);
+	}
 
-			if (ArrayUtil.contains(_PROTOCOLS, protocol)) {
+	protected String[] getValidUrlPrefixes(ThemeDisplay themeDisplay) {
+		String validUrlPrefixes = XSLContentUtil.replaceUrlTokens(
+			themeDisplay, _xslContentConfiguration.validUrlPrefixes());
+
+		return StringUtil.split(validUrlPrefixes);
+	}
+
+	protected boolean hasValidUrlPrefix(String[] validUrlPrefixes, String url) {
+		if (validUrlPrefixes.length == 0) {
+			return true;
+		}
+
+		for (String validUrlPrefix : validUrlPrefixes) {
+			if (StringUtil.startsWith(url, validUrlPrefix)) {
 				return true;
 			}
-		}
-		catch (MalformedURLException murle) {
-			return false;
 		}
 
 		return false;
@@ -76,25 +126,25 @@ public class XSLContentConfigurationAction extends DefaultConfigurationAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		String[] validUrlPrefixes = getValidUrlPrefixes(themeDisplay);
+
 		String xmlUrl = getParameter(actionRequest, "xmlUrl");
 
-		xmlUrl = StringUtil.replace(
-			xmlUrl, "@portal_url@", themeDisplay.getPortalURL());
+		xmlUrl = XSLContentUtil.replaceUrlTokens(themeDisplay, xmlUrl);
 
-		if (!hasAllowedProtocol(xmlUrl)) {
+		if (!hasValidUrlPrefix(validUrlPrefixes, xmlUrl)) {
 			SessionErrors.add(actionRequest, "xmlUrl");
 		}
 
 		String xslUrl = getParameter(actionRequest, "xslUrl");
 
-		xslUrl = StringUtil.replace(
-			xslUrl, "@portal_url@", themeDisplay.getPortalURL());
+		xslUrl = XSLContentUtil.replaceUrlTokens(themeDisplay, xslUrl);
 
-		if (!hasAllowedProtocol(xslUrl)) {
+		if (!hasValidUrlPrefix(validUrlPrefixes, xslUrl)) {
 			SessionErrors.add(actionRequest, "xslUrl");
 		}
 	}
 
-	private static final String[] _PROTOCOLS = {"http", "https"};
+	private volatile XSLContentConfiguration _xslContentConfiguration;
 
 }

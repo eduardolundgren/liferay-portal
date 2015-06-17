@@ -89,7 +89,7 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 						<portlet:param name="searchRepositoryId" value="<%= !searchEverywhere ? String.valueOf(scopeGroupId) : String.valueOf(repositoryId) %>" />
 						<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 						<portlet:param name="searchFolderId" value="<%= !searchEverywhere ? String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) : String.valueOf(folderId) %>" />
-						<portlet:param name="keywords" value="<%= String.valueOf(keywords) %>" />
+						<portlet:param name="keywords" value="<%= keywords %>" />
 						<portlet:param name="showRepositoryTabs" value="<% (searchEverywhere) ? Boolean.TRUE.toString() : Boolean.FALSE.toString() %>" />
 						<portlet:param name="showSearchInfo" value="<%= Boolean.TRUE.toString() %>" />
 					</portlet:renderURL>
@@ -153,9 +153,7 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 
 				searchContainer.setTotal(hits.getLength());
 
-				PortletURL hitURL = liferayPortletResponse.createRenderURL();
-
-				List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL);
+				List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale);
 
 				for (int i = 0; i < searchResultsList.size(); i++) {
 					SearchResult searchResult = searchResultsList.get(i);
@@ -196,18 +194,18 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 
 							<liferay-ui:app-view-search-entry
 								actionJsp="/html/portlet/document_library/file_entry_action.jsp"
+								commentRelatedSearchResults="<%= searchResult.getCommentRelatedSearchResults() %>"
 								containerName="<%= DLUtil.getAbsolutePath(liferayPortletRequest, fileEntry.getFolderId()) %>"
 								cssClass='<%= MathUtil.isEven(i) ? "alt" : StringPool.BLANK %>'
-								description="<%= (summary != null) ? summary.getContent() : fileEntry.getDescription() %>"
+								description="<%= ((summary != null) && Validator.isNotNull(summary.getContent())) ? summary.getContent() : fileEntry.getDescription() %>"
 								locked="<%= fileEntry.isCheckedOut() %>"
-								mbMessages="<%= searchResult.getMBMessages() %>"
 								queryTerms="<%= hits.getQueryTerms() %>"
 								rowCheckerId="<%= String.valueOf(fileEntry.getFileEntryId()) %>"
 								rowCheckerName="<%= FileEntry.class.getSimpleName() %>"
 								showCheckbox="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE) %>"
 								status="<%= latestFileVersion.getStatus() %>"
 								thumbnailSrc="<%= DLUtil.getThumbnailSrc(fileEntry, themeDisplay) %>"
-								title="<%= (summary != null) ? summary.getTitle() : fileEntry.getTitle() %>"
+								title="<%= ((summary != null) && Validator.isNotNull(summary.getTitle())) ? summary.getTitle() : fileEntry.getTitle() %>"
 								url="<%= tempRowURL.toString() %>"
 							/>
 						</c:when>
@@ -223,7 +221,7 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 
 							String folderImage = "folder_empty_document";
 
-							if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status, true) > 0) {
+							if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status, true) > 0)) {
 								folderImage = "folder_full_document";
 							}
 
@@ -242,13 +240,13 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 								actionJsp="/html/portlet/document_library/folder_action.jsp"
 								containerName="<%= DLUtil.getAbsolutePath(liferayPortletRequest, curFolder.getParentFolderId()) %>"
 								cssClass='<%= MathUtil.isEven(i) ? "alt" : StringPool.BLANK %>'
-								description="<%= (summary != null) ? summary.getContent() : curFolder.getDescription() %>"
+								description="<%= ((summary != null) && Validator.isNotNull(summary.getContent())) ? summary.getContent() : curFolder.getDescription() %>"
 								queryTerms="<%= hits.getQueryTerms() %>"
 								rowCheckerId="<%= String.valueOf(curFolder.getFolderId()) %>"
 								rowCheckerName="<%= Folder.class.getSimpleName() %>"
 								showCheckbox="<%= DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE) %>"
 								thumbnailSrc='<%= themeDisplay.getPathThemeImages() + "/file_system/large/" + folderImage + ".png" %>'
-								title="<%= (summary != null) ? summary.getTitle() : curFolder.getName() %>"
+								title="<%= ((summary != null) && Validator.isNotNull(summary.getTitle())) ? summary.getTitle() : curFolder.getName() %>"
 								url="<%= tempRowURL.toString() %>"
 							/>
 						</c:when>
@@ -291,7 +289,7 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 		searchRepositoryURL.setParameter("struts_action", "/document_library/search");
 		searchRepositoryURL.setParameter("repositoryId", String.valueOf(scopeGroupId));
 		searchRepositoryURL.setParameter("searchRepositoryId", String.valueOf(scopeGroupId));
-		searchRepositoryURL.setParameter("keywords", String.valueOf(keywords));
+		searchRepositoryURL.setParameter("keywords", keywords);
 		searchRepositoryURL.setParameter("showRepositoryTabs", Boolean.TRUE.toString());
 		searchRepositoryURL.setParameter("showSearchInfo", Boolean.TRUE.toString());
 

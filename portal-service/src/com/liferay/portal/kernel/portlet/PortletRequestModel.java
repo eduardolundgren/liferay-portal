@@ -17,6 +17,8 @@ package com.liferay.portal.kernel.portlet;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -29,10 +31,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.MimeResponse;
@@ -191,10 +191,9 @@ public class PortletRequestModel implements Serializable {
 			_themeDisplayModel = null;
 		}
 
-		_parameters = new HashMap<String, String[]>(
-			portletRequest.getParameterMap());
+		_parameters = new HashMap<>(portletRequest.getParameterMap());
 
-		_attributes = new HashMap<String, Object>();
+		_attributes = new HashMap<>();
 
 		Enumeration<String> enumeration = portletRequest.getAttributeNames();
 
@@ -335,8 +334,7 @@ public class PortletRequestModel implements Serializable {
 	}
 
 	public Map<String, Object> toMap() {
-		Map<String, Object> portletRequestModelMap =
-			new HashMap<String, Object>();
+		Map<String, Object> portletRequestModelMap = new HashMap<>();
 
 		portletRequestModelMap.put("container-type", "portlet");
 		portletRequestModelMap.put("container-namespace", _contextPath);
@@ -394,8 +392,7 @@ public class PortletRequestModel implements Serializable {
 		}
 
 		if (_themeDisplayModel != null) {
-			Map<String, Object> themeDisplayModelMap =
-				new HashMap<String, Object>();
+			Map<String, Object> themeDisplayModelMap = new HashMap<>();
 
 			portletRequestModelMap.put("theme-display", themeDisplayModelMap);
 
@@ -451,8 +448,7 @@ public class PortletRequestModel implements Serializable {
 				_themeDisplayModel.getPortletDisplayModel();
 
 			if (portletDisplayModel != null) {
-				Map<String, Object> portletDisplayModelMap =
-					new HashMap<String, Object>();
+				Map<String, Object> portletDisplayModelMap = new HashMap<>();
 
 				themeDisplayModelMap.put(
 					"portlet-display", portletDisplayModelMap);
@@ -477,7 +473,7 @@ public class PortletRequestModel implements Serializable {
 
 		portletRequestModelMap.put("attributes", _attributes);
 
-		Map<String, Object> portletSessionMap = new HashMap<String, Object>();
+		Map<String, Object> portletSessionMap = new HashMap<>();
 
 		portletRequestModelMap.put("portlet-session", portletSessionMap);
 
@@ -754,21 +750,23 @@ public class PortletRequestModel implements Serializable {
 	protected Map<String, Object> filterInvalidAttributes(
 		Map<String, Object> map) {
 
-		Set<Map.Entry<String, Object>> set = map.entrySet();
+		PredicateFilter<Map.Entry<String, Object>> predicateFilter =
+			new PredicateFilter<Map.Entry<String, Object>>() {
 
-		Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+				@Override
+				public boolean filter(Map.Entry<String, Object> entry) {
+					if (_isValidAttributeName(entry.getKey()) &&
+						_isValidAttributeValue(entry.getValue())) {
 
-		while (iterator.hasNext()) {
-			Map.Entry<String, Object> entry = iterator.next();
+						return true;
+					}
 
-			if (!_isValidAttributeName(entry.getKey()) ||
-				!_isValidAttributeValue(entry.getValue())) {
+					return false;
+				}
 
-				iterator.remove();
-			}
-		}
+			};
 
-		return map;
+		return MapUtil.filter(map, predicateFilter);
 	}
 
 	private static boolean _isValidAttributeName(String name) {
@@ -777,8 +775,7 @@ public class PortletRequestModel implements Serializable {
 			StringUtil.equalsIgnoreCase(name, "LAYOUTS") ||
 			StringUtil.equalsIgnoreCase(name, "PORTLET_RENDER_PARAMETERS") ||
 			StringUtil.equalsIgnoreCase(name, "USER_PASSWORD") ||
-			name.startsWith("javax.") ||
-			name.startsWith("liferay-ui:")) {
+			name.startsWith("javax.") || name.startsWith("liferay-ui:")) {
 
 			return false;
 		}

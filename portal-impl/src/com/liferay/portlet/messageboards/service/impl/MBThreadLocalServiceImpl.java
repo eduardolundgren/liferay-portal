@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -40,6 +39,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 import com.liferay.portlet.messageboards.NoSuchCategoryException;
 import com.liferay.portlet.messageboards.SplitThreadException;
 import com.liferay.portlet.messageboards.model.MBCategory;
@@ -74,8 +74,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Thread
 
-		Date now = new Date();
-
 		long threadId = message.getThreadId();
 
 		if (!message.isRoot() || (threadId <= 0)) {
@@ -89,8 +87,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		thread.setCompanyId(message.getCompanyId());
 		thread.setUserId(message.getUserId());
 		thread.setUserName(message.getUserName());
-		thread.setCreateDate(serviceContext.getCreateDate(now));
-		thread.setModifiedDate(serviceContext.getModifiedDate(now));
 		thread.setCategoryId(categoryId);
 		thread.setRootMessageId(message.getMessageId());
 		thread.setRootMessageUserId(message.getUserId());
@@ -102,7 +98,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			thread.setLastPostByUserId(message.getUserId());
 		}
 
-		thread.setLastPostDate(message.getCreateDate());
+		thread.setLastPostDate(message.getModifiedDate());
 
 		if (message.getPriority() != MBThreadConstants.PRIORITY_NOT_GIVEN) {
 			thread.setPriority(message.getPriority());
@@ -124,7 +120,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				MBThread.class.getName(), thread.getThreadId(),
 				thread.getUuid(), 0, new long[0], new String[0], false, null,
 				null, null, null, String.valueOf(thread.getRootMessageId()),
-				null, null, null, null, 0, 0, null, false);
+				null, null, null, null, 0, 0, null);
 		}
 
 		return thread;
@@ -140,7 +136,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public void deleteThread(MBThread thread) throws PortalException {
 		MBMessage rootMessage = mbMessagePersistence.findByPrimaryKey(
 			thread.getRootMessageId());
@@ -166,7 +163,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Thread flags
 
-		mbThreadFlagPersistence.removeByThreadId(thread.getThreadId());
+		mbThreadFlagLocalService.deleteThreadFlagsByThreadId(
+			thread.getThreadId());
 
 		// Messages
 
@@ -327,8 +325,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	public List<MBThread> getGroupThreads(
 		long groupId, int status, int start, int end) {
 
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status, start, end, null);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status, start, end, null);
 
 		return getGroupThreads(groupId, queryDefinition);
 	}
@@ -377,8 +375,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		long groupId, long userId, int status, boolean subscribed,
 		boolean includeAnonymous, int start, int end) {
 
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status, start, end, null);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status, start, end, null);
 
 		return getGroupThreads(
 			groupId, userId, subscribed, includeAnonymous, queryDefinition);
@@ -394,8 +392,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		long groupId, long userId, int status, boolean subscribed, int start,
 		int end) {
 
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status, start, end, null);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status, start, end, null);
 
 		return getGroupThreads(groupId, userId, subscribed, queryDefinition);
 	}
@@ -409,8 +407,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	public List<MBThread> getGroupThreads(
 		long groupId, long userId, int status, int start, int end) {
 
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status, start, end, null);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status, start, end, null);
 
 		return getGroupThreads(groupId, userId, false, queryDefinition);
 	}
@@ -447,8 +445,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	@Deprecated
 	@Override
 	public int getGroupThreadsCount(long groupId, int status) {
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status);
 
 		return getGroupThreadsCount(groupId, queryDefinition);
 	}
@@ -494,8 +492,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	@Deprecated
 	@Override
 	public int getGroupThreadsCount(long groupId, long userId, int status) {
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status);
 
 		return getGroupThreadsCount(groupId, userId, false, queryDefinition);
 	}
@@ -509,8 +507,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	public int getGroupThreadsCount(
 		long groupId, long userId, int status, boolean subscribed) {
 
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status);
 
 		return getGroupThreadsCount(
 			groupId, userId, subscribed, true, queryDefinition);
@@ -526,8 +524,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		long groupId, long userId, int status, boolean subscribed,
 		boolean includeAnonymous) {
 
-		QueryDefinition<MBThread> queryDefinition =
-			new QueryDefinition<MBThread>(status);
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status);
 
 		return getGroupThreadsCount(
 			groupId, userId, subscribed, includeAnonymous, queryDefinition);
@@ -577,7 +575,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			return mbThreadPersistence.findByC_P(categoryId, priority);
 		}
 
-		List<MBThread> threads = new ArrayList<MBThread>();
+		List<MBThread> threads = new ArrayList<>();
 
 		while ((categoryId != MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) &&
 			   (categoryId != MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {
@@ -637,7 +635,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	@BufferedIncrement(
-		configuration = "MBThread", incrementClass = NumberIncrement.class)
+		configuration = "MBThread", incrementClass = NumberIncrement.class
+	)
 	@Override
 	public void incrementViewCounter(long threadId, int increment)
 		throws PortalException {
@@ -658,7 +657,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			long groupId, long threadId, long trashEntryId)
 		throws PortalException {
 
-		Set<Long> userIds = new HashSet<Long>();
+		Set<Long> userIds = new HashSet<>();
 
 		List<MBMessage> messages = mbMessageLocalService.getThreadMessages(
 			threadId, WorkflowConstants.STATUS_ANY);
@@ -746,7 +745,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Thread
 
-		thread.setModifiedDate(new Date());
 		thread.setCategoryId(categoryId);
 
 		mbThreadPersistence.update(thread);
@@ -909,7 +907,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	public void restoreDependentsFromTrash(long groupId, long threadId)
 		throws PortalException {
 
-		Set<Long> userIds = new HashSet<Long>();
+		Set<Long> userIds = new HashSet<>();
 
 		List<MBMessage> messages = mbMessageLocalService.getThreadMessages(
 			threadId, WorkflowConstants.STATUS_ANY);
@@ -1097,8 +1095,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		MBThread thread = addThread(
 			message.getCategoryId(), message, serviceContext);
 
-		oldThread.setModifiedDate(serviceContext.getModifiedDate(new Date()));
-
 		mbThreadPersistence.update(oldThread);
 
 		// Update messages
@@ -1221,13 +1217,10 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
-		Date now = new Date();
-
-		thread.setModifiedDate(now);
 		thread.setStatus(status);
 		thread.setStatusByUserId(user.getUserId());
 		thread.setStatusByUserName(user.getFullName());
-		thread.setStatusDate(now);
+		thread.setStatusDate(new Date());
 
 		mbThreadPersistence.update(thread);
 

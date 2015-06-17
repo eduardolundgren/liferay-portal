@@ -17,17 +17,22 @@ package com.liferay.portlet.documentlibrary.util;
 import com.liferay.portal.kernel.search.HitsOpenSearchImpl;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@OSGiBeanProperties
 public class DLOpenSearchImpl extends HitsOpenSearchImpl {
 
-	public static final String SEARCH_PATH = "/c/document_library/open_search";
-
 	public static final String TITLE = "Liferay Documents and Media Search: ";
+
+	@Override
+	public String getClassName() {
+		return DLFileEntry.class.getName();
+	}
 
 	@Override
 	public Indexer getIndexer() {
@@ -35,13 +40,8 @@ public class DLOpenSearchImpl extends HitsOpenSearchImpl {
 	}
 
 	@Override
-	public String getPortletId() {
-		return PortletKeys.DOCUMENT_LIBRARY;
-	}
-
-	@Override
 	public String getSearchPath() {
-		return SEARCH_PATH;
+		return StringPool.BLANK;
 	}
 
 	@Override

@@ -19,7 +19,9 @@ import aQute.bnd.annotation.metatype.Meta;
 /**
  * @author Jorge Ferrer
  */
-@Meta.OCD(id = "com.liferay.amazon.rankings.web")
+@Meta.OCD(
+	id = "com.liferay.amazon.rankings.web.configuration.AmazonRankingsConfiguration"
+)
 public interface AmazonRankingsConfiguration {
 
 	@Meta.AD(required = false)
@@ -33,7 +35,8 @@ public interface AmazonRankingsConfiguration {
 
 	@Meta.AD(
 		deflt = "0066620996|0131412752|0201633612|0310205719|0310241448",
-		required = false)
+		required = false
+	)
 	public String[] isbns();
 
 }

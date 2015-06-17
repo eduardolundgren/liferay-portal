@@ -19,10 +19,10 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.security.ac.AccessControlled;
 
 /**
  * Provides the remote service interface for Website. Methods of this
@@ -54,17 +54,15 @@ public interface WebsiteService extends BaseService {
 	@java.lang.Deprecated
 	public com.liferay.portal.model.Website addWebsite(
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long typeId, boolean primary) throws PortalException;
 
 	public com.liferay.portal.model.Website addWebsite(
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary,
+		long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
-	public void deleteWebsite(long websiteId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteWebsite(long websiteId) throws PortalException;
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -75,12 +73,11 @@ public interface WebsiteService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.Website getWebsite(long websiteId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Website> getWebsites(
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String className, long classPK) throws PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -90,6 +87,6 @@ public interface WebsiteService extends BaseService {
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	public com.liferay.portal.model.Website updateWebsite(long websiteId,
-		java.lang.String url, int typeId, boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String url, long typeId, boolean primary)
+		throws PortalException;
 }

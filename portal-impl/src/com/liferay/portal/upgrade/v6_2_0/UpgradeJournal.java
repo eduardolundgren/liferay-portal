@@ -224,6 +224,8 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		updateStructures();
 		updateTemplates();
 
+		updateAssetEntryClassTypeId();
+
 		super.doUpgrade();
 	}
 
@@ -267,6 +269,37 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		return new String[] {
 			"56_INSTANCE_%", "62_INSTANCE_%", "101_INSTANCE_%"
 		};
+	}
+
+	protected void updateAssetEntryClassTypeId() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select groupId, resourcePrimKey, structureId from " +
+					"JournalArticle where structureId != ''");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long groupId = rs.getLong("groupId");
+				long resourcePrimKey = rs.getLong("resourcePrimKey");
+				String structureId = rs.getString("structureId");
+
+				long ddmStructureId = getDDMStructureId(groupId, structureId);
+
+				runSQL(
+					"update AssetEntry set classTypeId = " +
+						ddmStructureId + " where classPK = " + resourcePrimKey);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
 	}
 
 	protected void updatePreferencesClassPKs(
@@ -365,7 +398,7 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		_ddmStructureIds.put(groupId + "#" + structureId, ddmStructureId);
 		_ddmStructurePKs.put(id_, ddmStructureId);
 
-		return 0;
+		return ddmStructureId;
 	}
 
 	protected long updateStructure(String structureId) throws Exception {
@@ -530,9 +563,9 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 
 	private static final String _PORTLET_ID_JOURNAL_CONTENT_LIST = "62";
 
-	private static Log _log = LogFactoryUtil.getLog(UpgradeJournal.class);
+	private static final Log _log = LogFactoryUtil.getLog(UpgradeJournal.class);
 
-	private Map<String, Long> _ddmStructureIds = new HashMap<String, Long>();
-	private Map<Long, Long> _ddmStructurePKs = new HashMap<Long, Long>();
+	private final Map<String, Long> _ddmStructureIds = new HashMap<>();
+	private final Map<Long, Long> _ddmStructurePKs = new HashMap<>();
 
 }

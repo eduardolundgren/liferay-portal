@@ -19,10 +19,10 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.security.ac.AccessControlled;
 
 /**
  * Provides the remote service interface for User. Methods of this
@@ -61,7 +61,7 @@ public interface UserService extends BaseService {
 	*/
 	public void addGroupUsers(long groupId, long[] userIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the users to the organization.
@@ -75,7 +75,7 @@ public interface UserService extends BaseService {
 	not allowed by the membership policy
 	*/
 	public void addOrganizationUsers(long organizationId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Assigns the password policy to the users, removing any other currently
@@ -87,7 +87,7 @@ public interface UserService extends BaseService {
 	policy members
 	*/
 	public void addPasswordPolicyUsers(long passwordPolicyId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the users to the role.
@@ -100,7 +100,7 @@ public interface UserService extends BaseService {
 	policy
 	*/
 	public void addRoleUsers(long roleId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the users to the team.
@@ -112,7 +112,7 @@ public interface UserService extends BaseService {
 	members
 	*/
 	public void addTeamUsers(long teamId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a user with additional parameters.
@@ -174,7 +174,7 @@ public interface UserService extends BaseService {
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds,
@@ -185,7 +185,7 @@ public interface UserService extends BaseService {
 		java.util.List<com.liferay.portlet.announcements.model.AnnouncementsDelivery> announcementsDelivers,
 		boolean sendEmail,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a user.
@@ -242,12 +242,12 @@ public interface UserService extends BaseService {
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds, boolean sendEmail,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the users to the user group.
@@ -260,7 +260,7 @@ public interface UserService extends BaseService {
 	the membership policy
 	*/
 	public void addUserGroupUsers(long userGroupId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a user with workflow and additional parameters.
@@ -322,7 +322,7 @@ public interface UserService extends BaseService {
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds,
@@ -333,7 +333,7 @@ public interface UserService extends BaseService {
 		java.util.List<com.liferay.portlet.announcements.model.AnnouncementsDelivery> announcementsDelivers,
 		boolean sendEmail,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a user with workflow.
@@ -390,12 +390,12 @@ public interface UserService extends BaseService {
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds, boolean sendEmail,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the user's portrait image.
@@ -405,8 +405,7 @@ public interface UserService extends BaseService {
 	found, if the user's portrait could not be found, or if the
 	current user did not have permission to update the user
 	*/
-	public void deletePortrait(long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deletePortrait(long userId) throws PortalException;
 
 	/**
 	* Removes the user from the role.
@@ -418,7 +417,7 @@ public interface UserService extends BaseService {
 	assign role members
 	*/
 	public void deleteRoleUser(long roleId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the user.
@@ -427,8 +426,7 @@ public interface UserService extends BaseService {
 	* @throws PortalException if a user with the primary key could not be found
 	or if the current user did not have permission to delete the user
 	*/
-	public void deleteUser(long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteUser(long userId) throws PortalException;
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -439,12 +437,14 @@ public interface UserService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getCompanyUsers(
-		long companyId, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long companyId, int start, int end) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCompanyUsersCount(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public int getCompanyUsersCount(long companyId) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.User getCurrentUser()
+		throws PortalException;
 
 	/**
 	* Returns the primary keys of all the users belonging to the group.
@@ -455,8 +455,7 @@ public interface UserService extends BaseService {
 	view group assignments
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long[] getGroupUserIds(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public long[] getGroupUserIds(long groupId) throws PortalException;
 
 	/**
 	* Returns all the users belonging to the group.
@@ -468,8 +467,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getGroupUsers(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long groupId) throws PortalException;
 
 	/**
 	* Returns the primary keys of all the users belonging to the organization.
@@ -481,7 +479,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long[] getOrganizationUserIds(long organizationId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns all the users belonging to the organization.
@@ -493,8 +491,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getOrganizationUsers(
-		long organizationId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long organizationId) throws PortalException;
 
 	/**
 	* Returns the primary keys of all the users belonging to the role.
@@ -505,8 +502,7 @@ public interface UserService extends BaseService {
 	view role members
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long[] getRoleUserIds(long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public long[] getRoleUserIds(long roleId) throws PortalException;
 
 	/**
 	* Returns the user with the email address.
@@ -520,8 +516,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.User getUserByEmailAddress(long companyId,
-		java.lang.String emailAddress)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String emailAddress) throws PortalException;
 
 	/**
 	* Returns the user with the primary key.
@@ -533,7 +528,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.User getUserById(long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns the user with the screen name.
@@ -546,13 +541,11 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.User getUserByScreenName(long companyId,
-		java.lang.String screenName)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String screenName) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.User> getUserGroupUsers(
-		long userGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long userGroupId) throws PortalException;
 
 	/**
 	* Returns the primary key of the user with the email address.
@@ -565,8 +558,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getUserIdByEmailAddress(long companyId,
-		java.lang.String emailAddress)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String emailAddress) throws PortalException;
 
 	/**
 	* Returns the primary key of the user with the screen name.
@@ -578,8 +570,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getUserIdByScreenName(long companyId,
-		java.lang.String screenName)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String screenName) throws PortalException;
 
 	/**
 	* Returns <code>true</code> if the user is a member of the group.
@@ -593,7 +584,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasGroupUser(long groupId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns <code>true</code> if the user has the role with the name,
@@ -611,8 +602,7 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasRoleUser(long companyId, java.lang.String name,
-		long userId, boolean inherited)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long userId, boolean inherited) throws PortalException;
 
 	/**
 	* Returns <code>true</code> if the user is a member of the role.
@@ -626,18 +616,76 @@ public interface UserService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasRoleUser(long roleId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
+	/**
+	* Sends a password notification email to the user matching the email
+	* address. The portal's settings determine whether a password is sent
+	* explicitly or whether a link for resetting the user's password is sent.
+	* The method sends the email asynchronously and returns before the email is
+	* sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param emailAddress the user's email address
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the email address could not be
+	found
+	*/
 	public boolean sendPasswordByEmailAddress(long companyId,
-		java.lang.String emailAddress)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String emailAddress) throws PortalException;
 
+	/**
+	* Sends a password notification email to the user matching the screen name.
+	* The portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param screenName the user's screen name
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the screen name could not be found
+	*/
 	public boolean sendPasswordByScreenName(long companyId,
-		java.lang.String screenName)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String screenName) throws PortalException;
 
-	public boolean sendPasswordByUserId(long userId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	/**
+	* Sends a password notification email to the user matching the ID. The
+	* portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param userId the user's primary key
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the user ID could not be found
+	*/
+	public boolean sendPasswordByUserId(long userId) throws PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -657,7 +705,7 @@ public interface UserService extends BaseService {
 	membership policy
 	*/
 	public void setRoleUsers(long roleId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Sets the users in the user group, removing and adding users to the user
@@ -669,7 +717,7 @@ public interface UserService extends BaseService {
 	assign group members
 	*/
 	public void setUserGroupUsers(long userGroupId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the teams of a group.
@@ -680,7 +728,7 @@ public interface UserService extends BaseService {
 	modify user group assignments
 	*/
 	public void unsetGroupTeamsUsers(long groupId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the group.
@@ -695,7 +743,7 @@ public interface UserService extends BaseService {
 	*/
 	public void unsetGroupUsers(long groupId, long[] userIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the organization.
@@ -707,7 +755,7 @@ public interface UserService extends BaseService {
 	allowed by the membership policy
 	*/
 	public void unsetOrganizationUsers(long organizationId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the password policy.
@@ -718,7 +766,7 @@ public interface UserService extends BaseService {
 	modify policy assignments
 	*/
 	public void unsetPasswordPolicyUsers(long passwordPolicyId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the role.
@@ -730,7 +778,7 @@ public interface UserService extends BaseService {
 	the membership policy
 	*/
 	public void unsetRoleUsers(long roleId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the team.
@@ -741,7 +789,7 @@ public interface UserService extends BaseService {
 	modify team assignments
 	*/
 	public void unsetTeamUsers(long teamId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the users from the user group.
@@ -753,7 +801,7 @@ public interface UserService extends BaseService {
 	by the membership policy
 	*/
 	public void unsetUserGroupUsers(long userGroupId, long[] userIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user's response to the terms of use agreement.
@@ -765,8 +813,7 @@ public interface UserService extends BaseService {
 	update the user's agreement to terms-of-use
 	*/
 	public com.liferay.portal.model.User updateAgreedToTermsOfUse(long userId,
-		boolean agreedToTermsOfUse)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean agreedToTermsOfUse) throws PortalException;
 
 	/**
 	* Updates the user's email address.
@@ -786,7 +833,7 @@ public interface UserService extends BaseService {
 		java.lang.String password, java.lang.String emailAddress1,
 		java.lang.String emailAddress2,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates a user account that was automatically created when a guest user
@@ -832,12 +879,12 @@ public interface UserService extends BaseService {
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, boolean updateUserInformation,
 		boolean sendEmail,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates whether the user is locked out from logging in.
@@ -849,8 +896,7 @@ public interface UserService extends BaseService {
 	the user
 	*/
 	public com.liferay.portal.model.User updateLockoutById(long userId,
-		boolean lockout)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean lockout) throws PortalException;
 
 	/**
 	* Updates the user's OpenID.
@@ -862,8 +908,7 @@ public interface UserService extends BaseService {
 	or if the current user did not have permission to update the user
 	*/
 	public com.liferay.portal.model.User updateOpenId(long userId,
-		java.lang.String openId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String openId) throws PortalException;
 
 	/**
 	* Sets the organizations that the user is in, removing and adding
@@ -878,7 +923,7 @@ public interface UserService extends BaseService {
 	*/
 	public void updateOrganizations(long userId, long[] organizationIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user's password without tracking or validation of the change.
@@ -894,8 +939,7 @@ public interface UserService extends BaseService {
 	*/
 	public com.liferay.portal.model.User updatePassword(long userId,
 		java.lang.String password1, java.lang.String password2,
-		boolean passwordReset)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean passwordReset) throws PortalException;
 
 	/**
 	* Updates the user's portrait image.
@@ -908,8 +952,7 @@ public interface UserService extends BaseService {
 	did not have permission to update the user
 	*/
 	public com.liferay.portal.model.User updatePortrait(long userId,
-		byte[] bytes)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		byte[] bytes) throws PortalException;
 
 	/**
 	* Updates the user's password reset question and answer.
@@ -924,7 +967,7 @@ public interface UserService extends BaseService {
 	*/
 	public com.liferay.portal.model.User updateReminderQuery(long userId,
 		java.lang.String question, java.lang.String answer)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user's screen name.
@@ -937,8 +980,7 @@ public interface UserService extends BaseService {
 	did not have permission to update the user
 	*/
 	public com.liferay.portal.model.User updateScreenName(long userId,
-		java.lang.String screenName)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String screenName) throws PortalException;
 
 	/**
 	* Updates the user's workflow status.
@@ -957,7 +999,7 @@ public interface UserService extends BaseService {
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portal.model.User updateStatus(long userId, int status)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user's workflow status.
@@ -977,7 +1019,7 @@ public interface UserService extends BaseService {
 	*/
 	public com.liferay.portal.model.User updateStatus(long userId, int status,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user with additional parameters.
@@ -1042,12 +1084,12 @@ public interface UserService extends BaseService {
 	operation was not allowed by the membership policy
 	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
 	String, String, boolean, String, String, String, String,
-	long, String, String, String, String, String, String, String,
-	String, int, int, boolean, int, int, int, String, String,
-	String, String, String, String, String, String, String,
-	String, String, long[], long[], long[], java.util.List,
-	long[], java.util.List, java.util.List, java.util.List,
-	java.util.List, java.util.List, boolean, byte[],
+	long, String, boolean, byte[], String, String, String,
+	String, String, String, String, int, int, boolean, int, int,
+	int, String, String, String, String, String, String, String,
+	String, String, String, String, long[], long[], long[],
+	java.util.List, long[], java.util.List, java.util.List,
+	java.util.List, java.util.List, java.util.List,
 	com.liferay.portal.service.ServiceContext)}
 	*/
 	@java.lang.Deprecated
@@ -1060,8 +1102,8 @@ public interface UserService extends BaseService {
 		java.lang.String openId, java.lang.String languageId,
 		java.lang.String timeZoneId, java.lang.String greeting,
 		java.lang.String comments, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
 		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,
 		java.lang.String jabberSn, java.lang.String msnSn,
@@ -1077,7 +1119,7 @@ public interface UserService extends BaseService {
 		java.util.List<com.liferay.portal.model.Website> websites,
 		java.util.List<com.liferay.portlet.announcements.model.AnnouncementsDelivery> announcementsDelivers,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user.
@@ -1145,8 +1187,8 @@ public interface UserService extends BaseService {
 		java.lang.String openId, java.lang.String languageId,
 		java.lang.String timeZoneId, java.lang.String greeting,
 		java.lang.String comments, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
 		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,
 		java.lang.String jabberSn, java.lang.String msnSn,
@@ -1157,7 +1199,7 @@ public interface UserService extends BaseService {
 		java.util.List<com.liferay.portal.model.UserGroupRole> userGroupRoles,
 		long[] userGroupIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user with additional parameters.
@@ -1233,7 +1275,7 @@ public interface UserService extends BaseService {
 		java.lang.String languageId, java.lang.String timeZoneId,
 		java.lang.String greeting, java.lang.String comments,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,
@@ -1250,5 +1292,5 @@ public interface UserService extends BaseService {
 		java.util.List<com.liferay.portal.model.Website> websites,
 		java.util.List<com.liferay.portlet.announcements.model.AnnouncementsDelivery> announcementsDelivers,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 }

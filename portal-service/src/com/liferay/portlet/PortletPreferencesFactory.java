@@ -56,8 +56,19 @@ public interface PortletPreferencesFactory {
 	public PortalPreferences fromXML(
 		long companyId, long ownerId, int ownerType, String xml);
 
+	public PortletPreferences getExistingPortletSetup(
+			Layout layout, String portletId)
+		throws PortalException;
+
+	public PortletPreferences getExistingPortletSetup(
+			PortletRequest portletRequest)
+		throws PortalException;
+
 	public PortletPreferences getLayoutPortletSetup(
 		Layout layout, String portletId);
+
+	public PortletPreferences getLayoutPortletSetup(
+		Layout layout, String portletId, String defaultPreferences);
 
 	public PortalPreferences getPortalPreferences(HttpServletRequest request);
 
@@ -103,6 +114,10 @@ public interface PortletPreferencesFactory {
 			boolean modeEditGuest)
 		throws PortalException;
 
+	public PortletPreferencesIds getPortletPreferencesIds(
+		long companyId, long siteGroupId, long plid, String portletId,
+		String settingsScope);
+
 	public PortletPreferences getPortletSetup(
 			HttpServletRequest request, String portletId)
 		throws PortalException;
@@ -139,6 +154,10 @@ public interface PortletPreferencesFactory {
 
 	public PortletPreferences getStrictPortletSetup(
 		Layout layout, String portletId);
+
+	public PortletPreferences strictFromXML(
+		long companyId, long ownerId, int ownerType, long plid,
+		String portletId, String xml);
 
 	public String toXML(PortalPreferences portalPreferences);
 

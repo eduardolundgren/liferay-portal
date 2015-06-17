@@ -17,6 +17,9 @@ package com.liferay.portal.kernel.trash;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.model.TrashedModel;
@@ -55,8 +58,9 @@ import javax.portlet.PortletRequest;
  * BlogsEntry via {@link com.liferay.portlet.blogs.trash.BlogsEntryTrashHandler}
  * </li>
  * <li>
- * BookmarksEntry via {@link
- * com.liferay.portlet.bookmarks.trash.BookmarksEntryTrashHandler}
+ * BookmarksEntry via
+ * <code>com.liferay.bookmarks.trash.BookmarksEntryTrashHandler</code>
+ * located in Liferay Portal's external <code>modules</code> directory.
  * </li>
  * <li>
  * DLFileEntry via {@link
@@ -75,12 +79,12 @@ import javax.portlet.PortletRequest;
  * com.liferay.portlet.messageboards.trash.MBThreadTrashHandler}
  * </li>
  * <li>
- * WikiNode via {@link
- * com.liferay.portlet.wiki.trash.WikiNodeTrashHandler}
+ * WikiNode via <code>com.liferay.wiki.trash.WikiNodeTrashHandler</code> located
+ * in Liferay Portal's external <code>modules</code> directory.
  * </li>
  * <li>
- * WikiPage via {@link
- * com.liferay.portlet.wiki.trash.WikiPageTrashHandler}
+ * WikiPage via <code>com.liferay.wiki.trash.WikiPageTrashHandler</code> located
+ * in Liferay Portal's external <code>modules</code> directory.
  * </li>
  * </ul>
  *
@@ -276,6 +280,15 @@ public interface TrashHandler {
 
 	public long getDestinationContainerModelId(
 		long classPK, long destinationContainerModelId);
+
+	public Filter getExcludeFilter(SearchContext searchContext);
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getExcludeFilter(
+	 *             SearchContext)}
+	 */
+	@Deprecated
+	public Query getExcludeQuery(SearchContext searchContext);
 
 	/**
 	 * Returns the parent container model of the model entity with the primary

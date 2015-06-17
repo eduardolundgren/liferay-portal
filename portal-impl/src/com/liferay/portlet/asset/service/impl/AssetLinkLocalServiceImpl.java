@@ -15,6 +15,8 @@
 package com.liferay.portlet.asset.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portlet.asset.NoSuchLinkException;
@@ -113,6 +115,9 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 					link.getEntryId2(), link.getEntryId1(), link.getType());
 			}
 			catch (NoSuchLinkException nsle) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to delete asset link", nsle);
+				}
 			}
 		}
 
@@ -175,7 +180,7 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 		List<AssetLink> assetLinks = assetLinkPersistence.findByE1(entryId);
 
 		if (!assetLinks.isEmpty()) {
-			List<AssetLink> filteredAssetLinks = new ArrayList<AssetLink>(
+			List<AssetLink> filteredAssetLinks = new ArrayList<>(
 				assetLinks.size());
 
 			for (AssetLink assetLink : assetLinks) {
@@ -213,7 +218,7 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 			entryId, typeId);
 
 		if (!assetLinks.isEmpty()) {
-			List<AssetLink> filteredAssetLinks = new ArrayList<AssetLink>(
+			List<AssetLink> filteredAssetLinks = new ArrayList<>(
 				assetLinks.size());
 
 			for (AssetLink assetLink : assetLinks) {
@@ -244,7 +249,7 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 		List<AssetLink> e1Links = assetLinkPersistence.findByE1(entryId);
 		List<AssetLink> e2Links = assetLinkPersistence.findByE2(entryId);
 
-		List<AssetLink> links = new ArrayList<AssetLink>(
+		List<AssetLink> links = new ArrayList<>(
 			e1Links.size() + e2Links.size());
 
 		links.addAll(e1Links);
@@ -274,7 +279,7 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 		List<AssetLink> e2Links = assetLinkPersistence.findByE2_T(
 			entryId, typeId);
 
-		List<AssetLink> links = new ArrayList<AssetLink>(
+		List<AssetLink> links = new ArrayList<>(
 			e1Links.size() + e2Links.size());
 
 		links.addAll(e1Links);
@@ -378,5 +383,8 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 			}
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetLinkLocalServiceImpl.class);
 
 }

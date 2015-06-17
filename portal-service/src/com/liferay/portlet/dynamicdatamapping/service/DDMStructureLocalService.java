@@ -71,23 +71,14 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	public void addDLFileEntryTypeDDMStructures(long fileEntryTypeId,
 		long[] structureIds);
 
-	public void addJournalFolderDDMStructure(long folderId,
-		com.liferay.portlet.dynamicdatamapping.model.DDMStructure ddmStructure);
-
-	public void addJournalFolderDDMStructure(long folderId, long structureId);
-
-	public void addJournalFolderDDMStructures(long folderId,
-		java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> DDMStructures);
-
-	public void addJournalFolderDDMStructures(long folderId, long[] structureIds);
-
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
 		long userId, long groupId, long classNameId,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a structure referencing a default parent structure, using the portal
@@ -110,7 +101,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	found, if the XSD was not well-formed, or if a portal
 	exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	long, Map, Map, DDMForm, ServiceContext)}
+	long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
@@ -119,7 +110,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String definition,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
 		long userId, long groupId, long parentStructureId, long classNameId,
@@ -127,9 +118,10 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a structure referencing its parent structure.
@@ -160,8 +152,8 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	found, if the XSD was not well-formed, or if a portal
 	exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	long, long, String, Map, Map, DDMForm, String, int,
-	ServiceContext)}
+	long, long, String, Map, Map, DDMForm, DDMFormLayout, String,
+	int, ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
@@ -171,7 +163,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String definition, java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
 		long userId, long groupId, java.lang.String parentStructureKey,
@@ -179,9 +171,10 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a structure referencing a default parent structure if the parent
@@ -212,8 +205,8 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	found, if the XSD was not well-formed, or if a portal
 	exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	String, long, String, Map, Map, DDMForm, String, int,
-	ServiceContext)}
+	String, long, String, Map, Map, DDMForm, DDMFormLayout,
+	String, int, ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
@@ -223,7 +216,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String definition, java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the resources to the structure.
@@ -236,7 +229,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	public void addStructureResources(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructure structure,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the model resources with the permissions to the structure.
@@ -249,11 +242,9 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	public void addStructureResources(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructure structure,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void clearDLFileEntryTypeDDMStructures(long fileEntryTypeId);
-
-	public void clearJournalFolderDDMStructures(long folderId);
 
 	/**
 	* Copies a structure, creating a new structure with all the values
@@ -276,12 +267,12 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure copyStructure(
 		long userId, long structureId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Creates a new d d m structure with the primary key. Does not add the d d m structure to the database.
@@ -311,8 +302,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure deleteDDMStructure(
-		long structureId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long structureId) throws PortalException;
 
 	public void deleteDLFileEntryTypeDDMStructure(long fileEntryTypeId,
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructure ddmStructure);
@@ -326,24 +316,13 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	public void deleteDLFileEntryTypeDDMStructures(long fileEntryTypeId,
 		long[] structureIds);
 
-	public void deleteJournalFolderDDMStructure(long folderId,
-		com.liferay.portlet.dynamicdatamapping.model.DDMStructure ddmStructure);
-
-	public void deleteJournalFolderDDMStructure(long folderId, long structureId);
-
-	public void deleteJournalFolderDDMStructures(long folderId,
-		java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> DDMStructures);
-
-	public void deleteJournalFolderDDMStructures(long folderId,
-		long[] structureIds);
-
 	/**
 	* @throws PortalException
 	*/
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the matching structure and its resources.
@@ -360,8 +339,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteStructure(long groupId, long classNameId,
-		java.lang.String structureKey)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String structureKey) throws PortalException;
 
 	/**
 	* Deletes the structure and its resources.
@@ -377,7 +355,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	@com.liferay.portal.kernel.systemevent.SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public void deleteStructure(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructure structure)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the structure and its resources.
@@ -390,8 +368,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	* @param structureId the primary key of the structure to be deleted
 	* @throws PortalException if a portal exception occurred
 	*/
-	public void deleteStructure(long structureId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteStructure(long structureId) throws PortalException;
 
 	/**
 	* Deletes all the structures of the group.
@@ -405,11 +382,10 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	* @param groupId the primary key of the group
 	* @throws PortalException if a portal exception occurred
 	*/
-	public void deleteStructures(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteStructures(long groupId) throws PortalException;
 
 	public void deleteStructures(long groupId, long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -532,8 +508,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure fetchStructure(
 		long groupId, long classNameId, java.lang.String structureKey,
-		boolean includeAncestorStructures)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean includeAncestorStructures) throws PortalException;
 
 	/**
 	* Returns the structure with the ID.
@@ -555,34 +530,6 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	* @return the Spring bean ID for this bean
 	*/
 	public java.lang.String getBeanIdentifier();
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getClassStructures(long,
-	long)}
-	*/
-	@java.lang.Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getClassStructures(
-		long classNameId);
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getClassStructures(long,
-	long, OrderByComparator)}
-	*/
-	@java.lang.Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getClassStructures(
-		long classNameId,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator);
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getClassStructures(long,
-	long, int, int)}
-	*/
-	@java.lang.Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getClassStructures(
-		long classNameId, int start, int end);
 
 	/**
 	* Returns all the structures matching the class name ID.
@@ -646,8 +593,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getDDMStructure(
-		long structureId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long structureId) throws PortalException;
 
 	/**
 	* Returns the d d m structure matching the UUID and group.
@@ -659,8 +605,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getDDMStructureByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String uuid, long groupId) throws PortalException;
 
 	/**
 	* Returns a range of all the d d m structures.
@@ -749,43 +694,12 @@ public interface DDMStructureLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getJournalFolderDDMStructures(
-		long folderId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getJournalFolderDDMStructures(
-		long folderId, int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getJournalFolderDDMStructures(
-		long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getJournalFolderDDMStructuresCount(long folderId);
-
-	/**
-	* Returns the folderIds of the journal folders associated with the d d m structure.
-	*
-	* @param structureId the structureId of the d d m structure
-	* @return long[] the folderIds of journal folders associated with the d d m structure
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long[] getJournalFolderPrimaryKeys(long structureId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getJournalFolderStructures(
-		long[] groupIds, long journalFolderId, int restrictionType)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Returns the structure matching the class name ID, structure key, and
@@ -801,7 +715,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getStructure(
 		long groupId, long classNameId, java.lang.String structureKey)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns the structure matching the class name ID, structure key, and
@@ -828,8 +742,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getStructure(
 		long groupId, long classNameId, java.lang.String structureKey,
-		boolean includeAncestorStructures)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean includeAncestorStructures) throws PortalException;
 
 	/**
 	* Returns all the structures matching the group, name, and description.
@@ -852,32 +765,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getStructure(
-		long structureId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getStructures}
-	*/
-	@java.lang.Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getStructureEntries();
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getStructures(long)}
-	*/
-	@java.lang.Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getStructureEntries(
-		long groupId);
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getStructures(long, int,
-	int)}
-	*/
-	@java.lang.Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getStructureEntries(
-		long groupId, int start, int end);
+		long structureId) throws PortalException;
 
 	/**
 	* Returns all the structures present in the system.
@@ -1079,11 +967,10 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasDLFileEntryTypeDDMStructures(long fileEntryTypeId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasJournalFolderDDMStructure(long folderId, long structureId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasJournalFolderDDMStructures(long folderId);
+	public void revertStructure(long userId, long structureId,
+		java.lang.String version,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Returns an ordered range of all the structures matching the groups and
@@ -1102,8 +989,8 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structures are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param keywords the keywords (space separated), which may occur in the
 	structure's name or description (optionally <code>null</code>)
 	* @param start the lower bound of the range of structures to return
@@ -1115,7 +1002,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> search(
-		long companyId, long[] groupIds, long[] classNameIds,
+		long companyId, long[] groupIds, long classNameId,
 		java.lang.String keywords, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator);
 
@@ -1135,8 +1022,8 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structures are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param name the name keywords
 	* @param description the description keywords
 	* @param storageType the structure's storage type. It can be "xml" or
@@ -1155,7 +1042,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> search(
-		long companyId, long[] groupIds, long[] classNameIds,
+		long companyId, long[] groupIds, long classNameId,
 		java.lang.String name, java.lang.String description,
 		java.lang.String storageType, int type, boolean andOperator, int start,
 		int end,
@@ -1167,15 +1054,15 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structures are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param keywords the keywords (space separated), which may occur in the
 	structure's name or description (optionally <code>null</code>)
 	* @return the number of matching structures
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds,
-		long[] classNameIds, java.lang.String keywords);
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		java.lang.String keywords);
 
 	/**
 	* Returns the number of structures matching the groups, class name IDs,
@@ -1183,8 +1070,6 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structure's are related to
 	* @param name the name keywords
 	* @param description the description keywords
 	* @param storageType the structure's storage type. It can be "xml" or
@@ -1197,10 +1082,9 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	* @return the number of matching structures
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds,
-		long[] classNameIds, java.lang.String name,
-		java.lang.String description, java.lang.String storageType, int type,
-		boolean andOperator);
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		java.lang.String name, java.lang.String description,
+		java.lang.String storageType, int type, boolean andOperator);
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -1212,14 +1096,6 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	public void setDLFileEntryTypeDDMStructures(long fileEntryTypeId,
 		long[] structureIds);
 
-	public void setJournalFolderDDMStructures(long folderId, long[] structureIds);
-
-	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateDDMForm(
-		long structureId,
-		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
 	/**
 	* Updates the d d m structure in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
@@ -1229,15 +1105,6 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateDDMStructure(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructure ddmStructure);
-
-	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
-		long groupId, long parentStructureId, long classNameId,
-		java.lang.String structureKey,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Updates the structure matching the class name ID, structure key, and
@@ -1260,7 +1127,8 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	if the XSD was not well-formed, or if a portal exception
 	occurred
 	* @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
-	long, String, Map, Map, DDMForm, ServiceContext)}
+	long, long, String, Map, Map, DDMForm, DDMFormLayout,
+	ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
@@ -1270,15 +1138,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String definition,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
-		long structureId, long parentStructureId,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the structure matching the structure ID, replacing its old parent
@@ -1297,7 +1157,7 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	if the XSD was not well-formed, or if a portal exception
 	occurred
 	* @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
-	Map, Map, DDMForm, ServiceContext)}
+	long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
@@ -1306,7 +1166,33 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String definition,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
+		long userId, long groupId, long parentStructureId, long classNameId,
+		java.lang.String structureKey,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws PortalException;
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
+		long userId, long structureId,
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws PortalException;
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
+		long userId, long structureId, long parentStructureId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Updates the structure matching the structure ID, replacing its XSD with a
@@ -1320,12 +1206,12 @@ public interface DDMStructureLocalService extends BaseLocalService,
 	* @throws PortalException if a matching structure could not be found,
 	if the XSD was not well-formed, or if a portal exception
 	occurred
-	* @deprecated As of 7.0.0, replaced by {@link #updateDDMForm(long, String,
-	ServiceContext)}
+	* @deprecated As of 7.0.0, replaced by {@link #updateStructure(long,
+	DDMForm, DDMFormLayout, ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateXSD(
 		long structureId, java.lang.String definition,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 }

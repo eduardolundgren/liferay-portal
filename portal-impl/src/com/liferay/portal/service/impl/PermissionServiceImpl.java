@@ -118,7 +118,7 @@ public class PermissionServiceImpl extends PermissionServiceBaseImpl {
 
 			Team team = teamLocalService.fetchTeam(classPK);
 
-			groupId = team.getGroupId();
+			classPK = team.getGroupId();
 
 			actionId = ActionKeys.MANAGE_TEAMS;
 		}
@@ -246,8 +246,7 @@ public class PermissionServiceImpl extends PermissionServiceBaseImpl {
 	}
 
 	private final Map<String, BaseModelPermissionChecker>
-		_baseModelPermissionCheckers =
-			new ConcurrentHashMap<String, BaseModelPermissionChecker>();
+		_baseModelPermissionCheckers = new ConcurrentHashMap<>();
 	private ServiceTracker
 		<BaseModelPermissionChecker, BaseModelPermissionChecker>
 			_serviceTracker;

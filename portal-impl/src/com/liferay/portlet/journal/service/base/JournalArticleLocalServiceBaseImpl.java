@@ -23,7 +23,9 @@ import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -31,18 +33,13 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandler;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerRegistryUtil;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
@@ -68,11 +65,20 @@ import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetLinkPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
+import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStorageLinkPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureFinder;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructurePersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateFinder;
+import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateLinkPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplatePersistence;
 import com.liferay.portlet.expando.service.persistence.ExpandoRowPersistence;
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerRegistryUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalService;
 import com.liferay.portlet.journal.service.persistence.JournalArticleFinder;
@@ -82,8 +88,6 @@ import com.liferay.portlet.journal.service.persistence.JournalArticleResourcePer
 import com.liferay.portlet.journal.service.persistence.JournalContentSearchPersistence;
 import com.liferay.portlet.journal.service.persistence.JournalFolderFinder;
 import com.liferay.portlet.journal.service.persistence.JournalFolderPersistence;
-import com.liferay.portlet.messageboards.service.persistence.MBMessageFinder;
-import com.liferay.portlet.messageboards.service.persistence.MBMessagePersistence;
 import com.liferay.portlet.ratings.service.persistence.RatingsStatsFinder;
 import com.liferay.portlet.ratings.service.persistence.RatingsStatsPersistence;
 import com.liferay.portlet.social.service.persistence.SocialActivityFinder;
@@ -341,8 +345,20 @@ public abstract class JournalArticleLocalServiceBaseImpl
 		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(dynamicQuery,
-						"modifiedDate");
+					Criterion modifiedDateCriterion = portletDataContext.getDateRangeCriteria(
+							"modifiedDate");
+					Criterion statusDateCriterion = portletDataContext.getDateRangeCriteria(
+							"statusDate");
+
+					if ((modifiedDateCriterion != null) &&
+							(statusDateCriterion != null)) {
+						Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
+
+						disjunction.add(modifiedDateCriterion);
+						disjunction.add(statusDateCriterion);
+
+						dynamicQuery.add(disjunction);
+					}
 
 					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
 
@@ -354,13 +370,19 @@ public abstract class JournalArticleLocalServiceBaseImpl
 								stagedModelType.getReferrerClassNameId()));
 					}
 
-					StagedModelDataHandler<?> stagedModelDataHandler = StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(JournalArticle.class.getName());
-
 					Property workflowStatusProperty = PropertyFactoryUtil.forName(
 							"status");
 
-					dynamicQuery.add(workflowStatusProperty.in(
-							stagedModelDataHandler.getExportableStatuses()));
+					if (portletDataContext.isInitialPublication()) {
+						dynamicQuery.add(workflowStatusProperty.ne(
+								WorkflowConstants.STATUS_IN_TRASH));
+					}
+					else {
+						StagedModelDataHandler<?> stagedModelDataHandler = StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(JournalArticle.class.getName());
+
+						dynamicQuery.add(workflowStatusProperty.in(
+								stagedModelDataHandler.getExportableStatuses()));
+					}
 				}
 			});
 
@@ -487,7 +509,7 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	 *
 	 * @return the journal article local service
 	 */
-	public com.liferay.portlet.journal.service.JournalArticleLocalService getJournalArticleLocalService() {
+	public JournalArticleLocalService getJournalArticleLocalService() {
 		return journalArticleLocalService;
 	}
 
@@ -497,7 +519,7 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	 * @param journalArticleLocalService the journal article local service
 	 */
 	public void setJournalArticleLocalService(
-		com.liferay.portlet.journal.service.JournalArticleLocalService journalArticleLocalService) {
+		JournalArticleLocalService journalArticleLocalService) {
 		this.journalArticleLocalService = journalArticleLocalService;
 	}
 
@@ -1460,6 +1482,44 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d d m storage link local service.
+	 *
+	 * @return the d d m storage link local service
+	 */
+	public com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalService getDDMStorageLinkLocalService() {
+		return ddmStorageLinkLocalService;
+	}
+
+	/**
+	 * Sets the d d m storage link local service.
+	 *
+	 * @param ddmStorageLinkLocalService the d d m storage link local service
+	 */
+	public void setDDMStorageLinkLocalService(
+		com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalService ddmStorageLinkLocalService) {
+		this.ddmStorageLinkLocalService = ddmStorageLinkLocalService;
+	}
+
+	/**
+	 * Returns the d d m storage link persistence.
+	 *
+	 * @return the d d m storage link persistence
+	 */
+	public DDMStorageLinkPersistence getDDMStorageLinkPersistence() {
+		return ddmStorageLinkPersistence;
+	}
+
+	/**
+	 * Sets the d d m storage link persistence.
+	 *
+	 * @param ddmStorageLinkPersistence the d d m storage link persistence
+	 */
+	public void setDDMStorageLinkPersistence(
+		DDMStorageLinkPersistence ddmStorageLinkPersistence) {
+		this.ddmStorageLinkPersistence = ddmStorageLinkPersistence;
+	}
+
+	/**
 	 * Returns the d d m structure local service.
 	 *
 	 * @return the d d m structure local service
@@ -1610,6 +1670,44 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d d m template link local service.
+	 *
+	 * @return the d d m template link local service
+	 */
+	public com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService getDDMTemplateLinkLocalService() {
+		return ddmTemplateLinkLocalService;
+	}
+
+	/**
+	 * Sets the d d m template link local service.
+	 *
+	 * @param ddmTemplateLinkLocalService the d d m template link local service
+	 */
+	public void setDDMTemplateLinkLocalService(
+		com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService ddmTemplateLinkLocalService) {
+		this.ddmTemplateLinkLocalService = ddmTemplateLinkLocalService;
+	}
+
+	/**
+	 * Returns the d d m template link persistence.
+	 *
+	 * @return the d d m template link persistence
+	 */
+	public DDMTemplateLinkPersistence getDDMTemplateLinkPersistence() {
+		return ddmTemplateLinkPersistence;
+	}
+
+	/**
+	 * Sets the d d m template link persistence.
+	 *
+	 * @param ddmTemplateLinkPersistence the d d m template link persistence
+	 */
+	public void setDDMTemplateLinkPersistence(
+		DDMTemplateLinkPersistence ddmTemplateLinkPersistence) {
+		this.ddmTemplateLinkPersistence = ddmTemplateLinkPersistence;
+	}
+
+	/**
 	 * Returns the expando row local service.
 	 *
 	 * @return the expando row local service
@@ -1645,81 +1743,6 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	public void setExpandoRowPersistence(
 		ExpandoRowPersistence expandoRowPersistence) {
 		this.expandoRowPersistence = expandoRowPersistence;
-	}
-
-	/**
-	 * Returns the message-boards message local service.
-	 *
-	 * @return the message-boards message local service
-	 */
-	public com.liferay.portlet.messageboards.service.MBMessageLocalService getMBMessageLocalService() {
-		return mbMessageLocalService;
-	}
-
-	/**
-	 * Sets the message-boards message local service.
-	 *
-	 * @param mbMessageLocalService the message-boards message local service
-	 */
-	public void setMBMessageLocalService(
-		com.liferay.portlet.messageboards.service.MBMessageLocalService mbMessageLocalService) {
-		this.mbMessageLocalService = mbMessageLocalService;
-	}
-
-	/**
-	 * Returns the message-boards message remote service.
-	 *
-	 * @return the message-boards message remote service
-	 */
-	public com.liferay.portlet.messageboards.service.MBMessageService getMBMessageService() {
-		return mbMessageService;
-	}
-
-	/**
-	 * Sets the message-boards message remote service.
-	 *
-	 * @param mbMessageService the message-boards message remote service
-	 */
-	public void setMBMessageService(
-		com.liferay.portlet.messageboards.service.MBMessageService mbMessageService) {
-		this.mbMessageService = mbMessageService;
-	}
-
-	/**
-	 * Returns the message-boards message persistence.
-	 *
-	 * @return the message-boards message persistence
-	 */
-	public MBMessagePersistence getMBMessagePersistence() {
-		return mbMessagePersistence;
-	}
-
-	/**
-	 * Sets the message-boards message persistence.
-	 *
-	 * @param mbMessagePersistence the message-boards message persistence
-	 */
-	public void setMBMessagePersistence(
-		MBMessagePersistence mbMessagePersistence) {
-		this.mbMessagePersistence = mbMessagePersistence;
-	}
-
-	/**
-	 * Returns the message-boards message finder.
-	 *
-	 * @return the message-boards message finder
-	 */
-	public MBMessageFinder getMBMessageFinder() {
-		return mbMessageFinder;
-	}
-
-	/**
-	 * Sets the message-boards message finder.
-	 *
-	 * @param mbMessageFinder the message-boards message finder
-	 */
-	public void setMBMessageFinder(MBMessageFinder mbMessageFinder) {
-		this.mbMessageFinder = mbMessageFinder;
 	}
 
 	/**
@@ -2200,8 +2223,8 @@ public abstract class JournalArticleLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portlet.journal.service.JournalArticleLocalService.class)
-	protected com.liferay.portlet.journal.service.JournalArticleLocalService journalArticleLocalService;
+	@BeanReference(type = JournalArticleLocalService.class)
+	protected JournalArticleLocalService journalArticleLocalService;
 	@BeanReference(type = com.liferay.portlet.journal.service.JournalArticleService.class)
 	protected com.liferay.portlet.journal.service.JournalArticleService journalArticleService;
 	@BeanReference(type = JournalArticlePersistence.class)
@@ -2304,6 +2327,10 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	protected com.liferay.portlet.documentlibrary.service.DLAppLocalService dlAppLocalService;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLAppService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLAppService dlAppService;
+	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalService.class)
+	protected com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalService ddmStorageLinkLocalService;
+	@BeanReference(type = DDMStorageLinkPersistence.class)
+	protected DDMStorageLinkPersistence ddmStorageLinkPersistence;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService.class)
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService ddmStructureLocalService;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureService.class)
@@ -2320,18 +2347,14 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	protected DDMTemplatePersistence ddmTemplatePersistence;
 	@BeanReference(type = DDMTemplateFinder.class)
 	protected DDMTemplateFinder ddmTemplateFinder;
+	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService.class)
+	protected com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService ddmTemplateLinkLocalService;
+	@BeanReference(type = DDMTemplateLinkPersistence.class)
+	protected DDMTemplateLinkPersistence ddmTemplateLinkPersistence;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoRowLocalService.class)
 	protected com.liferay.portlet.expando.service.ExpandoRowLocalService expandoRowLocalService;
 	@BeanReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-	@BeanReference(type = com.liferay.portlet.messageboards.service.MBMessageLocalService.class)
-	protected com.liferay.portlet.messageboards.service.MBMessageLocalService mbMessageLocalService;
-	@BeanReference(type = com.liferay.portlet.messageboards.service.MBMessageService.class)
-	protected com.liferay.portlet.messageboards.service.MBMessageService mbMessageService;
-	@BeanReference(type = MBMessagePersistence.class)
-	protected MBMessagePersistence mbMessagePersistence;
-	@BeanReference(type = MBMessageFinder.class)
-	protected MBMessageFinder mbMessageFinder;
 	@BeanReference(type = com.liferay.portlet.ratings.service.RatingsStatsLocalService.class)
 	protected com.liferay.portlet.ratings.service.RatingsStatsLocalService ratingsStatsLocalService;
 	@BeanReference(type = RatingsStatsPersistence.class)

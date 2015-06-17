@@ -27,7 +27,6 @@ import com.liferay.portlet.shopping.service.base.ShoppingCategoryLocalServiceBas
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,7 +46,6 @@ public class ShoppingCategoryLocalServiceImpl
 		User user = userPersistence.findByPrimaryKey(userId);
 		long groupId = serviceContext.getScopeGroupId();
 		parentCategoryId = getParentCategoryId(groupId, parentCategoryId);
-		Date now = new Date();
 
 		validate(name);
 
@@ -60,8 +58,6 @@ public class ShoppingCategoryLocalServiceImpl
 		category.setCompanyId(user.getCompanyId());
 		category.setUserId(user.getUserId());
 		category.setUserName(user.getFullName());
-		category.setCreateDate(now);
-		category.setModifiedDate(now);
 		category.setParentCategoryId(parentCategoryId);
 		category.setName(name);
 		category.setDescription(description);
@@ -227,8 +223,7 @@ public class ShoppingCategoryLocalServiceImpl
 	public List<ShoppingCategory> getParentCategories(ShoppingCategory category)
 		throws PortalException {
 
-		List<ShoppingCategory> parentCategories =
-			new ArrayList<ShoppingCategory>();
+		List<ShoppingCategory> parentCategories = new ArrayList<>();
 
 		ShoppingCategory tempCategory = category;
 
@@ -290,8 +285,7 @@ public class ShoppingCategoryLocalServiceImpl
 
 		parentCategoryId = getParentCategoryId(category, parentCategoryId);
 
-		if (mergeWithParentCategory &&
-			(categoryId != parentCategoryId) &&
+		if (mergeWithParentCategory && (categoryId != parentCategoryId) &&
 			(parentCategoryId !=
 				ShoppingCategoryConstants.DEFAULT_PARENT_CATEGORY_ID)) {
 
@@ -304,7 +298,6 @@ public class ShoppingCategoryLocalServiceImpl
 
 		validate(name);
 
-		category.setModifiedDate(new Date());
 		category.setParentCategoryId(parentCategoryId);
 		category.setName(name);
 		category.setDescription(description);
@@ -354,7 +347,7 @@ public class ShoppingCategoryLocalServiceImpl
 			return category.getParentCategoryId();
 		}
 
-		List<Long> subcategoryIds = new ArrayList<Long>();
+		List<Long> subcategoryIds = new ArrayList<>();
 
 		getSubcategoryIds(
 			subcategoryIds, category.getGroupId(), category.getCategoryId());

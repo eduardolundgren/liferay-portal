@@ -25,7 +25,14 @@ PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("struts_action", "/blogs/view");
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/blogs/edit_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <liferay-portlet:renderURL varImpl="searchURL">
 	<portlet:param name="struts_action" value="/blogs/search" />
@@ -53,10 +60,6 @@ portletURL.setParameter("struts_action", "/blogs/view");
 	}
 	else {
 		int status = WorkflowConstants.STATUS_APPROVED;
-
-		if (BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ENTRY)) {
-			status = WorkflowConstants.STATUS_ANY;
-		}
 
 		total = BlogsEntryServiceUtil.getGroupEntriesCount(scopeGroupId, status);
 

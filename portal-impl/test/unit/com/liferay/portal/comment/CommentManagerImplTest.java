@@ -16,9 +16,9 @@ package com.liferay.portal.comment;
 
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Function;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
@@ -42,8 +42,6 @@ public class CommentManagerImplTest extends Mockito {
 		MockitoAnnotations.initMocks(this);
 
 		setUpRegistryUtil();
-
-		_commentManagerImpl = new CommentManagerImpl();
 	}
 
 	@Test
@@ -56,7 +54,7 @@ public class CommentManagerImplTest extends Mockito {
 
 		CommentManager defaultCommentManager = mock(CommentManager.class);
 
-		_commentManagerImpl.setDefaultCommentManager(defaultCommentManager);
+		_commentManagerImpl = new CommentManagerImpl(defaultCommentManager);
 
 		testAllCallsAreDelegated(defaultCommentManager);
 	}
@@ -79,7 +77,7 @@ public class CommentManagerImplTest extends Mockito {
 
 		CommentManager defaultCommentManager = mock(CommentManager.class);
 
-		_commentManagerImpl.setDefaultCommentManager(defaultCommentManager);
+		_commentManagerImpl = new CommentManagerImpl(defaultCommentManager);
 
 		testAllCallsAreDelegated(registryCommentManager);
 
@@ -124,15 +122,13 @@ public class CommentManagerImplTest extends Mockito {
 		String body = RandomTestUtil.randomString();
 		long commentId = RandomTestUtil.randomLong();
 
-		ServiceContext serviceContext = new ServiceContext();
-
 		_commentManagerImpl.addComment(
-			userId, groupId, className, classPK, body, serviceContext);
+			userId, groupId, className, classPK, body, _serviceContextFunction);
 
 		Mockito.verify(
 			commentManager
 		).addComment(
-			userId, groupId, className, classPK, body, serviceContext
+			userId, groupId, className, classPK, body, _serviceContextFunction
 		);
 
 		when(

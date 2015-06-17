@@ -75,11 +75,34 @@ public class PortletPreferencesFactoryUtil {
 			companyId, ownerId, ownerType, xml);
 	}
 
+	public static PortletPreferences getExistingPortletSetup(
+			Layout layout, String portletId)
+		throws PortalException {
+
+		return getPortletPreferencesFactory().getExistingPortletSetup(
+			layout, portletId);
+	}
+
+	public static PortletPreferences getExistingPortletSetup(
+			PortletRequest portletRequest)
+		throws PortalException {
+
+		return getPortletPreferencesFactory().getExistingPortletSetup(
+			portletRequest);
+	}
+
 	public static PortletPreferences getLayoutPortletSetup(
 		Layout layout, String portletId) {
 
 		return getPortletPreferencesFactory().getLayoutPortletSetup(
 			layout, portletId);
+	}
+
+	public static PortletPreferences getLayoutPortletSetup(
+		Layout layout, String portletId, String defaultPreferences) {
+
+		return getPortletPreferencesFactory().getLayoutPortletSetup(
+			layout, portletId, defaultPreferences);
 	}
 
 	public static PortalPreferences getPortalPreferences(
@@ -165,12 +188,20 @@ public class PortletPreferencesFactoryUtil {
 	}
 
 	public static PortletPreferencesIds getPortletPreferencesIds(
-			long scopeGroupId, long userId, Layout layout, String portletId,
+			long siteGroupId, long userId, Layout layout, String portletId,
 			boolean modeEditGuest)
 		throws PortalException {
 
 		return getPortletPreferencesFactory().getPortletPreferencesIds(
-			scopeGroupId, userId, layout, portletId, modeEditGuest);
+			siteGroupId, userId, layout, portletId, modeEditGuest);
+	}
+
+	public static PortletPreferencesIds getPortletPreferencesIds(
+		long companyId, long siteGroupId, long plid, String portletId,
+		String settingsScope) {
+
+		return getPortletPreferencesFactory().getPortletPreferencesIds(
+			companyId, siteGroupId, plid, portletId, settingsScope);
 	}
 
 	public static PortletPreferences getPortletSetup(
@@ -198,11 +229,11 @@ public class PortletPreferencesFactoryUtil {
 	}
 
 	public static PortletPreferences getPortletSetup(
-		long scopeGroupId, Layout layout, String portletId,
+		long siteGroupId, Layout layout, String portletId,
 		String defaultPreferences) {
 
 		return getPortletPreferencesFactory().getPortletSetup(
-			scopeGroupId, layout, portletId, defaultPreferences);
+			siteGroupId, layout, portletId, defaultPreferences);
 	}
 
 	public static PortletPreferences getPortletSetup(
@@ -252,6 +283,14 @@ public class PortletPreferencesFactoryUtil {
 
 		return getPortletPreferencesFactory().getStrictPortletSetup(
 			layout, portletId);
+	}
+
+	public static PortletPreferences strictFromXML(
+		long companyId, long ownerId, int ownerType, long plid,
+		String portletId, String xml) {
+
+		return getPortletPreferencesFactory().strictFromXML(
+			companyId, ownerId, ownerType, plid, portletId, xml);
 	}
 
 	public static String toXML(PortalPreferences portalPreferences) {

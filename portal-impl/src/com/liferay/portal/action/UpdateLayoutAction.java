@@ -16,11 +16,11 @@ package com.liferay.portal.action;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.portlet.AddPortletProvider;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -53,9 +53,9 @@ import com.liferay.portal.util.LayoutCloneFactory;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.asset.model.AssetRenderer;
-import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
+import com.liferay.registry.collections.ServiceTrackerCollections;
+import com.liferay.registry.collections.ServiceTrackerMap;
 
 import javax.portlet.PortletPreferences;
 
@@ -364,17 +364,28 @@ public class UpdateLayoutAction extends JSONAction {
 			return;
 		}
 
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				className);
+		AddPortletProvider addPortletProvider = _serviceTrackerMap.getService(
+			className);
 
-		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
-			classPK);
+		if (addPortletProvider == null) {
+			addPortletProvider = _serviceTrackerMap.getService(
+				AddPortletProvider.CLASS_NAME_ANY);
+		}
 
-		assetRenderer.setAddToPagePreferences(
-			portletSetup, portletId, themeDisplay);
+		if (addPortletProvider != null) {
+			addPortletProvider.updatePortletPreferences(
+				portletSetup, portletId, className, classPK, themeDisplay);
+		}
 
 		portletSetup.store();
+	}
+
+	private static final ServiceTrackerMap<String, AddPortletProvider>
+		_serviceTrackerMap = ServiceTrackerCollections.singleValueMap(
+			AddPortletProvider.class, "model.class.name");
+
+	static {
+		_serviceTrackerMap.open();
 	}
 
 }

@@ -14,11 +14,11 @@
 
 package com.liferay.portal.wab.generator.internal;
 
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.wab.generator.internal.artifact.WarArtifactUrlTransformer;
 import com.liferay.portal.wab.generator.internal.handler.WabURLStreamHandlerService;
 
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.servlet.ServletContext;
 
@@ -38,9 +38,7 @@ import org.osgi.service.url.URLStreamHandlerService;
  * @author Miguel Pastor
  * @author Raymond Augé
  */
-@Component(
-	immediate = true
-)
+@Component(immediate = true)
 public class WabGenerator {
 
 	@Activate
@@ -72,7 +70,7 @@ public class WabGenerator {
 
 		ClassLoader classLoader = clazz.getClassLoader();
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			URLConstants.URL_HANDLER_PROTOCOL, new String[] {"webbundle"});
@@ -87,9 +85,7 @@ public class WabGenerator {
 	 * This reference is held to force a dependency on the portal's complete
 	 * startup.
 	 */
-	@Reference(
-		target = "(original.bean=true)"
-	)
+	@Reference(target = "(original.bean=true)")
 	protected void setServletContext(ServletContext servletContext) {
 		_servletContext = servletContext;
 	}

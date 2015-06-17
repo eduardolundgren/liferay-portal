@@ -35,9 +35,9 @@ if (ppid.equals(PortletKeys.PORTLET_CONFIGURATION)) {
 	}
 
 	if (Validator.isNotNull(portletResource)) {
-		String strutsAction = ParamUtil.getString(request, PortalUtil.getPortletNamespace(ppid) + "struts_action");
+		String mvcPath = ParamUtil.getString(request, PortalUtil.getPortletNamespace(ppid) + "mvcPath");
 
-		if (!strutsAction.startsWith("/portlet_configuration/")) {
+		if (!mvcPath.contains("/portlet_configuration/")) {
 			ppid = portletResource;
 		}
 	}
@@ -113,21 +113,6 @@ request.setAttribute("control_panel.jsp-ppid", ppid);
 								<c:if test="<%= showControlPanelMenu %>">
 									<aui:row>
 										<div id="controlPanelSiteHeading">
-											<c:if test="<%= showControlPanelMenu %>">
-
-												<%
-												String backURL = HttpUtil.setParameter(themeDisplay.getURLControlPanel(), "p_p_id", PortletKeys.SITES_ADMIN);
-												%>
-
-												<a class="previous-level" href="<%= backURL %>" title="<liferay-ui:message key="back" />">
-													<i class="control-panel-back-icon icon-circle-arrow-left"></i>
-
-													<span class="helper-hidden-accessible">
-														<liferay-ui:message key="back" />
-													</span>
-												</a>
-											</c:if>
-
 											<h1 class="site-title">
 												<%@ include file="/html/portal/layout/view/control_panel_site_selector.jspf" %>
 											</h1>
@@ -136,38 +121,14 @@ request.setAttribute("control_panel.jsp-ppid", ppid);
 												<ul class="visit-links">
 													<li><liferay-ui:message key="visit" />:</li>
 
-													<%
-													PortletURL portletURL = new PortletURLImpl(request, PortletKeys.SITE_REDIRECTOR, plid, PortletRequest.ACTION_PHASE);
-
-													portletURL.setParameter("struts_action", "/my_sites/view");
-													portletURL.setParameter("groupId", String.valueOf(group.getGroupId()));
-													portletURL.setPortletMode(PortletMode.VIEW);
-													portletURL.setWindowState(WindowState.NORMAL);
-													%>
-
 													<c:choose>
 														<c:when test="<%= group.hasPrivateLayouts() && group.hasPublicLayouts() %>">
-
-															<%
-															portletURL.setParameter("privateLayout", Boolean.FALSE.toString());
-															%>
-
-															<li><a href="<%= portletURL.toString() %>"><liferay-ui:message key="public-pages" /></a></li>
+															<li><a href="<%= group.getDisplayURL(themeDisplay, false) %>"><liferay-ui:message key="public-pages" /></a></li>
 															<li class="divider"></li>
-
-															<%
-															portletURL.setParameter("privateLayout", Boolean.TRUE.toString());
-															%>
-
-															<li><a href="<%= portletURL.toString() %>"><liferay-ui:message key="private-pages" /></a></li>
+															<li><a href="<%= group.getDisplayURL(themeDisplay, true) %>"><liferay-ui:message key="private-pages" /></a></li>
 														</c:when>
 														<c:otherwise>
-
-															<%
-															portletURL.setParameter("privateLayout", group.hasPrivateLayouts() ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
-															%>
-
-															<li><a href="<%= portletURL.toString() %>"><liferay-ui:message key="site-pages" /></a></li>
+															<li><a href="<%= group.getDisplayURL(themeDisplay, group.hasPrivateLayouts()) %>"><liferay-ui:message key="site-pages" /></a></li>
 														</c:otherwise>
 													</c:choose>
 												</ul>
@@ -194,7 +155,10 @@ request.setAttribute("control_panel.jsp-ppid", ppid);
 
 									<c:if test="<%= !singlePortlet %>">
 										<aui:col cssClass="panel-page-menu" width="<%= 25 %>">
-											<liferay-portlet:runtime portletName="160" />
+											<liferay-portlet:runtime
+												portletProviderAction="<%= PortletProvider.Action.VIEW %>"
+												portletProviderClassName="<%= PortalAdministrationApplicationType.SiteAdmin.CLASS_NAME %>"
+											/>
 										</aui:col>
 									</c:if>
 

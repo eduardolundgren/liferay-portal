@@ -32,11 +32,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -57,8 +52,14 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureFinder;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructurePersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateFinder;
+import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateLinkPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplatePersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateVersionPersistence;
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -443,7 +444,7 @@ public abstract class DDMTemplateLocalServiceBaseImpl
 	 *
 	 * @return the d d m template local service
 	 */
-	public com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService getDDMTemplateLocalService() {
+	public DDMTemplateLocalService getDDMTemplateLocalService() {
 		return ddmTemplateLocalService;
 	}
 
@@ -453,7 +454,7 @@ public abstract class DDMTemplateLocalServiceBaseImpl
 	 * @param ddmTemplateLocalService the d d m template local service
 	 */
 	public void setDDMTemplateLocalService(
-		com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService ddmTemplateLocalService) {
+		DDMTemplateLocalService ddmTemplateLocalService) {
 		this.ddmTemplateLocalService = ddmTemplateLocalService;
 	}
 
@@ -926,6 +927,44 @@ public abstract class DDMTemplateLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d d m template link local service.
+	 *
+	 * @return the d d m template link local service
+	 */
+	public com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService getDDMTemplateLinkLocalService() {
+		return ddmTemplateLinkLocalService;
+	}
+
+	/**
+	 * Sets the d d m template link local service.
+	 *
+	 * @param ddmTemplateLinkLocalService the d d m template link local service
+	 */
+	public void setDDMTemplateLinkLocalService(
+		com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService ddmTemplateLinkLocalService) {
+		this.ddmTemplateLinkLocalService = ddmTemplateLinkLocalService;
+	}
+
+	/**
+	 * Returns the d d m template link persistence.
+	 *
+	 * @return the d d m template link persistence
+	 */
+	public DDMTemplateLinkPersistence getDDMTemplateLinkPersistence() {
+		return ddmTemplateLinkPersistence;
+	}
+
+	/**
+	 * Sets the d d m template link persistence.
+	 *
+	 * @param ddmTemplateLinkPersistence the d d m template link persistence
+	 */
+	public void setDDMTemplateLinkPersistence(
+		DDMTemplateLinkPersistence ddmTemplateLinkPersistence) {
+		this.ddmTemplateLinkPersistence = ddmTemplateLinkPersistence;
+	}
+
+	/**
 	 * Returns the d d m template version local service.
 	 *
 	 * @return the d d m template version local service
@@ -1044,8 +1083,8 @@ public abstract class DDMTemplateLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService.class)
-	protected com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService ddmTemplateLocalService;
+	@BeanReference(type = DDMTemplateLocalService.class)
+	protected DDMTemplateLocalService ddmTemplateLocalService;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateService.class)
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMTemplateService ddmTemplateService;
 	@BeanReference(type = DDMTemplatePersistence.class)
@@ -1096,6 +1135,10 @@ public abstract class DDMTemplateLocalServiceBaseImpl
 	protected DDMStructurePersistence ddmStructurePersistence;
 	@BeanReference(type = DDMStructureFinder.class)
 	protected DDMStructureFinder ddmStructureFinder;
+	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService.class)
+	protected com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService ddmTemplateLinkLocalService;
+	@BeanReference(type = DDMTemplateLinkPersistence.class)
+	protected DDMTemplateLinkPersistence ddmTemplateLinkPersistence;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateVersionLocalService.class)
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMTemplateVersionLocalService ddmTemplateVersionLocalService;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMTemplateVersionService.class)

@@ -18,9 +18,11 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.model.AttachedModel;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.LocalizedModel;
+import com.liferay.portal.model.WorkflowedModel;
 import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -45,8 +47,8 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface DDMTemplateVersionModel extends BaseModel<DDMTemplateVersion>,
-	LocalizedModel {
+public interface DDMTemplateVersionModel extends AttachedModel,
+	BaseModel<DDMTemplateVersion>, LocalizedModel, WorkflowedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -165,6 +167,48 @@ public interface DDMTemplateVersionModel extends BaseModel<DDMTemplateVersion>,
 	 * @param createDate the create date of this d d m template version
 	 */
 	public void setCreateDate(Date createDate);
+
+	/**
+	 * Returns the fully qualified class name of this d d m template version.
+	 *
+	 * @return the fully qualified class name of this d d m template version
+	 */
+	@Override
+	public String getClassName();
+
+	public void setClassName(String className);
+
+	/**
+	 * Returns the class name ID of this d d m template version.
+	 *
+	 * @return the class name ID of this d d m template version
+	 */
+	@Override
+	public long getClassNameId();
+
+	/**
+	 * Sets the class name ID of this d d m template version.
+	 *
+	 * @param classNameId the class name ID of this d d m template version
+	 */
+	@Override
+	public void setClassNameId(long classNameId);
+
+	/**
+	 * Returns the class p k of this d d m template version.
+	 *
+	 * @return the class p k of this d d m template version
+	 */
+	@Override
+	public long getClassPK();
+
+	/**
+	 * Sets the class p k of this d d m template version.
+	 *
+	 * @param classPK the class p k of this d d m template version
+	 */
+	@Override
+	public void setClassPK(long classPK);
 
 	/**
 	 * Returns the template ID of this d d m template version.
@@ -424,6 +468,158 @@ public interface DDMTemplateVersionModel extends BaseModel<DDMTemplateVersion>,
 	 * @param script the script of this d d m template version
 	 */
 	public void setScript(String script);
+
+	/**
+	 * Returns the status of this d d m template version.
+	 *
+	 * @return the status of this d d m template version
+	 */
+	@Override
+	public int getStatus();
+
+	/**
+	 * Sets the status of this d d m template version.
+	 *
+	 * @param status the status of this d d m template version
+	 */
+	@Override
+	public void setStatus(int status);
+
+	/**
+	 * Returns the status by user ID of this d d m template version.
+	 *
+	 * @return the status by user ID of this d d m template version
+	 */
+	@Override
+	public long getStatusByUserId();
+
+	/**
+	 * Sets the status by user ID of this d d m template version.
+	 *
+	 * @param statusByUserId the status by user ID of this d d m template version
+	 */
+	@Override
+	public void setStatusByUserId(long statusByUserId);
+
+	/**
+	 * Returns the status by user uuid of this d d m template version.
+	 *
+	 * @return the status by user uuid of this d d m template version
+	 */
+	@Override
+	public String getStatusByUserUuid();
+
+	/**
+	 * Sets the status by user uuid of this d d m template version.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this d d m template version
+	 */
+	@Override
+	public void setStatusByUserUuid(String statusByUserUuid);
+
+	/**
+	 * Returns the status by user name of this d d m template version.
+	 *
+	 * @return the status by user name of this d d m template version
+	 */
+	@AutoEscape
+	@Override
+	public String getStatusByUserName();
+
+	/**
+	 * Sets the status by user name of this d d m template version.
+	 *
+	 * @param statusByUserName the status by user name of this d d m template version
+	 */
+	@Override
+	public void setStatusByUserName(String statusByUserName);
+
+	/**
+	 * Returns the status date of this d d m template version.
+	 *
+	 * @return the status date of this d d m template version
+	 */
+	@Override
+	public Date getStatusDate();
+
+	/**
+	 * Sets the status date of this d d m template version.
+	 *
+	 * @param statusDate the status date of this d d m template version
+	 */
+	@Override
+	public void setStatusDate(Date statusDate);
+
+	/**
+	 * @deprecated As of 6.1.0, replaced by {@link #isApproved()}
+	 */
+	@Deprecated
+	@Override
+	public boolean getApproved();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is approved.
+	 *
+	 * @return <code>true</code> if this d d m template version is approved; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isApproved();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is denied.
+	 *
+	 * @return <code>true</code> if this d d m template version is denied; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isDenied();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is a draft.
+	 *
+	 * @return <code>true</code> if this d d m template version is a draft; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isDraft();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is expired.
+	 *
+	 * @return <code>true</code> if this d d m template version is expired; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isExpired();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is inactive.
+	 *
+	 * @return <code>true</code> if this d d m template version is inactive; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInactive();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is incomplete.
+	 *
+	 * @return <code>true</code> if this d d m template version is incomplete; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isIncomplete();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is pending.
+	 *
+	 * @return <code>true</code> if this d d m template version is pending; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isPending();
+
+	/**
+	 * Returns <code>true</code> if this d d m template version is scheduled.
+	 *
+	 * @return <code>true</code> if this d d m template version is scheduled; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isScheduled();
 
 	@Override
 	public boolean isNew();

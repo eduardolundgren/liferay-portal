@@ -22,6 +22,14 @@ import com.liferay.portal.kernel.resiliency.spi.agent.annotation.Distributed;
  */
 public interface WebKeys {
 
+	public static final String ASSET_ADDON_ENTRIES = "ASSET_ADDON_ENTRIES";
+
+	public static final String ASSET_ADDON_ENTRY = "ASSET_ADDON_ENTRY";
+
+	public static final String ASSET_ENTRY_ABSTRACT_LENGTH = "ASSET_ENTRY_ABSTRACT_LENGTH";
+
+	public static final String ASSET_ENTRY_VIEW_URL = "ASSET_ENTRY_VIEW_URL";
+
 	public static final String ASSET_RENDERER = "ASSET_RENDERER";
 
 	public static final String ASSET_RENDERER_FACTORY = "ASSET_RENDERER_FACTORY";
@@ -50,9 +58,15 @@ public interface WebKeys {
 	@Distributed(direction = Direction.REQUEST)
 	public static final String CURRENT_URL = "CURRENT_URL";
 
+	public static final String DIFF_HTML_RESULTS = "DIFF_HTML_RESULTS";
+
 	public static final String DOCUMENT_LIBRARY_FOLDER = "DOCUMENT_LIBRARY_FOLDER";
 
 	public static final String EXTEND_SESSION = "EXTEND_SESSION";
+
+	public static final String FACEBOOK_INCOMPLETE_USER_ID = "FACEBOOK_INCOMPLETE_USER_ID";
+
+	public static final String FACEBOOK_USER_EMAIL_ADDRESS = "FACEBOOK_USER_EMAIL_ADDRESS";
 
 	public static final String FILE_ITEM_THRESHOLD_SIZE_EXCEEDED = "FILE_ITEM_THRESHOLD_SIZE_EXCEEDED";
 
@@ -76,6 +90,9 @@ public interface WebKeys {
 
 	public static final String LAYOUT = "LAYOUT";
 
+	@Distributed
+	public static final String LAYOUT_ASSET_ENTRY = "LIFERAY_SHARED_LAYOUT_ASSET_ENTRY";
+
 	public static final String LAYOUTS = "LAYOUTS";
 
 	/**
@@ -89,6 +106,10 @@ public interface WebKeys {
 	 */
 	@Deprecated
 	public static final String LIFERAY_SHARED_VISITED_GROUP_ID_RECENT = "LIFERAY_SHARED_VISITED_GROUP_ID_RECENT";
+
+	public static final String OPEN_ID_LOGIN = "OPEN_ID_LOGIN";
+
+	public static final String OPEN_ID_LOGIN_PENDING = "OPEN_ID_LOGIN_PENDING";
 
 	public static final String OSGI_BUNDLE = "OSGI_BUNDLE";
 
@@ -147,6 +168,8 @@ public interface WebKeys {
 
 	public static final String PORTLET_SESSION_ATTRIBUTES = "PORTLET_SESSION_ATTRIBUTES_";
 
+	public static final String PRIVATE_LAYOUT = "PRIVATE_LAYOUT";
+
 	public static final String REDIRECT = "REDIRECT";
 
 	public static final String REFERER = "referer";
@@ -162,6 +185,8 @@ public interface WebKeys {
 	public static final String RENDER_PORTLET_COLUMN_ID = "RENDER_PORTLET_COLUMN_ID";
 
 	public static final String RENDER_PORTLET_COLUMN_POS = "RENDER_PORTLET_COLUMN_POS";
+
+	public static final String RENDER_PORTLET_PREFERENCES = "RENDER_PORTLET_PREFERENCES";
 
 	public static final String RENDER_PORTLET_RESOURCE = "RENDER_PORTLET_RESOURCE";
 
@@ -183,7 +208,11 @@ public interface WebKeys {
 
 	public static final String SERVLET_PATH = "SERVLET_PATH";
 
+	public static final String SETTINGS_SCOPE = "SETTINGS_SCOPE";
+
 	public static final String SINGLE_PAGE_APPLICATION_LAST_PORTLET_ID = "SINGLE_PAGE_APPLICATION_LAST_PORTLET_ID";
+
+	public static final String SOURCE_VERSION = "SOURCE_VERSION";
 
 	@Distributed(direction = Direction.RESPONSE)
 	public static final String SPI_AGENT_ACTION_RESULT = "SPI_AGENT_ACTION_RESULT";
@@ -212,9 +241,13 @@ public interface WebKeys {
 
 	public static final String SPI_AGENT_RESPONSE = "SPI_AGENT_RESPONSE";
 
+	public static final String TARGET_VERSION = "TARGET_VERSION";
+
 	public static final String THEME = "THEME";
 
 	public static final String THEME_DISPLAY = "LIFERAY_SHARED_THEME_DISPLAY";
+
+	public static final String TITLE = "TITLE";
 
 	public static final String UNIQUE_ELEMENT_IDS = "LIFERAY_SHARED_UNIQUE_ELEMENT_IDS";
 
@@ -237,6 +270,8 @@ public interface WebKeys {
 	public static final String VM_VARIABLES = "VM_VARIABLES";
 
 	public static final String WINDOW_STATE = "WINDOW_STATE";
+
+	public static final String WORKFLOW_ASSET_PREVIEW = "WORKFLOW_ASSET_PREVIEW";
 
 	public static final String XUGGLER_INSTALL_STATUS = "XUGGLER_INSTALL_STATUS";
 

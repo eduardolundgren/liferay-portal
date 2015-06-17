@@ -21,10 +21,10 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
@@ -33,7 +33,6 @@ import com.liferay.portal.model.ServiceComponent;
 import com.liferay.portal.service.ServiceComponentLocalServiceUtil;
 import com.liferay.portal.spring.hibernate.DialectDetector;
 import com.liferay.portal.upgrade.util.Table;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.ShutdownUtil;
 
@@ -91,7 +90,7 @@ public class ConvertDatabase extends BaseConvertProcess {
 
 		List<String> modelNames = ModelHintsUtil.getModels();
 
-		Map<String, Tuple> tableDetails = new LinkedHashMap<String, Tuple>();
+		Map<String, Tuple> tableDetails = new LinkedHashMap<>();
 
 		Connection connection = dataSource.getConnection();
 
@@ -175,10 +174,9 @@ public class ConvertDatabase extends BaseConvertProcess {
 			StartupHelperUtil.updateIndexes(db, connection, false);
 
 			List<ServiceComponent> serviceComponents =
-				ServiceComponentLocalServiceUtil.getServiceComponents(
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				ServiceComponentLocalServiceUtil.getLatestServiceComponents();
 
-			Set<String> validIndexNames = new HashSet<String>();
+			Set<String> validIndexNames = new HashSet<>();
 
 			for (ServiceComponent serviceComponent : serviceComponents) {
 				String indexesSQL = serviceComponent.getIndexesSQL();
@@ -288,6 +286,7 @@ public class ConvertDatabase extends BaseConvertProcess {
 			CyrusVirtual.TABLE_SQL_CREATE)
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(ConvertDatabase.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ConvertDatabase.class);
 
 }

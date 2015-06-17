@@ -15,6 +15,7 @@
 package com.liferay.portal.events;
 
 import com.liferay.portal.kernel.events.ActionException;
+import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.metadata.RawMetadataProcessorUtil;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
@@ -25,7 +26,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -38,9 +39,13 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUt
 import com.liferay.portlet.documentlibrary.util.RawMetadataProcessor;
 import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
+import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DefaultDDMStructureUtil;
 
 import java.io.StringReader;
 
@@ -57,8 +62,7 @@ import java.util.Map;
  * @author Miguel Pastor
  * @author Roberto Díaz
  */
-public class AddDefaultDocumentLibraryStructuresAction
-	extends BaseDefaultDDMStructureAction {
+public class AddDefaultDocumentLibraryStructuresAction extends SimpleAction {
 
 	@Override
 	public void run(String[] ids) throws ActionException {
@@ -76,7 +80,7 @@ public class AddDefaultDocumentLibraryStructuresAction
 			ServiceContext serviceContext)
 		throws Exception {
 
-		List<Long> ddmStructureIds = new ArrayList<Long>();
+		List<Long> ddmStructureIds = new ArrayList<>();
 
 		for (String ddmStructureName : ddmStructureNames) {
 			String ddmStructureKey = ddmStructureName;
@@ -96,10 +100,17 @@ public class AddDefaultDocumentLibraryStructuresAction
 
 		Locale locale = PortalUtil.getSiteDefaultLocale(groupId);
 
-		String definition = getDynamicDDMStructureDefinition(
-			"document-library-structures.xml", languageKey, locale);
+		String definition =
+			DefaultDDMStructureUtil.getDynamicDDMStructureDefinition(
+				AddDefaultDocumentLibraryStructuresAction.class.
+					getClassLoader(),
+				"com/liferay/portal/events/dependencies" +
+					"/document-library-structures.xml",
+				languageKey, locale);
 
-		serviceContext.setAttribute("definition", definition);
+		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(definition);
+
+		serviceContext.setAttribute("ddmForm", ddmForm);
 
 		try {
 			DLFileEntryTypeLocalServiceUtil.getFileEntryType(
@@ -122,7 +133,7 @@ public class AddDefaultDocumentLibraryStructuresAction
 			long userId, long groupId, ServiceContext serviceContext)
 		throws Exception {
 
-		List<String> ddmStructureNames = new ArrayList<String>();
+		List<String> ddmStructureNames = new ArrayList<>();
 
 		addDLFileEntryType(
 			userId, groupId, DLFileEntryTypeConstants.NAME_CONTRACT,
@@ -173,7 +184,7 @@ public class AddDefaultDocumentLibraryStructuresAction
 		String xsd = buildDLRawMetadataXML(
 			RawMetadataProcessorUtil.getFields(), locale);
 
-		Document document = SAXReaderUtil.read(new StringReader(xsd));
+		Document document = UnsecureSAXReaderUtil.read(new StringReader(xsd));
 
 		Element rootElement = document.getRootElement();
 
@@ -195,29 +206,32 @@ public class AddDefaultDocumentLibraryStructuresAction
 					PortalUtil.getClassNameId(RawMetadataProcessor.class),
 					name);
 
+			DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(
+				structureElementRootXML);
+
 			if (ddmStructure != null) {
-				ddmStructure.setDefinition(structureElementRootXML);
+				ddmStructure.setDDMForm(ddmForm);
 
 				DDMStructureLocalServiceUtil.updateDDMStructure(ddmStructure);
 			}
 			else {
-				Map<Locale, String> nameMap = new HashMap<Locale, String>();
+				Map<Locale, String> nameMap = new HashMap<>();
 
 				nameMap.put(locale, name);
 
-				Map<Locale, String> descriptionMap =
-					new HashMap<Locale, String>();
+				Map<Locale, String> descriptionMap = new HashMap<>();
 
 				descriptionMap.put(locale, description);
 
-				DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(
-					structureElementRootXML);
+				DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(
+					ddmForm);
 
 				DDMStructureLocalServiceUtil.addStructure(
 					userId, groupId,
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 					PortalUtil.getClassNameId(RawMetadataProcessor.class), name,
-					nameMap, descriptionMap, ddmForm, "xml",
+					nameMap, descriptionMap, ddmForm, ddmFormLayout,
+					StorageType.JSON.toString(),
 					DDMStructureConstants.TYPE_DEFAULT, serviceContext);
 			}
 		}
@@ -305,17 +319,20 @@ public class AddDefaultDocumentLibraryStructuresAction
 
 		serviceContext.setUserId(defaultUserId);
 
-		addDDMStructures(
+		DefaultDDMStructureUtil.addDDMStructures(
 			defaultUserId, group.getGroupId(),
 			PortalUtil.getClassNameId(DLFileEntryMetadata.class),
-			"document-library-structures.xml", serviceContext);
+			AddDefaultDocumentLibraryStructuresAction.class.getClassLoader(),
+			"com/liferay/portal/events/dependencies" +
+				"/document-library-structures.xml",
+			serviceContext);
 		addDLFileEntryTypes(defaultUserId, group.getGroupId(), serviceContext);
 		addDLRawMetadataStructures(
 			defaultUserId, group.getGroupId(), serviceContext);
 	}
 
 	protected Map<Locale, String> getLocalizationMap(String content) {
-		Map<Locale, String> localizationMap = new HashMap<Locale, String>();
+		Map<Locale, String> localizationMap = new HashMap<>();
 
 		Locale defaultLocale = LocaleUtil.getDefault();
 

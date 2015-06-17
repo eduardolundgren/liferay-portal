@@ -23,7 +23,6 @@ import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -196,56 +195,6 @@ public class ObjectServiceTrackerMapTest {
 	}
 
 	@Test
-	public void testGetServiceWithCustomComparator() {
-		try (ServiceTrackerMap<String, TrackedOne> serviceTrackerMap =
-				ServiceTrackerCollections.singleValueMap(
-					TrackedOne.class, "(target=*)",
-					new ServiceTrackerCollections.
-						PropertyServiceReferenceMapper<String, TrackedOne>(
-							"target"),
-					new Comparator<ServiceReference<TrackedOne>>() {
-
-						@Override
-						public int compare(
-							ServiceReference<TrackedOne> serviceReference1,
-							ServiceReference<TrackedOne> serviceReference2) {
-
-							return -1;
-						}
-
-					}
-				)) {
-
-			serviceTrackerMap.open();
-
-			TrackedOne trackedOne1 = new TrackedOne();
-
-			ServiceRegistration<TrackedOne> serviceRegistration1 =
-				registerService(trackedOne1);
-
-			TrackedOne trackedOne2 = new TrackedOne();
-
-			ServiceRegistration<TrackedOne> serviceRegistration2 =
-				registerService(trackedOne2);
-
-			Assert.assertEquals(
-				trackedOne2, serviceTrackerMap.getService("aTarget"));
-
-			serviceRegistration1.unregister();
-			serviceRegistration2.unregister();
-
-			serviceRegistration2 = registerService(trackedOne2);
-			serviceRegistration1 = registerService(trackedOne1);
-
-			Assert.assertEquals(
-				trackedOne1, serviceTrackerMap.getService("aTarget"));
-
-			serviceRegistration1.unregister();
-			serviceRegistration2.unregister();
-		}
-	}
-
-	@Test
 	public void testGetServiceWithCustomResolver() {
 		try (ServiceTrackerMap<String, TrackedOne> serviceTrackerMap =
 				ServiceTrackerCollections.singleValueMap(
@@ -266,8 +215,7 @@ public class ObjectServiceTrackerMapTest {
 
 			serviceTrackerMap.open();
 
-			Dictionary<String, String> properties =
-				new Hashtable<String, String>();
+			Dictionary<String, String> properties = new Hashtable<>();
 
 			properties.put("other", "aProperty");
 			properties.put("target", "aTarget");
@@ -374,7 +322,7 @@ public class ObjectServiceTrackerMapTest {
 								serviceReference);
 
 							String targetProperty =
-								(String) serviceReference.getProperty("target");
+								(String)serviceReference.getProperty("target");
 
 							emitter.emit(
 								targetProperty + "-" + service.getKey());
@@ -466,7 +414,7 @@ public class ObjectServiceTrackerMapTest {
 			ServiceRegistration<TrackedOne> serviceRegistration4 =
 				registerService(new TrackedOne(), "aTarget2");
 
-			Set<String> targets = new HashSet<String>();
+			Set<String> targets = new HashSet<>();
 
 			targets.add("aTarget1");
 			targets.add("aTarget2");
@@ -508,43 +456,6 @@ public class ObjectServiceTrackerMapTest {
 			serviceRegistration2.unregister();
 			serviceRegistration3.unregister();
 			serviceRegistration4.unregister();
-		}
-	}
-
-	@Test
-	public void testOperationBalancesOutGetServiceAndUngetService() {
-		RegistryWrapper registryWrapper = getRegistryWrapper();
-
-		try (ServiceTrackerMap<String, TrackedOne> serviceTrackerMap =
-				createServiceTrackerMap()) {
-
-			ServiceRegistration<TrackedOne> serviceRegistration1 =
-				registerService(new TrackedOne());
-			ServiceRegistration<TrackedOne> serviceRegistration2 =
-				registerService(new TrackedOne());
-
-			serviceRegistration2.unregister();
-
-			serviceRegistration2 = registerService(new TrackedOne());
-
-			serviceRegistration2.unregister();
-
-			serviceRegistration1.unregister();
-
-			Map<ServiceReference<?>, AtomicInteger> serviceReferenceCountsMap =
-				registryWrapper.getServiceReferenceCountsMap();
-
-			Collection<AtomicInteger> serviceReferenceCounts =
-				serviceReferenceCountsMap.values();
-
-			Assert.assertEquals(3, serviceReferenceCounts.size());
-
-			for (AtomicInteger serviceReferenceCount : serviceReferenceCounts) {
-				Assert.assertEquals(0, serviceReferenceCount.get());
-			}
-		}
-		finally {
-			RegistryUtil.setRegistry(registryWrapper.getWrappedRegistry());
 		}
 	}
 
@@ -628,7 +539,7 @@ public class ObjectServiceTrackerMapTest {
 	protected ServiceRegistration<TrackedOne> registerService(
 		TrackedOne trackedOne, int ranking, String target) {
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put("service.ranking", ranking);
 		properties.put("target", target);
@@ -640,7 +551,7 @@ public class ObjectServiceTrackerMapTest {
 	protected ServiceRegistration<TrackedOne> registerService(
 		TrackedOne trackedOne, String target) {
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put("target", target);
 

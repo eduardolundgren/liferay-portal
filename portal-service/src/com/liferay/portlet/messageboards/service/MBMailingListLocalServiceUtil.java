@@ -209,6 +209,11 @@ public class MBMailingListLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
+	public static com.liferay.portlet.messageboards.model.MBMailingList fetchCategoryMailingList(
+		long groupId, long categoryId) {
+		return getService().fetchCategoryMailingList(groupId, categoryId);
+	}
+
 	public static com.liferay.portlet.messageboards.model.MBMailingList fetchMBMailingList(
 		long mailingListId) {
 		return getService().fetchMBMailingList(mailingListId);
@@ -246,7 +251,7 @@ public class MBMailingListLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 

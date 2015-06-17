@@ -65,7 +65,14 @@ if (folder != null) {
 }
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/bookmarks/edit_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <liferay-util:include page="/html/portlet/bookmarks/top_links.jsp" servletContext="<%= application %>" />
 
@@ -131,7 +138,7 @@ if (folder != null) {
 						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="bookmarksEntriesFoldersListingPanel" persistState="<%= true %>" title='<%= (folder != null) ? "subfolders" : "folders" %>'>
 							<liferay-ui:search-container
 								curParam="cur1"
-								delta="<%= bookmarksSettings.getFoldersPerPage() %>"
+								delta="<%= GetterUtil.getInteger(bookmarksGroupServiceSettings.foldersPerPage()) %>"
 								deltaConfigurable="<%= false %>"
 								headerNames="<%= StringUtil.merge(folderColumns) %>"
 								iteratorURL="<%= portletURL %>"
@@ -197,57 +204,55 @@ if (folder != null) {
 
 	</c:when>
 	<c:when test='<%= topLink.equals("mine") || topLink.equals("recent") %>'>
-		<aui:row>
-			<liferay-ui:header
-				title="<%= topLink %>"
+		<liferay-ui:header
+			title="<%= topLink %>"
+		/>
+
+		<%
+		long groupEntriesUserId = 0;
+
+		if (topLink.equals("mine") && themeDisplay.isSignedIn()) {
+			groupEntriesUserId = user.getUserId();
+		}
+		%>
+
+		<liferay-ui:search-container
+			delta="<%= GetterUtil.getInteger(bookmarksGroupServiceSettings.entriesPerPage()) %>"
+			deltaConfigurable="<%= false %>"
+			emptyResultsMessage="there-are-no-entries"
+			iteratorURL="<%= portletURL %>"
+			total="<%= BookmarksEntryServiceUtil.getGroupEntriesCount(scopeGroupId, groupEntriesUserId) %>"
+		>
+			<liferay-ui:search-container-results
+				results="<%= BookmarksEntryServiceUtil.getGroupEntries(scopeGroupId, groupEntriesUserId, searchContainer.getStart(), searchContainer.getEnd()) %>"
 			/>
 
-			<%
-			long groupEntriesUserId = 0;
-
-			if (topLink.equals("mine") && themeDisplay.isSignedIn()) {
-				groupEntriesUserId = user.getUserId();
-			}
-			%>
-
-			<liferay-ui:search-container
-				delta="<%= bookmarksSettings.getEntriesPerPage() %>"
-				deltaConfigurable="<%= false %>"
-				emptyResultsMessage="there-are-no-entries"
-				iteratorURL="<%= portletURL %>"
-				total="<%= BookmarksEntryServiceUtil.getGroupEntriesCount(scopeGroupId, groupEntriesUserId) %>"
+			<liferay-ui:search-container-row
+				className="com.liferay.bookmarks.model.BookmarksEntry"
+				escapedModel="<%= true %>"
+				keyProperty="entryId"
+				modelVar="entry"
 			>
-				<liferay-ui:search-container-results
-					results="<%= BookmarksEntryServiceUtil.getGroupEntries(scopeGroupId, groupEntriesUserId, searchContainer.getStart(), searchContainer.getEnd()) %>"
-				/>
 
-				<liferay-ui:search-container-row
-					className="com.liferay.bookmarks.model.BookmarksEntry"
-					escapedModel="<%= true %>"
-					keyProperty="entryId"
-					modelVar="entry"
-				>
+				<%
+				String rowHREF = null;
 
-					<%
-					String rowHREF = null;
+				if (BookmarksEntryPermissionChecker.contains(permissionChecker, entry, ActionKeys.VIEW)) {
+					PortletURL tempRowURL = renderResponse.createRenderURL();
 
-					if (BookmarksEntryPermission.contains(permissionChecker, entry, ActionKeys.VIEW)) {
-						PortletURL tempRowURL = renderResponse.createRenderURL();
+					tempRowURL.setParameter("struts_action", "/bookmarks/view_entry");
+					tempRowURL.setParameter("redirect", currentURL);
+					tempRowURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
 
-						tempRowURL.setParameter("struts_action", "/bookmarks/view_entry");
-						tempRowURL.setParameter("redirect", currentURL);
-						tempRowURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
+					rowHREF = tempRowURL.toString();
+				}
+				%>
 
-						rowHREF = tempRowURL.toString();
-					}
-					%>
+				<%@ include file="/html/portlet/bookmarks/entry_columns.jspf" %>
+			</liferay-ui:search-container-row>
 
-					<%@ include file="/html/portlet/bookmarks/entry_columns.jspf" %>
-				</liferay-ui:search-container-row>
-
-				<liferay-ui:search-iterator />
-			</liferay-ui:search-container>
-		</aui:row>
+			<liferay-ui:search-iterator />
+		</liferay-ui:search-container>
 
 		<%
 		if (!layout.isTypeControlPanel()) {

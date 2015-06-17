@@ -40,6 +40,15 @@ public class DLAppLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.documentlibrary.service.impl.DLAppLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.portal.kernel.repository.model.FileEntry addFileEntry(
+		long userId, long repositoryId, long folderId,
+		java.lang.String sourceFileName, java.lang.String mimeType,
+		byte[] bytes, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addFileEntry(userId, repositoryId, folderId,
+			sourceFileName, mimeType, bytes, serviceContext);
+	}
 
 	/**
 	* Adds a file entry and associated metadata based on a byte array.
@@ -213,7 +222,7 @@ public class DLAppLocalServiceUtil {
 	* @throws PortalException if the parent folder or file entry could not be
 	found, or if the file shortcut's information was invalid
 	*/
-	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
+	public static com.liferay.portal.kernel.repository.model.FileShortcut addFileShortcut(
 		long userId, long repositoryId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -300,13 +309,13 @@ public class DLAppLocalServiceUtil {
 	* Deletes the file shortcut. This method is only supported by the Liferay
 	* repository.
 	*
-	* @param dlFileShortcut the file shortcut
+	* @param fileShortcut the file shortcut
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	public static void deleteFileShortcut(
-		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut)
+		com.liferay.portal.kernel.repository.model.FileShortcut fileShortcut)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().deleteFileShortcut(dlFileShortcut);
+		getService().deleteFileShortcut(fileShortcut);
 	}
 
 	/**
@@ -417,7 +426,7 @@ public class DLAppLocalServiceUtil {
 	* @return the file shortcut with the primary key
 	* @throws PortalException if the file shortcut could not be found
 	*/
-	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut getFileShortcut(
+	public static com.liferay.portal.kernel.repository.model.FileShortcut getFileShortcut(
 		long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getFileShortcut(fileShortcutId);
@@ -815,7 +824,7 @@ public class DLAppLocalServiceUtil {
 	* @throws PortalException if the file shortcut, folder, or file entry could
 	not be found
 	*/
-	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
+	public static com.liferay.portal.kernel.repository.model.FileShortcut updateFileShortcut(
 		long userId, long fileShortcutId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -828,12 +837,23 @@ public class DLAppLocalServiceUtil {
 	* Updates all file shortcuts to the existing file entry to the new file
 	* entry. This method is only supported by the Liferay repository.
 	*
-	* @param toRepositoryId the primary key of the repository
 	* @param oldToFileEntryId the primary key of the old file entry pointed to
 	* @param newToFileEntryId the primary key of the new file entry to point to
 	*/
+	public static void updateFileShortcuts(long oldToFileEntryId,
+		long newToFileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().updateFileShortcuts(oldToFileEntryId, newToFileEntryId);
+	}
+
+	/**
+	* Deprecated as of 7.0.0, replaced by {@link #updateFileShortcuts(long,
+	*            long)}
+	*/
+	@Deprecated
 	public static void updateFileShortcuts(long toRepositoryId,
-		long oldToFileEntryId, long newToFileEntryId) {
+		long oldToFileEntryId, long newToFileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.updateFileShortcuts(toRepositoryId, oldToFileEntryId,
 			newToFileEntryId);

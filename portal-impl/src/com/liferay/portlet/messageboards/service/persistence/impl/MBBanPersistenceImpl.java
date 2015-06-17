@@ -16,7 +16,6 @@ package com.liferay.portlet.messageboards.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -33,6 +32,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.messageboards.NoSuchBanException;
@@ -44,6 +45,7 @@ import com.liferay.portlet.messageboards.service.persistence.MBBanPersistence;
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,7 +62,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see MBBanPersistence
- * @see MBBanUtil
+ * @see com.liferay.portlet.messageboards.service.persistence.MBBanUtil
  * @generated
  */
 @ProviderType
@@ -119,7 +121,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns a range of all the message boards bans where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -136,7 +138,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns an ordered range of all the message boards bans where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -263,7 +265,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUuid_First(String uuid,
@@ -311,7 +313,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUuid_Last(String uuid,
@@ -366,7 +368,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan[] findByUuid_PrevAndNext(long banId, String uuid,
@@ -611,12 +613,12 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 			new String[] { String.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the message boards ban where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.portlet.messageboards.NoSuchBanException} if it could not be found.
+	 * Returns the message boards ban where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchBanException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @return the matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUUID_G(String uuid, long groupId)
@@ -893,7 +895,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns a range of all the message boards bans where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -912,7 +914,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns an ordered range of all the message boards bans where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1050,7 +1052,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUuid_C_First(String uuid, long companyId,
@@ -1103,7 +1105,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUuid_C_Last(String uuid, long companyId,
@@ -1164,7 +1166,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan[] findByUuid_C_PrevAndNext(long banId, String uuid,
@@ -1444,7 +1446,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns a range of all the message boards bans where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1461,7 +1463,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns an ordered range of all the message boards bans where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1574,7 +1576,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByGroupId_First(long groupId,
@@ -1622,7 +1624,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByGroupId_Last(long groupId,
@@ -1678,7 +1680,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan[] findByGroupId_PrevAndNext(long banId, long groupId,
@@ -1916,7 +1918,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns a range of all the message boards bans where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -1933,7 +1935,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns an ordered range of all the message boards bans where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2046,7 +2048,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUserId_First(long userId,
@@ -2094,7 +2096,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByUserId_Last(long userId,
@@ -2150,7 +2152,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan[] findByUserId_PrevAndNext(long banId, long userId,
@@ -2390,7 +2392,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns a range of all the message boards bans where banUserId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param banUserId the ban user ID
@@ -2407,7 +2409,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns an ordered range of all the message boards bans where banUserId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param banUserId the ban user ID
@@ -2520,7 +2522,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param banUserId the ban user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByBanUserId_First(long banUserId,
@@ -2568,7 +2570,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param banUserId the ban user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByBanUserId_Last(long banUserId,
@@ -2624,7 +2626,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * @param banUserId the ban user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan[] findByBanUserId_PrevAndNext(long banId, long banUserId,
@@ -2839,12 +2841,12 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 			new String[] { Long.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the message boards ban where groupId = &#63; and banUserId = &#63; or throws a {@link com.liferay.portlet.messageboards.NoSuchBanException} if it could not be found.
+	 * Returns the message boards ban where groupId = &#63; and banUserId = &#63; or throws a {@link NoSuchBanException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param banUserId the ban user ID
 	 * @return the matching message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a matching message boards ban could not be found
+	 * @throws NoSuchBanException if a matching message boards ban could not be found
 	 */
 	@Override
 	public MBBan findByG_B(long groupId, long banUserId)
@@ -3103,10 +3105,6 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(MBBanImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(MBBanImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -3246,7 +3244,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 *
 	 * @param banId the primary key of the message boards ban
 	 * @return the message boards ban that was removed
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan remove(long banId) throws NoSuchBanException {
@@ -3258,7 +3256,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 *
 	 * @param primaryKey the primary key of the message boards ban
 	 * @return the message boards ban that was removed
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan remove(Serializable primaryKey) throws NoSuchBanException {
@@ -3324,7 +3322,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	}
 
 	@Override
-	public MBBan updateImpl(com.liferay.portlet.messageboards.model.MBBan mbBan) {
+	public MBBan updateImpl(MBBan mbBan) {
 		mbBan = toUnwrappedModel(mbBan);
 
 		boolean isNew = mbBan.isNew();
@@ -3335,6 +3333,28 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 			String uuid = PortalUUIDUtil.generate();
 
 			mbBan.setUuid(uuid);
+		}
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (mbBan.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				mbBan.setCreateDate(now);
+			}
+			else {
+				mbBan.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!mbBanModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				mbBan.setModifiedDate(now);
+			}
+			else {
+				mbBan.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
 		}
 
 		Session session = null;
@@ -3489,7 +3509,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 *
 	 * @param primaryKey the primary key of the message boards ban
 	 * @return the message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan findByPrimaryKey(Serializable primaryKey)
@@ -3509,11 +3529,11 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	}
 
 	/**
-	 * Returns the message boards ban with the primary key or throws a {@link com.liferay.portlet.messageboards.NoSuchBanException} if it could not be found.
+	 * Returns the message boards ban with the primary key or throws a {@link NoSuchBanException} if it could not be found.
 	 *
 	 * @param banId the primary key of the message boards ban
 	 * @return the message boards ban
-	 * @throws com.liferay.portlet.messageboards.NoSuchBanException if a message boards ban with the primary key could not be found
+	 * @throws NoSuchBanException if a message boards ban with the primary key could not be found
 	 */
 	@Override
 	public MBBan findByPrimaryKey(long banId) throws NoSuchBanException {
@@ -3682,7 +3702,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns a range of all the message boards bans.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of message boards bans
@@ -3698,7 +3718,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	 * Returns an ordered range of all the message boards bans.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MBBanModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of message boards bans
@@ -3861,7 +3881,6 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "mbBan.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MBBan exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MBBan exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(MBBanPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"

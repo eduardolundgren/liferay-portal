@@ -23,9 +23,14 @@ import com.liferay.portal.service.UserLocalService;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
+import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
+import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,16 +62,20 @@ public class GoogleDocsDLFileEntryTypeHelper {
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			_company.getCompanyId());
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), "Google Docs Metadata");
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), "Google Docs Metadata");
 
 		String definition = ResourceUtil.get(
 			this, "dependencies/ddm_structure_google_docs.xml");
+
+		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(definition);
+
+		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -80,7 +89,7 @@ public class GoogleDocsDLFileEntryTypeHelper {
 			DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 			_dlFileEntryMetadataClassNameId,
 			GoogleDocsConstants.DDM_STRUCTURE_KEY_GOOGLE_DOCS, nameMap,
-			descriptionMap, definition, "xml",
+			descriptionMap, ddmForm, ddmFormLayout, StorageType.JSON.toString(),
 			DDMStructureConstants.TYPE_DEFAULT, serviceContext);
 	}
 
@@ -112,11 +121,11 @@ public class GoogleDocsDLFileEntryTypeHelper {
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			_company.getCompanyId());
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), "Google Docs");
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), "Google Docs");
 

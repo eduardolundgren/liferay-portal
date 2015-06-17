@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -27,9 +29,10 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.asset.model.ClassTypeReader;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
@@ -49,6 +52,11 @@ import javax.portlet.WindowStateException;
  * @author Raymond Augé
  * @author Sergio González
  */
+@OSGiBeanProperties(
+	property = {
+		"search.asset.type=com.liferay.portlet.documentlibrary.model.DLFileEntry"
+	}
+)
 public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "document";
@@ -120,18 +128,30 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	@Override
 	public PortletURL getURLAdd(
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
+		LiferayPortletResponse liferayPortletResponse, long classTypeId) {
 
 		PortletURL portletURL = liferayPortletResponse.createRenderURL(
 			PortletKeys.DOCUMENT_LIBRARY);
 
 		portletURL.setParameter(
 			"struts_action", "/document_library/edit_file_entry");
+		portletURL.setParameter(Constants.CMD, Constants.ADD);
 		portletURL.setParameter(
 			"folderId",
-			String.valueOf(
-				AssetPublisherUtil.getRecentFolderId(
-					liferayPortletRequest, getClassName())));
+			String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+
+		long fileEntryTypeId =
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT;
+
+		if (classTypeId >= 0) {
+			fileEntryTypeId = classTypeId;
+		}
+
+		portletURL.setParameter(
+			"fileEntryTypeId", String.valueOf(fileEntryTypeId));
+
+		portletURL.setParameter("showMountFolder", Boolean.FALSE.toString());
+		portletURL.setParameter("showSelectFolder", Boolean.TRUE.toString());
 
 		return portletURL;
 	}

@@ -19,7 +19,7 @@ import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksEntryServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
-import com.liferay.bookmarks.service.permission.BookmarksFolderPermission;
+import com.liferay.bookmarks.service.permission.BookmarksFolderPermissionChecker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -39,8 +39,6 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -81,7 +79,7 @@ public class BookmarksFolderAssetRenderer
 		if (BookmarksFolderServiceUtil.getFoldersAndEntriesCount(
 				_folder.getGroupId(), _folder.getFolderId()) > 0) {
 
-			return "icon-folder-close";
+			return "icon-folder-open";
 		}
 
 		return super.getIconCssClass();
@@ -215,7 +213,7 @@ public class BookmarksFolderAssetRenderer
 	public boolean hasEditPermission(PermissionChecker permissionChecker)
 		throws PortalException {
 
-		return BookmarksFolderPermission.contains(
+		return BookmarksFolderPermissionChecker.contains(
 			permissionChecker, _folder, ActionKeys.UPDATE);
 	}
 
@@ -223,18 +221,18 @@ public class BookmarksFolderAssetRenderer
 	public boolean hasViewPermission(PermissionChecker permissionChecker)
 		throws PortalException {
 
-		return BookmarksFolderPermission.contains(
+		return BookmarksFolderPermissionChecker.contains(
 			permissionChecker, _folder, ActionKeys.VIEW);
 	}
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_FULL_CONTENT)) {
-			renderRequest.setAttribute(
+			portletRequest.setAttribute(
 				BookmarksWebKeys.BOOKMARKS_FOLDER, _folder);
 
 			return "/html/portlet/bookmarks/asset/folder_" + template + ".jsp";

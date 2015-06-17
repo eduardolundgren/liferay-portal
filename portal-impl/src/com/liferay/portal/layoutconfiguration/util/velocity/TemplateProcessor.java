@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
+import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
@@ -65,12 +66,14 @@ public class TemplateProcessor implements ColumnProcessor {
 			_portlet = PortletLocalServiceUtil.getPortletById(
 				themeDisplay.getCompanyId(), portletId);
 		}
+		else {
+			_portlet = null;
+		}
 
 		_portletAjaxRender = GetterUtil.getBoolean(
 			request.getAttribute(WebKeys.PORTLET_AJAX_RENDER));
 
-		_portletRenderers = new TreeMap<Integer, List<PortletRenderer>>(
-			_renderWeightComparator);
+		_portletRenderers = new TreeMap<>(_renderWeightComparator);
 	}
 
 	public Map<Integer, List<PortletRenderer>> getPortletRenderers() {
@@ -148,7 +151,7 @@ public class TemplateProcessor implements ColumnProcessor {
 					renderWeight);
 
 				if (portletRenderers == null) {
-					portletRenderers = new ArrayList<PortletRenderer>();
+					portletRenderers = new ArrayList<>();
 
 					_portletRenderers.put(renderWeight, portletRenderers);
 				}
@@ -227,8 +230,9 @@ public class TemplateProcessor implements ColumnProcessor {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Settings settings = SettingsFactoryUtil.getPortletInstanceSettings(
-			themeDisplay.getLayout(), portletId);
+		Settings settings = SettingsFactoryUtil.getSettings(
+			new PortletInstanceSettingsLocator(
+				themeDisplay.getLayout(), portletId));
 
 		ModifiableSettings modifiableSettings =
 			settings.getModifiableSettings();
@@ -255,14 +259,14 @@ public class TemplateProcessor implements ColumnProcessor {
 		return processPortlet(portletId);
 	}
 
-	private static RenderWeightComparator _renderWeightComparator =
+	private static final RenderWeightComparator _renderWeightComparator =
 		new RenderWeightComparator();
 
-	private Portlet _portlet;
-	private boolean _portletAjaxRender;
-	private Map<Integer, List<PortletRenderer>> _portletRenderers;
-	private HttpServletRequest _request;
-	private HttpServletResponse _response;
+	private final Portlet _portlet;
+	private final boolean _portletAjaxRender;
+	private final Map<Integer, List<PortletRenderer>> _portletRenderers;
+	private final HttpServletRequest _request;
+	private final HttpServletResponse _response;
 
 	private static class RenderWeightComparator implements Comparator<Integer> {
 

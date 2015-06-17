@@ -23,7 +23,7 @@ SearchContainer searchContainer = (SearchContainer)request.getAttribute("view.js
 
 List results = searchContainer.getResults();
 
-DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, dlPortletInstanceSettings);
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(igRequestHelper);
 %>
 
 <c:choose>
@@ -63,7 +63,14 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					thumbnailId = "entry_" + fileEntry.getFileEntryId();
 				}
 
-				DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = DLViewFileVersionDisplayContextUtil.getIGFileVersionActionsDisplayContext(request, response, fileEntry.getFileVersion());
+				IGViewFileVersionDisplayContext igViewFileVersionDisplayContext = null;
+
+				if (fileShortcut == null) {
+					igViewFileVersionDisplayContext = IGDisplayContextProviderUtil.getIGFileVersionActionsDisplayContext(request, response, fileEntry.getFileVersion());
+				}
+				else {
+					igViewFileVersionDisplayContext = IGDisplayContextProviderUtil.getIGFileVersionActionsDisplayContext(request, response, fileShortcut);
+				}
 				%>
 
 				<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.VIEW) %>">
@@ -129,7 +136,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 						</a>
 					</div>
 
-					<c:if test="<%= dlActionsDisplayContext.isShowActions() %>">
+					<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
 						<div class="hide" id="<portlet:namespace />buttonsContainer_<%= thumbnailId %>">
 							<div class="buttons-container float-container" id="<portlet:namespace />buttons_<%= thumbnailId %>">
 								<%@ include file="/html/portlet/image_gallery_display/image_action.jspf" %>
@@ -208,6 +215,9 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 							<a class="image-link" href="<%= viewFolderURL.toString() %>" title="<%= HtmlUtil.escape(curFolder.getName()) + " - " + HtmlUtil.escape(curFolder.getDescription()) %>">
 
 								<%
+								String folderImageSrc = themeDisplay.getPathThemeImages() + "/file_system/large/folder_empty.png";
+
+								if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT) {
 									int curFoldersCount = DLAppServiceUtil.getFoldersCount(curFolder.getRepositoryId(), curFolder.getFolderId());
 
 									int curImagesCount = 0;
@@ -219,11 +229,10 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 										curImagesCount = DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED);
 									}
 
-									String folderImageSrc = themeDisplay.getPathThemeImages() + "/file_system/large/folder_empty.png";
-
 									if ((curFoldersCount + curImagesCount) > 0) {
 										folderImageSrc = themeDisplay.getPathThemeImages() + "/file_system/large/folder_full_image.png";
 									}
+								}
 								%>
 
 								<span class="image-thumbnail">
@@ -272,7 +281,7 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 		var imageGallery = new A.ImageViewer(
 			{
 				after: {
-					<c:if test="<%= dlActionsDisplayContext.isShowActions() %>">
+					<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
 						load: function(event) {
 							var instance = this;
 

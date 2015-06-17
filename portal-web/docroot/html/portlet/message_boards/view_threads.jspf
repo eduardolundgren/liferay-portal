@@ -44,6 +44,7 @@
 		if (useAssetEntryQuery) {
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery(MBMessage.class.getName(), searchContainer);
 
+			assetEntryQuery.setEnablePermissions(true);
 			assetEntryQuery.setExcludeZeroViewCount(false);
 
 			total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
@@ -97,12 +98,9 @@
 		<%@ include file="/html/portlet/message_boards/cast_result.jspf" %>
 
 		<%
-		MBMessage message = null;
+		MBMessage message = MBMessageLocalServiceUtil.fetchMBMessage(thread.getRootMessageId());
 
-		try {
-			message = MBMessageLocalServiceUtil.getMessage(thread.getRootMessageId());
-		}
-		catch (NoSuchMessageException nsme) {
+		if (message == null) {
 			_log.error("Thread requires missing root message id " + thread.getRootMessageId());
 
 			message = new MBMessageImpl();

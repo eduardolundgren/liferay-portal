@@ -17,6 +17,11 @@ package com.liferay.portal.theme;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.toolbar.PortletToolbar;
+import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
+import com.liferay.portal.kernel.settings.SettingsException;
+import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -69,6 +74,7 @@ public class PortletDisplay implements Serializable {
 		_namespace = master.getNamespace();
 		_portletName = master.getPortletName();
 		_portletSetup = master.getPortletSetup();
+		_portletToolbar = master.getPortletToolbar();
 		_resourcePK = master.getResourcePK();
 		_restoreCurrentView = master.isRestoreCurrentView();
 		_rootPortletId = master.getRootPortletId();
@@ -137,6 +143,7 @@ public class PortletDisplay implements Serializable {
 		slave.setPortletName(_portletName);
 		slave.setPortletResource(_portletResource);
 		slave.setPortletSetup(_portletSetup);
+		slave.setPortletToolbar(_portletToolbar);
 		slave.setResourcePK(_resourcePK);
 		slave.setRestoreCurrentView(_restoreCurrentView);
 		slave.setRootPortletId(_rootPortletId);
@@ -231,6 +238,21 @@ public class PortletDisplay implements Serializable {
 		return _namespace;
 	}
 
+	public <T> T getPortletInstanceConfiguration(Class<T> clazz)
+		throws SettingsException {
+
+		SettingsFactory settingsFactory =
+			SettingsFactoryUtil.getSettingsFactory();
+
+		String portletId = Validator.isNull(
+			_portletResource) ? _id : _portletResource;
+
+		return settingsFactory.getSettings(
+			clazz,
+			new PortletInstanceSettingsLocator(
+				_themeDisplay.getLayout(), portletId));
+	}
+
 	public String getPortletName() {
 		return _portletName;
 	}
@@ -241,6 +263,10 @@ public class PortletDisplay implements Serializable {
 
 	public PortletPreferences getPortletSetup() {
 		return _portletSetup;
+	}
+
+	public PortletToolbar getPortletToolbar() {
+		return _portletToolbar;
 	}
 
 	public String getResourcePK() {
@@ -656,6 +682,10 @@ public class PortletDisplay implements Serializable {
 		_portletSetup = portletSetup;
 	}
 
+	public void setPortletToolbar(PortletToolbar portletToolbar) {
+		_portletToolbar = portletToolbar;
+	}
+
 	public void setResourcePK(String resourcePK) {
 		_resourcePK = resourcePK;
 	}
@@ -862,6 +892,7 @@ public class PortletDisplay implements Serializable {
 	private String _portletName = StringPool.BLANK;
 	private String _portletResource = StringPool.BLANK;
 	private PortletPreferences _portletSetup;
+	private PortletToolbar _portletToolbar;
 	private String _resourcePK = StringPool.BLANK;
 	private boolean _restoreCurrentView;
 	private String _rootPortletId = StringPool.BLANK;

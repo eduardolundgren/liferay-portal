@@ -17,7 +17,7 @@ package com.liferay.bookmarks.asset;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.service.permission.BookmarksEntryPermission;
+import com.liferay.bookmarks.service.permission.BookmarksEntryPermissionChecker;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.trash.TrashRenderer;
@@ -34,8 +34,6 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -175,7 +173,7 @@ public class BookmarksEntryAssetRenderer
 	@Override
 	public boolean hasEditPermission(PermissionChecker permissionChecker) {
 		try {
-			return BookmarksEntryPermission.contains(
+			return BookmarksEntryPermissionChecker.contains(
 				permissionChecker, _entry, ActionKeys.UPDATE);
 		}
 		catch (Exception e) {
@@ -187,7 +185,7 @@ public class BookmarksEntryAssetRenderer
 	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker) {
 		try {
-			return BookmarksEntryPermission.contains(
+			return BookmarksEntryPermissionChecker.contains(
 				permissionChecker, _entry, ActionKeys.VIEW);
 		}
 		catch (Exception e) {
@@ -203,12 +201,12 @@ public class BookmarksEntryAssetRenderer
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_FULL_CONTENT)) {
-			renderRequest.setAttribute(
+			portletRequest.setAttribute(
 				BookmarksWebKeys.BOOKMARKS_ENTRY, _entry);
 
 			return "/html/portlet/bookmarks/asset/" + template + ".jsp";

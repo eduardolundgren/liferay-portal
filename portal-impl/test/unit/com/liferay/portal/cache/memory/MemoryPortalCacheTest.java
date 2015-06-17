@@ -14,14 +14,14 @@
 
 package com.liferay.portal.cache.memory;
 
-import com.liferay.portal.cache.MockPortalCacheManager;
-import com.liferay.portal.cache.TestCacheListener;
-import com.liferay.portal.cache.TestCacheReplicator;
+import com.liferay.portal.cache.test.MockPortalCacheManager;
+import com.liferay.portal.cache.test.TestCacheListener;
+import com.liferay.portal.cache.test.TestCacheReplicator;
 import com.liferay.portal.kernel.cache.AbstractPortalCache;
 import com.liferay.portal.kernel.cache.CacheListenerScope;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.List;
 
@@ -54,11 +54,11 @@ public class MemoryPortalCacheTest {
 
 		_memoryPortalCache.put(_KEY_1, _VALUE_1);
 
-		_defaultCacheListener = new TestCacheListener<String, String>();
+		_defaultCacheListener = new TestCacheListener<>();
 
 		_memoryPortalCache.registerCacheListener(_defaultCacheListener);
 
-		_defaultCacheReplicator = new TestCacheReplicator<String, String>();
+		_defaultCacheReplicator = new TestCacheReplicator<>();
 
 		_memoryPortalCache.registerCacheListener(_defaultCacheReplicator);
 	}
@@ -69,7 +69,7 @@ public class MemoryPortalCacheTest {
 		// Register
 
 		TestCacheListener<String, String> cacheListener =
-			new TestCacheListener<String, String>();
+			new TestCacheListener<>();
 
 		_memoryPortalCache.registerCacheListener(
 			cacheListener, CacheListenerScope.ALL);

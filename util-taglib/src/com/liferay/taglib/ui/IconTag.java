@@ -173,10 +173,10 @@ public class IconTag extends IncludeTag {
 		Map<String, Object> data = null;
 
 		if (_data != null) {
-			data = new HashMap<String, Object>(_data);
+			data = new HashMap<>(_data);
 		}
 		else {
-			data = new HashMap<String, Object>(1);
+			data = new HashMap<>(1);
 		}
 
 		if (_useDialog && Validator.isNull(data.get("title"))) {
@@ -432,13 +432,8 @@ public class IconTag extends IncludeTag {
 		}
 
 		return StringUtil.replace(
-			_image,
-			new String[] {
-				StringPool.UNDERLINE, _AUI_PATH
-			},
-			new String[] {
-				StringPool.DASH, StringPool.BLANK
-			});
+			_image, new String[] {StringPool.UNDERLINE, _AUI_PATH},
+			new String[] {StringPool.DASH, StringPool.BLANK});
 	}
 
 	protected String getProcessedUrl() {

@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.ac.AccessControlUtil;
+import com.liferay.portal.security.access.control.AccessControlUtil;
 import com.liferay.portal.security.auth.AuthTokenUtil;
-import com.liferay.portal.security.auth.PortalSessionAuthVerifier;
 import com.liferay.portal.security.sso.SSOUtil;
 import com.liferay.portal.servlet.SharedSessionServletRequest;
 import com.liferay.portal.util.PortalUtil;
@@ -77,7 +77,15 @@ public abstract class JSONAction extends Action {
 			json = getJSON(actionMapping, actionForm, request, response);
 
 			if (Validator.isNotNull(callback)) {
-				json = callback + "(" + json + ");";
+				StringBundler sb = new StringBundler(5);
+
+				sb.append("/**/");
+				sb.append(callback);
+				sb.append(StringPool.OPEN_PARENTHESIS);
+				sb.append(json);
+				sb.append(StringPool.CLOSE_PARENTHESIS);
+
+				json = sb.toString();
 			}
 		}
 		catch (SecurityException se) {
@@ -147,7 +155,7 @@ public abstract class JSONAction extends Action {
 			// The new web service should only check auth tokens when the user
 			// is authenticated using portal session cookies
 
-			if (!authType.equals(PortalSessionAuthVerifier.AUTH_TYPE)) {
+			if (!authType.equals(HttpServletRequest.FORM_AUTH)) {
 				return;
 			}
 		}

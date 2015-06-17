@@ -21,13 +21,10 @@ page import="com.liferay.portal.AddressStreetException" %><%@
 page import="com.liferay.portal.AddressZipException" %><%@
 page import="com.liferay.portal.CompanyMaxUsersException" %><%@
 page import="com.liferay.portal.ContactBirthdayException" %><%@
-page import="com.liferay.portal.ContactFirstNameException" %><%@
-page import="com.liferay.portal.ContactFullNameException" %><%@
-page import="com.liferay.portal.ContactLastNameException" %><%@
+page import="com.liferay.portal.ContactNameException" %><%@
 page import="com.liferay.portal.DuplicateOpenIdException" %><%@
 page import="com.liferay.portal.DuplicateOrganizationException" %><%@
 page import="com.liferay.portal.EmailAddressException" %><%@
-page import="com.liferay.portal.GroupFriendlyURLException" %><%@
 page import="com.liferay.portal.NoSuchCountryException" %><%@
 page import="com.liferay.portal.NoSuchListTypeException" %><%@
 page import="com.liferay.portal.NoSuchOrganizationException" %><%@
@@ -38,19 +35,22 @@ page import="com.liferay.portal.OrganizationParentException" %><%@
 page import="com.liferay.portal.PhoneNumberException" %><%@
 page import="com.liferay.portal.RequiredOrganizationException" %><%@
 page import="com.liferay.portal.RequiredUserException" %><%@
-page import="com.liferay.portal.ReservedUserEmailAddressException" %><%@
-page import="com.liferay.portal.ReservedUserIdException" %><%@
-page import="com.liferay.portal.ReservedUserScreenNameException" %><%@
 page import="com.liferay.portal.UserEmailAddressException" %><%@
 page import="com.liferay.portal.UserFieldException" %><%@
 page import="com.liferay.portal.UserIdException" %><%@
+page import="com.liferay.portal.UserLockoutException" %><%@
 page import="com.liferay.portal.UserPasswordException" %><%@
 page import="com.liferay.portal.UserScreenNameException" %><%@
 page import="com.liferay.portal.UserSmsException" %><%@
 page import="com.liferay.portal.WebsiteURLException" %><%@
+page import="com.liferay.portal.kernel.util.CamelCaseUtil" %><%@
+page import="com.liferay.portal.security.auth.FullNameDefinition" %><%@
+page import="com.liferay.portal.security.auth.FullNameDefinitionFactory" %><%@
+page import="com.liferay.portal.security.auth.FullNameField" %><%@
+page import="com.liferay.portal.security.auth.ScreenNameValidator" %><%@
+page import="com.liferay.portal.security.auth.ScreenNameValidatorFactory" %><%@
 page import="com.liferay.portal.security.membershippolicy.OrganizationMembershipPolicyUtil" %><%@
 page import="com.liferay.portal.security.membershippolicy.RoleMembershipPolicyUtil" %><%@
-page import="com.liferay.portal.security.membershippolicy.SiteMembershipPolicyUtil" %><%@
 page import="com.liferay.portal.security.membershippolicy.UserGroupMembershipPolicyUtil" %><%@
 page import="com.liferay.portal.service.permission.OrganizationPermissionUtil" %><%@
 page import="com.liferay.portal.service.permission.UserPermissionUtil" %><%@
@@ -58,22 +58,14 @@ page import="com.liferay.portlet.announcements.model.AnnouncementsDelivery" %><%
 page import="com.liferay.portlet.announcements.model.AnnouncementsEntryConstants" %><%@
 page import="com.liferay.portlet.announcements.model.impl.AnnouncementsDeliveryImpl" %><%@
 page import="com.liferay.portlet.announcements.service.AnnouncementsDeliveryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.rolesadmin.search.GroupRoleChecker" %><%@
 page import="com.liferay.portlet.rolesadmin.search.OrganizationRoleChecker" %><%@
 page import="com.liferay.portlet.rolesadmin.search.UserGroupRoleChecker" %><%@
 page import="com.liferay.portlet.rolesadmin.search.UserRoleChecker" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupGroupChecker" %><%@
-page import="com.liferay.portlet.usersadmin.search.GroupDisplayTerms" %><%@
-page import="com.liferay.portlet.usersadmin.search.OrganizationDisplayTerms" %><%@
-page import="com.liferay.portlet.usersadmin.search.UserDisplayTerms" %><%@
 page import="com.liferay.portlet.usersadmin.search.UserOrganizationChecker" %>
 
 <%
-boolean showActiveUserSelect = true;
-
-if (!(portletName.equals(PortletKeys.PASSWORD_POLICIES_ADMIN) || portletName.equals(PortletKeys.PORTAL_SETTINGS) || portletName.equals(PortletKeys.ROLES_ADMIN) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN))) {
-	showActiveUserSelect = false;
-}
-
 boolean filterManageableGroups = true;
 
 boolean filterManageableOrganizations = true;

@@ -1,4 +1,4 @@
-@import "compass";
+@import "bourbon";
 @import "mixins";
 
 .portlet-asset-publisher, .portlet-message-boards, .portlet-trash {
@@ -471,32 +471,6 @@
 			margin: 0;
 			padding: 0;
 		}
-	}
-}
-
-.ie {
-	.portlet-message-boards, .portlet-trash {
-		.message-container {
-			width: 100%;
-
-			.thread-body table {
-				table-layout: auto;
-			}
-		}
-	}
-}
-
-.ie6 {
-	.portlet-message-boards, .portlet-trash {
-		.code {
-			width: 100%;
-		}
-	}
-}
-
-.ie8 {
-	.question-details {
-		white-space: normal;
 	}
 }
 

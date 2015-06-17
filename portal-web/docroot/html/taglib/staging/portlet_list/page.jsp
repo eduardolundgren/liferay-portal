@@ -86,7 +86,7 @@
 
 									<aui:field-wrapper label='<%= ArrayUtil.isNotEmpty(metadataControls) ? "content" : StringPool.BLANK %>'>
 										<ul class="lfr-tree list-unstyled">
-											<liferay-util:include page="/html/portlet/layouts_admin/render_controls.jsp" />
+											<liferay-util:include page="/html/portlet/export_import/render_controls.jsp" />
 										</ul>
 									</aui:field-wrapper>
 
@@ -103,7 +103,7 @@
 
 									<aui:field-wrapper label='<%= ArrayUtil.isNotEmpty(metadataControls) ? "content" : StringPool.BLANK %>'>
 										<ul class="lfr-tree list-unstyled">
-											<liferay-util:include page="/html/portlet/layouts_admin/render_controls.jsp" />
+											<liferay-util:include page="/html/portlet/export_import/render_controls.jsp" />
 										</ul>
 									</aui:field-wrapper>
 
@@ -129,7 +129,7 @@
 
 										<aui:field-wrapper label="content-metadata">
 											<ul class="lfr-tree list-unstyled">
-												<liferay-util:include page="/html/portlet/layouts_admin/render_controls.jsp" />
+												<liferay-util:include page="/html/portlet/export_import/render_controls.jsp" />
 											</ul>
 										</aui:field-wrapper>
 
@@ -194,19 +194,6 @@
 				<aui:input disabled="<%= disableInputs %>" label="comments" name="<%= PortletDataHandlerKeys.COMMENTS %>" type="checkbox" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.COMMENTS, true) %>" />
 
 				<aui:input disabled="<%= disableInputs %>" label="ratings" name="<%= PortletDataHandlerKeys.RATINGS %>" type="checkbox" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.RATINGS, true) %>" />
-
-				<%
-				long modelDeletionCount = manifestSummary.getModelDeletionCount();
-				%>
-
-				<c:if test="<%= modelDeletionCount != 0 %>">
-
-					<%
-					String deletionsLabel = LanguageUtil.get(request, "deletions") + (modelDeletionCount > 0 ? " (" + modelDeletionCount + ")" : StringPool.BLANK);
-					%>
-
-					<aui:input checked="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.DELETIONS, !type.equals(Constants.EXPORT)) %>" data-name="<%= deletionsLabel %>" disabled="<%= disableInputs %>" helpMessage="deletions-help" label="<%= deletionsLabel %>" name="<%= PortletDataHandlerKeys.DELETIONS %>" type="checkbox" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.DELETIONS, false) %>" />
-				</c:if>
 			</li>
 		</ul>
 	</div>

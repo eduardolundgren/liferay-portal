@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -210,7 +211,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	* @return the create date of this repository
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _repository.getCreateDate();
 	}
 
@@ -255,7 +256,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	* @return the modified date of this repository
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _repository.getModifiedDate();
 	}
 
@@ -430,7 +431,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	* @param createDate the create date of this repository
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_repository.setCreateDate(createDate);
 	}
 
@@ -455,8 +456,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_repository.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -488,7 +488,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	* @param modifiedDate the modified date of this repository
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_repository.setModifiedDate(modifiedDate);
 	}
 
@@ -609,7 +609,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Repository> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Repository> toCacheModel() {
 		return _repository.toCacheModel();
 	}
 

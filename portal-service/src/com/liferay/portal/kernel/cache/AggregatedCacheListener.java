@@ -49,11 +49,24 @@ public class AggregatedCacheListener<K extends Serializable, V>
 	}
 
 	public void clearAll() {
+		dispose();
+
 		_cacheListeners.clear();
+	}
+
+	@Override
+	public void dispose() {
+		for (CacheListener<K, V> cacheListener : _cacheListeners.keySet()) {
+			cacheListener.dispose();
+		}
 	}
 
 	public Map<CacheListener<K, V>, CacheListenerScope> getCacheListeners() {
 		return Collections.unmodifiableMap(_cacheListeners);
+	}
+
+	public boolean isEmpty() {
+		return _cacheListeners.isEmpty();
 	}
 
 	@Override
@@ -157,6 +170,8 @@ public class AggregatedCacheListener<K extends Serializable, V>
 	}
 
 	public void removeCacheListener(CacheListener<K, V> cacheListener) {
+		cacheListener.dispose();
+
 		_cacheListeners.remove(cacheListener);
 	}
 
@@ -188,11 +203,10 @@ public class AggregatedCacheListener<K extends Serializable, V>
 	}
 
 	private static final ThreadLocal<Boolean> _remoteInvokeThreadLocal =
-		new InitialThreadLocal<Boolean>(
+		new InitialThreadLocal<>(
 			AggregatedCacheListener.class + "._remoteInvokeThreadLocal", false);
 
 	private final ConcurrentMap<CacheListener<K, V>, CacheListenerScope>
-		_cacheListeners =
-			new ConcurrentHashMap<CacheListener<K, V>, CacheListenerScope>();
+		_cacheListeners = new ConcurrentHashMap<>();
 
 }

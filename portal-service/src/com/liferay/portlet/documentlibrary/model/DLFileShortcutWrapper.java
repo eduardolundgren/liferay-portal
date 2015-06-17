@@ -16,9 +16,10 @@ package com.liferay.portlet.documentlibrary.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -232,7 +233,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* @return the create date of this document library file shortcut
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _dlFileShortcut.getCreateDate();
 	}
 
@@ -255,6 +256,12 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	@Override
 	public long getFileShortcutId() {
 		return _dlFileShortcut.getFileShortcutId();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.repository.model.FileVersion getFileVersion()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlFileShortcut.getFileVersion();
 	}
 
 	@Override
@@ -289,7 +296,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* @return the modified date of this document library file shortcut
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _dlFileShortcut.getModifiedDate();
 	}
 
@@ -364,7 +371,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* @return the status date of this document library file shortcut
 	*/
 	@Override
-	public java.util.Date getStatusDate() {
+	public Date getStatusDate() {
 		return _dlFileShortcut.getStatusDate();
 	}
 
@@ -645,7 +652,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* @param createDate the create date of this document library file shortcut
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_dlFileShortcut.setCreateDate(createDate);
 	}
 
@@ -703,7 +710,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* @param modifiedDate the modified date of this document library file shortcut
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_dlFileShortcut.setModifiedDate(modifiedDate);
 	}
 
@@ -783,7 +790,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* @param statusDate the status date of this document library file shortcut
 	*/
 	@Override
-	public void setStatusDate(java.util.Date statusDate) {
+	public void setStatusDate(Date statusDate) {
 		_dlFileShortcut.setStatusDate(statusDate);
 	}
 

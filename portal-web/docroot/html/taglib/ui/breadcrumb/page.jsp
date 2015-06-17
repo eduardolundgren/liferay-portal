@@ -19,7 +19,12 @@
 <div id="<portlet:namespace />breadcrumbs-defaultScreen">
 	<h1 class="hide-accessible"><liferay-ui:message key="breadcrumbs" /></h1>
 
-	<c:if test="<%= Validator.isNotNull(breadcrumbString) %>">
-		<liferay-util:include page='<%= "/html/taglib/ui/breadcrumb/display_style_" + displayStyle + ".jsp" %>' />
+	<c:if test="<%= !breadcrumbEntries.isEmpty() %>">
+		<liferay-ui:ddm-template-renderer
+			className="<%= BreadcrumbEntry.class.getName() %>"
+			displayStyle="<%= displayStyle %>"
+			displayStyleGroupId="<%= displayStyleGroupId %>"
+			entries="<%= breadcrumbEntries %>"
+		/>
 	</c:if>
 </div>

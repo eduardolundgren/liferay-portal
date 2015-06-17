@@ -17,7 +17,9 @@ package com.liferay.portlet.dynamicdatamapping.io;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 
+import org.junit.Assert;
 import org.junit.Before;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -31,6 +33,7 @@ public class DDMFormJSONDeserializerTest
 
 	@Before
 	public void setUp() {
+		setUpDDMFormFieldTypeRegistryUtil();
 		setUpDDMFormJSONDeserializerUtil();
 		setUpLocaleUtil();
 		setUpJSONFactoryUtil();
@@ -53,12 +56,27 @@ public class DDMFormJSONDeserializerTest
 		return ".json";
 	}
 
+	@Override
 	protected void setUpDDMFormJSONDeserializerUtil() {
 		DDMFormJSONDeserializerUtil ddmFormJSONDeserializerUtil =
 			new DDMFormJSONDeserializerUtil();
 
 		ddmFormJSONDeserializerUtil.setDDMFormJSONDeserializer(
 			new DDMFormJSONDeserializerImpl());
+	}
+
+	@Override
+	protected void testBooleanDDMFormField(DDMFormField ddmFormField) {
+		super.testBooleanDDMFormField(ddmFormField);
+
+		Assert.assertEquals("true", ddmFormField.getVisibilityExpression());
+	}
+
+	@Override
+	protected void testDecimalDDMFormField(DDMFormField ddmFormField) {
+		super.testDecimalDDMFormField(ddmFormField);
+
+		Assert.assertEquals("false", ddmFormField.getVisibilityExpression());
 	}
 
 }

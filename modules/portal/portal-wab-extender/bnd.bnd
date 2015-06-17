@@ -4,12 +4,11 @@ Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.portal.wab.extender.ws.axis
 Import-Package:\
-	com.liferay.portal.servlet.jsp;version='[1.0.0,2.0)';resolution:='optional',\
+	com.liferay.portal.servlet.jsp.compiler;version='[1.0.0,2.0)',\
 	javax.servlet;version='[2.3.0,4.0.0)',\
 	javax.servlet.http;version='[2.3.0,4.0.0)',\
 	org.apache.axis;resolution:='optional',\
 	org.apache.axis.configuration;resolution:='optional',\
-	org.eclipse.equinox.http.servlet;version='[1.1.0,2.0)',\
 	org.osgi.framework;version='[1.3,2.0)',\
 	org.osgi.service.component;version='[1.2,2.0)',\
 	org.osgi.service.log;resolution:='optional',\
@@ -20,4 +19,6 @@ Include-Resource:\
 	classes,\
 	@lib/org.apache.felix.utils.jar!/org/apache/felix/utils/extender/*,\
 	@lib/org.apache.felix.utils.jar!/org/apache/felix/utils/log/*,\
-	@../../../portal-service/portal-service.jar!/com/liferay/portal/kernel/util/GetterUtil.class
+	@../../../portal-service/portal-service.jar!/com/liferay/portal/kernel/util/GetterUtil.class,\
+	@../../../portal-service/portal-service.jar!/com/liferay/portal/kernel/util/HashMapDictionary.class,\
+	@../../../portal-service/portal-service.jar!/com/liferay/portal/kernel/util/ReflectionUtil.class

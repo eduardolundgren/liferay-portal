@@ -14,9 +14,9 @@
 
 package com.liferay.portal.spring.aop;
 
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.util.ClassLoaderUtil;
 
 import java.lang.reflect.InvocationHandler;
 
@@ -76,9 +76,8 @@ public class DynamicProxyCreator
 			InvocationHandlerFactory invocationHandlerFactory) {
 
 			ObjectValuePair<BeanMatcher, InvocationHandlerFactory>
-				objectValuePair =
-					new ObjectValuePair<BeanMatcher, InvocationHandlerFactory>(
-						beanMatcher, invocationHandlerFactory);
+				objectValuePair = new ObjectValuePair<>(
+					beanMatcher, invocationHandlerFactory);
 
 			_instance._beanMatcherInvocationHandlerFactories.add(
 				objectValuePair);
@@ -90,8 +89,6 @@ public class DynamicProxyCreator
 		new DynamicProxyCreator();
 
 	private final List<ObjectValuePair<BeanMatcher, InvocationHandlerFactory>>
-		_beanMatcherInvocationHandlerFactories =
-			new ArrayList
-				<ObjectValuePair<BeanMatcher, InvocationHandlerFactory>>();
+		_beanMatcherInvocationHandlerFactories = new ArrayList<>();
 
 }

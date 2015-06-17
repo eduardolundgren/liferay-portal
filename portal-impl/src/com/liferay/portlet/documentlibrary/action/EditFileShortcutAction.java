@@ -14,18 +14,19 @@
 
 package com.liferay.portlet.documentlibrary.action;
 
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.FileShortcutPermissionException;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFileShortcutException;
-import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
+import com.liferay.portlet.documentlibrary.model.DLFileShortcutConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
@@ -123,10 +124,13 @@ public class EditFileShortcutAction extends PortletAction {
 			actionRequest, "fileShortcutId");
 
 		if (moveToTrash) {
-			DLFileShortcut fileShortcut =
+			FileShortcut fileShortcut =
 				DLAppServiceUtil.moveFileShortcutToTrash(fileShortcutId);
 
-			TrashUtil.addTrashSessionMessages(actionRequest, fileShortcut);
+			if (fileShortcut.getModel() instanceof TrashedModel) {
+				TrashUtil.addTrashSessionMessages(
+					actionRequest, (TrashedModel)fileShortcut.getModel());
+			}
 
 			hideDefaultSuccessMessage(actionRequest);
 		}
@@ -146,18 +150,14 @@ public class EditFileShortcutAction extends PortletAction {
 		long toFileEntryId = ParamUtil.getLong(actionRequest, "toFileEntryId");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DLFileShortcut.class.getName(), actionRequest);
+			DLFileShortcutConstants.getClassName(), actionRequest);
 
 		if (fileShortcutId <= 0) {
 
 			// Add file shortcut
 
-			DLFileShortcut fileShortcut = DLAppServiceUtil.addFileShortcut(
+			DLAppServiceUtil.addFileShortcut(
 				repositoryId, folderId, toFileEntryId, serviceContext);
-
-			AssetPublisherUtil.addAndStoreSelection(
-				actionRequest, DLFileShortcut.class.getName(),
-				fileShortcut.getFileShortcutId(), -1);
 		}
 		else {
 
@@ -165,9 +165,6 @@ public class EditFileShortcutAction extends PortletAction {
 
 			DLAppServiceUtil.updateFileShortcut(
 				fileShortcutId, folderId, toFileEntryId, serviceContext);
-
-			AssetPublisherUtil.addRecentFolderId(
-				actionRequest, DLFileShortcut.class.getName(), folderId);
 		}
 	}
 

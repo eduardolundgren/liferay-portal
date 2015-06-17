@@ -36,6 +36,7 @@ import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetLinkPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureFinder;
+import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureLinkPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructurePersistence;
 import com.liferay.portlet.expando.service.persistence.ExpandoValuePersistence;
 import com.liferay.portlet.journal.model.JournalFolder;
@@ -95,7 +96,7 @@ public abstract class JournalFolderServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the journal folder remote service
 	 */
-	public com.liferay.portlet.journal.service.JournalFolderService getJournalFolderService() {
+	public JournalFolderService getJournalFolderService() {
 		return journalFolderService;
 	}
 
@@ -105,7 +106,7 @@ public abstract class JournalFolderServiceBaseImpl extends BaseServiceImpl
 	 * @param journalFolderService the journal folder remote service
 	 */
 	public void setJournalFolderService(
-		com.liferay.portlet.journal.service.JournalFolderService journalFolderService) {
+		JournalFolderService journalFolderService) {
 		this.journalFolderService = journalFolderService;
 	}
 
@@ -692,6 +693,44 @@ public abstract class JournalFolderServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the d d m structure link local service.
+	 *
+	 * @return the d d m structure link local service
+	 */
+	public com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService getDDMStructureLinkLocalService() {
+		return ddmStructureLinkLocalService;
+	}
+
+	/**
+	 * Sets the d d m structure link local service.
+	 *
+	 * @param ddmStructureLinkLocalService the d d m structure link local service
+	 */
+	public void setDDMStructureLinkLocalService(
+		com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService ddmStructureLinkLocalService) {
+		this.ddmStructureLinkLocalService = ddmStructureLinkLocalService;
+	}
+
+	/**
+	 * Returns the d d m structure link persistence.
+	 *
+	 * @return the d d m structure link persistence
+	 */
+	public DDMStructureLinkPersistence getDDMStructureLinkPersistence() {
+		return ddmStructureLinkPersistence;
+	}
+
+	/**
+	 * Sets the d d m structure link persistence.
+	 *
+	 * @param ddmStructureLinkPersistence the d d m structure link persistence
+	 */
+	public void setDDMStructureLinkPersistence(
+		DDMStructureLinkPersistence ddmStructureLinkPersistence) {
+		this.ddmStructureLinkPersistence = ddmStructureLinkPersistence;
+	}
+
+	/**
 	 * Returns the expando value local service.
 	 *
 	 * @return the expando value local service
@@ -1055,8 +1094,8 @@ public abstract class JournalFolderServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portlet.journal.service.JournalFolderLocalService.class)
 	protected com.liferay.portlet.journal.service.JournalFolderLocalService journalFolderLocalService;
-	@BeanReference(type = com.liferay.portlet.journal.service.JournalFolderService.class)
-	protected com.liferay.portlet.journal.service.JournalFolderService journalFolderService;
+	@BeanReference(type = JournalFolderService.class)
+	protected JournalFolderService journalFolderService;
 	@BeanReference(type = JournalFolderPersistence.class)
 	protected JournalFolderPersistence journalFolderPersistence;
 	@BeanReference(type = JournalFolderFinder.class)
@@ -1119,6 +1158,10 @@ public abstract class JournalFolderServiceBaseImpl extends BaseServiceImpl
 	protected DDMStructurePersistence ddmStructurePersistence;
 	@BeanReference(type = DDMStructureFinder.class)
 	protected DDMStructureFinder ddmStructureFinder;
+	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService.class)
+	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService ddmStructureLinkLocalService;
+	@BeanReference(type = DDMStructureLinkPersistence.class)
+	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoValueLocalService.class)
 	protected com.liferay.portlet.expando.service.ExpandoValueLocalService expandoValueLocalService;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoValueService.class)

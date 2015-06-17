@@ -14,8 +14,12 @@
 
 package com.liferay.portlet.usersadmin.lar;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.lar.test.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.EmailAddress;
 import com.liferay.portal.model.Group;
@@ -34,13 +38,8 @@ import com.liferay.portal.service.PasswordPolicyRelLocalServiceUtil;
 import com.liferay.portal.service.PhoneLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.WebsiteLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.util.test.OrganizationTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 
 import java.util.List;
 import java.util.Map;
@@ -71,6 +70,10 @@ public class OrganizationStagedModelDataHandlerTest
 		_organization =
 			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
 				_organization.getUuid(), _organization.getCompanyId());
+
+		if (_organization != null) {
+			deleteOrganizations(_organization);
+		}
 	}
 
 	@Override
@@ -121,6 +124,20 @@ public class OrganizationStagedModelDataHandlerTest
 			dependentStagedModelsMap, Website.class, website);
 
 		return _organization;
+	}
+
+	protected void deleteOrganizations(Organization organization)
+		throws Exception {
+
+		List<Organization> childOrganizations =
+			OrganizationLocalServiceUtil.getOrganizations(
+				organization.getCompanyId(), organization.getOrganizationId());
+
+		for (Organization childOrganization : childOrganizations) {
+			deleteOrganizations(childOrganization);
+		}
+
+		OrganizationLocalServiceUtil.deleteOrganization(organization);
 	}
 
 	@Override
@@ -264,7 +281,6 @@ public class OrganizationStagedModelDataHandlerTest
 			organization.getOrganizationId(), importedWebsite.getClassPK());
 	}
 
-	@DeleteAfterTestRun
 	private Organization _organization;
 
 }

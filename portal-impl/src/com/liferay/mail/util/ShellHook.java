@@ -88,9 +88,7 @@ public class ShellHook implements Hook {
 	@Override
 	public void deleteUser(long companyId, long userId) {
 		execute(
-			new String[] {
-				SHELL_SCRIPT, "deleteUser", String.valueOf(userId)
-			}
+			new String[] {SHELL_SCRIPT, "deleteUser", String.valueOf(userId)}
 		);
 	}
 
@@ -145,6 +143,6 @@ public class ShellHook implements Hook {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ShellHook.class);
+	private static final Log _log = LogFactoryUtil.getLog(ShellHook.class);
 
 }

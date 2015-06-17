@@ -177,6 +177,7 @@ viewProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId
 					<liferay-ui:icon
 						iconCssClass="icon-download"
 						message="download-page"
+						method="get"
 						url="<%= latestProductVersion.getDownloadPageURL() %>"
 					/>
 				</c:if>
@@ -185,6 +186,7 @@ viewProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId
 					<liferay-ui:icon
 						iconCssClass="icon-download"
 						message="direct-download"
+						method="get"
 						url="<%= latestProductVersion.getDirectDownloadURL() %>"
 					/>
 				</c:if>
@@ -257,10 +259,15 @@ List productScreenshots = SCProductScreenshotLocalServiceUtil.getProductScreensh
 			<portlet:param name="struts_action" value="/software_catalog/edit_product_entry_discussion" />
 		</portlet:actionURL>
 
+		<portlet:resourceURL var="discussionPaginationURL">
+			<portlet:param name="struts_action" value="/software_catalog/edit_product_entry_discussion" />
+		</portlet:resourceURL>
+
 		<liferay-ui:discussion
 			className="<%= SCProductEntry.class.getName() %>"
 			classPK="<%= productEntry.getProductEntryId() %>"
 			formAction="<%= discussionURL %>"
+			paginationURL="<%= discussionPaginationURL %>"
 			redirect="<%= currentURL %>"
 			userId="<%= productEntry.getUserId() %>"
 		/>

@@ -15,10 +15,6 @@
 package com.liferay.portlet.usersadmin.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Address;
@@ -41,6 +37,10 @@ import com.liferay.portal.service.PasswordPolicyRelLocalServiceUtil;
 import com.liferay.portal.service.PhoneLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.WebsiteLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
 import java.util.ArrayList;
@@ -58,26 +58,39 @@ public class OrganizationStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {Organization.class.getName()};
 
 	@Override
+	public void deleteStagedModel(Organization organization)
+		throws PortalException {
+
+		OrganizationLocalServiceUtil.deleteOrganization(organization);
+	}
+
+	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		Organization organization = fetchStagedModelByUuidAndCompanyId(
-			uuid, group.getCompanyId());
+		Organization organization =
+			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
+				uuid, group.getCompanyId());
 
 		if (organization != null) {
-			OrganizationLocalServiceUtil.deleteOrganization(organization);
+			deleteStagedModel(organization);
 		}
 	}
 
 	@Override
-	public Organization fetchStagedModelByUuidAndCompanyId(
+	public List<Organization> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
-			uuid, companyId);
+		List<Organization> organizations = new ArrayList<>();
+
+		organizations.add(
+			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
+				uuid, companyId));
+
+		return organizations;
 	}
 
 	@Override
@@ -95,7 +108,7 @@ public class OrganizationStagedModelDataHandler
 			PortletDataContext portletDataContext, Organization organization)
 		throws Exception {
 
-		Queue<Organization> organizations = new LinkedList<Organization>();
+		Queue<Organization> organizations = new LinkedList<>();
 
 		organizations.add(organization);
 
@@ -150,8 +163,9 @@ public class OrganizationStagedModelDataHandler
 
 		serviceContext.setUserId(userId);
 
-		Organization existingOrganization = fetchStagedModelByUuidAndCompanyId(
-			organization.getUuid(), portletDataContext.getGroupId());
+		Organization existingOrganization =
+			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
+				organization.getUuid(), portletDataContext.getGroupId());
 
 		if (existingOrganization == null) {
 			existingOrganization =
@@ -164,12 +178,11 @@ public class OrganizationStagedModelDataHandler
 		if (existingOrganization == null) {
 			serviceContext.setUuid(organization.getUuid());
 
-			importedOrganization =
-				OrganizationLocalServiceUtil.addOrganization(
-					userId, parentOrganizationId, organization.getName(),
-					organization.getType(), organization.getRegionId(),
-					organization.getCountryId(), organization.getStatusId(),
-					organization.getComments(), false, serviceContext);
+			importedOrganization = OrganizationLocalServiceUtil.addOrganization(
+				userId, parentOrganizationId, organization.getName(),
+				organization.getType(), organization.getRegionId(),
+				organization.getCountryId(), organization.getStatusId(),
+				organization.getComments(), false, serviceContext);
 		}
 		else {
 			importedOrganization =
@@ -299,8 +312,7 @@ public class OrganizationStagedModelDataHandler
 			portletDataContext.getReferenceDataElements(
 				organization, Address.class);
 
-		List<Address> addresses = new ArrayList<Address>(
-			addressElements.size());
+		List<Address> addresses = new ArrayList<>(addressElements.size());
 
 		for (Element addressElement : addressElements) {
 			String addressPath = addressElement.attributeValue("path");
@@ -338,7 +350,7 @@ public class OrganizationStagedModelDataHandler
 			portletDataContext.getReferenceDataElements(
 				organization, EmailAddress.class);
 
-		List<EmailAddress> emailAddresses = new ArrayList<EmailAddress>(
+		List<EmailAddress> emailAddresses = new ArrayList<>(
 			emailAddressElements.size());
 
 		for (Element emailAddressElement : emailAddressElements) {
@@ -436,7 +448,7 @@ public class OrganizationStagedModelDataHandler
 			portletDataContext.getReferenceDataElements(
 				organization, Phone.class);
 
-		List<Phone> phones = new ArrayList<Phone>(phoneElements.size());
+		List<Phone> phones = new ArrayList<>(phoneElements.size());
 
 		for (Element phoneElement : phoneElements) {
 			String phonePath = phoneElement.attributeValue("path");
@@ -479,7 +491,7 @@ public class OrganizationStagedModelDataHandler
 			portletDataContext.getReferenceDataElements(
 				organization, Website.class);
 
-		List<Website> websites = new ArrayList<Website>(websiteElements.size());
+		List<Website> websites = new ArrayList<>(websiteElements.size());
 
 		for (Element websiteElement : websiteElements) {
 			String websitePath = websiteElement.attributeValue("path");

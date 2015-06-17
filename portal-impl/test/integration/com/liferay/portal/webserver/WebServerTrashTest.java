@@ -14,8 +14,17 @@
 
 package com.liferay.portal.webserver;
 
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.webdav.methods.Method;
@@ -30,16 +39,13 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.test.RoleTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,8 +74,11 @@ public class WebServerTrashTest extends BaseWebServerTestCase {
 
 		_user = UserTestUtil.addUser(null, group.getGroupId());
 
+		String portletId = PortletProviderUtil.getPortletId(
+			TrashEntry.class.getName(), PortletProvider.Action.VIEW);
+
 		_role = RoleTestUtil.addRole(
-			"Trash Admin", RoleConstants.TYPE_REGULAR, PortletKeys.TRASH,
+			"Trash Admin", RoleConstants.TYPE_REGULAR, portletId,
 			ResourceConstants.SCOPE_COMPANY,
 			String.valueOf(TestPropsValues.getCompanyId()),
 			ActionKeys.ACCESS_IN_CONTROL_PANEL);
@@ -94,10 +103,17 @@ public class WebServerTrashTest extends BaseWebServerTestCase {
 
 	@Test
 	public void testRequestFileInTrash() throws Exception {
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), parentFolder.getFolderId(), "Test Trash.txt");
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
 
-		MockHttpServletResponse mockHttpServletResponse =  testRequestFile(
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), group.getGroupId(),
+			parentFolder.getFolderId(), "Test Trash.txt",
+			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomBytes(),
+			serviceContext);
+
+		MockHttpServletResponse mockHttpServletResponse = testRequestFile(
 			fileEntry, _user, false);
 
 		Assert.assertEquals(
@@ -146,7 +162,7 @@ public class WebServerTrashTest extends BaseWebServerTestCase {
 
 		String path = sb.toString();
 
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 
 		if (statusInTrash) {
 			params.put(

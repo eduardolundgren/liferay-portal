@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.SortedProperties;
@@ -108,7 +107,7 @@ public abstract class BasePACLPolicy implements PACLPolicy {
 
 	@Override
 	public Set<String> getPropertySet(String key) {
-		return new TreeSet<String>(SetUtil.fromArray(getPropertyArray(key)));
+		return new TreeSet<>(SetUtil.fromArray(getPropertyArray(key)));
 	}
 
 	@Override
@@ -164,10 +163,6 @@ public abstract class BasePACLPolicy implements PACLPolicy {
 
 	protected Provider getProvider() {
 		String providerName = "SUN";
-
-		if (JavaDetector.isIBM() && JavaDetector.isJDK6()) {
-			providerName = "Policy";
-		}
 
 		return Security.getProvider(providerName);
 	}
@@ -271,12 +266,11 @@ public abstract class BasePACLPolicy implements PACLPolicy {
 
 	private static final Log _log = LogFactoryUtil.getLog(BasePACLPolicy.class);
 
-	private final Map<String, Checker> _checkers =
-		new HashMap<String, Checker>();
+	private final Map<String, Checker> _checkers = new HashMap<>();
 	private final ClassLoader _classLoader;
 	private Policy _policy;
 	private final Properties _properties;
 	private final String _servletContextName;
-	private final List<URL> _urls = new ArrayList<URL>();
+	private final List<URL> _urls = new ArrayList<>();
 
 }

@@ -25,7 +25,7 @@ long repositoryId = BeanParamUtil.getLong(fileEntry, request, "repositoryId");
 
 if (repositoryId <= 0) {
 
-	// add_asset.jspf only passes in groupId
+	// <liferay-ui:asset_add_button /> only passes in groupId
 
 	repositoryId = BeanParamUtil.getLong(fileEntry, request, "groupId");
 }
@@ -85,10 +85,10 @@ long assetClassPK = 0;
 DLEditFileEntryDisplayContext dlEditFileEntryDisplayContext = null;
 
 if (fileEntry == null) {
-	dlEditFileEntryDisplayContext = DLEditFileEntryDisplayContextUtil.getDLEditFileEntryDisplayContext(request, response, fileEntryType);
+	dlEditFileEntryDisplayContext = DLDisplayContextProviderUtil.getDLEditFileEntryDisplayContext(request, response, fileEntryType);
 }
 else {
-	dlEditFileEntryDisplayContext = DLEditFileEntryDisplayContextUtil.getDLEditFileEntryDisplayContext(request, response, fileEntry);
+	dlEditFileEntryDisplayContext = DLDisplayContextProviderUtil.getDLEditFileEntryDisplayContext(request, response, fileEntry);
 }
 %>
 
@@ -163,7 +163,9 @@ else {
 								try {
 									DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
 
-									fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
+									DDMFormValues ddmFormValues = StorageEngineUtil.getDDMFormValues(fileEntryMetadata.getDDMStorageId());
+
+									fields = DDMFormValuesToFieldsConverterUtil.convert(ddmStructure, ddmFormValues);
 								}
 								catch (Exception e) {
 								}

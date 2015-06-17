@@ -14,25 +14,21 @@
 
 package com.liferay.portal.service;
 
-import com.liferay.portal.NoSuchUserException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
 
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -74,18 +70,13 @@ public class LayoutServiceTest {
 
 		serviceContext.setUserId(userId);
 
-		try {
-			LayoutLocalServiceUtil.updateLayout(
-				_group.getGroupId(), layout.isPrivateLayout(),
-				layout.getLayoutId(), layout.getParentLayoutId(),
-				layout.getNameMap(), layout.getTitleMap(),
-				layout.getDescriptionMap(), layout.getKeywordsMap(),
-				layout.getRobotsMap(), layout.getType(), layout.isHidden(),
-				friendlyURLMap, layout.getIconImage(), null, serviceContext);
-		}
-		catch (NoSuchUserException nsue) {
-			Assert.fail(ExceptionUtils.getStackTrace(nsue));
-		}
+		LayoutLocalServiceUtil.updateLayout(
+			_group.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getParentLayoutId(), layout.getNameMap(),
+			layout.getTitleMap(), layout.getDescriptionMap(),
+			layout.getKeywordsMap(), layout.getRobotsMap(), layout.getType(),
+			layout.isHidden(), friendlyURLMap, layout.getIconImage(), null,
+			serviceContext);
 	}
 
 	@DeleteAfterTestRun

@@ -103,32 +103,6 @@ if (Validator.isNotNull(roleTypesParam)) {
 	roleTypes = StringUtil.split(roleTypesParam, 0);
 }
 
-PortletURL actionPortletURL = renderResponse.createActionURL();
-
-actionPortletURL.setParameter("struts_action", "/portlet_configuration/edit_permissions");
-actionPortletURL.setParameter("tabs2", tabs2);
-actionPortletURL.setParameter("redirect", redirect);
-actionPortletURL.setParameter("returnToFullPageURL", returnToFullPageURL);
-actionPortletURL.setParameter("portletResource", portletResource);
-actionPortletURL.setParameter("modelResource", modelResource);
-actionPortletURL.setParameter("modelResourceDescription", modelResourceDescription);
-actionPortletURL.setParameter("resourceGroupId", String.valueOf(resourceGroupId));
-actionPortletURL.setParameter("resourcePrimKey", resourcePrimKey);
-actionPortletURL.setParameter("roleTypes", roleTypesParam);
-
-PortletURL renderPortletURL = renderResponse.createRenderURL();
-
-renderPortletURL.setParameter("struts_action", "/portlet_configuration/edit_permissions");
-renderPortletURL.setParameter("tabs2", tabs2);
-renderPortletURL.setParameter("redirect", redirect);
-renderPortletURL.setParameter("returnToFullPageURL", returnToFullPageURL);
-renderPortletURL.setParameter("portletResource", portletResource);
-renderPortletURL.setParameter("modelResource", modelResource);
-renderPortletURL.setParameter("modelResourceDescription", modelResourceDescription);
-renderPortletURL.setParameter("resourceGroupId", String.valueOf(resourceGroupId));
-renderPortletURL.setParameter("resourcePrimKey", resourcePrimKey);
-renderPortletURL.setParameter("roleTypes", roleTypesParam);
-
 long controlPanelPlid = PortalUtil.getControlPanelPlid(company.getCompanyId());
 
 PortletURLImpl definePermissionsURL = new PortletURLImpl(request, PortletKeys.ROLES_ADMIN, controlPanelPlid, PortletRequest.RENDER_PHASE);
@@ -140,8 +114,19 @@ definePermissionsURL.setRefererPlid(plid);
 %>
 
 <div class="edit-permissions">
-	<aui:form action="<%= actionPortletURL.toString() %>" method="post" name="fm">
-		<aui:input name="<%= Constants.CMD %>" type="hidden" value="role_permissions" />
+	<portlet:actionURL name="updateRolePermissions" var="updateRolePermissionsURL">
+		<portlet:param name="mvcPath" value="/html/portlet/portlet_configuration/edit_permissions.jsp" />
+		<portlet:param name="tabs2" value="<%= tabs2 %>" />
+		<portlet:param name="returnToFullPageURL" value="<%= returnToFullPageURL %>" />
+		<portlet:param name="portletResource" value="<%= portletResource %>" />
+		<portlet:param name="modelResource" value="<%= modelResource %>" />
+		<portlet:param name="modelResourceDescription" value="<%= modelResourceDescription %>" />
+		<portlet:param name="resourceGroupId" value="<%= String.valueOf(resourceGroupId) %>" />
+		<portlet:param name="resourcePrimKey" value="<%= resourcePrimKey %>" />
+		<portlet:param name="roleTypes" value="<%= roleTypesParam %>" />
+	</portlet:actionURL>
+
+	<aui:form action="<%= updateRolePermissionsURL.toString() %>" method="post" name="fm">
 		<aui:input name="resourceId" type="hidden" value="<%= resource.getResourceId() %>" />
 
 		<c:choose>
@@ -301,7 +286,7 @@ definePermissionsURL.setRefererPlid(plid);
 
 				String name = role.getName();
 
-				if (!name.equals(RoleConstants.ADMINISTRATOR) && !name.equals(RoleConstants.ORGANIZATION_ADMINISTRATOR) && !name.equals(RoleConstants.ORGANIZATION_OWNER) && !name.equals(RoleConstants.OWNER) && !name.equals(RoleConstants.SITE_ADMINISTRATOR) && !name.equals(RoleConstants.SITE_OWNER) && RolePermissionUtil.contains(permissionChecker, role.getRoleId(), ActionKeys.DEFINE_PERMISSIONS)) {
+				if (!name.equals(RoleConstants.ADMINISTRATOR) && !name.equals(RoleConstants.ORGANIZATION_ADMINISTRATOR) && !name.equals(RoleConstants.ORGANIZATION_OWNER) && !name.equals(RoleConstants.OWNER) && !name.equals(RoleConstants.SITE_ADMINISTRATOR) && !name.equals(RoleConstants.SITE_OWNER) && !role.isTeam() && RolePermissionUtil.contains(permissionChecker, role.getRoleId(), ActionKeys.DEFINE_PERMISSIONS)) {
 					definePermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 
 					definePermissionsHREF = definePermissionsURL.toString();
@@ -315,7 +300,7 @@ definePermissionsURL.setRefererPlid(plid);
 					<liferay-ui:icon
 						iconCssClass="<%= RolesAdminUtil.getIconCssClass(role) %>"
 						label="<%= true %>"
-						message="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+						message="<%= role.getTitle(locale) %>"
 					/>
 				</liferay-ui:search-container-column-text>
 
@@ -382,7 +367,11 @@ definePermissionsURL.setRefererPlid(plid);
 						String actionSeparator = Validator.isNotNull(preselectedMsg) ? ActionUtil.PRESELECTED : ActionUtil.ACTION;
 						%>
 
-						<input <%= checked ? "checked" : StringPool.BLANK %> class="<%= Validator.isNotNull(preselectedMsg) ? "lfr-checkbox-preselected" : StringPool.BLANK %>" data-message="<%= dataMessage %>" <%= disabled ? "disabled" : StringPool.BLANK %> id="<%= FriendlyURLNormalizerUtil.normalize(role.getName()) + actionSeparator + action %>" name="<%= renderResponse.getNamespace() + role.getRoleId() + actionSeparator + action %>" type="checkbox" />
+						<c:if test="<%= disabled && checked %>">
+							<input name="<%= renderResponse.getNamespace() + role.getRoleId() + actionSeparator + action %>" type="hidden" value="<%= true %>" />
+						</c:if>
+
+						<input <%= checked ? "checked" : StringPool.BLANK %> class="<%= Validator.isNotNull(preselectedMsg) ? "lfr-checkbox-preselected" : StringPool.BLANK %>" data-message="<%= dataMessage %>" <%= disabled ? "disabled" : StringPool.BLANK %> id="<%= FriendlyURLNormalizerUtil.normalize(role.getName()) + actionSeparator + action %>" name="<%= renderResponse.getNamespace() + role.getRoleId() + actionSeparator + action %>" onclick="<%= Validator.isNotNull(preselectedMsg) ? "return false;" : StringPool.BLANK %>" type="checkbox" />
 					</liferay-ui:search-container-column-text>
 
 				<%

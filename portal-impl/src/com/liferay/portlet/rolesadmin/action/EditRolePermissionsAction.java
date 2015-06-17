@@ -289,8 +289,7 @@ public class EditRolePermissionsAction extends PortletAction {
 		String[] modelResources = StringUtil.split(
 			ParamUtil.getString(actionRequest, "modelResources"));
 
-		Map<String, List<String>> resourceActionsMap =
-			new HashMap<String, List<String>>();
+		Map<String, List<String>> resourceActionsMap = new HashMap<>();
 
 		if (Validator.isNotNull(portletResource)) {
 			resourceActionsMap.put(
@@ -362,7 +361,6 @@ public class EditRolePermissionsAction extends PortletAction {
 				}
 
 				if (selected &&
-					(scope == ResourceConstants.SCOPE_COMPANY) &&
 					actionId.equals(ActionKeys.ACCESS_IN_CONTROL_PANEL)) {
 
 					updateViewControlPanelPermission(
@@ -448,7 +446,9 @@ public class EditRolePermissionsAction extends PortletAction {
 		String selResource = null;
 		String actionId = null;
 
-		if (ArrayUtil.contains(PortletCategoryKeys.ALL, controlPanelCategory)) {
+		if (ArrayUtil.contains(PortletCategoryKeys.ALL, controlPanelCategory) &&
+			(role.getType() == RoleConstants.TYPE_REGULAR)) {
+
 			selResource = PortletKeys.PORTAL;
 			actionId = ActionKeys.VIEW_CONTROL_PANEL;
 		}

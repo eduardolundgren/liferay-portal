@@ -15,8 +15,6 @@
 package com.liferay.portlet;
 
 import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
-import com.liferay.portal.kernel.lar.PortletDataHandler;
-import com.liferay.portal.kernel.lar.StagedModelDataHandler;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
 import com.liferay.portal.kernel.poller.PollerProcessor;
@@ -41,6 +39,8 @@ import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
+import com.liferay.portlet.exportimport.lar.PortletDataHandler;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
 import com.liferay.portlet.social.model.SocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialRequestInterpreter;
 
@@ -170,6 +170,7 @@ public class PortletBagImpl implements PortletBag {
 		close(_schedulerEntryInstances);
 		close(_socialActivityInterpreterInstances);
 		close(_socialRequestInterpreterInstances);
+		close(_stagedModelDataHandlerInstances);
 		close(_templateHandlerInstances);
 		close(_trashHandlerInstances);
 		close(_urlEncoderInstances);
@@ -267,15 +268,16 @@ public class PortletBagImpl implements PortletBag {
 
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
-		ResourceBundle resourceBundle = _resourceBundleTracker.getResouceBundle(
-			LocaleUtil.toLanguageId(locale));
+		ResourceBundle resourceBundle =
+			_resourceBundleTracker.getResourceBundle(
+				LocaleUtil.toLanguageId(locale));
 
 		if (resourceBundle == null) {
-			resourceBundle = _resourceBundleTracker.getResouceBundle(
+			resourceBundle = _resourceBundleTracker.getResourceBundle(
 				locale.getLanguage());
 
 			if (resourceBundle == null) {
-				resourceBundle = _resourceBundleTracker.getResouceBundle(
+				resourceBundle = _resourceBundleTracker.getResourceBundle(
 					LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
 			}
 		}

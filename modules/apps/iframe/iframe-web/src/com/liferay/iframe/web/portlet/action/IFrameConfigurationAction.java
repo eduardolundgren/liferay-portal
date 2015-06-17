@@ -14,29 +14,59 @@
 
 package com.liferay.iframe.web.portlet.action;
 
+import aQute.bnd.annotation.metatype.Configurable;
+
+import com.liferay.iframe.web.configuration.IFrameConfiguration;
+import com.liferay.iframe.web.constants.IFramePortletKeys;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.Map;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
+import javax.servlet.ServletContext;
+
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
-	immediate = true,
-	property = {
-		"javax.portlet.name=com_liferay_iframe_web_portlet_IFramePortlet"
-	},
+	configurationPid = "com.liferay.iframe.web.configuration.IFrameConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	property = {"javax.portlet.name=" + IFramePortletKeys.IFRAME},
 	service = ConfigurationAction.class
 )
 public class IFrameConfigurationAction extends DefaultConfigurationAction {
+
+	@Override
+	public String getJspPath(RenderRequest renderRequest) {
+		return "/configuration.jsp";
+	}
+
+	@Override
+	public void include(
+			PortletConfig portletConfig, RenderRequest renderRequest,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		renderRequest.setAttribute(
+			IFrameConfiguration.class.getName(), _iFrameConfiguration);
+
+		super.include(portletConfig, renderRequest, renderResponse);
+	}
 
 	@Override
 	public void processAction(
@@ -46,8 +76,7 @@ public class IFrameConfigurationAction extends DefaultConfigurationAction {
 
 		String src = getParameter(actionRequest, "src");
 
-		if (!src.startsWith("/") &&
-			!StringUtil.startsWith(src, "http://") &&
+		if (!src.startsWith("/") && !StringUtil.startsWith(src, "http://") &&
 			!StringUtil.startsWith(src, "https://") &&
 			!StringUtil.startsWith(src, "mhtml://")) {
 
@@ -74,5 +103,22 @@ public class IFrameConfigurationAction extends DefaultConfigurationAction {
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.iframe.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_iFrameConfiguration = Configurable.createConfigurable(
+			IFrameConfiguration.class, properties);
+	}
+
+	private volatile IFrameConfiguration _iFrameConfiguration;
 
 }

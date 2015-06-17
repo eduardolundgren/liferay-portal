@@ -79,7 +79,7 @@ public class PropertiesTransformerListener extends BaseTransformerListener {
 		Properties properties = new Properties();
 
 		try {
-			Map<String, String> newTokens = new HashMap<String, String>();
+			Map<String, String> newTokens = new HashMap<>();
 
 			MapUtil.copy(tokens, newTokens);
 
@@ -151,7 +151,7 @@ public class PropertiesTransformerListener extends BaseTransformerListener {
 
 	private static final String _GLOBAL_PROPERTIES = "GLOBAL-PROPERTIES";
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		PropertiesTransformerListener.class);
 
 }

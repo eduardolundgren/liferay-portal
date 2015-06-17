@@ -14,7 +14,6 @@
 
 package com.liferay.taglib.ui;
 
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,12 +47,8 @@ public class DiscussionTag extends IncludeTag {
 		_hideControls = hideControls;
 	}
 
-	public void setPermissionClassName(String permissionClassName) {
-		_permissionClassName = permissionClassName;
-	}
-
-	public void setPermissionClassPK(long permissionClassPK) {
-		_permissionClassPK = permissionClassPK;
+	public void setPaginationURL(String paginationURL) {
+		_paginationURL = paginationURL;
 	}
 
 	public void setRatingsEnabled(boolean ratingsEnabled) {
@@ -83,8 +78,7 @@ public class DiscussionTag extends IncludeTag {
 		_formAction = null;
 		_formName = "fm";
 		_hideControls = false;
-		_permissionClassName = null;
-		_permissionClassPK = 0;
+		_paginationURL = null;
 		_ratingsEnabled = true;
 		_redirect = null;
 		_userId = 0;
@@ -97,18 +91,6 @@ public class DiscussionTag extends IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		String permissionClassName = _permissionClassName;
-
-		if (Validator.isNull(permissionClassName)) {
-			permissionClassName = _className;
-		}
-
-		long permissionClassPK = _permissionClassPK;
-
-		if (permissionClassPK == 0) {
-			permissionClassPK = _classPK;
-		}
-
 		request.setAttribute(
 			"liferay-ui:discussion:assetEntryVisible",
 			String.valueOf(_assetEntryVisible));
@@ -121,10 +103,7 @@ public class DiscussionTag extends IncludeTag {
 			"liferay-ui:discussion:hideControls",
 			String.valueOf(_hideControls));
 		request.setAttribute(
-			"liferay-ui:discussion:permissionClassName", permissionClassName);
-		request.setAttribute(
-			"liferay-ui:discussion:permissionClassPK",
-			String.valueOf(permissionClassPK));
+			"liferay-ui:discussion:paginationURL", _paginationURL);
 		request.setAttribute(
 			"liferay-ui:discussion:ratingsEnabled",
 			String.valueOf(_ratingsEnabled));
@@ -141,8 +120,7 @@ public class DiscussionTag extends IncludeTag {
 	private String _formAction;
 	private String _formName = "fm";
 	private boolean _hideControls;
-	private String _permissionClassName;
-	private long _permissionClassPK;
+	private String _paginationURL;
 	private boolean _ratingsEnabled = true;
 	private String _redirect;
 	private long _userId;

@@ -15,15 +15,15 @@
 package com.liferay.portal.fabric.netty.fileserver;
 
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileServerTestUtil;
-import com.liferay.portal.fabric.netty.fileserver.handlers.FileSystemProviderWrapper;
-import com.liferay.portal.fabric.netty.fileserver.handlers.FileSystemWrapper;
-import com.liferay.portal.fabric.netty.fileserver.handlers.PathWrapper;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.nio.FileSystemProviderWrapper;
+import com.liferay.portal.kernel.nio.FileSystemWrapper;
+import com.liferay.portal.kernel.nio.PathWrapper;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.SwappableSecurityManager;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 
 import java.io.File;
@@ -645,10 +645,10 @@ public class FileHelperUtilTest {
 
 		String folderName = "TestFolder";
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			FileHelperUtil.class.getName(), Level.FINEST);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					FileHelperUtil.class.getName(), Level.FINEST)) {
 
-		try {
 			Path folderPath = FileServerTestUtil.createFolderWithFiles(
 				Paths.get(folderName));
 
@@ -690,16 +690,13 @@ public class FileHelperUtilTest {
 
 			FileServerTestUtil.assertFileEquals(folderPath, unzipFolderPath);
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		// Without log
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			FileHelperUtil.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					FileHelperUtil.class.getName(), Level.OFF)) {
 
-		try {
 			Path folderPath = FileServerTestUtil.createFolderWithFiles(
 				Paths.get(folderName));
 
@@ -728,9 +725,6 @@ public class FileHelperUtilTest {
 			Assert.assertTrue(logRecords.isEmpty());
 
 			FileServerTestUtil.assertFileEquals(folderPath, unzipFolderPath);
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

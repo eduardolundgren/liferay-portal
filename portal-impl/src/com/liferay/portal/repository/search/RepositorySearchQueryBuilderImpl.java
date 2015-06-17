@@ -14,13 +14,11 @@
 
 package com.liferay.portal.repository.search;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilder;
+import com.liferay.portal.kernel.repository.search.RepositorySearchQueryTermBuilder;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryTerm;
@@ -29,22 +27,15 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.TermRangeQuery;
 import com.liferay.portal.kernel.search.WildcardQuery;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.lucene.LuceneHelperUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
-import com.liferay.util.lucene.KeywordsUtil;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.QueryParser;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 
 /**
  * @author Mika Koivisto
@@ -53,23 +44,29 @@ import org.apache.lucene.queryParser.QueryParser;
 public class RepositorySearchQueryBuilderImpl
 	implements RepositorySearchQueryBuilder {
 
+	public RepositorySearchQueryBuilderImpl() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		_serviceTracker = registry.trackServices(
+			RepositorySearchQueryTermBuilder.class);
+
+		_serviceTracker.open();
+	}
+
 	@Override
 	public BooleanQuery getFullQuery(SearchContext searchContext)
 		throws SearchException {
 
 		try {
-			BooleanQuery contextQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			BooleanQuery contextQuery = new BooleanQueryImpl();
 
 			addContext(contextQuery, searchContext);
 
-			BooleanQuery searchQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			BooleanQuery searchQuery = new BooleanQueryImpl();
 
 			addSearchKeywords(searchQuery, searchContext);
 
-			BooleanQuery fullQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			BooleanQuery fullQuery = new BooleanQueryImpl();
 
 			if (contextQuery.hasClauses()) {
 				fullQuery.add(contextQuery, BooleanClauseOccur.MUST);
@@ -79,12 +76,13 @@ public class RepositorySearchQueryBuilderImpl
 				fullQuery.add(searchQuery, BooleanClauseOccur.MUST);
 			}
 
-			BooleanClause[] booleanClauses = searchContext.getBooleanClauses();
+			BooleanClause<Query>[] booleanClauses =
+				searchContext.getBooleanClauses();
 
 			if (booleanClauses != null) {
-				for (BooleanClause booleanClause : booleanClauses) {
+				for (BooleanClause<Query> booleanClause : booleanClauses) {
 					fullQuery.add(
-						booleanClause.getQuery(),
+						booleanClause.getClause(),
 						booleanClause.getBooleanClauseOccur());
 				}
 			}
@@ -96,10 +94,6 @@ public class RepositorySearchQueryBuilderImpl
 		catch (Exception e) {
 			throw new SearchException(e);
 		}
-	}
-
-	public void setAnalyzer(Analyzer analyzer) {
-		_analyzer = analyzer;
 	}
 
 	protected void addContext(
@@ -116,8 +110,7 @@ public class RepositorySearchQueryBuilderImpl
 			return;
 		}
 
-		BooleanQuery folderIdsQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
+		BooleanQuery folderIdsQuery = new BooleanQueryImpl();
 
 		for (long folderId : folderIds) {
 			try {
@@ -143,18 +136,22 @@ public class RepositorySearchQueryBuilderImpl
 			return;
 		}
 
-		BooleanQuery titleQuery = BooleanQueryFactoryUtil.create(searchContext);
+		RepositorySearchQueryTermBuilder repositorySearchQueryTermBuilder =
+			_serviceTracker.getService();
 
-		addTerm(titleQuery, searchContext, Field.TITLE, keywords);
+		BooleanQuery titleQuery = new BooleanQueryImpl();
+
+		repositorySearchQueryTermBuilder.addTerm(
+			titleQuery, searchContext, Field.TITLE, keywords);
 
 		if (titleQuery.hasClauses() && !contains(searchQuery, titleQuery)) {
 			searchQuery.add(titleQuery, BooleanClauseOccur.SHOULD);
 		}
 
-		BooleanQuery userNameQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
+		BooleanQuery userNameQuery = new BooleanQueryImpl();
 
-		addTerm(userNameQuery, searchContext, Field.USER_NAME, keywords);
+		repositorySearchQueryTermBuilder.addTerm(
+			userNameQuery, searchContext, Field.USER_NAME, keywords);
 
 		if (userNameQuery.hasClauses() &&
 			!contains(searchQuery, userNameQuery)) {
@@ -162,46 +159,13 @@ public class RepositorySearchQueryBuilderImpl
 			searchQuery.add(userNameQuery, BooleanClauseOccur.SHOULD);
 		}
 
-		BooleanQuery contentQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
+		BooleanQuery contentQuery = new BooleanQueryImpl();
 
-		addTerm(contentQuery, searchContext, Field.CONTENT, keywords);
+		repositorySearchQueryTermBuilder.addTerm(
+			contentQuery, searchContext, Field.CONTENT, keywords);
 
 		if (contentQuery.hasClauses() && !contains(searchQuery, contentQuery)) {
 			searchQuery.add(contentQuery, BooleanClauseOccur.SHOULD);
-		}
-	}
-
-	protected void addTerm(
-		BooleanQuery booleanQuery, SearchContext searchContext, String field,
-		String value) {
-
-		if (Validator.isNull(value)) {
-			return;
-		}
-
-		try {
-			QueryParser queryParser = new QueryParser(
-				LuceneHelperUtil.getVersion(), field, _analyzer);
-
-			queryParser.setAllowLeadingWildcard(true);
-			queryParser.setLowercaseExpandedTerms(false);
-
-			org.apache.lucene.search.Query query = null;
-
-			try {
-				query = queryParser.parse(value);
-			}
-			catch (Exception e) {
-				query = queryParser.parse(KeywordsUtil.escape(value));
-			}
-
-			translateQuery(
-				booleanQuery, searchContext, query,
-				org.apache.lucene.search.BooleanClause.Occur.SHOULD);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
 		}
 	}
 
@@ -209,10 +173,10 @@ public class RepositorySearchQueryBuilderImpl
 		if (query1 instanceof BooleanQuery) {
 			BooleanQuery booleanQuery = (BooleanQuery)query1;
 
-			for (com.liferay.portal.kernel.search.BooleanClause booleanClause :
-					booleanQuery.clauses()) {
+			for (com.liferay.portal.kernel.search.BooleanClause<Query>
+					booleanClause : booleanQuery.clauses()) {
 
-				if (contains(booleanClause.getQuery(), query2)) {
+				if (contains(booleanClause.getClause(), query2)) {
 					return true;
 				}
 			}
@@ -222,10 +186,10 @@ public class RepositorySearchQueryBuilderImpl
 		else if (query2 instanceof BooleanQuery) {
 			BooleanQuery booleanQuery = (BooleanQuery)query2;
 
-			for (com.liferay.portal.kernel.search.BooleanClause booleanClause :
-					booleanQuery.clauses()) {
+			for (com.liferay.portal.kernel.search.BooleanClause<Query>
+					booleanClause : booleanQuery.clauses()) {
 
-				if (contains(query1, booleanClause.getQuery())) {
+				if (contains(query1, booleanClause.getClause())) {
 					return true;
 				}
 			}
@@ -303,161 +267,8 @@ public class RepositorySearchQueryBuilderImpl
 		return false;
 	}
 
-	protected org.apache.lucene.search.BooleanClause.Occur
-		getBooleanClauseOccur(BooleanClauseOccur occur) {
-
-		if (occur.equals(BooleanClauseOccur.MUST)) {
-			return org.apache.lucene.search.BooleanClause.Occur.MUST;
-		}
-		else if (occur.equals(BooleanClauseOccur.MUST_NOT)) {
-			return org.apache.lucene.search.BooleanClause.Occur.MUST_NOT;
-		}
-
-		return org.apache.lucene.search.BooleanClause.Occur.SHOULD;
-	}
-
-	protected BooleanClauseOccur getBooleanClauseOccur(
-		org.apache.lucene.search.BooleanClause.Occur occur) {
-
-		if (occur.equals(org.apache.lucene.search.BooleanClause.Occur.MUST)) {
-			return BooleanClauseOccur.MUST;
-		}
-		else if (occur.equals(
-					org.apache.lucene.search.BooleanClause.Occur.MUST_NOT)) {
-
-			return BooleanClauseOccur.MUST_NOT;
-		}
-
-		return BooleanClauseOccur.SHOULD;
-	}
-
-	protected void translateQuery(
-			BooleanQuery booleanQuery, SearchContext searchContext,
-			org.apache.lucene.search.Query query,
-			org.apache.lucene.search.BooleanClause.Occur occur)
-		throws Exception {
-
-		BooleanClauseOccur booleanClauseOccur = getBooleanClauseOccur(occur);
-
-		if (query instanceof org.apache.lucene.search.TermQuery) {
-			Set<Term> terms = new HashSet<Term>();
-
-			query.extractTerms(terms);
-
-			for (Term term : terms) {
-				String termValue = term.text();
-
-				booleanQuery.addTerm(
-					term.field(), termValue, false,
-					getBooleanClauseOccur(occur));
-			}
-		}
-		else if (query instanceof org.apache.lucene.search.BooleanQuery) {
-			org.apache.lucene.search.BooleanQuery curBooleanQuery =
-				(org.apache.lucene.search.BooleanQuery)query;
-
-			BooleanQuery conjunctionQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
-			BooleanQuery disjunctionQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
-
-			for (org.apache.lucene.search.BooleanClause booleanClause :
-					curBooleanQuery.getClauses()) {
-
-				BooleanClauseOccur curBooleanClauseOccur =
-					getBooleanClauseOccur(booleanClause.getOccur());
-
-				BooleanQuery subbooleanQuery = null;
-
-				if (curBooleanClauseOccur.equals(BooleanClauseOccur.SHOULD)) {
-					subbooleanQuery = disjunctionQuery;
-				}
-				else {
-					subbooleanQuery = conjunctionQuery;
-				}
-
-				translateQuery(
-					subbooleanQuery, searchContext, booleanClause.getQuery(),
-					booleanClause.getOccur());
-			}
-
-			if (conjunctionQuery.hasClauses()) {
-				booleanQuery.add(conjunctionQuery, BooleanClauseOccur.MUST);
-			}
-
-			if (disjunctionQuery.hasClauses()) {
-				booleanQuery.add(disjunctionQuery, BooleanClauseOccur.SHOULD);
-			}
-		}
-		else if (query instanceof org.apache.lucene.search.FuzzyQuery) {
-			org.apache.lucene.search.FuzzyQuery fuzzyQuery =
-				(org.apache.lucene.search.FuzzyQuery)query;
-
-			Term term = fuzzyQuery.getTerm();
-
-			String termValue = term.text().concat(StringPool.STAR);
-
-			booleanQuery.addTerm(
-				term.field(), termValue, true, booleanClauseOccur);
-		}
-		else if (query instanceof org.apache.lucene.search.PhraseQuery) {
-			org.apache.lucene.search.PhraseQuery phraseQuery =
-				(org.apache.lucene.search.PhraseQuery)query;
-
-			Term[] terms = phraseQuery.getTerms();
-
-			StringBundler sb = new StringBundler(terms.length * 2);
-
-			for (Term term : terms) {
-				sb.append(term.text());
-				sb.append(StringPool.SPACE);
-			}
-
-			booleanQuery.addTerm(
-				terms[0].field(), sb.toString().trim(), false,
-				booleanClauseOccur);
-		}
-		else if (query instanceof org.apache.lucene.search.PrefixQuery) {
-			org.apache.lucene.search.PrefixQuery prefixQuery =
-				(org.apache.lucene.search.PrefixQuery)query;
-
-			Term prefixTerm = prefixQuery.getPrefix();
-
-			String termValue = prefixTerm.text().concat(StringPool.STAR);
-
-			booleanQuery.addTerm(
-				prefixTerm.field(), termValue, true, booleanClauseOccur);
-		}
-		else if (query instanceof org.apache.lucene.search.TermRangeQuery) {
-			org.apache.lucene.search.TermRangeQuery termRangeQuery =
-				(org.apache.lucene.search.TermRangeQuery)query;
-
-			booleanQuery.addRangeTerm(
-				termRangeQuery.getField(), termRangeQuery.getLowerTerm(),
-				termRangeQuery.getUpperTerm());
-		}
-		else if (query instanceof org.apache.lucene.search.WildcardQuery) {
-			org.apache.lucene.search.WildcardQuery wildcardQuery =
-				(org.apache.lucene.search.WildcardQuery)query;
-
-			Term wildcardTerm = wildcardQuery.getTerm();
-
-			booleanQuery.addTerm(
-				wildcardTerm.field(), wildcardTerm.text(), true,
-				booleanClauseOccur);
-		}
-		else {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Ignoring unknown query type " + query.getClass() +
-						" with query " + query);
-			}
-		}
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RepositorySearchQueryBuilderImpl.class);
-
-	private Analyzer _analyzer;
+	private final ServiceTracker
+		<RepositorySearchQueryTermBuilder, RepositorySearchQueryTermBuilder>
+			_serviceTracker;
 
 }

@@ -61,15 +61,62 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 	}
 
 	protected List<DDMFormField> createDDMFormFields() {
-		List<DDMFormField> ddmFormFields = new ArrayList<DDMFormField>();
+		List<DDMFormField> ddmFormFields = new ArrayList<>();
 
 		ddmFormFields.add(
 			createNestedDDMFormFields("ParentField", "ChildField"));
 		ddmFormFields.add(createRadioDDMFormField("BooleanField"));
 		ddmFormFields.add(createSelectDDMFormField("SelectField"));
 		ddmFormFields.add(createTextDDMFormField("TextField"));
+		ddmFormFields.add(createHTMLDDMFormField("HTMLField"));
 
 		return ddmFormFields;
+	}
+
+	protected DDMFormField createHTMLDDMFormField(String name) {
+		DDMFormField ddmFormField = new DDMFormField(name, "ddm-text-html");
+
+		ddmFormField.setDataType("html");
+		ddmFormField.setFieldNamespace("ddm");
+		ddmFormField.setIndexType("keyword");
+		ddmFormField.setLabel(createHTMLDDMFormFieldLabel());
+		ddmFormField.setLocalizable(true);
+		ddmFormField.setPredefinedValue(
+			createHTMLDDMFormFieldPredefinedValue());
+		ddmFormField.setReadOnly(false);
+		ddmFormField.setRepeatable(false);
+		ddmFormField.setRequired(false);
+		ddmFormField.setShowLabel(true);
+		ddmFormField.setTip(createHTMLDDMFormFieldTip());
+
+		return ddmFormField;
+	}
+
+	protected LocalizedValue createHTMLDDMFormFieldLabel() {
+		LocalizedValue label = new LocalizedValue();
+
+		label.addString(LocaleUtil.BRAZIL, "HTML");
+		label.addString(LocaleUtil.US, "HTML");
+
+		return label;
+	}
+
+	protected LocalizedValue createHTMLDDMFormFieldPredefinedValue() {
+		LocalizedValue predefinedValue = new LocalizedValue();
+
+		predefinedValue.addString(LocaleUtil.BRAZIL, "");
+		predefinedValue.addString(LocaleUtil.US, "");
+
+		return predefinedValue;
+	}
+
+	protected LocalizedValue createHTMLDDMFormFieldTip() {
+		LocalizedValue predefinedValue = new LocalizedValue();
+
+		predefinedValue.addString(LocaleUtil.BRAZIL, "Dica");
+		predefinedValue.addString(LocaleUtil.US, "Tip");
+
+		return predefinedValue;
 	}
 
 	protected DDMFormField createNestedDDMFormFields(
@@ -77,7 +124,7 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 
 		DDMFormField parentDDMFormField = createTextDDMFormField(parentName);
 
-		List<DDMFormField> nestedDDMFormFields = new ArrayList<DDMFormField>();
+		List<DDMFormField> nestedDDMFormFields = new ArrayList<>();
 
 		nestedDDMFormFields.add(createSelectDDMFormField(childName));
 
@@ -91,8 +138,12 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 
 		ddmFormField.setDataType("string");
 		ddmFormField.setDDMFormFieldOptions(createDDMFormFieldOptions());
+		ddmFormField.setLocalizable(false);
+		ddmFormField.setReadOnly(false);
+		ddmFormField.setRepeatable(false);
 		ddmFormField.setRequired(true);
 		ddmFormField.setShowLabel(false);
+		ddmFormField.setVisibilityExpression("false");
 
 		return ddmFormField;
 	}
@@ -101,9 +152,14 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		DDMFormField ddmFormField = new DDMFormField(name, "select");
 
 		ddmFormField.setDataType("string");
+		ddmFormField.setLocalizable(false);
 		ddmFormField.setIndexType("");
 		ddmFormField.setMultiple(true);
+		ddmFormField.setReadOnly(false);
+		ddmFormField.setRepeatable(false);
+		ddmFormField.setRequired(false);
 		ddmFormField.setShowLabel(true);
+		ddmFormField.setVisibilityExpression("true");
 
 		DDMFormFieldOptions ddmFormFieldOptions = createDDMFormFieldOptions();
 
@@ -119,10 +175,14 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setDataType("string");
 		ddmFormField.setIndexType("keyword");
 		ddmFormField.setLabel(createTextDDMFormFieldLabel());
+		ddmFormField.setLocalizable(false);
 		ddmFormField.setPredefinedValue(
 			createTextDDMFormFieldPredefinedValue());
+		ddmFormField.setReadOnly(false);
 		ddmFormField.setRepeatable(true);
+		ddmFormField.setRequired(false);
 		ddmFormField.setShowLabel(true);
+		ddmFormField.setVisibilityExpression("true");
 
 		return ddmFormField;
 	}

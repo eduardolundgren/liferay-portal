@@ -31,6 +31,9 @@ public class PropsValues {
 	public static final String CLUSTER_NODE_2 = PropsUtil.get(
 		"cluster.node2");
 
+	public static final String COMPONENT_NAMES = PropsUtil.get(
+		"component.names");
+
 	public static final String EMAIL_ADDRESS_1 = PropsUtil.get(
 		"email.address.1");
 
@@ -70,26 +73,30 @@ public class PropsValues {
 	public static final String IGNORE_ERRORS_DELIMITER =
 		PropsUtil.get("ignore.errors.delimiter");
 
+	public static final String LIFERAY_HOME = PropsUtil.get("liferay.home");
+
 	public static final String LIFERAY_PORTAL_BRANCH = PropsUtil.get(
 		"liferay.portal.branch");
 
 	public static final String LIFERAY_PORTAL_BUNDLE = PropsUtil.get(
 		"liferay.portal.bundle");
 
-	public static final boolean MOBILE_DEVICE_ENABLED = GetterUtil.getBoolean(
-		PropsUtil.get("mobile.device.enabled"));
+	public static final String LOGGER_RESOURCES_URL = PropsUtil.get(
+		"logger.resources.url");
 
-	public static final String MOBILE_DEVICE_RESOLUTION =
-		PropsUtil.get("mobile.device.resolution");
+	public static final String MOBILE_ANDROID_HOME = PropsUtil.get(
+		"mobile.android.home");
 
-	public static final String MOBILE_DEVICE_USER_AGENT =
-		PropsUtil.get("mobile.device.user.agent");
+	public static final String MOBILE_DEVICE_TYPE = PropsUtil.get(
+		"mobile.device.type");
 
 	public static final String OUTPUT_DIR_NAME = PropsUtil.get(
 		"output.dir");
 
 	public static final String PORTAL_URL = PropsUtil.get(
 		"portal.url");
+
+	public static final String PRODUCT_NAMES = PropsUtil.get("product.names");
 
 	public static final boolean SAVE_SCREENSHOT = GetterUtil.getBoolean(
 		PropsUtil.get("save.screenshot"));
@@ -132,8 +139,16 @@ public class PropsValues {
 	public static final String TEST_BASE_DIR_NAME = PropsUtil.get(
 		"test.basedir");
 
+	public static final String TEST_CASE_AVAILABLE_PROPERTY_NAMES =
+		PropsUtil.get("test.case.available.property.names");
+
 	public static final boolean TEST_DATABASE_MINIMAL = GetterUtil.getBoolean(
 		PropsUtil.get("test.database.minimal"));
+
+	public static final boolean TEST_RUN_LOCALLY = GetterUtil.getBoolean(
+		PropsUtil.get("test.run.locally"));
+
+	public static final String TEST_NAME = PropsUtil.get("test.name");
 
 	public static final boolean TEST_SKIP_TEAR_DOWN = GetterUtil.getBoolean(
 		PropsUtil.get("test.skip.tear.down"));

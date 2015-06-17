@@ -14,33 +14,39 @@
 
 package com.liferay.portlet.documentlibrary.lar;
 
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
+import com.liferay.portal.lar.test.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,9 +85,15 @@ public class FileEntryStagedModelDataHandlerTest
 	public void testExportImportFileExtension() throws Exception {
 		String sourceFileName = RandomTestUtil.randomString() + ".pdf";
 
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			stagingGroup.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, sourceFileName);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), stagingGroup.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, sourceFileName,
+			ContentTypes.APPLICATION_PDF, RandomTestUtil.randomBytes(),
+			serviceContext);
 
 		exportImportStagedModel(fileEntry);
 
@@ -93,9 +105,10 @@ public class FileEntryStagedModelDataHandlerTest
 
 		String title = RandomTestUtil.randomString() + ".awesome";
 
-		DLAppTestUtil.updateFileEntry(
-			stagingGroup.getGroupId(), fileEntry.getFileEntryId(),
-			StringPool.BLANK, title);
+		DLAppServiceUtil.updateFileEntry(
+			fileEntry.getFileEntryId(), StringPool.BLANK,
+			ContentTypes.TEXT_PLAIN, title, StringPool.BLANK, StringPool.BLANK,
+			false, (byte[])null, serviceContext);
 
 		exportImportStagedModel(fileEntry);
 
@@ -109,7 +122,7 @@ public class FileEntryStagedModelDataHandlerTest
 		throws Exception {
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			new HashMap<String, List<StagedModel>>();
+			new HashMap<>();
 
 		Company company = CompanyLocalServiceUtil.fetchCompany(
 			stagingGroup.getCompanyId());
@@ -122,15 +135,21 @@ public class FileEntryStagedModelDataHandlerTest
 		addDependentStagedModel(
 			dependentStagedModelsMap, DDMStructure.class, ddmStructure);
 
-		DLFileEntryType dlFileEntryType = DLAppTestUtil.addDLFileEntryType(
+		DLFileEntryType dlFileEntryType = addDLFileEntryType(
 			companyGroup.getGroupId(), ddmStructure.getStructureId());
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFileEntryType.class, dlFileEntryType);
 
-		Folder folder = DLAppTestUtil.addFolder(
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		Folder folder = DLAppServiceUtil.addFolder(
 			stagingGroup.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFolder.class, folder);
@@ -144,27 +163,47 @@ public class FileEntryStagedModelDataHandlerTest
 		throws Exception {
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			new HashMap<String, List<StagedModel>>();
+			new LinkedHashMap<>();
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
 			group.getGroupId(), DLFileEntryType.class.getName());
 
-		addDependentStagedModel(
-			dependentStagedModelsMap, DDMStructure.class, ddmStructure);
-
-		DLFileEntryType dlFileEntryType = DLAppTestUtil.addDLFileEntryType(
+		DLFileEntryType dlFileEntryType = addDLFileEntryType(
 			group.getGroupId(), ddmStructure.getStructureId());
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFileEntryType.class, dlFileEntryType);
 
-		Folder folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+		addDependentStagedModel(
+			dependentStagedModelsMap, DDMStructure.class, ddmStructure);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		Folder folder = DLAppServiceUtil.addFolder(
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFolder.class, folder);
 
 		return dependentStagedModelsMap;
+	}
+
+	protected DLFileEntryType addDLFileEntryType(
+			long groupId, long ddmStructureId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				groupId, TestPropsValues.getUserId());
+
+		return DLFileEntryTypeLocalServiceUtil.addFileEntryType(
+			TestPropsValues.getUserId(), groupId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new long[] {ddmStructureId},
+			serviceContext);
 	}
 
 	@Override
@@ -184,10 +223,18 @@ public class FileEntryStagedModelDataHandlerTest
 		DLFileEntryType dlFileEntryType =
 			(DLFileEntryType)fileEntryTypeDependentStagedModels.get(0);
 
-		return DLAppTestUtil.addFileEntry(
-			group.getGroupId(), folder.getFolderId(),
-			RandomTestUtil.randomString(),
-			dlFileEntryType.getFileEntryTypeId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		DLAppTestUtil.populateServiceContext(
+			serviceContext, dlFileEntryType.getFileEntryTypeId());
+
+		return DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), group.getGroupId(),
+			folder.getFolderId(), RandomTestUtil.randomString() + ".txt",
+			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomBytes(),
+			serviceContext);
 	}
 
 	protected void exportImportStagedModel(StagedModel stagedModel)

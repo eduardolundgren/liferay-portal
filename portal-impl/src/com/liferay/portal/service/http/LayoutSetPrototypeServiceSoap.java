@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.LayoutSetPrototypeServiceUtil} service utility. The
+ * {@link LayoutSetPrototypeServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -63,7 +63,7 @@ import java.util.Map;
  * @author Brian Wing Shun Chan
  * @see LayoutSetPrototypeServiceHttp
  * @see com.liferay.portal.model.LayoutSetPrototypeSoap
- * @see com.liferay.portal.service.LayoutSetPrototypeServiceUtil
+ * @see LayoutSetPrototypeServiceUtil
  * @generated
  */
 @ProviderType
@@ -125,6 +125,20 @@ public class LayoutSetPrototypeServiceSoap {
 		throws RemoteException {
 		try {
 			LayoutSetPrototypeServiceUtil.deleteLayoutSetPrototype(layoutSetPrototypeId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.model.LayoutSetPrototypeSoap fetchLayoutSetPrototype(
+		long layoutSetPrototypeId) throws RemoteException {
+		try {
+			com.liferay.portal.model.LayoutSetPrototype returnValue = LayoutSetPrototypeServiceUtil.fetchLayoutSetPrototype(layoutSetPrototypeId);
+
+			return com.liferay.portal.model.LayoutSetPrototypeSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

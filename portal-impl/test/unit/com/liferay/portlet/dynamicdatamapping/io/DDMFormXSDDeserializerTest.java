@@ -30,10 +30,12 @@ public class DDMFormXSDDeserializerTest
 	extends BaseDDMFormDeserializerTestCase {
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		setUpDDMFormFieldTypeRegistryUtil();
 		setUpDDMFormXSDDeserializerUtil();
 		setUpHtmlUtil();
 		setUpLocaleUtil();
+		setUpPropsUtil();
 		setUpSAXReaderUtil();
 	}
 
@@ -52,6 +54,14 @@ public class DDMFormXSDDeserializerTest
 	@Override
 	protected String getTestFileExtension() {
 		return ".xml";
+	}
+
+	protected void setUpDDMFormXSDDeserializerUtil() {
+		DDMFormXSDDeserializerUtil ddmFormXSDDeserializerUtil =
+			new DDMFormXSDDeserializerUtil();
+
+		ddmFormXSDDeserializerUtil.setDDMFormXSDDeserializer(
+			new DDMFormXSDDeserializerImpl());
 	}
 
 }

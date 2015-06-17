@@ -30,11 +30,6 @@ import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -54,6 +49,11 @@ import com.liferay.portlet.asset.service.persistence.AssetCategoryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetCategoryPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetVocabularyFinder;
 import com.liferay.portlet.asset.service.persistence.AssetVocabularyPersistence;
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -430,7 +430,7 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	 *
 	 * @return the asset vocabulary local service
 	 */
-	public com.liferay.portlet.asset.service.AssetVocabularyLocalService getAssetVocabularyLocalService() {
+	public AssetVocabularyLocalService getAssetVocabularyLocalService() {
 		return assetVocabularyLocalService;
 	}
 
@@ -440,7 +440,7 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	 * @param assetVocabularyLocalService the asset vocabulary local service
 	 */
 	public void setAssetVocabularyLocalService(
-		com.liferay.portlet.asset.service.AssetVocabularyLocalService assetVocabularyLocalService) {
+		AssetVocabularyLocalService assetVocabularyLocalService) {
 		this.assetVocabularyLocalService = assetVocabularyLocalService;
 	}
 
@@ -881,8 +881,8 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portlet.asset.service.AssetVocabularyLocalService.class)
-	protected com.liferay.portlet.asset.service.AssetVocabularyLocalService assetVocabularyLocalService;
+	@BeanReference(type = AssetVocabularyLocalService.class)
+	protected AssetVocabularyLocalService assetVocabularyLocalService;
 	@BeanReference(type = com.liferay.portlet.asset.service.AssetVocabularyService.class)
 	protected com.liferay.portlet.asset.service.AssetVocabularyService assetVocabularyService;
 	@BeanReference(type = AssetVocabularyPersistence.class)

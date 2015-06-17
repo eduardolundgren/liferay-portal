@@ -59,12 +59,18 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
 		attributes.put("templateId", getTemplateId());
 		attributes.put("version", getVersion());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
 		attributes.put("language", getLanguage());
 		attributes.put("script", getScript());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
 
 		return attributes;
 	}
@@ -107,6 +113,18 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 			setCreateDate(createDate);
 		}
 
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
 		Long templateId = (Long)attributes.get("templateId");
 
 		if (templateId != null) {
@@ -142,6 +160,30 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 		if (script != null) {
 			setScript(script);
 		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	@Override
@@ -155,9 +197,48 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 		return _ddmTemplateVersion.compareTo(ddmTemplateVersion);
 	}
 
+	/**
+	* @deprecated As of 6.1.0, replaced by {@link #isApproved()}
+	*/
+	@Deprecated
+	@Override
+	public boolean getApproved() {
+		return _ddmTemplateVersion.getApproved();
+	}
+
 	@Override
 	public java.lang.String[] getAvailableLanguageIds() {
 		return _ddmTemplateVersion.getAvailableLanguageIds();
+	}
+
+	/**
+	* Returns the fully qualified class name of this d d m template version.
+	*
+	* @return the fully qualified class name of this d d m template version
+	*/
+	@Override
+	public java.lang.String getClassName() {
+		return _ddmTemplateVersion.getClassName();
+	}
+
+	/**
+	* Returns the class name ID of this d d m template version.
+	*
+	* @return the class name ID of this d d m template version
+	*/
+	@Override
+	public long getClassNameId() {
+		return _ddmTemplateVersion.getClassNameId();
+	}
+
+	/**
+	* Returns the class p k of this d d m template version.
+	*
+	* @return the class p k of this d d m template version
+	*/
+	@Override
+	public long getClassPK() {
+		return _ddmTemplateVersion.getClassPK();
 	}
 
 	/**
@@ -176,7 +257,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	* @return the create date of this d d m template version
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _ddmTemplateVersion.getCreateDate();
 	}
 
@@ -259,7 +340,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	* @return the locales and localized descriptions of this d d m template version
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+	public Map<java.util.Locale, java.lang.String> getDescriptionMap() {
 		return _ddmTemplateVersion.getDescriptionMap();
 	}
 
@@ -361,7 +442,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	* @return the locales and localized names of this d d m template version
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getNameMap() {
+	public Map<java.util.Locale, java.lang.String> getNameMap() {
 		return _ddmTemplateVersion.getNameMap();
 	}
 
@@ -388,6 +469,62 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	@Override
 	public java.lang.String getScript() {
 		return _ddmTemplateVersion.getScript();
+	}
+
+	/**
+	* Returns the status of this d d m template version.
+	*
+	* @return the status of this d d m template version
+	*/
+	@Override
+	public int getStatus() {
+		return _ddmTemplateVersion.getStatus();
+	}
+
+	/**
+	* Returns the status by user ID of this d d m template version.
+	*
+	* @return the status by user ID of this d d m template version
+	*/
+	@Override
+	public long getStatusByUserId() {
+		return _ddmTemplateVersion.getStatusByUserId();
+	}
+
+	/**
+	* Returns the status by user name of this d d m template version.
+	*
+	* @return the status by user name of this d d m template version
+	*/
+	@Override
+	public java.lang.String getStatusByUserName() {
+		return _ddmTemplateVersion.getStatusByUserName();
+	}
+
+	/**
+	* Returns the status by user uuid of this d d m template version.
+	*
+	* @return the status by user uuid of this d d m template version
+	*/
+	@Override
+	public java.lang.String getStatusByUserUuid() {
+		return _ddmTemplateVersion.getStatusByUserUuid();
+	}
+
+	/**
+	* Returns the status date of this d d m template version.
+	*
+	* @return the status date of this d d m template version
+	*/
+	@Override
+	public Date getStatusDate() {
+		return _ddmTemplateVersion.getStatusDate();
+	}
+
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMTemplate getTemplate()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmTemplateVersion.getTemplate();
 	}
 
 	/**
@@ -455,9 +592,39 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 		return _ddmTemplateVersion.hashCode();
 	}
 
+	/**
+	* Returns <code>true</code> if this d d m template version is approved.
+	*
+	* @return <code>true</code> if this d d m template version is approved; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isApproved() {
+		return _ddmTemplateVersion.isApproved();
+	}
+
 	@Override
 	public boolean isCachedModel() {
 		return _ddmTemplateVersion.isCachedModel();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m template version is denied.
+	*
+	* @return <code>true</code> if this d d m template version is denied; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isDenied() {
+		return _ddmTemplateVersion.isDenied();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m template version is a draft.
+	*
+	* @return <code>true</code> if this d d m template version is a draft; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isDraft() {
+		return _ddmTemplateVersion.isDraft();
 	}
 
 	@Override
@@ -465,9 +632,59 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 		return _ddmTemplateVersion.isEscapedModel();
 	}
 
+	/**
+	* Returns <code>true</code> if this d d m template version is expired.
+	*
+	* @return <code>true</code> if this d d m template version is expired; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isExpired() {
+		return _ddmTemplateVersion.isExpired();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m template version is inactive.
+	*
+	* @return <code>true</code> if this d d m template version is inactive; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isInactive() {
+		return _ddmTemplateVersion.isInactive();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m template version is incomplete.
+	*
+	* @return <code>true</code> if this d d m template version is incomplete; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isIncomplete() {
+		return _ddmTemplateVersion.isIncomplete();
+	}
+
 	@Override
 	public boolean isNew() {
 		return _ddmTemplateVersion.isNew();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m template version is pending.
+	*
+	* @return <code>true</code> if this d d m template version is pending; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isPending() {
+		return _ddmTemplateVersion.isPending();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m template version is scheduled.
+	*
+	* @return <code>true</code> if this d d m template version is scheduled; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isScheduled() {
+		return _ddmTemplateVersion.isScheduled();
 	}
 
 	@Override
@@ -493,6 +710,31 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 		_ddmTemplateVersion.setCachedModel(cachedModel);
 	}
 
+	@Override
+	public void setClassName(java.lang.String className) {
+		_ddmTemplateVersion.setClassName(className);
+	}
+
+	/**
+	* Sets the class name ID of this d d m template version.
+	*
+	* @param classNameId the class name ID of this d d m template version
+	*/
+	@Override
+	public void setClassNameId(long classNameId) {
+		_ddmTemplateVersion.setClassNameId(classNameId);
+	}
+
+	/**
+	* Sets the class p k of this d d m template version.
+	*
+	* @param classPK the class p k of this d d m template version
+	*/
+	@Override
+	public void setClassPK(long classPK) {
+		_ddmTemplateVersion.setClassPK(classPK);
+	}
+
 	/**
 	* Sets the company ID of this d d m template version.
 	*
@@ -509,7 +751,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	* @param createDate the create date of this d d m template version
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_ddmTemplateVersion.setCreateDate(createDate);
 	}
 
@@ -560,7 +802,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		Map<java.util.Locale, java.lang.String> descriptionMap) {
 		_ddmTemplateVersion.setDescriptionMap(descriptionMap);
 	}
 
@@ -572,7 +814,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.util.Locale defaultLocale) {
 		_ddmTemplateVersion.setDescriptionMap(descriptionMap, defaultLocale);
 	}
@@ -660,8 +902,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	* @param nameMap the locales and localized names of this d d m template version
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap) {
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap) {
 		_ddmTemplateVersion.setNameMap(nameMap);
 	}
 
@@ -672,8 +913,7 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	* @param defaultLocale the default locale
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Locale defaultLocale) {
 		_ddmTemplateVersion.setNameMap(nameMap, defaultLocale);
 	}
@@ -706,6 +946,56 @@ public class DDMTemplateVersionWrapper implements DDMTemplateVersion,
 	@Override
 	public void setScript(java.lang.String script) {
 		_ddmTemplateVersion.setScript(script);
+	}
+
+	/**
+	* Sets the status of this d d m template version.
+	*
+	* @param status the status of this d d m template version
+	*/
+	@Override
+	public void setStatus(int status) {
+		_ddmTemplateVersion.setStatus(status);
+	}
+
+	/**
+	* Sets the status by user ID of this d d m template version.
+	*
+	* @param statusByUserId the status by user ID of this d d m template version
+	*/
+	@Override
+	public void setStatusByUserId(long statusByUserId) {
+		_ddmTemplateVersion.setStatusByUserId(statusByUserId);
+	}
+
+	/**
+	* Sets the status by user name of this d d m template version.
+	*
+	* @param statusByUserName the status by user name of this d d m template version
+	*/
+	@Override
+	public void setStatusByUserName(java.lang.String statusByUserName) {
+		_ddmTemplateVersion.setStatusByUserName(statusByUserName);
+	}
+
+	/**
+	* Sets the status by user uuid of this d d m template version.
+	*
+	* @param statusByUserUuid the status by user uuid of this d d m template version
+	*/
+	@Override
+	public void setStatusByUserUuid(java.lang.String statusByUserUuid) {
+		_ddmTemplateVersion.setStatusByUserUuid(statusByUserUuid);
+	}
+
+	/**
+	* Sets the status date of this d d m template version.
+	*
+	* @param statusDate the status date of this d d m template version
+	*/
+	@Override
+	public void setStatusDate(Date statusDate) {
+		_ddmTemplateVersion.setStatusDate(statusDate);
 	}
 
 	/**

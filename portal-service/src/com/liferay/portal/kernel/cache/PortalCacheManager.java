@@ -27,14 +27,21 @@ import java.util.Set;
  */
 public interface PortalCacheManager<K extends Serializable, V> {
 
+	public static final String PORTAL_CACHE_MANAGER_NAME =
+		"portal.cache.manager.name";
+
+	public static final String PORTAL_CACHE_MANAGER_TYPE =
+		"portal.cache.manager.type";
+
 	@Proxy
 	public void clearAll() throws PortalCacheException;
 
 	public void destroy();
 
-	public PortalCache<K, V> getCache(String name) throws PortalCacheException;
+	public PortalCache<K, V> getCache(String portalCacheName)
+		throws PortalCacheException;
 
-	public PortalCache<K, V> getCache(String name, boolean blocking)
+	public PortalCache<K, V> getCache(String portalCacheName, boolean blocking)
 		throws PortalCacheException;
 
 	public Set<CacheManagerListener> getCacheManagerListeners();
@@ -49,7 +56,7 @@ public interface PortalCacheManager<K extends Serializable, V> {
 	public boolean registerCacheManagerListener(
 		CacheManagerListener cacheManagerListener);
 
-	public void removeCache(String name);
+	public void removeCache(String portalCacheName);
 
 	public boolean unregisterCacheManagerListener(
 		CacheManagerListener cacheManagerListener);

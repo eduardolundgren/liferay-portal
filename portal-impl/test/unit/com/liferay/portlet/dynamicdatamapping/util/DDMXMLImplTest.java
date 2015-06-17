@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
 
 import java.util.List;
@@ -40,16 +40,17 @@ import org.junit.Test;
 public class DDMXMLImplTest extends BaseDDMTestCase {
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		setUpPropsUtil();
 		setUpSAXReaderUtil();
 	}
 
 	@Test
 	public void testUpdateContentDefaultLocale() throws Exception {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LocaleUtil.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LocaleUtil.class.getName(), Level.WARNING)) {
 
-		try {
 			updateContentDefaultLocale(
 				"dynamic-data-mapping-structures.xml", true);
 
@@ -66,9 +67,6 @@ public class DDMXMLImplTest extends BaseDDMTestCase {
 
 			Assert.assertEquals(
 				"es_ES is not a valid language id", logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -121,14 +119,15 @@ public class DDMXMLImplTest extends BaseDDMTestCase {
 
 		String xml = read(fileName);
 
-		Document document = SAXReaderUtil.read(xml);
+		Document document = UnsecureSAXReaderUtil.read(xml);
 
 		List<Node> structureNodes = document.selectNodes("//structure");
 
 		for (Node structureNode : structureNodes) {
 			String structureXML = structureNode.asXML();
 
-			Document structureDocument = SAXReaderUtil.read(structureXML);
+			Document structureDocument = UnsecureSAXReaderUtil.read(
+				structureXML);
 
 			Element rootElement = (Element)structureDocument.selectSingleNode(
 				"/structure/root");
@@ -143,7 +142,8 @@ public class DDMXMLImplTest extends BaseDDMTestCase {
 			structureXML = _ddmXML.updateXMLDefaultLocale(
 				rootXML, contentDefaultLocale, availableDefaultLocale);
 
-			Document updatedXMLDocument = SAXReaderUtil.read(structureXML);
+			Document updatedXMLDocument = UnsecureSAXReaderUtil.read(
+				structureXML);
 
 			rootElement = updatedXMLDocument.getRootElement();
 

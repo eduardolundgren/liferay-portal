@@ -16,7 +16,6 @@ package com.liferay.portlet.journal.model.impl;
 
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.templateparser.TransformerListener;
@@ -42,6 +41,7 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.model.JournalFolder;
@@ -53,6 +53,7 @@ import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portlet.journal.util.JournalUtil;
 import com.liferay.portlet.journal.util.LocaleTransformerListener;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -66,11 +67,17 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	public static String getContentByLocale(
 		Document document, String languageId) {
 
+		return getContentByLocale(document, languageId, null);
+	}
+
+	public static String getContentByLocale(
+		Document document, String languageId, Map<String, String> tokens) {
+
 		TransformerListener transformerListener =
 			new LocaleTransformerListener();
 
 		document = transformerListener.onXml(
-			document.clone(), languageId, null);
+			document.clone(), languageId, tokens);
 
 		return document.asXML();
 	}
@@ -174,7 +181,19 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 
 	@Override
 	public String getContentByLocale(String languageId) {
-		return getContentByLocale(getDocument(), languageId);
+		Map<String, String> tokens = new HashMap<>();
+
+		try {
+			DDMStructure ddmStructure = getDDMStructure();
+
+			tokens.put(
+				"ddm_structure_id",
+				String.valueOf(ddmStructure.getStructureId()));
+		}
+		catch (PortalException pe) {
+		}
+
+		return getContentByLocale(getDocument(), languageId, tokens);
 	}
 
 	@Override
@@ -272,6 +291,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #getDDMStructureKey()}
 	 */
+	@Deprecated
 	@Override
 	public String getStructureId() {
 		return getDDMStructureKey();
@@ -280,6 +300,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #getDDMTemplateKey()}
 	 */
+	@Deprecated
 	@Override
 	public String getTemplateId() {
 		return getDDMTemplateKey();
@@ -378,6 +399,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #setDDMStructureKey(String)}
 	 */
+	@Deprecated
 	@Override
 	public void setStructureId(String ddmStructureKey) {
 		setDDMStructureKey(ddmStructureKey);
@@ -386,6 +408,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #setDDMTemplateKey(String)}
 	 */
+	@Deprecated
 	@Override
 	public void setTemplateId(String ddmTemplateKey) {
 		setDDMTemplateKey(ddmTemplateKey);

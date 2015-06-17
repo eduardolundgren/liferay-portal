@@ -17,9 +17,12 @@ package com.liferay.portal.kernel.portlet;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
+import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
+import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
-import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -42,15 +45,13 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletConfigFactoryUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletRequest;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ValidatorException;
@@ -60,7 +61,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Iván Zaera
  */
-public class SettingsConfigurationAction
+public abstract class SettingsConfigurationAction
 	extends LiferayPortlet
 	implements ConfigurationAction, ResourceServingConfigurationAction {
 
@@ -188,30 +189,6 @@ public class SettingsConfigurationAction
 	}
 
 	@Override
-	public String render(
-			PortletConfig portletConfig, RenderRequest renderRequest,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		PortletConfig selPortletConfig = getSelPortletConfig(renderRequest);
-
-		String configTemplate = selPortletConfig.getInitParameter(
-			"config-template");
-
-		if (Validator.isNotNull(configTemplate)) {
-			return configTemplate;
-		}
-
-		String configJSP = selPortletConfig.getInitParameter("config-jsp");
-
-		if (Validator.isNotNull(configJSP)) {
-			return configJSP;
-		}
-
-		return "/configuration.jsp";
-	}
-
-	@Override
 	public void serveResource(
 			PortletConfig portletConfig, ResourceRequest resourceRequest,
 			ResourceResponse resourceResponse)
@@ -232,7 +209,7 @@ public class SettingsConfigurationAction
 				WebKeys.PORTLET_PREFERENCES_MAP);
 
 		if (portletPreferencesMap == null) {
-			portletPreferencesMap = new HashMap<String, String[]>();
+			portletPreferencesMap = new HashMap<>();
 
 			portletRequest.setAttribute(
 				WebKeys.PORTLET_PREFERENCES_MAP, portletPreferencesMap);
@@ -272,19 +249,22 @@ public class SettingsConfigurationAction
 			actionRequest, "settingsScope");
 
 		if (settingsScope.equals("company")) {
-			return SettingsFactoryUtil.getCompanyServiceSettings(
-				themeDisplay.getCompanyId(), serviceName);
+			return SettingsFactoryUtil.getSettings(
+				new CompanyServiceSettingsLocator(
+					themeDisplay.getCompanyId(), serviceName));
 		}
 		else if (settingsScope.equals("group")) {
-			return SettingsFactoryUtil.getGroupServiceSettings(
-				themeDisplay.getSiteGroupId(), serviceName);
+			return SettingsFactoryUtil.getSettings(
+				new GroupServiceSettingsLocator(
+					themeDisplay.getSiteGroupId(), serviceName));
 		}
 		else if (settingsScope.equals("portletInstance")) {
 			String portletResource = ParamUtil.getString(
 				actionRequest, "portletResource");
 
-			return SettingsFactoryUtil.getPortletInstanceSettings(
-				themeDisplay.getLayout(), portletResource);
+			return SettingsFactoryUtil.getSettings(
+				new PortletInstanceSettingsLocator(
+					themeDisplay.getLayout(), portletResource));
 		}
 
 		throw new IllegalArgumentException(
@@ -317,11 +297,10 @@ public class SettingsConfigurationAction
 	protected void updateMultiValuedKeys(ActionRequest actionRequest) {
 		String settingsId = getSettingsId(actionRequest);
 
-		SettingsFactory settingsFactory =
-			SettingsFactoryUtil.getSettingsFactory();
+		SettingsDescriptor settingsDescriptor =
+			SettingsFactoryUtil.getSettingsDescriptor(settingsId);
 
-		List<String> multiValuedKeys = settingsFactory.getMultiValuedKeys(
-			settingsId);
+		Set<String> multiValuedKeys = settingsDescriptor.getMultiValuedKeys();
 
 		for (String multiValuedKey : multiValuedKeys) {
 			String multiValuedValue = getParameter(

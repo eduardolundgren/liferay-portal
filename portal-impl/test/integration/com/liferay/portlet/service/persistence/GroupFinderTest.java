@@ -16,7 +16,13 @@ package com.liferay.portlet.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ResourcePermissionTestUtil;
+import com.liferay.portal.kernel.test.util.ResourceTypePermissionTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
@@ -30,17 +36,11 @@ import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourceTypePermissionLocalServiceUtil;
 import com.liferay.portal.service.persistence.GroupFinderUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.GroupNameComparator;
-import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ResourcePermissionTestUtil;
-import com.liferay.portal.util.test.ResourceTypePermissionTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -110,19 +110,24 @@ public class GroupFinderTest {
 	public void testFindByC_C_N_DJoinByRoleResourcePermissions()
 		throws Exception {
 
+		boolean exists = false;
+
 		List<Group> groups = findByC_C_N_D(
 			_arbitraryResourceAction.getActionId(),
 			_resourcePermission.getName(), _resourcePermission.getRoleId());
 
 		for (Group group : groups) {
 			if (group.getGroupId() == _group.getGroupId()) {
-				return;
+				exists = true;
+
+				break;
 			}
 		}
 
-		Assert.fail(
+		Assert.assertTrue(
 			"The method findByC_C_N_D should have returned the group " +
-				_group.getGroupId());
+				_group.getGroupId(),
+			exists);
 	}
 
 	@Test
@@ -134,21 +139,25 @@ public class GroupFinderTest {
 			_resourceTypePermission.getName(),
 			_resourceTypePermission.getRoleId());
 
+		boolean exists = false;
+
 		for (Group group : groups) {
 			if (group.getGroupId() == _group.getGroupId()) {
-				return;
+				exists = true;
+
+				break;
 			}
 		}
 
-		Assert.fail(
+		Assert.assertTrue(
 			"The method findByC_C_N_D should have returned the group " +
-				_group.getGroupId());
+				_group.getGroupId(),
+			exists);
 	}
 
 	@Test
 	public void testFindByCompanyId() throws Exception {
-		LinkedHashMap<String, Object> groupParams =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
 
 		groupParams.put("inherit", Boolean.TRUE);
 		groupParams.put("site", Boolean.TRUE);
@@ -200,7 +209,7 @@ public class GroupFinderTest {
 
 		String name = RandomTestUtil.randomString() + "Model";
 
-		List<String> actionIds = new ArrayList<String>();
+		List<String> actionIds = new ArrayList<>();
 
 		actionIds.add(ActionKeys.UPDATE);
 		actionIds.add(ActionKeys.VIEW);
@@ -222,10 +231,9 @@ public class GroupFinderTest {
 			String actionId, String name, long roleId)
 		throws Exception {
 
-		LinkedHashMap<String, Object> groupParams =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
 
-		List<Object> rolePermissions = new ArrayList<Object>();
+		List<Object> rolePermissions = new ArrayList<>();
 
 		rolePermissions.add(name);
 		rolePermissions.add(new Integer(ResourceConstants.SCOPE_GROUP));

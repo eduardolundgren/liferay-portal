@@ -19,7 +19,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.test.PACLTestRule;
+import com.liferay.portal.test.rule.PACLTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -59,12 +59,7 @@ public class DynamicQueryTest {
 
 	@Test
 	public void test3() throws Exception {
-		try {
-			GroupLocalServiceUtil.dynamicQuery();
-		}
-		catch (SecurityException se) {
-			Assert.fail();
-		}
+		GroupLocalServiceUtil.dynamicQuery();
 	}
 
 	@Test

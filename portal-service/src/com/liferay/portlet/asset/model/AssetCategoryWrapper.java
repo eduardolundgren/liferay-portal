@@ -16,9 +16,10 @@ package com.liferay.portlet.asset.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -214,7 +215,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @return the create date of this asset category
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _assetCategory.getCreateDate();
 	}
 
@@ -297,7 +298,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @return the locales and localized descriptions of this asset category
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+	public Map<java.util.Locale, java.lang.String> getDescriptionMap() {
 		return _assetCategory.getDescriptionMap();
 	}
 
@@ -332,7 +333,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @return the modified date of this asset category
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _assetCategory.getModifiedDate();
 	}
 
@@ -465,7 +466,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @return the locales and localized titles of this asset category
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getTitleMap() {
+	public Map<java.util.Locale, java.lang.String> getTitleMap() {
 		return _assetCategory.getTitleMap();
 	}
 
@@ -593,7 +594,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @param createDate the create date of this asset category
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_assetCategory.setCreateDate(createDate);
 	}
 
@@ -644,7 +645,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		Map<java.util.Locale, java.lang.String> descriptionMap) {
 		_assetCategory.setDescriptionMap(descriptionMap);
 	}
 
@@ -656,7 +657,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.util.Locale defaultLocale) {
 		_assetCategory.setDescriptionMap(descriptionMap, defaultLocale);
 	}
@@ -705,7 +706,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @param modifiedDate the modified date of this asset category
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_assetCategory.setModifiedDate(modifiedDate);
 	}
 
@@ -804,8 +805,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @param titleMap the locales and localized titles of this asset category
 	*/
 	@Override
-	public void setTitleMap(
-		java.util.Map<java.util.Locale, java.lang.String> titleMap) {
+	public void setTitleMap(Map<java.util.Locale, java.lang.String> titleMap) {
 		_assetCategory.setTitleMap(titleMap);
 	}
 
@@ -816,8 +816,7 @@ public class AssetCategoryWrapper implements AssetCategory,
 	* @param defaultLocale the default locale
 	*/
 	@Override
-	public void setTitleMap(
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+	public void setTitleMap(Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Locale defaultLocale) {
 		_assetCategory.setTitleMap(titleMap, defaultLocale);
 	}

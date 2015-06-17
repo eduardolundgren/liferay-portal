@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchBrowserTrackerException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -56,7 +55,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see BrowserTrackerPersistence
- * @see BrowserTrackerUtil
+ * @see com.liferay.portal.service.persistence.BrowserTrackerUtil
  * @generated
  */
 @ProviderType
@@ -94,11 +93,11 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 			new String[] { Long.class.getName() });
 
 	/**
-	 * Returns the browser tracker where userId = &#63; or throws a {@link com.liferay.portal.NoSuchBrowserTrackerException} if it could not be found.
+	 * Returns the browser tracker where userId = &#63; or throws a {@link NoSuchBrowserTrackerException} if it could not be found.
 	 *
 	 * @param userId the user ID
 	 * @return the matching browser tracker
-	 * @throws com.liferay.portal.NoSuchBrowserTrackerException if a matching browser tracker could not be found
+	 * @throws NoSuchBrowserTrackerException if a matching browser tracker could not be found
 	 */
 	@Override
 	public BrowserTracker findByUserId(long userId)
@@ -337,10 +336,6 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(BrowserTrackerImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(BrowserTrackerImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -441,7 +436,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	 *
 	 * @param browserTrackerId the primary key of the browser tracker
 	 * @return the browser tracker that was removed
-	 * @throws com.liferay.portal.NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
+	 * @throws NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
 	 */
 	@Override
 	public BrowserTracker remove(long browserTrackerId)
@@ -454,7 +449,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	 *
 	 * @param primaryKey the primary key of the browser tracker
 	 * @return the browser tracker that was removed
-	 * @throws com.liferay.portal.NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
+	 * @throws NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
 	 */
 	@Override
 	public BrowserTracker remove(Serializable primaryKey)
@@ -522,8 +517,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	}
 
 	@Override
-	public BrowserTracker updateImpl(
-		com.liferay.portal.model.BrowserTracker browserTracker) {
+	public BrowserTracker updateImpl(BrowserTracker browserTracker) {
 		browserTracker = toUnwrappedModel(browserTracker);
 
 		boolean isNew = browserTracker.isNew();
@@ -590,7 +584,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	 *
 	 * @param primaryKey the primary key of the browser tracker
 	 * @return the browser tracker
-	 * @throws com.liferay.portal.NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
+	 * @throws NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
 	 */
 	@Override
 	public BrowserTracker findByPrimaryKey(Serializable primaryKey)
@@ -610,11 +604,11 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	}
 
 	/**
-	 * Returns the browser tracker with the primary key or throws a {@link com.liferay.portal.NoSuchBrowserTrackerException} if it could not be found.
+	 * Returns the browser tracker with the primary key or throws a {@link NoSuchBrowserTrackerException} if it could not be found.
 	 *
 	 * @param browserTrackerId the primary key of the browser tracker
 	 * @return the browser tracker
-	 * @throws com.liferay.portal.NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
+	 * @throws NoSuchBrowserTrackerException if a browser tracker with the primary key could not be found
 	 */
 	@Override
 	public BrowserTracker findByPrimaryKey(long browserTrackerId)
@@ -786,7 +780,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	 * Returns a range of all the browser trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of browser trackers
@@ -802,7 +796,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	 * Returns an ordered range of all the browser trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link BrowserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of browser trackers
@@ -960,7 +954,6 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 	private static final String _ORDER_BY_ENTITY_ALIAS = "browserTracker.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No BrowserTracker exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No BrowserTracker exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(BrowserTrackerPersistenceImpl.class);
 	private static final BrowserTracker _nullBrowserTracker = new BrowserTrackerImpl() {
 			@Override

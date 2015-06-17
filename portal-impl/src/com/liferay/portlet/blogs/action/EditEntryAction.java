@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
-import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -43,7 +42,7 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.spring.transaction.TransactionAttributeBuilder;
-import com.liferay.portal.spring.transaction.TransactionalCallableUtil;
+import com.liferay.portal.spring.transaction.TransactionHandlerUtil;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -53,7 +52,6 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.blogs.BlogsEntryAttachmentFileEntryHelper;
 import com.liferay.portlet.blogs.BlogsEntryAttachmentFileEntryReference;
 import com.liferay.portlet.blogs.EntryContentException;
@@ -67,6 +65,7 @@ import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.service.BlogsEntryServiceUtil;
 import com.liferay.portlet.documentlibrary.FileSizeException;
+import com.liferay.portlet.trash.service.TrashEntryServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
@@ -135,7 +134,7 @@ public class EditEntryAction extends PortletAction {
 				Callable<Object[]> updateEntryCallable =
 					new UpdateEntryCallable(actionRequest);
 
-				Object[] returnValue = TransactionalCallableUtil.call(
+				Object[] returnValue = TransactionHandlerUtil.invoke(
 					_transactionAttribute, updateEntryCallable);
 
 				entry = (BlogsEntry)returnValue[0];
@@ -150,16 +149,14 @@ public class EditEntryAction extends PortletAction {
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteEntries(actionRequest, true);
 			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restoreTrashEntries(actionRequest);
+			}
 			else if (cmd.equals(Constants.SUBSCRIBE)) {
 				subscribe(actionRequest);
 			}
 			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
 				unsubscribe(actionRequest);
-			}
-			else if (cmd.equals(Constants.UPDATE_CONTENT)) {
-				updateContent(actionRequest, actionResponse);
-
-				return;
 			}
 
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
@@ -360,6 +357,13 @@ public class EditEntryAction extends PortletAction {
 			}
 		}
 
+		long assetCategoryId = ParamUtil.getLong(renderRequest, "categoryId");
+		String assetCategoryName = ParamUtil.getString(renderRequest, "tag");
+
+		if ((assetCategoryId > 0) || Validator.isNotNull(assetCategoryName)) {
+			return actionMapping.findForward("portlet.blogs.view");
+		}
+
 		return actionMapping.findForward(
 			getForward(renderRequest, "portlet.blogs.edit_entry"));
 	}
@@ -380,7 +384,7 @@ public class EditEntryAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "deleteEntryIds"), 0L);
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteEntryId : deleteEntryIds) {
 			if (moveToTrash) {
@@ -411,8 +415,6 @@ public class EditEntryAction extends PortletAction {
 
 		String backURL = ParamUtil.getString(actionRequest, "backURL");
 
-		boolean preview = ParamUtil.getBoolean(actionRequest, "preview");
-
 		PortletURLImpl portletURL = new PortletURLImpl(
 			actionRequest, portletConfig.getPortletName(),
 			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
@@ -433,10 +435,20 @@ public class EditEntryAction extends PortletAction {
 			"groupId", String.valueOf(entry.getGroupId()), false);
 		portletURL.setParameter(
 			"entryId", String.valueOf(entry.getEntryId()), false);
-		portletURL.setParameter("preview", String.valueOf(preview), false);
 		portletURL.setWindowState(actionRequest.getWindowState());
 
 		return portletURL.toString();
+	}
+
+	protected void restoreTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] restoreTrashEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
+
+		for (long restoreTrashEntryId : restoreTrashEntryIds) {
+			TrashEntryServiceUtil.restoreEntry(restoreTrashEntryId);
+		}
 	}
 
 	protected void subscribe(ActionRequest actionRequest) throws Exception {
@@ -451,64 +463,6 @@ public class EditEntryAction extends PortletAction {
 			WebKeys.THEME_DISPLAY);
 
 		BlogsEntryServiceUtil.unsubscribe(themeDisplay.getScopeGroupId());
-	}
-
-	protected void updateContent(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long entryId = ParamUtil.getLong(actionRequest, "entryId");
-
-		BlogsEntry entry = BlogsEntryLocalServiceUtil.getEntry(entryId);
-
-		String content = ParamUtil.getString(actionRequest, "content");
-
-		Calendar displayDateCal = CalendarFactoryUtil.getCalendar(
-			themeDisplay.getTimeZone());
-
-		displayDateCal.setTime(entry.getDisplayDate());
-
-		int displayDateMonth = displayDateCal.get(Calendar.MONTH);
-		int displayDateDay = displayDateCal.get(Calendar.DATE);
-		int displayDateYear = displayDateCal.get(Calendar.YEAR);
-		int displayDateHour = displayDateCal.get(Calendar.HOUR);
-		int displayDateMinute = displayDateCal.get(Calendar.MINUTE);
-
-		if (displayDateCal.get(Calendar.AM_PM) == Calendar.PM) {
-			displayDateHour += 12;
-		}
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			actionRequest);
-
-		serviceContext.setCommand(Constants.UPDATE);
-
-		try {
-			BlogsEntryServiceUtil.updateEntry(
-				entryId, entry.getTitle(), entry.getSubtitle(),
-				entry.getDescription(), content, displayDateMonth,
-				displayDateDay, displayDateYear, displayDateHour,
-				displayDateMinute, entry.getAllowPingbacks(),
-				entry.getAllowTrackbacks(), null, null, null, serviceContext);
-
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("success", Boolean.TRUE);
-
-			writeJSON(actionRequest, actionResponse, jsonObject);
-		}
-		catch (Exception e) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			jsonObject.put("success", Boolean.FALSE);
-
-			jsonObject.putException(e);
-
-			writeJSON(actionRequest, actionResponse, jsonObject);
-		}
 	}
 
 	protected Object[] updateEntry(ActionRequest actionRequest)
@@ -568,6 +522,9 @@ public class EditEntryAction extends PortletAction {
 		String coverImageFileEntryCropRegion = ParamUtil.getString(
 			actionRequest, "coverImageFileEntryCropRegion");
 
+		String coverImageCaption = ParamUtil.getString(
+			actionRequest, "coverImageCaption");
+
 		ImageSelector coverImageImageSelector = new ImageSelector(
 			coverImageFileEntryId, coverImageURL,
 			coverImageFileEntryCropRegion);
@@ -596,8 +553,8 @@ public class EditEntryAction extends PortletAction {
 				title, subtitle, description, content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
 				displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-				coverImageImageSelector, smallImageImageSelector,
-				serviceContext);
+				coverImageCaption, coverImageImageSelector,
+				smallImageImageSelector, serviceContext);
 
 			BlogsEntryAttachmentFileEntryHelper
 				blogsEntryAttachmentFileEntryHelper =
@@ -628,10 +585,6 @@ public class EditEntryAction extends PortletAction {
 				PortletFileRepositoryUtil.deletePortletFileEntry(
 					tempBlogsEntryAttachment.getFileEntryId());
 			}
-
-			AssetPublisherUtil.addAndStoreSelection(
-				actionRequest, BlogsEntry.class.getName(), entry.getEntryId(),
-				-1);
 		}
 		else {
 
@@ -676,8 +629,9 @@ public class EditEntryAction extends PortletAction {
 				entryId, title, subtitle, description, content,
 				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, allowPingbacks,
-				allowTrackbacks, trackbacks, coverImageImageSelector,
-				smallImageImageSelector, serviceContext);
+				allowTrackbacks, trackbacks, coverImageCaption,
+				coverImageImageSelector, smallImageImageSelector,
+				serviceContext);
 
 			for (FileEntry tempBlogsEntryAttachmentFileEntry :
 					tempBlogsEntryAttachmentFileEntries) {
@@ -689,10 +643,6 @@ public class EditEntryAction extends PortletAction {
 			if (!tempOldUrlTitle.equals(entry.getUrlTitle())) {
 				oldUrlTitle = tempOldUrlTitle;
 			}
-
-			AssetPublisherUtil.addAndStoreSelection(
-				actionRequest, BlogsEntry.class.getName(), entry.getEntryId(),
-				-1);
 		}
 
 		return new Object[] {
@@ -700,9 +650,10 @@ public class EditEntryAction extends PortletAction {
 		};
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(EditEntryAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditEntryAction.class);
 
-	private TransactionAttribute _transactionAttribute =
+	private final TransactionAttribute _transactionAttribute =
 		TransactionAttributeBuilder.build(
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
 
@@ -717,7 +668,7 @@ public class EditEntryAction extends PortletAction {
 			_actionRequest = actionRequest;
 		}
 
-		private ActionRequest _actionRequest;
+		private final ActionRequest _actionRequest;
 
 	}
 

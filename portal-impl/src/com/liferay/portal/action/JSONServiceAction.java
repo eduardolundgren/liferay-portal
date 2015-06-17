@@ -22,7 +22,9 @@ import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.access.control.AccessControlThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -33,11 +35,9 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.ac.AccessControlThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextUtil;
 import com.liferay.portal.struts.JSONAction;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.lang.reflect.Method;
@@ -424,7 +424,8 @@ public class JSONServiceAction extends JSONAction {
 	}
 
 	/**
-	 * @see JSONWebServiceServiceAction#getCSRFOrigin(HttpServletRequest)
+	 * @see com.liferay.portal.jsonwebservice.JSONWebServiceServiceAction#getCSRFOrigin(
+	 *      HttpServletRequest)
 	 */
 	@Override
 	protected String getCSRFOrigin(HttpServletRequest request) {
@@ -651,14 +652,14 @@ public class JSONServiceAction extends JSONAction {
 
 	private static final String _REROUTE_PATH = "/api/json";
 
-	private static Log _log = LogFactoryUtil.getLog(JSONServiceAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		JSONServiceAction.class);
 
-	private static Pattern _fieldDescriptorPattern = Pattern.compile(
+	private static final Pattern _fieldDescriptorPattern = Pattern.compile(
 		"^(.*?)((\\[\\])*)$", Pattern.DOTALL);
 
-	private Set<String> _invalidClassNames;
-	private Set<String> _invalidMethodNames;
-	private Map<String, Object[]> _methodCache =
-		new HashMap<String, Object[]>();
+	private final Set<String> _invalidClassNames;
+	private final Set<String> _invalidMethodNames;
+	private final Map<String, Object[]> _methodCache = new HashMap<>();
 
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+
+<project>
+	<path id="service.builder.classpath">
+		<fileset dir="../lib" includes="*.jar" />
+		<fileset dir="../../../../tools/sdk/dist" includes="com.liferay.portal.tools.service.builder-*.jar" />
+	</path>
+
+	<taskdef classpathref="service.builder.classpath" resource="com/liferay/portal/tools/service/builder/ant/taskdefs.properties" />
+
+	<target name="build-service">
+		<service-builder
+			apiDirName="../tmp/api"
+			hbmFileName="../tmp/src/META-INF/portal-hbm.xml"
+			implDirName="../tmp/src"
+			inputFileName="service.xml"
+			modelHintsFileName="../tmp/src/META-INF/portal-model-hints.xml"
+			resourcesDirName="../tmp/src"
+			springFileName="../tmp/src/META-INF/portal-spring.xml"
+			sqlDirName="../tmp/sql"
+			testDirName="../tmp/test/integration"
+		/>
+	</target>
+</project>

@@ -798,10 +798,10 @@ public class HtmlImpl implements Html {
 
 	private static final char[] _XPATH_TOKENS = {
 		'(', ')', '[', ']', '.', '@', ',', ':', '/', '|', '+', '-', '=', '!',
-		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232};
+		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232
+	};
 
-	private static final Map<String, String> _unescapeMap =
-		new HashMap<String, String>();
+	private static final Map<String, String> _unescapeMap = new HashMap<>();
 
 	static {
 		_unescapeMap.put("lt", "<");
@@ -821,6 +821,6 @@ public class HtmlImpl implements Html {
 		_unescapeMap.put("#045", "-");
 	}
 
-	private Pattern _pattern = Pattern.compile("([\\s<&]|$)");
+	private final Pattern _pattern = Pattern.compile("([\\s<&]|$)");
 
 }

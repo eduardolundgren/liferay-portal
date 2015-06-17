@@ -15,11 +15,13 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -50,6 +52,24 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 	public BaseOpenSearchImpl() {
 		_enabled = GetterUtil.getBoolean(
 			PropsUtil.get(getClass().getName()), true);
+
+		_openSearchURL = StringPool.BLANK;
+		_openSearchDescriptionURL = StringPool.BLANK;
+	}
+
+	public BaseOpenSearchImpl(
+		String openSearchURL, String openSearchDescriptionURL) {
+
+		_openSearchURL = openSearchURL;
+		_openSearchDescriptionURL = openSearchDescriptionURL;
+
+		_enabled = GetterUtil.getBoolean(
+			PropsUtil.get(ClassUtil.getClassName(this)), true);
+	}
+
+	@Override
+	public String getClassName() {
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -276,20 +296,6 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 			item, "score", OpenSearchUtil.RELEVANCE_NAMESPACE, score);
 	}
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	protected Object[] addSearchResults(
-		String keywords, int startPage, int itemsPerPage, int total, int start,
-		String title, String searchPath, String format,
-		ThemeDisplay themeDisplay) {
-
-		return addSearchResults(
-			new String[0], keywords, startPage, itemsPerPage, total, start,
-			title, searchPath, format, themeDisplay);
-	}
-
 	protected Object[] addSearchResults(
 		String[] queryTerms, String keywords, int startPage, int itemsPerPage,
 		int total, int start, String title, String searchPath, String format,
@@ -397,7 +403,7 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 
 		// links
 
-		String searchURL = themeDisplay.getURLPortal() + searchPath;
+		String searchURL = getOpenSearchURL(searchPath, themeDisplay);
 
 		OpenSearchUtil.addLink(
 			root, searchURL, "self", keywords, startPage, itemsPerPage);
@@ -422,7 +428,8 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 			root, "link", OpenSearchUtil.DEFAULT_NAMESPACE);
 
 		link.addAttribute("rel", "search");
-		link.addAttribute("href", searchPath + "_description.xml");
+		link.addAttribute(
+			"href", getOpenSearchDescriptionURL(searchPath, themeDisplay));
 		link.addAttribute("type", "application/opensearchdescription+xml");
 
 		return new Object[] {doc, root};
@@ -459,7 +466,7 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 
 		OpenSearchUtil.addElement(
 			channel, "link", OpenSearchUtil.NO_NAMESPACE,
-			themeDisplay.getURLPortal() + searchPath);
+			getOpenSearchURL(searchPath, themeDisplay));
 
 		// description
 
@@ -497,6 +504,26 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 		query.addAttribute("startPage", String.valueOf(startPage));
 
 		return new Object[] {doc, channel};
+	}
+
+	protected String getOpenSearchDescriptionURL(
+		String searchPath, ThemeDisplay themeDisplay) {
+
+		if (Validator.isNotNull(_openSearchDescriptionURL)) {
+			return _openSearchDescriptionURL;
+		}
+
+		return themeDisplay.getPortalURL() + searchPath + "_description.xml";
+	}
+
+	protected String getOpenSearchURL(
+		String searchPath, ThemeDisplay themeDisplay) {
+
+		if (Validator.isNotNull(_openSearchURL)) {
+			return _openSearchURL;
+		}
+
+		return themeDisplay.getPortalURL() + searchPath;
 	}
 
 	protected PortletURL getPortletURL(
@@ -542,5 +569,7 @@ public abstract class BaseOpenSearchImpl implements OpenSearch {
 	}
 
 	private final boolean _enabled;
+	private final String _openSearchDescriptionURL;
+	private final String _openSearchURL;
 
 }

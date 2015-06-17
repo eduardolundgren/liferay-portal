@@ -18,19 +18,16 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.util.CalendarFactoryImpl;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.HtmlImpl;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryImpl;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
@@ -437,11 +434,13 @@ public class DDMFormFieldValueRendererTest extends BaseDDMTestCase {
 	protected void setUpDLAppLocalServiceUtil() throws Exception {
 		mockStatic(DLAppLocalServiceUtil.class);
 
-		DLFileEntry dlFileEntry = new DLFileEntryImpl();
+		FileEntry fileEntry = mock(FileEntry.class);
 
-		dlFileEntry.setTitle("File Entry Title");
-
-		FileEntry fileEntry = new LiferayFileEntry(dlFileEntry);
+		when(
+			fileEntry.getTitle()
+		).thenReturn(
+			"File Entry Title"
+		);
 
 		when(
 			DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(

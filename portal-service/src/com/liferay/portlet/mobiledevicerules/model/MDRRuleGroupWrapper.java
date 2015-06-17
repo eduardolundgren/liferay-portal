@@ -16,9 +16,10 @@ package com.liferay.portlet.mobiledevicerules.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -163,7 +164,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @return the create date of this m d r rule group
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _mdrRuleGroup.getCreateDate();
 	}
 
@@ -246,7 +247,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @return the locales and localized descriptions of this m d r rule group
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+	public Map<java.util.Locale, java.lang.String> getDescriptionMap() {
 		return _mdrRuleGroup.getDescriptionMap();
 	}
 
@@ -271,7 +272,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @return the modified date of this m d r rule group
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _mdrRuleGroup.getModifiedDate();
 	}
 
@@ -348,7 +349,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @return the locales and localized names of this m d r rule group
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getNameMap() {
+	public Map<java.util.Locale, java.lang.String> getNameMap() {
 		return _mdrRuleGroup.getNameMap();
 	}
 
@@ -481,7 +482,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @param createDate the create date of this m d r rule group
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_mdrRuleGroup.setCreateDate(createDate);
 	}
 
@@ -532,7 +533,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		Map<java.util.Locale, java.lang.String> descriptionMap) {
 		_mdrRuleGroup.setDescriptionMap(descriptionMap);
 	}
 
@@ -544,7 +545,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.util.Locale defaultLocale) {
 		_mdrRuleGroup.setDescriptionMap(descriptionMap, defaultLocale);
 	}
@@ -583,7 +584,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @param modifiedDate the modified date of this m d r rule group
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_mdrRuleGroup.setModifiedDate(modifiedDate);
 	}
 
@@ -632,8 +633,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @param nameMap the locales and localized names of this m d r rule group
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap) {
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap) {
 		_mdrRuleGroup.setNameMap(nameMap);
 	}
 
@@ -644,8 +644,7 @@ public class MDRRuleGroupWrapper implements MDRRuleGroup,
 	* @param defaultLocale the default locale
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Locale defaultLocale) {
 		_mdrRuleGroup.setNameMap(nameMap, defaultLocale);
 	}

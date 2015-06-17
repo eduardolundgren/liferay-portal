@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.Map;
 
@@ -27,6 +28,19 @@ import java.util.Map;
  * @author Shuyang Zhou
  */
 public class MockRepository<T> implements Repository<T> {
+
+	public MockRepository() {
+		this(null);
+	}
+
+	public MockRepository(String repositoryPath) {
+		if (repositoryPath == null) {
+			_repositoryPath = null;
+		}
+		else {
+			_repositoryPath = Paths.get(repositoryPath);
+		}
+	}
 
 	@Override
 	public void dispose(boolean delete) {
@@ -50,7 +64,7 @@ public class MockRepository<T> implements Repository<T> {
 		T t, Map<Path, Path> pathMap, boolean deleteAfterFetch) {
 
 		DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>();
+			new DefaultNoticeableFuture<>();
 
 		defaultNoticeableFuture.set(pathMap);
 
@@ -59,10 +73,11 @@ public class MockRepository<T> implements Repository<T> {
 
 	@Override
 	public Path getRepositoryPath() {
-		return null;
+		return _repositoryPath;
 	}
 
 	private final AsyncBroker<Path, FileResponse> _asyncBroker =
-		new AsyncBroker<Path, FileResponse>();
+		new AsyncBroker<>();
+	private final Path _repositoryPath;
 
 }

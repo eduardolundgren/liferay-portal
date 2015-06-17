@@ -5,11 +5,11 @@ AUI.add(
 
 		var DISPLAY_STYLE_TOOLBAR = 'displayStyleToolbar';
 
+		var STR_ROW_IDS_FILE_ENTRY_CHECKBOX = 'rowIdsFileEntry';
+
 		var STR_ROW_IDS_FILE_SHORTCUT_CHECKBOX = 'rowIdsDLFileShortcut';
 
 		var STR_ROW_IDS_FOLDER_CHECKBOX = 'rowIdsFolder';
-
-		var STR_ROW_IDS_FILE_ENTRY_CHECKBOX = 'rowIdsFileEntry';
 
 		var WIN = A.config.win;
 
@@ -34,18 +34,6 @@ AUI.add(
 						instance._eventDataRequest = instance.ns('dataRequest');
 						instance._eventOpenDocument = instance.ns('openDocument');
 						instance._entriesContainer = instance.byId('entriesContainer');
-
-						if (!config.syncMessageDisabled) {
-							instance._syncMessage = new Liferay.Message(
-								{
-									boundingBox: instance.byId('syncNotification'),
-									contentBox: instance.byId('syncNotificationContent'),
-									id: instance.NS + 'show-sync-message',
-									trigger: instance.one('#showSyncMessageIconContainer'),
-									visible: true
-								}
-							).render();
-						}
 
 						var checkBoxesId = [
 							instance.ns(STR_ROW_IDS_FILE_SHORTCUT_CHECKBOX),

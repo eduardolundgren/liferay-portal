@@ -16,20 +16,19 @@ package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletURL;
@@ -50,16 +49,13 @@ public abstract class HitsOpenSearchImpl extends BaseOpenSearchImpl {
 		return null;
 	}
 
-	public abstract String getPortletId();
-
 	public abstract String getSearchPath();
 
 	public Summary getSummary(
-			Indexer indexer, Document document, Locale locale, String snippet,
-			PortletURL portletURL)
+			Indexer indexer, Document document, Locale locale, String snippet)
 		throws SearchException {
 
-		return indexer.getSummary(document, snippet, portletURL, null, null);
+		return indexer.getSummary(document, snippet, null, null);
 	}
 
 	public abstract String getTitle(String keywords);
@@ -95,7 +91,8 @@ public abstract class HitsOpenSearchImpl extends BaseOpenSearchImpl {
 			Group layoutGroup = layout.getGroup();
 
 			if (!layoutGroup.isStagingGroup() &&
-				!layoutGroup.isControlPanel()) {
+				!layoutGroup.isControlPanel() &&
+				!layoutGroup.isUserPersonalPanel()) {
 
 				searchContext.setIncludeStagingGroups(false);
 			}
@@ -110,15 +107,6 @@ public abstract class HitsOpenSearchImpl extends BaseOpenSearchImpl {
 			searchContext.setUserId(userId);
 
 			Indexer indexer = getIndexer();
-
-			if (indexer == null) {
-				Portlet portlet = PortletLocalServiceUtil.getPortletById(
-					themeDisplay.getCompanyId(), getPortletId());
-
-				List<Indexer> indexers = portlet.getIndexerInstances();
-
-				indexer = indexers.get(0);
-			}
 
 			Hits results = indexer.search(searchContext);
 
@@ -137,13 +125,7 @@ public abstract class HitsOpenSearchImpl extends BaseOpenSearchImpl {
 			for (int i = 0; i < results.getDocs().length; i++) {
 				Document result = results.doc(i);
 
-				String portletId = getPortletId();
-
-				if (Validator.isNull(portletId)) {
-					portletId = result.get(Field.PORTLET_ID);
-				}
-
-				String snippet = results.snippet(i);
+				String snippet = result.get(Field.SNIPPET);
 
 				long resultGroupId = GetterUtil.getLong(
 					result.get(Field.GROUP_ID));
@@ -159,12 +141,20 @@ public abstract class HitsOpenSearchImpl extends BaseOpenSearchImpl {
 					resultScopeGroupId = themeDisplay.getScopeGroupId();
 				}
 
+				String className = indexer.getClassName();
+
+				if (Validator.isNull(className)) {
+					className = result.get(Field.ENTRY_CLASS_NAME);
+				}
+
+				String portletId = PortletProviderUtil.getPortletId(
+					className, PortletProvider.Action.VIEW);
+
 				PortletURL portletURL = getPortletURL(
 					request, portletId, resultScopeGroupId);
 
 				Summary summary = getSummary(
-					indexer, result, themeDisplay.getLocale(), snippet,
-					portletURL);
+					indexer, result, themeDisplay.getLocale(), snippet);
 
 				String title = summary.getTitle();
 				String url = getURL(
@@ -221,6 +211,7 @@ public abstract class HitsOpenSearchImpl extends BaseOpenSearchImpl {
 		return portletURL.toString();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(HitsOpenSearchImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		HitsOpenSearchImpl.class);
 
 }

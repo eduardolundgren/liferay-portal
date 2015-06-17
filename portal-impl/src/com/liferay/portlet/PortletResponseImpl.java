@@ -33,6 +33,7 @@ import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.model.PortletURLListener;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.struts.StrutsActionPortletURL;
@@ -201,7 +202,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 			}
 			else {
 				if (element != null) {
-					values = new ArrayList<Element>();
+					values = new ArrayList<>();
 
 					values.add(element);
 
@@ -236,7 +237,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 		if (_document == null) {
 			try {
 				DocumentBuilderFactory documentBuilderFactory =
-					DocumentBuilderFactory.newInstance();
+					SecureXMLFactoryProviderUtil.newDocumentBuilderFactory();
 
 				DocumentBuilder documentBuilder =
 					documentBuilderFactory.newDocumentBuilder();
@@ -355,6 +356,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 		return _plid;
 	}
 
+	@Override
 	public Portlet getPortlet() {
 		if (_portlet == null) {
 			try {
@@ -379,8 +381,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 
 	@Override
 	public Map<String, String[]> getProperties() {
-		Map<String, String[]> properties =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> properties = new LinkedHashMap<>();
 
 		for (Map.Entry<String, Object> entry : _headers.entrySet()) {
 			String name = entry.getKey();
@@ -536,7 +537,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 			MimeResponse.MARKUP_HEAD_ELEMENT);
 
 		if (markupHeadElements == null) {
-			markupHeadElements = new ArrayList<String>();
+			markupHeadElements = new ArrayList<>();
 
 			request.setAttribute(
 				MimeResponse.MARKUP_HEAD_ELEMENT, markupHeadElements);
@@ -736,15 +737,16 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 		setPlid(plid);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PortletResponseImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletResponseImpl.class);
 
 	private long _companyId;
-	private Map<String, Constructor<? extends PortletURLImpl>> _constructors =
-		new ConcurrentHashMap<String, Constructor<? extends PortletURLImpl>>();
+	private final Map<String, Constructor<? extends PortletURLImpl>>
+		_constructors = new ConcurrentHashMap<>();
 	private Document _document;
-	private Map<String, Object> _headers = new LinkedHashMap<String, Object>();
-	private Map<String, List<Element>> _markupHeadElements =
-		new LinkedHashMap<String, List<Element>>();
+	private final Map<String, Object> _headers = new LinkedHashMap<>();
+	private final Map<String, List<Element>> _markupHeadElements =
+		new LinkedHashMap<>();
 	private String _namespace;
 	private long _plid;
 	private Portlet _portlet;
@@ -774,8 +776,8 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 				_plid, _portletName, _lifecycle, _includeLinkToLayoutUuid);
 		}
 
-		private boolean _includeLinkToLayoutUuid;
-		private String _lifecycle;
+		private final boolean _includeLinkToLayoutUuid;
+		private final String _lifecycle;
 		private long _plid;
 		private String _portletName;
 

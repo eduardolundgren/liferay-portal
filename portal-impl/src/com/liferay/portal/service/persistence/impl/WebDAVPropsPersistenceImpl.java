@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchWebDAVPropsException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,11 +34,14 @@ import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.WebDAVProps;
 import com.liferay.portal.model.impl.WebDAVPropsImpl;
 import com.liferay.portal.model.impl.WebDAVPropsModelImpl;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.WebDAVPropsPersistence;
 
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,7 +58,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see WebDAVPropsPersistence
- * @see WebDAVPropsUtil
+ * @see com.liferay.portal.service.persistence.WebDAVPropsUtil
  * @generated
  */
 @ProviderType
@@ -93,12 +95,12 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 			new String[] { Long.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the web d a v props where classNameId = &#63; and classPK = &#63; or throws a {@link com.liferay.portal.NoSuchWebDAVPropsException} if it could not be found.
+	 * Returns the web d a v props where classNameId = &#63; and classPK = &#63; or throws a {@link NoSuchWebDAVPropsException} if it could not be found.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class p k
 	 * @return the matching web d a v props
-	 * @throws com.liferay.portal.NoSuchWebDAVPropsException if a matching web d a v props could not be found
+	 * @throws NoSuchWebDAVPropsException if a matching web d a v props could not be found
 	 */
 	@Override
 	public WebDAVProps findByC_C(long classNameId, long classPK)
@@ -356,10 +358,6 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(WebDAVPropsImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(WebDAVPropsImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -469,7 +467,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 *
 	 * @param webDavPropsId the primary key of the web d a v props
 	 * @return the web d a v props that was removed
-	 * @throws com.liferay.portal.NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
+	 * @throws NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
 	 */
 	@Override
 	public WebDAVProps remove(long webDavPropsId)
@@ -482,7 +480,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 *
 	 * @param primaryKey the primary key of the web d a v props
 	 * @return the web d a v props that was removed
-	 * @throws com.liferay.portal.NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
+	 * @throws NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
 	 */
 	@Override
 	public WebDAVProps remove(Serializable primaryKey)
@@ -550,11 +548,34 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	}
 
 	@Override
-	public WebDAVProps updateImpl(
-		com.liferay.portal.model.WebDAVProps webDAVProps) {
+	public WebDAVProps updateImpl(WebDAVProps webDAVProps) {
 		webDAVProps = toUnwrappedModel(webDAVProps);
 
 		boolean isNew = webDAVProps.isNew();
+
+		WebDAVPropsModelImpl webDAVPropsModelImpl = (WebDAVPropsModelImpl)webDAVProps;
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (webDAVProps.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				webDAVProps.setCreateDate(now);
+			}
+			else {
+				webDAVProps.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!webDAVPropsModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				webDAVProps.setModifiedDate(now);
+			}
+			else {
+				webDAVProps.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
+		}
 
 		Session session = null;
 
@@ -622,7 +643,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 *
 	 * @param primaryKey the primary key of the web d a v props
 	 * @return the web d a v props
-	 * @throws com.liferay.portal.NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
+	 * @throws NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
 	 */
 	@Override
 	public WebDAVProps findByPrimaryKey(Serializable primaryKey)
@@ -642,11 +663,11 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	}
 
 	/**
-	 * Returns the web d a v props with the primary key or throws a {@link com.liferay.portal.NoSuchWebDAVPropsException} if it could not be found.
+	 * Returns the web d a v props with the primary key or throws a {@link NoSuchWebDAVPropsException} if it could not be found.
 	 *
 	 * @param webDavPropsId the primary key of the web d a v props
 	 * @return the web d a v props
-	 * @throws com.liferay.portal.NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
+	 * @throws NoSuchWebDAVPropsException if a web d a v props with the primary key could not be found
 	 */
 	@Override
 	public WebDAVProps findByPrimaryKey(long webDavPropsId)
@@ -817,7 +838,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 * Returns a range of all the web d a v propses.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebDAVPropsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebDAVPropsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of web d a v propses
@@ -833,7 +854,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 * Returns an ordered range of all the web d a v propses.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebDAVPropsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebDAVPropsModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of web d a v propses
@@ -991,7 +1012,6 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "webDAVProps.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No WebDAVProps exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No WebDAVProps exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(WebDAVPropsPersistenceImpl.class);
 	private static final WebDAVProps _nullWebDAVProps = new WebDAVPropsImpl() {
 			@Override

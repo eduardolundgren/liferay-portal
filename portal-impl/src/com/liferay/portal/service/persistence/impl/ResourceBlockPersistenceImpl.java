@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchResourceBlockException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -57,7 +56,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see ResourceBlockPersistence
- * @see ResourceBlockUtil
+ * @see com.liferay.portal.service.persistence.ResourceBlockUtil
  * @generated
  */
 @ProviderType
@@ -123,7 +122,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * Returns a range of all the resource blocks where companyId = &#63; and name = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -142,7 +141,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * Returns an ordered range of all the resource blocks where companyId = &#63; and name = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -280,7 +279,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a matching resource block could not be found
+	 * @throws NoSuchResourceBlockException if a matching resource block could not be found
 	 */
 	@Override
 	public ResourceBlock findByC_N_First(long companyId, String name,
@@ -336,7 +335,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a matching resource block could not be found
+	 * @throws NoSuchResourceBlockException if a matching resource block could not be found
 	 */
 	@Override
 	public ResourceBlock findByC_N_Last(long companyId, String name,
@@ -399,7 +398,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a resource block with the primary key could not be found
+	 * @throws NoSuchResourceBlockException if a resource block with the primary key could not be found
 	 */
 	@Override
 	public ResourceBlock[] findByC_N_PrevAndNext(long resourceBlockId,
@@ -694,7 +693,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * Returns a range of all the resource blocks where companyId = &#63; and groupId = &#63; and name = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -714,7 +713,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * Returns an ordered range of all the resource blocks where companyId = &#63; and groupId = &#63; and name = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -860,7 +859,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a matching resource block could not be found
+	 * @throws NoSuchResourceBlockException if a matching resource block could not be found
 	 */
 	@Override
 	public ResourceBlock findByC_G_N_First(long companyId, long groupId,
@@ -921,7 +920,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a matching resource block could not be found
+	 * @throws NoSuchResourceBlockException if a matching resource block could not be found
 	 */
 	@Override
 	public ResourceBlock findByC_G_N_Last(long companyId, long groupId,
@@ -989,7 +988,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a resource block with the primary key could not be found
+	 * @throws NoSuchResourceBlockException if a resource block with the primary key could not be found
 	 */
 	@Override
 	public ResourceBlock[] findByC_G_N_PrevAndNext(long resourceBlockId,
@@ -1267,14 +1266,14 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 			});
 
 	/**
-	 * Returns the resource block where companyId = &#63; and groupId = &#63; and name = &#63; and permissionsHash = &#63; or throws a {@link com.liferay.portal.NoSuchResourceBlockException} if it could not be found.
+	 * Returns the resource block where companyId = &#63; and groupId = &#63; and name = &#63; and permissionsHash = &#63; or throws a {@link NoSuchResourceBlockException} if it could not be found.
 	 *
 	 * @param companyId the company ID
 	 * @param groupId the group ID
 	 * @param name the name
 	 * @param permissionsHash the permissions hash
 	 * @return the matching resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a matching resource block could not be found
+	 * @throws NoSuchResourceBlockException if a matching resource block could not be found
 	 */
 	@Override
 	public ResourceBlock findByC_G_N_P(long companyId, long groupId,
@@ -1645,10 +1644,6 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(ResourceBlockImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(ResourceBlockImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -1764,7 +1759,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 *
 	 * @param resourceBlockId the primary key of the resource block
 	 * @return the resource block that was removed
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a resource block with the primary key could not be found
+	 * @throws NoSuchResourceBlockException if a resource block with the primary key could not be found
 	 */
 	@Override
 	public ResourceBlock remove(long resourceBlockId)
@@ -1777,7 +1772,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 *
 	 * @param primaryKey the primary key of the resource block
 	 * @return the resource block that was removed
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a resource block with the primary key could not be found
+	 * @throws NoSuchResourceBlockException if a resource block with the primary key could not be found
 	 */
 	@Override
 	public ResourceBlock remove(Serializable primaryKey)
@@ -1845,8 +1840,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	}
 
 	@Override
-	public ResourceBlock updateImpl(
-		com.liferay.portal.model.ResourceBlock resourceBlock) {
+	public ResourceBlock updateImpl(ResourceBlock resourceBlock) {
 		resourceBlock = toUnwrappedModel(resourceBlock);
 
 		boolean isNew = resourceBlock.isNew();
@@ -1964,7 +1958,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 *
 	 * @param primaryKey the primary key of the resource block
 	 * @return the resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a resource block with the primary key could not be found
+	 * @throws NoSuchResourceBlockException if a resource block with the primary key could not be found
 	 */
 	@Override
 	public ResourceBlock findByPrimaryKey(Serializable primaryKey)
@@ -1984,11 +1978,11 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	}
 
 	/**
-	 * Returns the resource block with the primary key or throws a {@link com.liferay.portal.NoSuchResourceBlockException} if it could not be found.
+	 * Returns the resource block with the primary key or throws a {@link NoSuchResourceBlockException} if it could not be found.
 	 *
 	 * @param resourceBlockId the primary key of the resource block
 	 * @return the resource block
-	 * @throws com.liferay.portal.NoSuchResourceBlockException if a resource block with the primary key could not be found
+	 * @throws NoSuchResourceBlockException if a resource block with the primary key could not be found
 	 */
 	@Override
 	public ResourceBlock findByPrimaryKey(long resourceBlockId)
@@ -2159,7 +2153,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * Returns a range of all the resource blocks.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource blocks
@@ -2175,7 +2169,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	 * Returns an ordered range of all the resource blocks.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link ResourceBlockModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource blocks
@@ -2333,7 +2327,6 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 	private static final String _ORDER_BY_ENTITY_ALIAS = "resourceBlock.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No ResourceBlock exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ResourceBlock exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(ResourceBlockPersistenceImpl.class);
 	private static final ResourceBlock _nullResourceBlock = new ResourceBlockImpl() {
 			@Override

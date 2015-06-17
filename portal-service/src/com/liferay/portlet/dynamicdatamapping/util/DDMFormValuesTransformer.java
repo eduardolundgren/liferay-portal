@@ -55,8 +55,7 @@ public class DDMFormValuesTransformer {
 		throws PortalException {
 
 		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			ddmFormFieldValueTransformer.transform(
-				ddmFormFieldValue.getValue());
+			ddmFormFieldValueTransformer.transform(ddmFormFieldValue);
 		}
 	}
 
@@ -90,8 +89,7 @@ public class DDMFormValuesTransformer {
 	}
 
 	private final Map<String, DDMFormFieldValueTransformer>
-		_ddmFormFieldValueTransformersMap =
-			new HashMap<String, DDMFormFieldValueTransformer>();
+		_ddmFormFieldValueTransformersMap = new HashMap<>();
 	private final DDMFormValues _ddmFormValues;
 
 }

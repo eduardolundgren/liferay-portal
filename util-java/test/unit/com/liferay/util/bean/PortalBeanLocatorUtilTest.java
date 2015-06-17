@@ -40,18 +40,9 @@ public class PortalBeanLocatorUtilTest extends PowerMockito {
 		PortalBeanLocatorUtil.setBeanLocator(null);
 	}
 
-	@Test
+	@Test(expected = BeanLocatorException.class)
 	public void testBeanLocatorHasNotBeenSet() {
-		try {
-			PortalBeanLocatorUtil.locate("beanName");
-		}
-		catch (BeanLocatorException ble) {
-			Assert.assertTrue(true);
-
-			return;
-		}
-
-		Assert.fail("No bean locator should be inyected");
+		PortalBeanLocatorUtil.locate("beanName");
 	}
 
 	@Test
@@ -64,7 +55,7 @@ public class PortalBeanLocatorUtilTest extends PowerMockito {
 
 		PortalBeanLocatorUtil.setBeanLocator(_beanLocator);
 
-		String bean = (String) PortalBeanLocatorUtil.locate("existingBean");
+		String bean = (String)PortalBeanLocatorUtil.locate("existingBean");
 
 		Assert.assertNotNull(bean);
 		Assert.assertEquals("existingBean", bean);
@@ -82,7 +73,7 @@ public class PortalBeanLocatorUtilTest extends PowerMockito {
 
 		PortalBeanLocatorUtil.setBeanLocator(_beanLocator);
 
-		String bean = (String) PortalBeanLocatorUtil.locate("nonExistingBean");
+		String bean = (String)PortalBeanLocatorUtil.locate("nonExistingBean");
 
 		Assert.assertNull(bean);
 

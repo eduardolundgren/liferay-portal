@@ -122,7 +122,7 @@
 											assetCategoryClassPK="<%= childGroup.getGroupId() %>"
 											assetTagClassName="<%= Group.class.getName() %>"
 											assetTagClassPK="<%= childGroup.getGroupId() %>"
-											description="<%= HtmlUtil.escape(childGroup.getDescription()) %>"
+											description="<%= HtmlUtil.escape(childGroup.getDescription(locale)) %>"
 											displayStyle="<%= displayStyle %>"
 											showCheckbox="<%= false %>"
 											thumbnailSrc='<%= themeDisplay.getPathImage() + "/layout_set_logo?img_id=" + layoutSet.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(layoutSet.getLogoId()) %>'
@@ -228,7 +228,7 @@ private void _buildSitesList(Group rootGroup, Group curGroup, List<Group> branch
 
 		if (childGroup.getGroupId() != themeDisplay.getScopeGroupId()) {
 			sb.append("href=\"");
-			sb.append(HtmlUtil.escapeHREF(childGroup.getDisplayURL(themeDisplay, childGroup.hasPublicLayouts())));
+			sb.append(HtmlUtil.escapeHREF(childGroup.getDisplayURL(themeDisplay, !childGroup.hasPublicLayouts())));
 			sb.append("\"");
 		}
 

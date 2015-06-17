@@ -17,7 +17,6 @@ package com.liferay.portlet.blogs.asset;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.trash.TrashRenderer;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -37,8 +36,6 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -103,8 +100,7 @@ public class BlogsEntryAssetRenderer
 		String summary = _entry.getDescription();
 
 		if (Validator.isNull(summary)) {
-			summary = StringUtil.shorten(
-				HtmlUtil.stripHtml(_entry.getContent()), 200);
+			summary = StringUtil.shorten(_entry.getContent(), 200);
 		}
 
 		return summary;
@@ -220,14 +216,14 @@ public class BlogsEntryAssetRenderer
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_ABSTRACT) ||
 			template.equals(TEMPLATE_FULL_CONTENT)) {
 
-			renderRequest.setAttribute(WebKeys.BLOGS_ENTRY, _entry);
+			portletRequest.setAttribute(WebKeys.BLOGS_ENTRY, _entry);
 
 			return "/html/portlet/blogs/asset/" + template + ".jsp";
 		}

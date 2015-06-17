@@ -113,7 +113,7 @@ public class Log4JUtil {
 		domConfigurator.doConfigure(
 			urlReader, LogManager.getLoggerRepository());
 
-		Set<String> currentLoggerNames = new HashSet<String>();
+		Set<String> currentLoggerNames = new HashSet<>();
 
 		Enumeration<Logger> enu = LogManager.getCurrentLoggers();
 
@@ -145,12 +145,12 @@ public class Log4JUtil {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_logger.error(e, e);
 		}
 	}
 
 	public static Map<String, String> getCustomLogSettings() {
-		return new HashMap<String, String>(_customLogSettings);
+		return new HashMap<>(_customLogSettings);
 	}
 
 	public static String getOriginalLevel(String className) {
@@ -185,7 +185,7 @@ public class Log4JUtil {
 			LogFactoryUtil.setLogFactory(logFactory);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_logger.error(e, e);
 		}
 
 		for (String name : customLogSettings.keySet()) {
@@ -250,7 +250,7 @@ public class Log4JUtil {
 	}
 
 	private static String _getURLContent(URL url) {
-		Map<String, String> variables = new HashMap<String, String>();
+		Map<String, String> variables = new HashMap<>();
 
 		variables.put("@liferay.home@", _getLiferayHome());
 
@@ -274,7 +274,7 @@ public class Log4JUtil {
 			urlContent = new String(bytes, StringPool.UTF8);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_logger.error(e, e);
 
 			return null;
 		}
@@ -314,8 +314,10 @@ public class Log4JUtil {
 			StringPool.BLANK);
 	}
 
+	private static final Logger _logger = Logger.getRootLogger();
+
 	private static final Map<String, String> _customLogSettings =
-		new ConcurrentHashMap<String, String>();
+		new ConcurrentHashMap<>();
 	private static String _liferayHome;
 
 }

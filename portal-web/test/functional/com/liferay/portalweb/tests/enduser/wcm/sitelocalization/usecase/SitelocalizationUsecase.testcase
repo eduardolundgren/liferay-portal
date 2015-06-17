@@ -1,0 +1,707 @@
+<definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="Site Localization" />
+
+	<set-up>
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<execute macro="Page#tearDownPG" />
+
+		<execute macro="Site#tearDownCP" />
+	</tear-down>
+
+	<command name="AvailableSiteLocalesSubsetOfAvailablePortalLocales" priority="5">
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Language Test Page" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Portal Settings" />
+		</execute>
+
+		<execute macro="PortalSettings#configureCurrentLanguagesCP">
+			<var name="currentPortalLanguages" value="English (United States),German (Germany),Spanish (Spain)" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="English (United States),German (Germany),Spanish (Spain)" />
+			<var name="defaultSiteLanguage" value="Spanish (Spain)" />
+			<var name="displaySettings" value="Display Settings" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Portal Settings" />
+		</execute>
+
+		<execute macro="PortalSettings#configureCurrentLanguagesCP">
+			<var name="currentPortalLanguages" value="Arabic (Saudi Arabia),Czech (Czech Republic),French (France)" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Language Test Page" />
+		</execute>
+
+		<execute macro="Page#viewPageLocalization">
+			<var name="defaultSiteLanguageKey" value="es_ES" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+		</execute>
+
+		<execute macro="Site#viewCurrentLanguagesCP">
+			<var name="availableSiteLanguages" value="Arabic (Saudi Arabia),Czech (Czech Republic),French (France)" />
+			<var name="currentSiteLanguages" value="English (United States),German (Germany),Spanish (Spain)" />
+			<var name="defaultSiteLanguage" value="English (United States)" />
+			<var name="displaySettings" value="Display Settings" />
+		</execute>
+	</command>
+
+	<command name="LocalizationStyle0" priority="3">
+		<property name="custom.properties" value="locale.prepend.friendly.url.style=0" />
+
+		<var name="pageName" value="Language Test Page" />
+		<var name="portletName" value="Language" />
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="${portletName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="Spanish (Spain)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="Japanese (Japan)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+	</command>
+
+	<command name="LocalizationStyle1" priority="3">
+		<property name="custom.properties" value="locale.prepend.friendly.url.style=1" />
+
+		<var name="pageName" value="Language Test Page" />
+		<var name="portletName" value="Language" />
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="${portletName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="Spanish (Spain)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/es/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="Japanese (Japan)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/ja/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+	</command>
+
+	<command name="LocalizationStyle2" priority="3">
+		<property name="custom.properties" value="locale.prepend.friendly.url.style=2" />
+
+		<var name="pageName" value="Language Test Page" />
+		<var name="portletName" value="Language" />
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="${portletName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/en/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="Spanish (Spain)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/es/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="Japanese (Japan)" />
+		</execute>
+
+		<execute function="AssertLocation" value1="http://localhost:8080/ja/web/guest/language-test-page" />
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+	</command>
+
+	<command name="NoLocalePrependedWhenLocaleMatchMyPreferredLocalization" priority="3">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site1 Name" />
+		</execute>
+
+		<execute macro="Page#gotoPagesCP">
+			<var name="portletName" value="Site Pages" />
+			<var name="siteScopeName" value="Site1 Name" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="siteName" value="Site Name" />
+			<var name="sitePageName" value="Site Page Name" />
+			<var name="sitePagePrivacy" value="Public" />
+			<var name="siteScopeSelected" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site2 Name" />
+		</execute>
+
+		<execute macro="Page#gotoPagesCP">
+			<var name="portletName" value="Site Pages" />
+			<var name="siteScopeName" value="Site2 Name" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="siteName" value="Site Name" />
+			<var name="sitePageName" value="Site Page Name" />
+			<var name="sitePagePrivacy" value="Public" />
+			<var name="siteScopeSelected" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site1 Name" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="defaultSiteLanguage" value="English (United States)" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site2 Name" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="defaultSiteLanguage" value="Spanish (Spain)" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editUserSiteCP">
+			<var name="siteName" value="Site1 Name" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editUserSiteCP">
+			<var name="siteName" value="Site2 Name" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editDisplaySettingsCP">
+			<var name="languageName" value="español (España)" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#openURLLocale">
+			<var name="localizationPageURL" value="http://localhost:8080/web/site2-name" />
+		</execute>
+
+		<execute macro="Page#viewURLLocale">
+			<var name="localePageURL" value="http://localhost:8080/es/web/site2-name" />
+			<var name="localizationPageURL" value="http://localhost:8080/web/site2-name" />
+		</execute>
+
+		<execute macro="Page#openURLLocale">
+			<var name="localizationPageURL" value="http://localhost:8080/web/site1-name" />
+		</execute>
+
+		<execute macro="Page#viewURLLocale">
+			<var name="localePageURL" value="http://localhost:8080/en/web/site1-name" />
+			<var name="localizationPageURL" value="http://localhost:8080/web/site1-name" />
+		</execute>
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
+		<execute macro="Page#openURLLocale">
+			<var name="localizationPageURL" value="http://localhost:8080/es/web/site2-name" />
+		</execute>
+
+		<execute macro="Page#viewURLLocale">
+			<var name="localePageURL" value="http://localhost:8080/es/web/site2-name" />
+			<var name="localizationOption" value="Display the page in English (United States)." />
+			<var name="localizationPageURL" value="http://localhost:8080/web/site2-name" />
+		</execute>
+	</command>
+
+	<command name="PortletInteractionLocalization" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="sitePageName" value="Site Page 1" />
+			<var name="sitePagePrivacy" value="Public" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="pageName" value="Site Page 2" />
+			<var name="siteName" value="Site Name" />
+			<var name="sitePageName" value="Site Page 2" />
+			<var name="sitePagePrivacy" value="Public" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Language" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Web Content Display" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="Spanish (Spain),German (Germany)" />
+			<var name="defaultSiteLanguage" value="Spanish (Spain)" />
+			<var name="displaySettings" value="Display Settings" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#viewPageLocalization">
+			<var name="defaultSiteLanguageKey" value="es_ES" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 2" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#viewPageLocalization">
+			<var name="defaultSiteLanguageKey" value="es_ES" />
+		</execute>
+
+		<execute macro="Page#gotoCPLocalized">
+			<var name="localizedControlPanel" value="Panel de control" />
+			<var name="localizedPortletName" value="Configuración del Portal" />
+		</execute>
+
+		<execute macro="PortalSettings#viewCurrentDefaultPortalLanguageCP">
+			<var name="defaultPortalLanguage" value="inglés (Estados Unidos)" />
+			<var name="displaySettings" value="Preferencias de presentación" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationLocalizedCP">
+			<var name="localizedAdmin" value="Administración" />
+			<var name="localizedPortletCategoryName" value="Configuración" />
+			<var name="localizedPortletName" value="Ajustes del sitio" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="español (España),alemán (Alemania)" />
+			<var name="displaySettings" value="Preferencias de presentación" />
+			<var name="localizedSuccessMessage" value="Su petición ha terminado con éxito." />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaWCD">
+			<var name="localizedBasicWebContent" value="Contenido web básico" />
+			<var name="localizedTitle" value="true" />
+			<var name="lowercaseLanguageCode" value="es" />
+			<var name="webContentContent" value="Web Content1 Content" />
+			<var name="webContentTitle" value="Web Content1 Title" />
+		</execute>
+
+		<execute macro="WebContent#viewPGViaWCD">
+			<var name="webContentContent" value="Web Content1 Content" />
+		</execute>
+
+		<execute macro="WebContentNavigator#gotoEditPGViaWCD" />
+
+		<execute macro="WebContent#viewAvailableLanguagesPGViaWCD">
+			<var name="webContentTranslationLanguage1" value="alemán (Alemania)" />
+			<var name="webContentTranslationLanguage2" value="inglés (Estados Unidos)" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationLocalizedCP">
+			<var name="localizedAdmin" value="Administración" />
+			<var name="localizedPortletCategoryName" value="Configuración" />
+			<var name="localizedPortletName" value="Ajustes del sitio" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="español (España),alemán (Alemania),inglés (Estados Unidos)" />
+			<var name="displaySettings" value="Preferencias de presentación" />
+			<var name="localizedSuccessMessage" value="Su petición ha terminado con éxito." />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page 1" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="LanguagePortlet#selectLanguagePG">
+			<var name="language" value="English (United States)" />
+		</execute>
+	</command>
+
+	<command name="SiteTemplateLocalization" priority="5">
+		<property name="web.plugins.includes" value="kaleo-web" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#addCP">
+			<var name="siteTemplateActive" value="Yes" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewNoSiteOrWorkflowLinksCP">
+			<var name="currentPortalLanguages" value="English (United States),German (Germany),Spanish (Spain)" />
+			<var name="portletCategoryName" value="Configuration" />
+			<var name="portletCategoryName2" value="Users" />
+			<var name="portletNames" value="Site Settings,Social Activities,Workflow Configuration" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addCP">
+			<var name="portletNames" value="Site Settings,Social Activities,Workflow Configuration" />
+			<var name="siteName" value="Site Name from Template" />
+			<var name="siteTemplateActive" value="Yes" />
+			<var name="siteTemplateName" value="Site Template Name" />
+			<var name="siteType" value="Site Template" />
+			<var name="uncheckPropagation" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site Name from Template" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="English (United States),German (Germany),Spanish (Spain)" />
+			<var name="defaultSiteLanguage" value="Spanish (Spain)" />
+			<var name="displaySettings" value="Display Settings" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site Name from Template" />
+		</execute>
+
+		<execute macro="Site#viewSiteClonedFromSiteTemplateCP">
+			<var name="clonedFromTemplate" value="true" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name not from Template" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site Name not from Template" />
+		</execute>
+
+		<execute macro="Site#viewSiteClonedFromSiteTemplateCP">
+			<var name="clonedFromTemplate" value="false" />
+		</execute>
+	</command>
+
+	<command name="ViewAvailableSiteLocaleAlternatives" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editDisplaySettingsCP">
+			<var name="languageName" value="español (España)" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteTemplateActive" value="${siteTemplateActive}" />
+			<var name="siteTemplateName" value="${siteTemplateName}" />
+			<var name="siteType" value="Blank" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="English (United States)" />
+			<var name="defaultSiteLanguage" value="English (United States)" />
+			<var name="displaySettings" value="Display Settings" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="siteName" value="Site Name" />
+			<var name="sitePageName" value="Site Page Name" />
+			<var name="sitePagePrivacy" value="Public" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginPG">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page Name" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute function="AssertTextEquals" locator1="Home#PORTAL_LOCALIZATION_INFO_MESSAGE" value1="× Esta página se muestra en inglés (Estados Unidos). Mostrar la página en español (España). Establecer inglés (Estados Unidos) como su idioma preferido." />
+
+		<execute function="AssertTextEquals" locator1="Home#PORTAL_LOCALIZATION_CONFIRMATION_MESSAGE" value1="Mostrar la página en español (España)." />
+
+		<execute function="AssertTextEquals" locator1="Home#PORTAL_LOCALIZATION_PREFERRED_MESSAGE" value1="Establecer inglés (Estados Unidos) como su idioma preferido." />
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginPG" />
+	</command>
+
+	<command name="ViewSiteLocalizationAfterDeletingOriginalLocale" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Portal Settings" />
+		</execute>
+
+		<execute macro="PortalSettings#viewDefaultLanguageCP">
+			<var name="defaultPortalLanguage" value="English (United States)" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteType" value="Blank" />
+		</execute>
+
+		<execute macro="Site#configureCurrentLanguagesCP">
+			<var name="currentSiteLanguages" value="Portuguese (Brazil),Spanish (Spain)" />
+			<var name="defaultSiteLanguage" value="Spanish (Spain)" />
+			<var name="displaySettings" value="Display Settings" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="siteName" value="Site Name" />
+			<var name="sitePageName" value="Site Page Name" />
+			<var name="sitePagePrivacy" value="Public" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page Name" />
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#viewFriendlyURLLanguageOptionsPG">
+			<var name="assertUnavailableLanguages" value="true" />
+			<var name="currentLanguageList" value="DETAILS_FRIENDLY_URL_PORTUGUESE_BRAZIL,DETAILS_FRIENDLY_URL_SPANISH_SPAIN" />
+			<var name="unavailableLanguageList" value="DETAILS_FRIENDLY_URL_ENGLISH_UNITED_STATES" />
+		</execute>
+	</command>
+</definition>

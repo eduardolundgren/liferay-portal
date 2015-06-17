@@ -15,6 +15,10 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.search.facet.Facet;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.MatchAllQuery;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -22,7 +26,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
-import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
 
 import java.util.Map;
 import java.util.Set;
@@ -34,11 +37,6 @@ public class FacetedSearcher extends BaseSearcher {
 
 	public static Indexer getInstance() {
 		return new FacetedSearcher();
-	}
-
-	@Override
-	public String[] getClassNames() {
-		return null;
 	}
 
 	protected void addSearchExpandoKeywords(
@@ -60,8 +58,8 @@ public class FacetedSearcher extends BaseSearcher {
 				properties.getProperty(ExpandoColumnConstants.INDEX_TYPE));
 
 			if (indexType != ExpandoColumnConstants.INDEX_TYPE_NONE) {
-				String fieldName = ExpandoBridgeIndexerUtil.encodeFieldName(
-					attributeName);
+				String fieldName = getExpandoFieldName(
+					searchContext, expandoBridge, attributeName);
 
 				if (searchContext.isAndSearch()) {
 					searchQuery.addRequiredTerm(fieldName, keywords);
@@ -75,11 +73,10 @@ public class FacetedSearcher extends BaseSearcher {
 
 	@Override
 	protected BooleanQuery createFullQuery(
-			BooleanQuery contextQuery, SearchContext searchContext)
+			BooleanFilter fullQueryBooleanFilter, SearchContext searchContext)
 		throws Exception {
 
-		BooleanQuery searchQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
+		BooleanQuery searchQuery = new BooleanQueryImpl();
 
 		String keywords = searchContext.getKeywords();
 
@@ -93,9 +90,8 @@ public class FacetedSearcher extends BaseSearcher {
 				searchContext.getAttribute(Field.GROUP_ID));
 
 			if (groupId == 0) {
-				searchQuery.addTerm(
-					Field.STAGING_GROUP, "true", false,
-					BooleanClauseOccur.MUST_NOT);
+				fullQueryBooleanFilter.addTerm(
+					Field.STAGING_GROUP, "true", BooleanClauseOccur.MUST_NOT);
 			}
 
 			searchQuery.addTerms(Field.KEYWORDS, keywords);
@@ -119,42 +115,58 @@ public class FacetedSearcher extends BaseSearcher {
 					searchQuery, searchContext, keywords, entryClassName);
 			}
 
-			indexer.postProcessSearchQuery(searchQuery, searchContext);
+			indexer.postProcessSearchQuery(
+				searchQuery, fullQueryBooleanFilter, searchContext);
 
 			for (IndexerPostProcessor indexerPostProcessor :
 					indexer.getIndexerPostProcessors()) {
 
 				indexerPostProcessor.postProcessSearchQuery(
-					searchQuery, searchContext);
+					searchQuery, fullQueryBooleanFilter, searchContext);
 			}
+
+			doPostProcessSearchQuery(indexer, searchQuery, searchContext);
 		}
 
 		Map<String, Facet> facets = searchContext.getFacets();
 
+		BooleanFilter facetBooleanFilter = new BooleanFilter();
+
 		for (Facet facet : facets.values()) {
-			BooleanClause facetClause = facet.getFacetClause();
+			BooleanClause<Filter> facetClause =
+				facet.getFacetFilterBooleanClause();
 
 			if (facetClause != null) {
-				contextQuery.add(
-					facetClause.getQuery(),
+				facetBooleanFilter.add(
+					facetClause.getClause(),
 					facetClause.getBooleanClauseOccur());
 			}
 		}
 
-		BooleanQuery fullQuery = BooleanQueryFactoryUtil.create(searchContext);
+		addFacetClause(searchContext, facetBooleanFilter, facets.values());
 
-		fullQuery.add(contextQuery, BooleanClauseOccur.MUST);
+		if (facetBooleanFilter.hasClauses()) {
+			fullQueryBooleanFilter.add(
+				facetBooleanFilter, BooleanClauseOccur.MUST);
+		}
+
+		BooleanQuery fullQuery = new BooleanQueryImpl();
+
+		if (fullQueryBooleanFilter.hasClauses()) {
+			fullQuery.setPreBooleanFilter(fullQueryBooleanFilter);
+		}
 
 		if (searchQuery.hasClauses()) {
 			fullQuery.add(searchQuery, BooleanClauseOccur.MUST);
 		}
 
-		BooleanClause[] booleanClauses = searchContext.getBooleanClauses();
+		BooleanClause<Query>[] booleanClauses =
+			searchContext.getBooleanClauses();
 
 		if (booleanClauses != null) {
-			for (BooleanClause booleanClause : booleanClauses) {
+			for (BooleanClause<Query> booleanClause : booleanClauses) {
 				fullQuery.add(
-					booleanClause.getQuery(),
+					booleanClause.getClause(),
 					booleanClause.getBooleanClauseOccur());
 			}
 		}
@@ -190,14 +202,21 @@ public class FacetedSearcher extends BaseSearcher {
 		try {
 			searchContext.setSearchEngineId(getSearchEngineId());
 
-			BooleanQuery contextQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			BooleanFilter queryBooleanFilter = new BooleanFilter();
 
-			contextQuery.addRequiredTerm(
+			queryBooleanFilter.addRequiredTerm(
 				Field.COMPANY_ID, searchContext.getCompanyId());
 
-			BooleanQuery fullQuery = createFullQuery(
-				contextQuery, searchContext);
+			Query fullQuery = getFullQuery(searchContext);
+
+			if (!fullQuery.hasChildren()) {
+				BooleanFilter preBooleanFilter =
+					fullQuery.getPreBooleanFilter();
+
+				fullQuery = new MatchAllQuery();
+
+				fullQuery.setPreBooleanFilter(preBooleanFilter);
+			}
 
 			QueryConfig queryConfig = searchContext.getQueryConfig();
 

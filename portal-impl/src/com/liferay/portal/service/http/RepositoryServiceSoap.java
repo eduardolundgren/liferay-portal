@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.RepositoryServiceUtil} service utility. The
+ * {@link RepositoryServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -59,7 +59,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see RepositoryServiceHttp
  * @see com.liferay.portal.model.RepositorySoap
- * @see com.liferay.portal.service.RepositoryServiceUtil
+ * @see RepositoryServiceUtil
  * @generated
  */
 @ProviderType
@@ -116,10 +116,31 @@ public class RepositoryServiceSoap {
 		}
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link
+	#getSupportedParameters(String, String)}
+	*/
+	@Deprecated
 	public static java.lang.String[] getSupportedParameters(long classNameId,
 		java.lang.String configuration) throws RemoteException {
 		try {
 			java.lang.String[] returnValue = RepositoryServiceUtil.getSupportedParameters(classNameId,
+					configuration);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static java.lang.String[] getSupportedParameters(
+		java.lang.String className, java.lang.String configuration)
+		throws RemoteException {
+		try {
+			java.lang.String[] returnValue = RepositoryServiceUtil.getSupportedParameters(className,
 					configuration);
 
 			return returnValue;

@@ -68,12 +68,12 @@ for (FileEntry curFileEntry : fileEntries) {
 	}
 }
 
-List<DLFileShortcut> fileShortcuts = (List<DLFileShortcut>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUTS);
+List<FileShortcut> fileShortcuts = (List<FileShortcut>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUTS);
 
-List<DLFileShortcut> invalidShortcutEntries = new ArrayList<DLFileShortcut>();
-List<DLFileShortcut> validShortcutEntries = new ArrayList<DLFileShortcut>();
+List<FileShortcut> invalidShortcutEntries = new ArrayList<FileShortcut>();
+List<FileShortcut> validShortcutEntries = new ArrayList<FileShortcut>();
 
-for (DLFileShortcut curFileShortcut : fileShortcuts) {
+for (FileShortcut curFileShortcut : fileShortcuts) {
 	boolean movePermission = DLFileShortcutPermission.contains(permissionChecker, curFileShortcut, ActionKeys.UPDATE);
 
 	if (movePermission) {
@@ -105,6 +105,16 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 
 	<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />
 	<liferay-ui:error exception="<%= DuplicateFolderNameException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />
+
+	<liferay-ui:error exception="<%= InvalidFolderException.class %>">
+
+		<%
+		InvalidFolderException ife = (InvalidFolderException)errorException;
+		%>
+
+		<liferay-ui:message arguments="<%= ife.getMessageArgument(locale) %>" key="<%= ife.getMessageKey() %>" translateArguments="<%= false %>" />
+	</liferay-ui:error>
+
 	<liferay-ui:error exception="<%= NoSuchFolderException.class %>" message="please-enter-a-valid-folder" />
 
 	<c:if test="<%= !validMoveFolders.isEmpty() %>">
@@ -227,7 +237,7 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 
 					AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(invalidMoveFileEntry.getFileEntryId());
 
-					Lock lock = invalidMoveFileEntry.getLock();
+					com.liferay.portal.kernel.lock.Lock lock = invalidMoveFileEntry.getLock();
 				%>
 
 					<li class="icon-warning-sign move-error move-file">
@@ -268,7 +278,7 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 			<ul class="list-unstyled">
 
 				<%
-				for (DLFileShortcut fileShortcut : validShortcutEntries) {
+				for (FileShortcut fileShortcut : validShortcutEntries) {
 				%>
 
 					<li class="move-file">
@@ -294,7 +304,7 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 			<ul class="list-unstyled">
 
 				<%
-				for (DLFileShortcut fileShortcut : invalidShortcutEntries) {
+				for (FileShortcut fileShortcut : invalidShortcutEntries) {
 				%>
 
 					<li class="move-error move-file">

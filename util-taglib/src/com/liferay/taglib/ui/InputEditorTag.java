@@ -14,14 +14,35 @@
 
 package com.liferay.taglib.ui;
 
-import com.liferay.portal.kernel.editor.EditorUtil;
+import com.liferay.portal.kernel.editor.Editor;
+import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
+import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
+import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
+import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
+import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.collections.ServiceReferenceMapper;
+import com.liferay.registry.collections.ServiceTrackerCollections;
+import com.liferay.registry.collections.ServiceTrackerMap;
 import com.liferay.taglib.util.IncludeTag;
 
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -31,6 +52,14 @@ public class InputEditorTag extends IncludeTag {
 
 	public void setAllowBrowseDocuments(boolean allowBrowseDocuments) {
 		_allowBrowseDocuments = allowBrowseDocuments;
+	}
+
+	public void setAutoCreate(boolean autoCreate) {
+		_autoCreate = autoCreate;
+	}
+
+	public void setConfigKey(String configKey) {
+		_configKey = configKey;
 	}
 
 	public void setConfigParams(Map<String, String> configParams) {
@@ -53,8 +82,16 @@ public class InputEditorTag extends IncludeTag {
 		_data = data;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #setEditorName(String)}
+	 */
+	@Deprecated
 	public void setEditorImpl(String editorImpl) {
-		_editorImpl = editorImpl;
+		_editorName = PropsUtil.get(editorImpl);
+	}
+
+	public void setEditorName(String editorName) {
+		_editorName = editorName;
 	}
 
 	public void setFileBrowserParams(Map<String, String> fileBrowserParams) {
@@ -109,6 +146,10 @@ public class InputEditorTag extends IncludeTag {
 		_resizable = resizable;
 	}
 
+	public void setShowSource(boolean showSource) {
+		_showSource = showSource;
+	}
+
 	public void setSkipEditorLoading(boolean skipEditorLoading) {
 		_skipEditorLoading = skipEditorLoading;
 	}
@@ -124,12 +165,14 @@ public class InputEditorTag extends IncludeTag {
 	@Override
 	protected void cleanUp() {
 		_allowBrowseDocuments = true;
+		_autoCreate = true;
+		_configKey = null;
 		_configParams = null;
 		_contents = null;
 		_contentsLanguageId = null;
 		_cssClass = null;
 		_data = null;
-		_editorImpl = null;
+		_editorName = null;
 		_fileBrowserParams = null;
 		_height = null;
 		_initMethod = "initEditor";
@@ -140,21 +183,25 @@ public class InputEditorTag extends IncludeTag {
 		_onBlurMethod = null;
 		_onFocusMethod = null;
 		_onInitMethod = null;
-		_page = null;
 		_placeholder = null;
 		_resizable = true;
+		_showSource = true;
 		_skipEditorLoading = false;
 		_toolbarSet = "liferay";
 		_width = null;
 	}
 
-	@Override
-	protected String getPage() {
-		return _page;
+	protected String getConfigKey() {
+		String configKey = _configKey;
+
+		if (Validator.isNull(configKey)) {
+			configKey = _name;
+		}
+
+		return configKey;
 	}
 
-	@Override
-	protected void setAttributes(HttpServletRequest request) {
+	protected String getContentsLanguageId() {
 		if (_contentsLanguageId == null) {
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -162,30 +209,119 @@ public class InputEditorTag extends IncludeTag {
 			_contentsLanguageId = themeDisplay.getLanguageId();
 		}
 
-		String cssClasses = "portlet ";
+		return _contentsLanguageId;
+	}
 
+	protected String getCssClasses() {
 		Portlet portlet = (Portlet)request.getAttribute(WebKeys.RENDER_PORTLET);
+
+		String cssClasses = "portlet ";
 
 		if (portlet != null) {
 			cssClasses += portlet.getCssClassWrapper();
 		}
 
-		String editorImpl = EditorUtil.getEditorValue(request, _editorImpl);
+		return cssClasses;
+	}
 
-		_page = "/html/js/editor/" + editorImpl + ".jsp";
+	protected Map<String, Object> getData() {
+		Portlet portlet = (Portlet)request.getAttribute(WebKeys.RENDER_PORTLET);
 
+		if (portlet == null) {
+			return _data;
+		}
+
+		Map<String, Object> attributes = new HashMap<>();
+
+		Enumeration<String> enumeration = request.getAttributeNames();
+
+		while (enumeration.hasMoreElements()) {
+			String attributeName = enumeration.nextElement();
+
+			if (attributeName.startsWith("liferay-ui:input-editor")) {
+				attributes.put(
+					attributeName, request.getAttribute(attributeName));
+			}
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		LiferayPortletResponse portletResponse =
+			(LiferayPortletResponse)request.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+		EditorConfiguration editorConfiguration =
+			EditorConfigurationFactoryUtil.getEditorConfiguration(
+				portlet.getPortletId(), getConfigKey(), getEditorName(request),
+				attributes, themeDisplay, portletResponse);
+
+		Map<String, Object> data = editorConfiguration.getData();
+
+		if (MapUtil.isNotEmpty(_data)) {
+			MapUtil.merge(_data, data);
+		}
+
+		return data;
+	}
+
+	protected Editor getEditor(HttpServletRequest request) {
+		String editorName = _editorName;
+
+		if (!BrowserSnifferUtil.isRtf(request)) {
+			return _serviceTrackerMap.getService("simple");
+		}
+
+		if (Validator.isNull(editorName)) {
+			return _serviceTrackerMap.getService(_EDITOR_WYSIWYG_DEFAULT);
+		}
+
+		if (!_serviceTrackerMap.containsKey(editorName)) {
+			return _serviceTrackerMap.getService(_EDITOR_WYSIWYG_DEFAULT);
+		}
+
+		return _serviceTrackerMap.getService(editorName);
+	}
+
+	protected String getEditorName(HttpServletRequest request) {
+		Editor editor = getEditor(request);
+
+		return editor.getName();
+	}
+
+	@Override
+	protected String getPage() {
+		Editor editor = getEditor(request);
+
+		return editor.getJspPath(request);
+	}
+
+	@Override
+	protected RequestDispatcher getRequestDispatcher(String page) {
+		return DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+			PortalWebResourcesUtil.getServletContext(
+				PortalWebResourceConstants.RESOURCE_TYPE_EDITORS),
+			page);
+	}
+
+	@Override
+	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute(
 			"liferay-ui:input-editor:allowBrowseDocuments",
 			String.valueOf(_allowBrowseDocuments));
 		request.setAttribute(
+			"liferay-ui:input-editor:autoCreate", String.valueOf(_autoCreate));
+		request.setAttribute(
 			"liferay-ui:input-editor:configParams", _configParams);
 		request.setAttribute("liferay-ui:input-editor:contents", _contents);
 		request.setAttribute(
-			"liferay-ui:input-editor:contentsLanguageId", _contentsLanguageId);
+			"liferay-ui:input-editor:contentsLanguageId",
+			getContentsLanguageId());
 		request.setAttribute("liferay-ui:input-editor:cssClass", _cssClass);
-		request.setAttribute("liferay-ui:input-editor:cssClasses", cssClasses);
-		request.setAttribute("liferay-ui:input-editor:data", _data);
-		request.setAttribute("liferay-ui:input-editor:editorImpl", editorImpl);
+		request.setAttribute(
+			"liferay-ui:input-editor:cssClasses", getCssClasses());
+		request.setAttribute(
+			"liferay-ui:input-editor:editorName", getEditorName(request));
 		request.setAttribute(
 			"liferay-ui:input-editor:fileBrowserParams", _fileBrowserParams);
 		request.setAttribute("liferay-ui:input-editor:height", _height);
@@ -208,19 +344,55 @@ public class InputEditorTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:input-editor:resizable", String.valueOf(_resizable));
 		request.setAttribute(
+			"liferay-ui:input-editor:showSource", String.valueOf(_showSource));
+		request.setAttribute(
 			"liferay-ui:input-editor:skipEditorLoading",
 			String.valueOf(_skipEditorLoading));
 		request.setAttribute("liferay-ui:input-editor:toolbarSet", _toolbarSet);
 		request.setAttribute("liferay-ui:input-editor:width", _width);
+
+		request.setAttribute("liferay-ui:input-editor:data", getData());
+
+		Editor editor = getEditor(request);
+
+		editor.setItemSelectorAttribute(request);
+	}
+
+	private static final String _EDITOR_WYSIWYG_DEFAULT = PropsUtil.get(
+		PropsKeys.EDITOR_WYSIWYG_DEFAULT);
+
+	private static final ServiceTrackerMap<String, Editor> _serviceTrackerMap =
+		ServiceTrackerCollections.singleValueMap(
+			Editor.class, null,
+			new ServiceReferenceMapper<String, Editor>() {
+
+				@Override
+				public void map(
+					ServiceReference<Editor> serviceReference,
+					Emitter<String> emitter) {
+
+					Registry registry = RegistryUtil.getRegistry();
+
+					Editor editor = registry.getService(serviceReference);
+
+					emitter.emit(editor.getName());
+				}
+
+			});
+
+	static {
+		_serviceTrackerMap.open();
 	}
 
 	private boolean _allowBrowseDocuments = true;
+	private boolean _autoCreate = true;
+	private String _configKey;
 	private Map<String, String> _configParams;
 	private String _contents;
 	private String _contentsLanguageId;
 	private String _cssClass;
 	private Map<String, Object> _data = null;
-	private String _editorImpl;
+	private String _editorName;
 	private Map<String, String> _fileBrowserParams;
 	private String _height;
 	private String _initMethod = "initEditor";
@@ -231,9 +403,9 @@ public class InputEditorTag extends IncludeTag {
 	private String _onChangeMethod;
 	private String _onFocusMethod;
 	private String _onInitMethod;
-	private String _page;
 	private String _placeholder;
 	private boolean _resizable = true;
+	private boolean _showSource = true;
 	private boolean _skipEditorLoading;
 	private String _toolbarSet = "liferay";
 	private String _width;

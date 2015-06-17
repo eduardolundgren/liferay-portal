@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Company;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 
@@ -153,8 +154,7 @@ public class BookmarksUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$BOOKMARKS_ENTRY_USER_NAME$]",
@@ -178,8 +178,11 @@ public class BookmarksUtil {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$TO_ADDRESS$]",
 			LanguageUtil.get(
@@ -194,7 +197,7 @@ public class BookmarksUtil {
 	}
 
 	public static List<Object> getEntries(Hits hits) {
-		List<Object> entries = new ArrayList<Object>();
+		List<Object> entries = new ArrayList<>();
 
 		for (Document document : hits.getDocs()) {
 			String entryClassName = document.get(Field.ENTRY_CLASS_NAME);

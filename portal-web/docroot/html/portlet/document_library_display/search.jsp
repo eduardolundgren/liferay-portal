@@ -30,7 +30,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 int mountFoldersCount = DLAppServiceUtil.getMountFoldersCount(scopeGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, dlPortletInstanceSettings);
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlDisplayRequestHelper);
 %>
 
 <liferay-portlet:renderURL varImpl="searchURL">
@@ -51,7 +51,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 	/>
 
 	<div class="form-search">
-		<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" placeholder='<%= LanguageUtil.get(locale, "keywords") %>' title='<%= LanguageUtil.get(locale, "search-documents") %>' />
+		<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" placeholder='<%= LanguageUtil.get(request, "keywords") %>' title='<%= LanguageUtil.get(request, "search-documents") %>' />
 	</div>
 
 	<br /><br />
@@ -123,12 +123,10 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 		Hits hits = DLAppServiceUtil.search(repositoryId, searchContext);
 
 		searchContainer.setTotal(hits.getLength());
-
-		PortletURL hitURL = renderResponse.createRenderURL();
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= SearchResultUtil.getSearchResults(hits, locale, hitURL) %>"
+			results="<%= SearchResultUtil.getSearchResults(hits, locale) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -158,7 +156,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 				<c:when test="<%= fileEntry != null %>">
 
 					<%
-					request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
+					request.setAttribute("search.jsp-fileEntry", fileEntry);
 					%>
 
 					<portlet:renderURL var="rowURL">
@@ -168,11 +166,11 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					</portlet:renderURL>
 
 					<liferay-ui:app-view-search-entry
-						actionJsp='<%= (dlActionsDisplayContext.isShowActions()) ? "/html/portlet/document_library/file_entry_action.jsp" : StringPool.BLANK %>'
+						actionJsp='<%= (dlPortletInstanceSettingsHelper.isShowActions()) ? "/html/portlet/document_library/file_entry_action.jsp" : StringPool.BLANK %>'
+						commentRelatedSearchResults="<%= searchResult.getCommentRelatedSearchResults() %>"
 						containerName="<%= DLUtil.getAbsolutePath(renderRequest, fileEntry.getFolderId()) %>"
 						cssClass='<%= MathUtil.isEven(index) ? "search" : "search alt" %>'
 						description="<%= (summary != null) ? summary.getContent() : fileEntry.getDescription() %>"
-						mbMessages="<%= searchResult.getMBMessages() %>"
 						queryTerms="<%= hits.getQueryTerms() %>"
 						thumbnailSrc="<%= DLUtil.getThumbnailSrc(fileEntry, themeDisplay) %>"
 						title="<%= (summary != null) ? summary.getTitle() : fileEntry.getTitle() %>"
@@ -184,7 +182,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					<%
 					String folderImage = "folder_empty_document";
 
-					if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(folder.getRepositoryId(), folder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0) {
+					if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(folder.getRepositoryId(), folder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0)) {
 						folderImage = "folder_full_document";
 					}
 
@@ -200,7 +198,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					</portlet:renderURL>
 
 					<liferay-ui:app-view-search-entry
-						actionJsp='<%= (dlActionsDisplayContext.isShowActions()) ? "/html/portlet/document_library/folder_action.jsp" : StringPool.BLANK %>'
+						actionJsp='<%= (dlPortletInstanceSettingsHelper.isShowActions()) ? "/html/portlet/document_library/folder_action.jsp" : StringPool.BLANK %>'
 						containerName="<%= DLUtil.getAbsolutePath(renderRequest, folder.getParentFolderId()) %>"
 						cssClass='<%= MathUtil.isEven(index) ? "search" : "search alt" %>'
 						description="<%= (summary != null) ? summary.getContent() : folder.getDescription() %>"

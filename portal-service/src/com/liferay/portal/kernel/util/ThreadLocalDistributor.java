@@ -135,13 +135,12 @@ public class ThreadLocalDistributor implements Externalizable {
 		objectOutput.writeObject(_threadLocalValues);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ThreadLocalDistributor.class);
 
 	private ClassLoader _classLoader;
 	private int _index;
-	private List<ThreadLocal<Serializable>> _threadLocals =
-		new ArrayList<ThreadLocal<Serializable>>();
+	private List<ThreadLocal<Serializable>> _threadLocals = new ArrayList<>();
 	private List<KeyValuePair> _threadLocalSources;
 	private Serializable[] _threadLocalValues;
 

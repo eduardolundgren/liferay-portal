@@ -16,16 +16,10 @@ package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.RepositoryEntry;
@@ -35,6 +29,11 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 
 import java.util.List;
 
@@ -47,6 +46,14 @@ public class RepositoryStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {Repository.class.getName()};
 
 	@Override
+	public void deleteStagedModel(Repository repository)
+		throws PortalException {
+
+		RepositoryLocalServiceUtil.deleteRepository(
+			repository.getRepositoryId());
+	}
+
+	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
@@ -54,25 +61,8 @@ public class RepositoryStagedModelDataHandler
 		Repository repository = fetchStagedModelByUuidAndGroupId(uuid, groupId);
 
 		if (repository != null) {
-			RepositoryLocalServiceUtil.deleteRepository(
-				repository.getRepositoryId());
+			deleteStagedModel(repository);
 		}
-	}
-
-	@Override
-	public Repository fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<Repository> repositories =
-			RepositoryLocalServiceUtil.getRepositoriesByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<Repository>());
-
-		if (ListUtil.isEmpty(repositories)) {
-			return null;
-		}
-
-		return repositories.get(0);
 	}
 
 	@Override
@@ -81,6 +71,15 @@ public class RepositoryStagedModelDataHandler
 
 		return RepositoryLocalServiceUtil.fetchRepositoryByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<Repository> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return RepositoryLocalServiceUtil.getRepositoriesByUuidAndCompanyId(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new StagedModelModifiedDateComparator<Repository>());
 	}
 
 	@Override

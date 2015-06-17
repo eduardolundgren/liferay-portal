@@ -21,6 +21,7 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -53,7 +54,7 @@ public abstract class BaseTrashRenderer implements TrashRenderer {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(PortletRequest,
-	 *             PortletResponse)}
+	 *             javax.portlet.PortletResponse)}
 	 */
 	@Deprecated
 	@Override
@@ -63,7 +64,7 @@ public abstract class BaseTrashRenderer implements TrashRenderer {
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 

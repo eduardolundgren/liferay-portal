@@ -15,7 +15,6 @@
 package com.liferay.sync.engine.documentlibrary.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.model.SyncAccount;
@@ -23,10 +22,14 @@ import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.util.FileUtil;
+import com.liferay.sync.engine.util.JSONUtil;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Shinn Lok
@@ -38,15 +41,15 @@ public class GetUserSitesGroupsHandler extends BaseJSONHandler {
 	}
 
 	@Override
-	protected void processResponse(String response) throws Exception {
-		Set<Long> remoteSyncSiteIds = new HashSet<Long>();
+	public void processResponse(String response) throws Exception {
+		Set<Long> remoteSyncSiteIds = new HashSet<>();
 
-		ObjectMapper objectMapper = new ObjectMapper();
+		if (_remoteSyncSites == null) {
+			_remoteSyncSites = JSONUtil.readValue(
+				response, new TypeReference<List<SyncSite>>() {});
+		}
 
-		List<SyncSite> remoteSyncSites = objectMapper.readValue(
-			response, new TypeReference<List<SyncSite>>() {});
-
-		for (SyncSite remoteSyncSite : remoteSyncSites) {
+		for (SyncSite remoteSyncSite : _remoteSyncSites) {
 			SyncSite localSyncSite = SyncSiteService.fetchSyncSite(
 				remoteSyncSite.getGroupId(), getSyncAccountId());
 
@@ -64,6 +67,7 @@ public class GetUserSitesGroupsHandler extends BaseJSONHandler {
 					FileUtil.getFilePathName(
 						syncAccount.getFilePathName(), name));
 
+				remoteSyncSite.setRemoteSyncTime(-1);
 				remoteSyncSite.setSyncAccountId(getSyncAccountId());
 
 				SyncSiteService.update(remoteSyncSite);
@@ -95,5 +99,23 @@ public class GetUserSitesGroupsHandler extends BaseJSONHandler {
 			SyncSiteService.deleteSyncSite(localSyncSite.getSyncSiteId());
 		}
 	}
+
+	@Override
+	protected void logResponse(String response) {
+		try {
+			_remoteSyncSites = JSONUtil.readValue(
+				response, new TypeReference<List<SyncSite>>() {});
+
+			super.logResponse("{\"count\":" + _remoteSyncSites.size() + "}");
+		}
+		catch (Exception e) {
+			_logger.error(e.getMessage(), e);
+		}
+	}
+
+	private static final Logger _logger = LoggerFactory.getLogger(
+		GetUserSitesGroupsHandler.class);
+
+	private List<SyncSite> _remoteSyncSites;
 
 }

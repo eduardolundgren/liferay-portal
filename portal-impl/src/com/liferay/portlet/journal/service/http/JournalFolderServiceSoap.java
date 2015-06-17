@@ -26,7 +26,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portlet.journal.service.JournalFolderServiceUtil} service utility. The
+ * {@link JournalFolderServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -61,7 +61,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see JournalFolderServiceHttp
  * @see com.liferay.portlet.journal.model.JournalFolderSoap
- * @see com.liferay.portlet.journal.service.JournalFolderServiceUtil
+ * @see JournalFolderServiceUtil
  * @generated
  */
 @ProviderType
@@ -114,6 +114,23 @@ public class JournalFolderServiceSoap {
 			com.liferay.portlet.journal.model.JournalFolder returnValue = JournalFolderServiceUtil.fetchFolder(folderId);
 
 			return com.liferay.portlet.journal.model.JournalFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap[] getDDMStructures(
+		long[] groupIds, long folderId, int restrictionType)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> returnValue =
+				JournalFolderServiceUtil.getDDMStructures(groupIds, folderId,
+					restrictionType);
+
+			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -438,14 +455,15 @@ public class JournalFolderServiceSoap {
 	}
 
 	public static com.liferay.portlet.journal.model.JournalFolderSoap updateFolder(
-		long folderId, long parentFolderId, java.lang.String name,
-		java.lang.String description, boolean mergeWithParentFolder,
+		long groupId, long folderId, long parentFolderId,
+		java.lang.String name, java.lang.String description,
+		boolean mergeWithParentFolder,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
-			com.liferay.portlet.journal.model.JournalFolder returnValue = JournalFolderServiceUtil.updateFolder(folderId,
-					parentFolderId, name, description, mergeWithParentFolder,
-					serviceContext);
+			com.liferay.portlet.journal.model.JournalFolder returnValue = JournalFolderServiceUtil.updateFolder(groupId,
+					folderId, parentFolderId, name, description,
+					mergeWithParentFolder, serviceContext);
 
 			return com.liferay.portlet.journal.model.JournalFolderSoap.toSoapModel(returnValue);
 		}
@@ -457,15 +475,17 @@ public class JournalFolderServiceSoap {
 	}
 
 	public static com.liferay.portlet.journal.model.JournalFolderSoap updateFolder(
-		long folderId, long parentFolderId, java.lang.String name,
-		java.lang.String description, long[] ddmStructureIds,
-		int restrictionType, boolean mergeWithParentFolder,
+		long groupId, long folderId, long parentFolderId,
+		java.lang.String name, java.lang.String description,
+		long[] ddmStructureIds, int restrictionType,
+		boolean mergeWithParentFolder,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
-			com.liferay.portlet.journal.model.JournalFolder returnValue = JournalFolderServiceUtil.updateFolder(folderId,
-					parentFolderId, name, description, ddmStructureIds,
-					restrictionType, mergeWithParentFolder, serviceContext);
+			com.liferay.portlet.journal.model.JournalFolder returnValue = JournalFolderServiceUtil.updateFolder(groupId,
+					folderId, parentFolderId, name, description,
+					ddmStructureIds, restrictionType, mergeWithParentFolder,
+					serviceContext);
 
 			return com.liferay.portlet.journal.model.JournalFolderSoap.toSoapModel(returnValue);
 		}

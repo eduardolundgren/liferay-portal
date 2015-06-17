@@ -50,7 +50,7 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 						%>
 
 							<portlet:actionURL var="layoutBranchURL">
-								<portlet:param name="struts_action" value="/dockbar/edit_layouts" />
+								<portlet:param name="struts_action" value="/staging_bar/edit_layout_branch" />
 								<portlet:param name="<%= Constants.CMD %>" value="select_layout_branch" />
 								<portlet:param name="redirect" value="<%= stagingFriendlyURL %>" />
 								<portlet:param name="groupId" value="<%= String.valueOf(curLayoutBranch.getGroupId()) %>" />
@@ -93,7 +93,7 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 	$('.layout-branch-selector').on(
 		'mouseenter',
 		function(event) {
-			Liferay.Portal.ToolTip.show(event.currentTarget, '<liferay-ui:message key="page-variation" />')
+			Liferay.Portal.ToolTip.show(event.currentTarget, '<liferay-ui:message key="page-variation" />');
 		}
 	);
 

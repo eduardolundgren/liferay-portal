@@ -14,6 +14,7 @@
 
 package com.liferay.nested.portlets.web.upgrade;
 
+import com.liferay.nested.portlets.web.constants.NestedPortletsPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
@@ -31,9 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  * @author Peter Fellwock
  */
-@Component(
-	immediate = true, service = NestedPortletWebUpgrade.class
-)
+@Component(immediate = true, service = NestedPortletWebUpgrade.class)
 public class NestedPortletWebUpgrade {
 
 	@Reference(unbind = "-")
@@ -55,9 +54,7 @@ public class NestedPortletWebUpgrade {
 			protected String[][] getRenamePortletIdsArray() {
 				return new String[][] {
 					new String[] {
-						"118",
-						"com_liferay_nested_portlets_web_portlet_" +
-							"NestedPortletsPortlet"
+						"118", NestedPortletsPortletKeys.NESTED_PORTLETS
 					}
 				};
 			}
@@ -66,7 +63,7 @@ public class NestedPortletWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.nested.portlets.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

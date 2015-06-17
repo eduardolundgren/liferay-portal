@@ -85,11 +85,6 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 	}
 
 	@Override
-	public String getEditPage() {
-		return StrutsUtil.TEXT_HTML_DIR + _editPage;
-	}
-
-	@Override
 	public String getURL() {
 		return _url;
 	}
@@ -119,6 +114,28 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 		}
 
 		return path;
+	}
+
+	@Override
+	public String includeEditContent(
+			HttpServletRequest request, HttpServletResponse response,
+			Layout layout)
+		throws Exception {
+
+		ServletContext servletContext = (ServletContext)request.getAttribute(
+			WebKeys.CTX);
+
+		RequestDispatcher requestDispatcher =
+			servletContext.getRequestDispatcher(getEditPage());
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+		PipingServletResponse pipingServletResponse = new PipingServletResponse(
+			response, unsyncStringWriter);
+
+		requestDispatcher.include(request, pipingServletResponse);
+
+		return unsyncStringWriter.toString();
 	}
 
 	@Override
@@ -192,15 +209,19 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 		}
 	}
 
-	private String[] _configurationActionDelete;
-	private String[] _configurationActionUpdate;
-	private String _editPage;
-	private boolean _firstPageable;
-	private boolean _parentable;
-	private boolean _sitemapable;
-	private String _type;
-	private String _url;
-	private boolean _urlFriendliable;
-	private String _viewPage;
+	protected String getEditPage() {
+		return StrutsUtil.TEXT_HTML_DIR + _editPage;
+	}
+
+	private final String[] _configurationActionDelete;
+	private final String[] _configurationActionUpdate;
+	private final String _editPage;
+	private final boolean _firstPageable;
+	private final boolean _parentable;
+	private final boolean _sitemapable;
+	private final String _type;
+	private final String _url;
+	private final boolean _urlFriendliable;
+	private final String _viewPage;
 
 }

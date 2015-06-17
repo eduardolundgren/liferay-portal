@@ -14,6 +14,7 @@
 
 package com.liferay.invitation.web.upgrade;
 
+import com.liferay.invitation.web.constants.InvitationPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
@@ -31,9 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  * @author Peter Fellwock
  */
-@Component(
-	immediate = true, service = InvitationWebUpgrade.class
-)
+@Component(immediate = true, service = InvitationWebUpgrade.class)
 public class InvitationWebUpgrade {
 
 	@Reference(unbind = "-")
@@ -54,10 +53,7 @@ public class InvitationWebUpgrade {
 			@Override
 			protected String[][] getRenamePortletIdsArray() {
 				return new String[][] {
-					new String[] {
-						"100",
-						"com_liferay_invitation_web_portlet_InvitationPortlet"
-					}
+					new String[] {"100", InvitationPortletKeys.INVITATION}
 				};
 			}
 
@@ -65,7 +61,7 @@ public class InvitationWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.invitation.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

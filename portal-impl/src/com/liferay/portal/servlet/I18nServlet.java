@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class I18nServlet extends HttpServlet {
 	}
 
 	public static void setLanguageIds(Element root) {
-		_languageIds = new HashSet<String>();
+		_languageIds = new HashSet<>();
 
 		List<Element> rootElements = root.elements("servlet-mapping");
 
@@ -94,7 +95,10 @@ public class I18nServlet extends HttpServlet {
 				String i18nLanguageId = i18nData[0];
 				String i18nPath = i18nData[1];
 				String redirect = i18nData[2];
+				String i18nLanguageCode = i18nData[3];
 
+				request.setAttribute(
+					WebKeys.I18N_LANGUAGE_CODE, i18nLanguageCode);
 				request.setAttribute(WebKeys.I18N_LANGUAGE_ID, i18nLanguageId);
 				request.setAttribute(WebKeys.I18N_PATH, i18nPath);
 
@@ -146,7 +150,13 @@ public class I18nServlet extends HttpServlet {
 
 		String i18nPath = StringPool.SLASH + i18nLanguageId;
 
-		Locale locale = LocaleUtil.fromLanguageId(i18nLanguageId);
+		Locale locale = LocaleUtil.fromLanguageId(
+			i18nLanguageId, true,
+			PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE);
+
+		if (locale == null) {
+			return null;
+		}
 
 		if (Validator.isNull(locale.getCountry())) {
 
@@ -163,7 +173,9 @@ public class I18nServlet extends HttpServlet {
 			_log.debug("Redirect " + redirect);
 		}
 
-		return new String[] {i18nLanguageId, i18nPath, redirect};
+		return new String[] {
+			i18nLanguageId, i18nPath, redirect, locale.getLanguage()
+		};
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(I18nServlet.class);

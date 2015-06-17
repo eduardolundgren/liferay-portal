@@ -15,9 +15,10 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskLockHelperUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatus;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistry;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocalManager;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BackgroundTask;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.User;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -57,6 +58,39 @@ public class BackgroundTaskLocalServiceImpl
 	extends BackgroundTaskLocalServiceBaseImpl {
 
 	@Override
+	public BackgroundTask addBackgroundTask(BackgroundTask backgroundTask) {
+		Map<String, Serializable> taskContextMap =
+			backgroundTask.getTaskContextMap();
+
+		if (taskContextMap == null) {
+			taskContextMap = new HashMap<>();
+
+			backgroundTask.setTaskContextMap(taskContextMap);
+		}
+
+		_backgroundTaskThreadLocalManager.serializeThreadLocals(taskContextMap);
+
+		backgroundTask = super.addBackgroundTask(backgroundTask);
+
+		final long backgroundTaskId = backgroundTask.getBackgroundTaskId();
+
+		TransactionCommitCallbackRegistryUtil.registerCallback(
+			new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+					backgroundTaskLocalService.triggerBackgroundTask(
+						backgroundTaskId);
+
+					return null;
+				}
+
+			});
+
+		return backgroundTask;
+	}
+
+	@Override
 	public BackgroundTask addBackgroundTask(
 			long userId, long groupId, String name,
 			String[] servletContextNames, Class<?> taskExecutorClass,
@@ -65,7 +99,6 @@ public class BackgroundTaskLocalServiceImpl
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		final long backgroundTaskId = counterLocalService.increment();
 
@@ -73,9 +106,7 @@ public class BackgroundTaskLocalServiceImpl
 			backgroundTaskId);
 
 		backgroundTask.setCompanyId(user.getCompanyId());
-		backgroundTask.setCreateDate(serviceContext.getCreateDate(now));
 		backgroundTask.setGroupId(groupId);
-		backgroundTask.setModifiedDate(serviceContext.getModifiedDate(now));
 		backgroundTask.setUserId(userId);
 		backgroundTask.setUserName(user.getFullName());
 		backgroundTask.setName(name);
@@ -83,9 +114,13 @@ public class BackgroundTaskLocalServiceImpl
 			StringUtil.merge(servletContextNames));
 		backgroundTask.setTaskExecutorClassName(taskExecutorClass.getName());
 
-		if (taskContextMap != null) {
-			backgroundTask.setTaskContextMap(taskContextMap);
+		if (taskContextMap == null) {
+			taskContextMap = new HashMap<>();
 		}
+
+		_backgroundTaskThreadLocalManager.serializeThreadLocals(taskContextMap);
+
+		backgroundTask.setTaskContextMap(taskContextMap);
 
 		backgroundTask.setStatus(BackgroundTaskConstants.STATUS_NEW);
 
@@ -154,8 +189,6 @@ public class BackgroundTaskLocalServiceImpl
 		long backgroundTaskId, Map<String, Serializable> taskContextMap,
 		int status, String statusMessage, ServiceContext serviceContext) {
 
-		Date now = new Date();
-
 		BackgroundTask backgroundTask =
 			backgroundTaskPersistence.fetchByPrimaryKey(backgroundTaskId);
 
@@ -163,9 +196,10 @@ public class BackgroundTaskLocalServiceImpl
 			return null;
 		}
 
-		backgroundTask.setModifiedDate(serviceContext.getModifiedDate(now));
-
 		if (taskContextMap != null) {
+			_backgroundTaskThreadLocalManager.serializeThreadLocals(
+				taskContextMap);
+
 			backgroundTask.setTaskContextMap(taskContextMap);
 		}
 
@@ -173,7 +207,7 @@ public class BackgroundTaskLocalServiceImpl
 			(status == BackgroundTaskConstants.STATUS_SUCCESSFUL)) {
 
 			backgroundTask.setCompleted(true);
-			backgroundTask.setCompletionDate(now);
+			backgroundTask.setCompletionDate(new Date());
 		}
 
 		backgroundTask.setStatus(status);
@@ -193,19 +227,7 @@ public class BackgroundTaskLocalServiceImpl
 		final BackgroundTask backgroundTask, final int status) {
 
 		try {
-			Lock lock = lockLocalService.getLock(
-				BackgroundTaskExecutor.class.getName(),
-				backgroundTask.getTaskExecutorClassName());
-
-			String owner =
-				backgroundTask.getName() + StringPool.POUND +
-					backgroundTask.getBackgroundTaskId();
-
-			if (owner.equals(lock.getOwner())) {
-				lockLocalService.unlock(
-					BackgroundTaskExecutor.class.getName(),
-					backgroundTask.getTaskExecutorClassName());
-			}
+			BackgroundTaskLockHelperUtil.unlockBackgroundTask(backgroundTask);
 		}
 		catch (Exception e) {
 		}
@@ -536,5 +558,8 @@ public class BackgroundTaskLocalServiceImpl
 
 	@BeanReference(type = BackgroundTaskStatusRegistry.class)
 	private BackgroundTaskStatusRegistry _backgroundTaskStatusRegistry;
+
+	@BeanReference(type = BackgroundTaskThreadLocalManager.class)
+	private BackgroundTaskThreadLocalManager _backgroundTaskThreadLocalManager;
 
 }

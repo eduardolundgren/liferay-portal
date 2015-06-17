@@ -13,6 +13,7 @@ _sass_cache_*.css
 cobertura.ser
 
 **/.sonar
+**/pmd-reports
 
 /*.ant-*
 /*.ipr
@@ -58,7 +59,12 @@ cobertura.ser
 /lib/development/ojdbc5.jar
 /lib/development/ojdbc6.jar
 
+/modules/frontend/*/test/coverage
+/modules/frontend/*/test/junit
+
 /nbproject/private
+
+/node_modules
 
 /osgi/bootstrap/classes
 /osgi/bootstrap/osgi-bootstrap.jar
@@ -152,6 +158,8 @@ cobertura.ser
 /portal-web/docroot/wsrp
 
 /portal-web/docroot/html/ALLOY_ZIP
+
+/portal-web/docroot/html/css/common/bourbon
 
 /portal-web/docroot/html/css/portal/aui_deprecated.css
 /portal-web/docroot/html/css/portal/bootstrap.css
@@ -297,7 +305,5 @@ cobertura.ser
 /util-taglib/*.ipr
 /util-taglib/*.iws
 /util-taglib/classes
-/util-taglib/src/META-INF/liferay-aui.tld
-/util-taglib/src/META-INF/liferay-portlet_2_0.tld
 /util-taglib/util-taglib*.asc
 /util-taglib/util-taglib*.jar

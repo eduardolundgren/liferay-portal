@@ -14,9 +14,9 @@
 
 package com.liferay.portal.dao.shard.advice;
 
-import com.liferay.portal.dao.shard.ShardDataSourceTargetSource;
 import com.liferay.portal.dao.shard.ShardSelector;
-import com.liferay.portal.dao.shard.ShardSessionFactoryTargetSource;
+import com.liferay.portal.kernel.dao.shard.ShardDataSourceTargetSource;
+import com.liferay.portal.kernel.dao.shard.ShardSessionFactoryTargetSource;
 import com.liferay.portal.kernel.exception.LoggedExceptionInInitializerError;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -46,21 +46,19 @@ public class ShardAdvice {
 	public void afterPropertiesSet() {
 		if (_shardDataSourceTargetSource == null) {
 			_shardDataSourceTargetSource =
-				(ShardDataSourceTargetSource)InfrastructureUtil.
-					getShardDataSourceTargetSource();
+				InfrastructureUtil.getShardDataSourceTargetSource();
 		}
 
 		if (_shardSessionFactoryTargetSource == null) {
 			_shardSessionFactoryTargetSource =
-				(ShardSessionFactoryTargetSource)InfrastructureUtil.
-					getShardSessionFactoryTargetSource();
+				InfrastructureUtil.getShardSessionFactoryTargetSource();
 		}
 	}
 
 	public String getCompanyShardName(
 		String webId, String virtualHostname, String mx, String shardName) {
 
-		Map<String, String> shardParams = new HashMap<String, String>();
+		Map<String, String> shardParams = new HashMap<>();
 
 		shardParams.put("webId", webId);
 		shardParams.put("mx", mx);
@@ -166,7 +164,7 @@ public class ShardAdvice {
 		Stack<String> companyServiceStack = _companyServiceStack.get();
 
 		if (companyServiceStack == null) {
-			companyServiceStack = new Stack<String>();
+			companyServiceStack = new Stack<>();
 
 			_companyServiceStack.set(companyServiceStack);
 		}
@@ -198,11 +196,10 @@ public class ShardAdvice {
 	private static final Log _log = LogFactoryUtil.getLog(ShardAdvice.class);
 
 	private static final ThreadLocal<Stack<String>> _companyServiceStack =
-		new ThreadLocal<Stack<String>>();
-	private static final ThreadLocal<Object> _globalCall =
-		new ThreadLocal<Object>();
+		new ThreadLocal<>();
+	private static final ThreadLocal<Object> _globalCall = new ThreadLocal<>();
 	private static final ThreadLocal<String> _shardName =
-		new InitialThreadLocal<String>(
+		new InitialThreadLocal<>(
 			ShardAdvice.class + "._shardName", PropsValues.SHARD_DEFAULT_NAME);
 	private static final ShardSelector _shardSelector;
 

@@ -16,7 +16,6 @@ package com.liferay.portlet.social.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -58,7 +57,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SocialActivityLimitPersistence
- * @see SocialActivityLimitUtil
+ * @see com.liferay.portlet.social.service.persistence.SocialActivityLimitUtil
  * @generated
  */
 @ProviderType
@@ -122,7 +121,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns a range of all the social activity limits where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -140,7 +139,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns an ordered range of all the social activity limits where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -253,7 +252,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByGroupId_First(long groupId,
@@ -304,7 +303,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByGroupId_Last(long groupId,
@@ -362,7 +361,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit[] findByGroupId_PrevAndNext(
@@ -605,7 +604,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns a range of all the social activity limits where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -623,7 +622,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns an ordered range of all the social activity limits where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -736,7 +735,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByUserId_First(long userId,
@@ -787,7 +786,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByUserId_Last(long userId,
@@ -845,7 +844,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit[] findByUserId_PrevAndNext(
@@ -1090,7 +1089,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns a range of all the social activity limits where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -1109,7 +1108,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns an ordered range of all the social activity limits where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -1234,7 +1233,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByC_C_First(long classNameId, long classPK,
@@ -1290,7 +1289,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByC_C_Last(long classNameId, long classPK,
@@ -1353,7 +1352,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit[] findByC_C_PrevAndNext(long activityLimitId,
@@ -1595,7 +1594,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 			});
 
 	/**
-	 * Returns the social activity limit where groupId = &#63; and userId = &#63; and classNameId = &#63; and classPK = &#63; and activityType = &#63; and activityCounterName = &#63; or throws a {@link com.liferay.portlet.social.NoSuchActivityLimitException} if it could not be found.
+	 * Returns the social activity limit where groupId = &#63; and userId = &#63; and classNameId = &#63; and classPK = &#63; and activityType = &#63; and activityCounterName = &#63; or throws a {@link NoSuchActivityLimitException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
@@ -1604,7 +1603,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * @param activityType the activity type
 	 * @param activityCounterName the activity counter name
 	 * @return the matching social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a matching social activity limit could not be found
+	 * @throws NoSuchActivityLimitException if a matching social activity limit could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByG_U_C_C_A_A(long groupId, long userId,
@@ -1993,10 +1992,6 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(SocialActivityLimitImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(SocialActivityLimitImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -2128,7 +2123,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 *
 	 * @param activityLimitId the primary key of the social activity limit
 	 * @return the social activity limit that was removed
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit remove(long activityLimitId)
@@ -2141,7 +2136,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 *
 	 * @param primaryKey the primary key of the social activity limit
 	 * @return the social activity limit that was removed
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit remove(Serializable primaryKey)
@@ -2211,7 +2206,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 
 	@Override
 	public SocialActivityLimit updateImpl(
-		com.liferay.portlet.social.model.SocialActivityLimit socialActivityLimit) {
+		SocialActivityLimit socialActivityLimit) {
 		socialActivityLimit = toUnwrappedModel(socialActivityLimit);
 
 		boolean isNew = socialActivityLimit.isNew();
@@ -2343,7 +2338,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 *
 	 * @param primaryKey the primary key of the social activity limit
 	 * @return the social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByPrimaryKey(Serializable primaryKey)
@@ -2363,11 +2358,11 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	}
 
 	/**
-	 * Returns the social activity limit with the primary key or throws a {@link com.liferay.portlet.social.NoSuchActivityLimitException} if it could not be found.
+	 * Returns the social activity limit with the primary key or throws a {@link NoSuchActivityLimitException} if it could not be found.
 	 *
 	 * @param activityLimitId the primary key of the social activity limit
 	 * @return the social activity limit
-	 * @throws com.liferay.portlet.social.NoSuchActivityLimitException if a social activity limit with the primary key could not be found
+	 * @throws NoSuchActivityLimitException if a social activity limit with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityLimit findByPrimaryKey(long activityLimitId)
@@ -2541,7 +2536,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns a range of all the social activity limits.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of social activity limits
@@ -2557,7 +2552,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	 * Returns an ordered range of all the social activity limits.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityLimitModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of social activity limits
@@ -2715,7 +2710,6 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 	private static final String _ORDER_BY_ENTITY_ALIAS = "socialActivityLimit.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SocialActivityLimit exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SocialActivityLimit exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(SocialActivityLimitPersistenceImpl.class);
 	private static final SocialActivityLimit _nullSocialActivityLimit = new SocialActivityLimitImpl() {
 			@Override

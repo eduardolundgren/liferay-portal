@@ -17,7 +17,9 @@
 <%@ include file="/html/portlet/users_admin/init.jsp" %>
 
 <%
-Organization organization = (Organization)request.getAttribute(WebKeys.ORGANIZATION);
+long organizationId = ParamUtil.getLong(request, "organizationId");
+
+Organization organization = OrganizationServiceUtil.fetchOrganization(organizationId);
 
 long parentOrganizationId = ParamUtil.getLong(request, "parentOrganizationSearchContainerPrimaryKeys", (organization != null) ? organization.getParentOrganizationId() : OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
 
@@ -239,8 +241,8 @@ if (parentOrganization != null) {
 				select: '<portlet:namespace />countryId',
 				selectData: Liferay.Address.getCountries,
 				selectDesc: 'nameCurrentValue',
-				selectSort: '<%= true %>',
 				selectId: 'countryId',
+				selectSort: '<%= true %>',
 				selectVal: '<%= countryId %>'
 			},
 			{

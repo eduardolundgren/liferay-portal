@@ -16,10 +16,6 @@
 
 <%@ include file="/html/taglib/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.lar.PortletDataContext" %><%@
-page import="com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil" %><%@
-page import="com.liferay.portal.kernel.util.DateRange" %>
-
 <liferay-staging:defineObjects />
 
 <%

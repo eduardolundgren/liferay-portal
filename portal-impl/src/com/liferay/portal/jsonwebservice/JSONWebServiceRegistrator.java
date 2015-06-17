@@ -85,7 +85,11 @@ public class JSONWebServiceRegistrator {
 		try {
 			bean = beanLocator.locate(beanName);
 		}
-		catch (BeanLocatorException e) {
+		catch (BeanLocatorException ble) {
+			return;
+		}
+
+		if (bean == null) {
 			return;
 		}
 
@@ -147,7 +151,7 @@ public class JSONWebServiceRegistrator {
 		throws ClassNotFoundException {
 
 		if (_utilClasses == null) {
-			_utilClasses = new HashMap<Class<?>, Class<?>>();
+			_utilClasses = new HashMap<>();
 		}
 
 		Class<?> utilClass = _utilClasses.get(implementationClass);

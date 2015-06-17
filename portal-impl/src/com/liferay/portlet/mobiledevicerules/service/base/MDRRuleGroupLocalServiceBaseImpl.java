@@ -30,11 +30,6 @@ import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -48,6 +43,11 @@ import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.util.PortalUtil;
 
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup;
 import com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupLocalService;
 import com.liferay.portlet.mobiledevicerules.service.persistence.MDRRuleGroupFinder;
@@ -428,7 +428,7 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 	 *
 	 * @return the m d r rule group local service
 	 */
-	public com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupLocalService getMDRRuleGroupLocalService() {
+	public MDRRuleGroupLocalService getMDRRuleGroupLocalService() {
 		return mdrRuleGroupLocalService;
 	}
 
@@ -438,7 +438,7 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 	 * @param mdrRuleGroupLocalService the m d r rule group local service
 	 */
 	public void setMDRRuleGroupLocalService(
-		com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupLocalService mdrRuleGroupLocalService) {
+		MDRRuleGroupLocalService mdrRuleGroupLocalService) {
 		this.mdrRuleGroupLocalService = mdrRuleGroupLocalService;
 	}
 
@@ -878,8 +878,8 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupLocalService.class)
-	protected com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupLocalService mdrRuleGroupLocalService;
+	@BeanReference(type = MDRRuleGroupLocalService.class)
+	protected MDRRuleGroupLocalService mdrRuleGroupLocalService;
 	@BeanReference(type = com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupService.class)
 	protected com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupService mdrRuleGroupService;
 	@BeanReference(type = MDRRuleGroupPersistence.class)

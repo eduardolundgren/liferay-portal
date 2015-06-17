@@ -26,11 +26,13 @@ long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folder
 long repositoryId = GetterUtil.getLong((String)request.getAttribute("view.jsp-repositoryId"));
 
 String keywords = ParamUtil.getString(request, "keywords");
+
+boolean search = strutsAction.equals("/document_library/search");
 %>
 
 <aui:nav-bar>
 	<aui:nav collapsible="<%= true %>" cssClass="nav-display-style-buttons navbar-nav" icon="th-list" id="displayStyleButtons">
-		<c:if test='<%= !strutsAction.equals("/document_library/search") %>'>
+		<c:if test="<%= !search %>">
 			<liferay-util:include page="/html/portlet/document_library/display_style_buttons.jsp" />
 		</c:if>
 	</aui:nav>
@@ -84,7 +86,9 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 		<liferay-util:include page="/html/portlet/document_library/add_button.jsp" />
 
-		<liferay-util:include page="/html/portlet/document_library/sort_button.jsp" />
+		<c:if test="<%= !search %>">
+			<liferay-util:include page="/html/portlet/document_library/sort_button.jsp" />
+		</c:if>
 
 		<c:if test="<%= !user.isDefaultUser() %>">
 			<aui:nav-item dropdown="<%= true %>" label="manage">
@@ -113,7 +117,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 					<portlet:param name="searchRepositoryId" value="<%= String.valueOf(repositoryId) %>" />
 					<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 					<portlet:param name="searchFolderId" value="<%= String.valueOf(folderId) %>" />
-					<portlet:param name="keywords" value="<%= String.valueOf(keywords) %>" />
 					<portlet:param name="showRepositoryTabs" value="<%= (folderId == 0) ? Boolean.TRUE.toString() : Boolean.FALSE.toString() %>" />
 					<portlet:param name="showSearchInfo" value="<%= Boolean.TRUE.toString() %>" />
 				</liferay-portlet:renderURL>
@@ -149,7 +152,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 					on: {
 						visibleChange: function(event) {
 							if (!event.newVal) {
-								Liferay.Portlet.refresh('#p_p_id_' + <%= portletDisplay.getId() %> + '_');
+								Liferay.Portlet.refresh('#p_p_id_<%= portletDisplay.getId() %>_');
 							}
 						}
 					}
@@ -168,6 +171,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 				dialog: {
 					destroyOnHide: true
 				},
+				groupId: <%= scopeGroupId %>,
 				refererPortletName: '<%= PortletKeys.DOCUMENT_LIBRARY %>',
 				showAncestorScopes: true,
 				showManageTemplates: false,

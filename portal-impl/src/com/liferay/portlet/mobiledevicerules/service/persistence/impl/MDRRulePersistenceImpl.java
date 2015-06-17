@@ -16,7 +16,6 @@ package com.liferay.portlet.mobiledevicerules.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -33,6 +32,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.mobiledevicerules.NoSuchRuleException;
@@ -44,6 +45,7 @@ import com.liferay.portlet.mobiledevicerules.service.persistence.MDRRulePersiste
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,7 +62,7 @@ import java.util.Set;
  *
  * @author Edward C. Han
  * @see MDRRulePersistence
- * @see MDRRuleUtil
+ * @see com.liferay.portlet.mobiledevicerules.service.persistence.MDRRuleUtil
  * @generated
  */
 @ProviderType
@@ -119,7 +121,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns a range of all the m d r rules where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -136,7 +138,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns an ordered range of all the m d r rules where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -263,7 +265,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByUuid_First(String uuid,
@@ -312,7 +314,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByUuid_Last(String uuid,
@@ -369,7 +371,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule[] findByUuid_PrevAndNext(long ruleId, String uuid,
@@ -615,12 +617,12 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 			new String[] { String.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the m d r rule where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.portlet.mobiledevicerules.NoSuchRuleException} if it could not be found.
+	 * Returns the m d r rule where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchRuleException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @return the matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByUUID_G(String uuid, long groupId)
@@ -897,7 +899,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns a range of all the m d r rules where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -916,7 +918,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns an ordered range of all the m d r rules where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -1054,7 +1056,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByUuid_C_First(String uuid, long companyId,
@@ -1109,7 +1111,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByUuid_C_Last(String uuid, long companyId,
@@ -1171,7 +1173,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule[] findByUuid_C_PrevAndNext(long ruleId, String uuid,
@@ -1453,7 +1455,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns a range of all the m d r rules where ruleGroupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param ruleGroupId the rule group ID
@@ -1470,7 +1472,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns an ordered range of all the m d r rules where ruleGroupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param ruleGroupId the rule group ID
@@ -1583,7 +1585,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param ruleGroupId the rule group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByRuleGroupId_First(long ruleGroupId,
@@ -1634,7 +1636,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param ruleGroupId the rule group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a matching m d r rule could not be found
+	 * @throws NoSuchRuleException if a matching m d r rule could not be found
 	 */
 	@Override
 	public MDRRule findByRuleGroupId_Last(long ruleGroupId,
@@ -1691,7 +1693,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * @param ruleGroupId the rule group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule[] findByRuleGroupId_PrevAndNext(long ruleId,
@@ -1944,10 +1946,6 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(MDRRuleImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(MDRRuleImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -2056,7 +2054,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 *
 	 * @param ruleId the primary key of the m d r rule
 	 * @return the m d r rule that was removed
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule remove(long ruleId) throws NoSuchRuleException {
@@ -2068,7 +2066,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 *
 	 * @param primaryKey the primary key of the m d r rule
 	 * @return the m d r rule that was removed
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule remove(Serializable primaryKey) throws NoSuchRuleException {
@@ -2134,8 +2132,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	}
 
 	@Override
-	public MDRRule updateImpl(
-		com.liferay.portlet.mobiledevicerules.model.MDRRule mdrRule) {
+	public MDRRule updateImpl(MDRRule mdrRule) {
 		mdrRule = toUnwrappedModel(mdrRule);
 
 		boolean isNew = mdrRule.isNew();
@@ -2146,6 +2143,28 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 			String uuid = PortalUUIDUtil.generate();
 
 			mdrRule.setUuid(uuid);
+		}
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (mdrRule.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				mdrRule.setCreateDate(now);
+			}
+			else {
+				mdrRule.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!mdrRuleModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				mdrRule.setModifiedDate(now);
+			}
+			else {
+				mdrRule.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
 		}
 
 		Session session = null;
@@ -2275,7 +2294,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 *
 	 * @param primaryKey the primary key of the m d r rule
 	 * @return the m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule findByPrimaryKey(Serializable primaryKey)
@@ -2295,11 +2314,11 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	}
 
 	/**
-	 * Returns the m d r rule with the primary key or throws a {@link com.liferay.portlet.mobiledevicerules.NoSuchRuleException} if it could not be found.
+	 * Returns the m d r rule with the primary key or throws a {@link NoSuchRuleException} if it could not be found.
 	 *
 	 * @param ruleId the primary key of the m d r rule
 	 * @return the m d r rule
-	 * @throws com.liferay.portlet.mobiledevicerules.NoSuchRuleException if a m d r rule with the primary key could not be found
+	 * @throws NoSuchRuleException if a m d r rule with the primary key could not be found
 	 */
 	@Override
 	public MDRRule findByPrimaryKey(long ruleId) throws NoSuchRuleException {
@@ -2468,7 +2487,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns a range of all the m d r rules.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of m d r rules
@@ -2484,7 +2503,7 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	 * Returns an ordered range of all the m d r rules.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.mobiledevicerules.model.impl.MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link MDRRuleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of m d r rules
@@ -2647,7 +2666,6 @@ public class MDRRulePersistenceImpl extends BasePersistenceImpl<MDRRule>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "mdrRule.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MDRRule exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MDRRule exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(MDRRulePersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "type"

@@ -36,11 +36,6 @@ import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -49,6 +44,12 @@ import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.util.PortalUtil;
+
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -419,7 +420,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the polls vote local service
 	 */
-	public com.liferay.polls.service.PollsVoteLocalService getPollsVoteLocalService() {
+	public PollsVoteLocalService getPollsVoteLocalService() {
 		return pollsVoteLocalService;
 	}
 
@@ -429,7 +430,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param pollsVoteLocalService the polls vote local service
 	 */
 	public void setPollsVoteLocalService(
-		com.liferay.polls.service.PollsVoteLocalService pollsVoteLocalService) {
+		PollsVoteLocalService pollsVoteLocalService) {
 		this.pollsVoteLocalService = pollsVoteLocalService;
 	}
 
@@ -722,8 +723,8 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.polls.service.PollsVoteLocalService.class)
-	protected com.liferay.polls.service.PollsVoteLocalService pollsVoteLocalService;
+	@BeanReference(type = PollsVoteLocalService.class)
+	protected PollsVoteLocalService pollsVoteLocalService;
 	@BeanReference(type = com.liferay.polls.service.PollsVoteService.class)
 	protected com.liferay.polls.service.PollsVoteService pollsVoteService;
 	@BeanReference(type = PollsVotePersistence.class)

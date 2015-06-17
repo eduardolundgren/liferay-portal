@@ -17,9 +17,12 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
-boolean emailFileEntryAnyEventEnabled = dlSettings.isEmailFileEntryAddedEnabled() || dlSettings.isEmailFileEntryUpdatedEnabled();
+boolean emailFileEntryAnyEventEnabled = dlGroupServiceSettings.isEmailFileEntryAddedEnabled() || dlGroupServiceSettings.isEmailFileEntryUpdatedEnabled();
 
 String navigation = ParamUtil.getString(request, "navigation", "home");
+
+String currentFolder = ParamUtil.getString(request, "curFolder");
+String deltaFolder = ParamUtil.getString(request, "deltaFolder");
 
 Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
@@ -42,16 +45,18 @@ String tagName = ParamUtil.getString(request, "tag");
 
 boolean useAssetEntryQuery = (categoryId > 0) || Validator.isNotNull(tagName);
 
-DLEntryListDisplayContext dlEntriesListDisplayContext = new DLEntryListDisplayContext(request, dlPortletInstanceSettings);
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlRequestHelper);
 
 String displayStyle = GetterUtil.getString((String)request.getAttribute("view.jsp-displayStyle"));
 
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/document_library/view");
+portletURL.setParameter("curFolder", currentFolder);
+portletURL.setParameter("deltaFolder", deltaFolder);
 portletURL.setParameter("folderId", String.valueOf(folderId));
 
-SearchContainer dlSearchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
+SearchContainer dlSearchContainer = new SearchContainer(liferayPortletRequest, null, null, "curEntry", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
 EntriesChecker entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
 
@@ -133,10 +138,11 @@ if (fileEntryTypeId >= 0) {
 else {
 	if (navigation.equals("home")) {
 		if (useAssetEntryQuery) {
-			long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcut.class.getName())};
+			long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcutConstants.getClassName())};
 
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery(classNameIds, dlSearchContainer);
 
+			assetEntryQuery.setEnablePermissions(true);
 			assetEntryQuery.setExcludeZeroViewCount(false);
 
 			total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
@@ -319,7 +325,7 @@ dlSearchContainer.setResults(results);
 						<%
 						String folderImage = "folder_empty_document";
 
-						if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status, true) > 0) {
+						if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status, true) > 0)) {
 							folderImage = "folder_full_document";
 						}
 
@@ -358,7 +364,7 @@ dlSearchContainer.setResults(results);
 		<c:otherwise>
 
 			<%
-			String[] entryColumns = dlEntriesListDisplayContext.getEntryColumns();
+			String[] entryColumns = dlPortletInstanceSettingsHelper.getEntryColumns();
 			%>
 
 			<liferay-ui:search-container

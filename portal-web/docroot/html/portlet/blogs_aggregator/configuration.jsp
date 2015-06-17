@@ -48,7 +48,11 @@ if (organizationId > 0) {
 
 			<aui:button name="selectOrganizationButton" value="select" />
 
-			<aui:button disabled="<%= organizationId <= 0 %>" name="removeOrganizationButton" onClick='<%= renderResponse.getNamespace() + "removeOrganization();" %>' value="remove" />
+			<%
+			String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('organizationId', 'organizationName', this, '" + renderResponse.getNamespace() + "');";
+			%>
+
+			<aui:button disabled="<%= organizationId <= 0 %>" name="removeOrganizationButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
 		</div>
 
 		<aui:select name="preferences--displayStyle--" value="<%= displayStyle %>">
@@ -99,14 +103,6 @@ if (organizationId > 0) {
 </aui:form>
 
 <aui:script>
-	function <portlet:namespace />removeOrganization() {
-		document.<portlet:namespace />fm.<portlet:namespace />organizationId.value = '';
-
-		document.getElementById('<portlet:namespace />organizationName').value = '';
-
-		Liferay.Util.toggleDisabled('#<portlet:namespace />removeOrganizationButton', true);
-	}
-
 	AUI.$('#<portlet:namespace />selectOrganizationButton').on(
 		'click',
 		function(event) {
@@ -118,7 +114,7 @@ if (organizationId > 0) {
 					},
 					id: '<portlet:namespace />selectOrganization',
 					title: '<liferay-ui:message arguments="organization" key="select-x" />',
-					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/portlet_configuration/select_organization" /><portlet:param name="tabs1" value="organizations" /></portlet:renderURL>'
+					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/users_admin/select_organization" /><portlet:param name="tabs1" value="organizations" /></portlet:renderURL>'
 				},
 				function(event) {
 					document.<portlet:namespace />fm.<portlet:namespace />organizationId.value = event.organizationid;

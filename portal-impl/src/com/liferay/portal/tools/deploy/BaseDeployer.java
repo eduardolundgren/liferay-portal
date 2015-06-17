@@ -50,7 +50,7 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.security.lang.SecurityManagerUtil;
 import com.liferay.portal.tools.ToolDependencies;
@@ -96,8 +96,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	public static void main(String[] args) {
 		ToolDependencies.wireDeployers();
 
-		List<String> wars = new ArrayList<String>();
-		List<String> jars = new ArrayList<String>();
+		List<String> wars = new ArrayList<>();
+		List<String> jars = new ArrayList<>();
 
 		for (String arg : args) {
 			String fileName = StringUtil.toLowerCase(arg);
@@ -197,7 +197,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	public int autoDeploy(AutoDeploymentContext autoDeploymentContext)
 		throws AutoDeployException {
 
-		List<String> wars = new ArrayList<String>();
+		List<String> wars = new ArrayList<>();
 
 		File file = autoDeploymentContext.getFile();
 
@@ -230,8 +230,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				"The system property deployer.app.server.type is not set");
 		}
 
-		if (!appServerType.equals(ServerDetector.GERONIMO_ID) &&
-			!appServerType.equals(ServerDetector.GLASSFISH_ID) &&
+		if (!appServerType.equals(ServerDetector.GLASSFISH_ID) &&
 			!appServerType.equals(ServerDetector.JBOSS_ID) &&
 			!appServerType.equals(ServerDetector.JONAS_ID) &&
 			!appServerType.equals(ServerDetector.JETTY_ID) &&
@@ -578,10 +577,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			File srcFile, String displayName, PluginPackage pluginPackage)
 		throws Exception {
 
-		if (appServerType.equals(ServerDetector.GERONIMO_ID)) {
-			copyDependencyXml("geronimo-web.xml", srcFile + "/WEB-INF");
-		}
-		else if (appServerType.equals(ServerDetector.JBOSS_ID)) {
+		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
 			if (ServerDetector.isJBoss5()) {
 				copyDependencyXml("jboss-web.xml", srcFile + "/WEB-INF");
 			}
@@ -667,8 +663,6 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		copyTlds(srcFile, pluginPackage);
 		copyXmls(srcFile, displayName, pluginPackage);
 		copyPortalDependencies(srcFile);
-
-		updateGeronimoWebXml(srcFile, displayName, pluginPackage);
 
 		File webXml = new File(srcFile + "/WEB-INF/web.xml");
 
@@ -941,8 +935,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
 			deployDir = jbossPrefix + deployDir;
 		}
-		else if (appServerType.equals(ServerDetector.GERONIMO_ID) ||
-				 appServerType.equals(ServerDetector.GLASSFISH_ID) ||
+		else if (appServerType.equals(ServerDetector.GLASSFISH_ID) ||
 				 appServerType.equals(ServerDetector.JETTY_ID) ||
 				 appServerType.equals(ServerDetector.JONAS_ID) ||
 				 appServerType.equals(ServerDetector.OC4J_ID) ||
@@ -1527,7 +1520,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return null;
 		}
 
-		Map<String, String> filterMap = new HashMap<String, String>();
+		Map<String, String> filterMap = new HashMap<>();
 
 		filterMap.put("author", wrapCDATA(pluginPackage.getAuthor()));
 		filterMap.put("change_log", wrapCDATA(pluginPackage.getChangeLog()));
@@ -1742,7 +1735,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		String webSphereHome = System.getenv("WAS_HOME");
 
-		List<String> commands = new ArrayList<String>();
+		List<String> commands = new ArrayList<>();
 
 		if (OSDetector.isWindows()) {
 			commands.add(webSphereHome + "\\bin\\wsadmin.bat");
@@ -2009,7 +2002,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			File file = new File(srcDir + "/WEB-INF/" + fileName);
 
 			try {
-				Document doc = SAXReaderUtil.read(file);
+				Document doc = UnsecureSAXReaderUtil.read(file);
 
 				String content = doc.formattedString(StringPool.TAB, true);
 
@@ -2033,11 +2026,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return content;
 		}
 
-		Document document = SAXReaderUtil.read(content);
+		Document document = UnsecureSAXReaderUtil.read(content);
 
 		Element rootElement = document.getRootElement();
 
-		List<String> listenerClasses = new ArrayList<String>();
+		List<String> listenerClasses = new ArrayList<>();
 
 		List<Element> listenerElements = rootElement.elements("listener");
 
@@ -2179,41 +2172,6 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	public void updateDeployDirectory(File srcFile) throws Exception {
 	}
 
-	public void updateGeronimoWebXml(
-			File srcFile, String displayName, PluginPackage pluginPackage)
-		throws Exception {
-
-		if (!appServerType.equals(ServerDetector.GERONIMO_ID)) {
-			return;
-		}
-
-		File geronimoWebXml = new File(srcFile + "/WEB-INF/geronimo-web.xml");
-
-		Document document = SAXReaderUtil.read(geronimoWebXml);
-
-		Element rootElement = document.getRootElement();
-
-		Element environmentElement = rootElement.element("environment");
-
-		Element moduleIdElement = environmentElement.element("moduleId");
-
-		Element artifactIdElement = moduleIdElement.element("artifactId");
-
-		artifactIdElement.setText(displayName);
-
-		Element versionElement = moduleIdElement.element("version");
-
-		versionElement.setText(pluginPackage.getVersion());
-
-		String content = document.formattedString();
-
-		FileUtil.write(geronimoWebXml, content);
-
-		if (_log.isInfoEnabled()) {
-			_log.info("Modifying Geronimo " + geronimoWebXml);
-		}
-	}
-
 	public String updateLiferayWebXml(
 			double webXmlVersion, File srcFile, String webXmlContent)
 		throws Exception {
@@ -2307,14 +2265,14 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			content = content.substring(0, x) + content.substring(y);
 		}
 
-		Document document = SAXReaderUtil.read(content);
+		Document document = UnsecureSAXReaderUtil.read(content);
 
 		Element rootElement = document.getRootElement();
 
 		double webXmlVersion = GetterUtil.getDouble(
 			rootElement.attributeValue("version"), 2.3);
 
-		if (!PropsValues.TCK_URL && (webXmlVersion <= 2.3)) {
+		if (webXmlVersion <= 2.3) {
 			throw new AutoDeployException(
 				webXml.getName() +
 					" must be updated to the Servlet 2.4 specification");
@@ -2428,6 +2386,6 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	private static final String _PORTAL_CLASS_LOADER =
 		"com.liferay.support.tomcat.loader.PortalClassLoader";
 
-	private static Log _log = LogFactoryUtil.getLog(BaseDeployer.class);
+	private static final Log _log = LogFactoryUtil.getLog(BaseDeployer.class);
 
 }

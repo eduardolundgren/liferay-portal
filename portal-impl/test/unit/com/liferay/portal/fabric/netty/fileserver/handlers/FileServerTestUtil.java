@@ -70,6 +70,38 @@ public class FileServerTestUtil {
 		return file;
 	}
 
+	/**
+	 * Creates the folder with new subfolders and files included in its
+	 * directory structure.
+	 *
+	 * <p>
+	 * The following diagram illustrates the folder's directory structure:
+	 * </p>
+	 *
+	 * <p>
+	 * <pre>
+	 * folder
+	 *      |
+	 *      |->subFolder1
+	 *      |           |
+	 *      |           |->file1
+	 *      |           |->file2
+	 *      |
+	 *      |->subFolder2
+	 *      |           |
+	 *      |           |->file3
+	 *      |
+	 *      |->subFolder3
+	 *                  |
+	 *                  |->subFolder4
+	 * </pre>
+	 * </p>
+	 *
+	 * @param  folder the folder
+	 * @return the folder with new subfolders and files included in its
+	 *         directory structure
+	 * @throws IOException if an IO exception occurred
+	 */
 	public static Path createFolderWithFiles(Path folder) throws IOException {
 		FileHelperUtil.delete(folder);
 
@@ -143,7 +175,7 @@ public class FileServerTestUtil {
 			data, data.length / 2, data.length - data.length / 2);
 	}
 
-	protected static final Set<Path> _paths = new HashSet<Path>();
+	protected static final Set<Path> _paths = new HashSet<>();
 
 	protected static class FolderCompareFileVisitor
 		extends SimpleFileVisitor<Path> {

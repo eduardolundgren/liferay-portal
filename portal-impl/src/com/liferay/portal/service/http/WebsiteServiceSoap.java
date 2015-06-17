@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.WebsiteServiceUtil} service utility. The
+ * {@link WebsiteServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -59,7 +59,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see WebsiteServiceHttp
  * @see com.liferay.portal.model.WebsiteSoap
- * @see com.liferay.portal.service.WebsiteServiceUtil
+ * @see WebsiteServiceUtil
  * @generated
  */
 @ProviderType
@@ -71,7 +71,7 @@ public class WebsiteServiceSoap {
 	@Deprecated
 	public static com.liferay.portal.model.WebsiteSoap addWebsite(
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary) throws RemoteException {
+		long typeId, boolean primary) throws RemoteException {
 		try {
 			com.liferay.portal.model.Website returnValue = WebsiteServiceUtil.addWebsite(className,
 					classPK, url, typeId, primary);
@@ -87,7 +87,7 @@ public class WebsiteServiceSoap {
 
 	public static com.liferay.portal.model.WebsiteSoap addWebsite(
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary,
+		long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
@@ -144,7 +144,7 @@ public class WebsiteServiceSoap {
 	}
 
 	public static com.liferay.portal.model.WebsiteSoap updateWebsite(
-		long websiteId, java.lang.String url, int typeId, boolean primary)
+		long websiteId, java.lang.String url, long typeId, boolean primary)
 		throws RemoteException {
 		try {
 			com.liferay.portal.model.Website returnValue = WebsiteServiceUtil.updateWebsite(websiteId,
