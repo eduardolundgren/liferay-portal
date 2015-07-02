@@ -18,11 +18,11 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
-<%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
-<%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
-<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
-<%@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %>
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
+taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.polls.constants.PollsPortletKeys" %><%@
 page import="com.liferay.polls.constants.PollsWebKeys" %><%@
@@ -39,8 +39,8 @@ page import="com.liferay.polls.model.PollsVote" %><%@
 page import="com.liferay.polls.service.PollsChoiceLocalServiceUtil" %><%@
 page import="com.liferay.polls.service.PollsQuestionLocalServiceUtil" %><%@
 page import="com.liferay.polls.service.PollsVoteLocalServiceUtil" %><%@
-page import="com.liferay.polls.service.permission.PollsPermission" %><%@
-page import="com.liferay.polls.service.permission.PollsQuestionPermission" %><%@
+page import="com.liferay.polls.service.permission.PollsQuestionPermissionChecker" %><%@
+page import="com.liferay.polls.service.permission.PollsResourcePermissionChecker" %><%@
 page import="com.liferay.polls.web.polls.portlet.action.EditQuestionAction" %><%@
 page import="com.liferay.polls.web.util.PollsUtil" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
@@ -59,7 +59,6 @@ page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.model.Portlet" %><%@
 page import="com.liferay.portal.model.User" %><%@
-page import="com.liferay.portal.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.security.permission.ResourceActionsUtil" %><%@
 page import="com.liferay.portal.service.PortletLocalServiceUtil" %><%@
@@ -80,7 +79,8 @@ page import="javax.portlet.ResourceURL" %><%@
 page import="javax.portlet.WindowState" %>
 
 <portlet:defineObjects />
-<liferay-theme:defineObjects/>
+
+<liferay-theme:defineObjects />
 
 <%
 WindowState windowState = liferayPortletRequest.getWindowState();

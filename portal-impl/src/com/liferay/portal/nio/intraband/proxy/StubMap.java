@@ -56,7 +56,7 @@ public class StubMap<T> extends ConcurrentHashMap<String, T> {
 			return originalValue;
 		}
 
-		stubHolder = new StubHolder<T>(
+		stubHolder = new StubHolder<>(
 			originalValue, portletId, registrationReference, _stubCreator);
 
 		StubHolder<T> previousStubHolder = _stubHolders.putIfAbsent(
@@ -90,6 +90,6 @@ public class StubMap<T> extends ConcurrentHashMap<String, T> {
 
 	private final StubCreator<T> _stubCreator;
 	private final ConcurrentMap<String, StubHolder<T>> _stubHolders =
-		new ConcurrentHashMap<String, StubHolder<T>>();
+		new ConcurrentHashMap<>();
 
 }

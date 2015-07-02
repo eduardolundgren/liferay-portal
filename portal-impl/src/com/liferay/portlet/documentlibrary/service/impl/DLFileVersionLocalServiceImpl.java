@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -25,7 +26,7 @@ import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.base.DLFileVersionLocalServiceBaseImpl;
-import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
+import com.liferay.portlet.documentlibrary.util.comparator.DLFileVersionVersionComparator;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +73,7 @@ public class DLFileVersionLocalServiceImpl
 
 		dlFileVersions = ListUtil.copy(dlFileVersions);
 
-		Collections.sort(dlFileVersions, new FileVersionVersionComparator());
+		Collections.sort(dlFileVersions, new DLFileVersionVersionComparator());
 
 		return dlFileVersions;
 	}
@@ -97,7 +98,7 @@ public class DLFileVersionLocalServiceImpl
 
 		dlFileVersions = ListUtil.copy(dlFileVersions);
 
-		Collections.sort(dlFileVersions, new FileVersionVersionComparator());
+		Collections.sort(dlFileVersions, new DLFileVersionVersionComparator());
 
 		DLFileVersion dlFileVersion = dlFileVersions.get(0);
 
@@ -135,6 +136,10 @@ public class DLFileVersionLocalServiceImpl
 	public void setTreePaths(final long folderId, final String treePath)
 		throws PortalException {
 
+		if (treePath == null) {
+			throw new IllegalArgumentException("Tree path is null");
+		}
+
 		ActionableDynamicQuery actionableDynamicQuery =
 			getActionableDynamicQuery();
 
@@ -151,7 +156,10 @@ public class DLFileVersionLocalServiceImpl
 					Property treePathProperty = PropertyFactoryUtil.forName(
 						"treePath");
 
-					dynamicQuery.add(treePathProperty.ne(treePath));
+					dynamicQuery.add(
+						RestrictionsFactoryUtil.or(
+							treePathProperty.isNull(),
+							treePathProperty.ne(treePath)));
 				}
 
 			});

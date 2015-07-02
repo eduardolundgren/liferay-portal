@@ -63,7 +63,31 @@ String buildInfo = StringUtil.replace(releaseInfoArray[1], ")", "");
 
 List<ClusterNode> clusterNodes = ClusterExecutorUtil.getClusterNodes();
 
-Collections.sort(clusterNodes);
+Collections.sort(
+	clusterNodes,
+	new java.util.Comparator<ClusterNode>() {
+
+		@Override
+		public int compare(ClusterNode clusterNode1, ClusterNode clusterNode2) {
+			java.net.InetAddress inetAddress1 = clusterNode1.getBindInetAddress();
+			java.net.InetAddress inetAddress2 = clusterNode2.getBindInetAddress();
+
+			String hostAddress1 = inetAddress1.getHostAddress();
+			String hostAddress2 = inetAddress2.getHostAddress();
+
+			int value = hostAddress1.compareTo(hostAddress2);
+
+			if (value == 0) {
+				String clusterNodeId1 = clusterNode1.getClusterNodeId();
+				String clusterNodeId2 = clusterNode2.getClusterNodeId();
+
+				value = clusterNodeId1.compareTo(clusterNodeId2);
+			}
+
+			return value;
+		}
+
+	});
 
 DateFormat dateFormatDateTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
 
@@ -433,7 +457,7 @@ dateFormatDateTime.setTimeZone(timeZone);
 							dataType: 'JSON',
 							on: {
 								failure: function() {
-									var errorMessage = A.Lang.sub(Liferay.Language.get('error-contacting-x'), [ip]);
+									var errorMessage = A.Lang.sub('<liferay-ui:message key="error-contacting-x" />', [ip]);
 
 									if (port != '-1') {
 										errorMessage += ':' + port;

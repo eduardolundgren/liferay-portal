@@ -46,7 +46,7 @@ public class BatchablePipe<K, V> {
 
 			if (concurrentMap.replace(
 					key, previousIncreasableEntryWrapper,
-				new IncreasableEntryWrapper<K, V>(newIncreasableEntry))) {
+					new IncreasableEntryWrapper<K, V>(newIncreasableEntry))) {
 
 				queue.offer(newIncreasableEntry);
 
@@ -65,7 +65,7 @@ public class BatchablePipe<K, V> {
 
 			if (concurrentMap.remove(
 					increasableEntry.getKey(),
-				new IncreasableEntryWrapper<K, V>(increasableEntry))) {
+					new IncreasableEntryWrapper<K, V>(increasableEntry))) {
 
 				return increasableEntry;
 			}
@@ -73,10 +73,9 @@ public class BatchablePipe<K, V> {
 	}
 
 	protected final ConcurrentMap<K, IncreasableEntryWrapper<K, V>>
-		concurrentMap =
-			new ConcurrentHashMap<K, IncreasableEntryWrapper<K, V>>();
+		concurrentMap = new ConcurrentHashMap<>();
 	protected final Queue<IncreasableEntry<K, V>> queue =
-		new ConcurrentLinkedQueue<IncreasableEntry<K, V>>();
+		new ConcurrentLinkedQueue<>();
 
 	protected static class IncreasableEntryWrapper<K, V> {
 

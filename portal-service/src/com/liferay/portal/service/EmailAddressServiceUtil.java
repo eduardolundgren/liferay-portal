@@ -48,7 +48,7 @@ public class EmailAddressServiceUtil {
 	@Deprecated
 	public static com.liferay.portal.model.EmailAddress addEmailAddress(
 		java.lang.String className, long classPK, java.lang.String address,
-		int typeId, boolean primary)
+		long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addEmailAddress(className, classPK, address, typeId, primary);
@@ -56,7 +56,7 @@ public class EmailAddressServiceUtil {
 
 	public static com.liferay.portal.model.EmailAddress addEmailAddress(
 		java.lang.String className, long classPK, java.lang.String address,
-		int typeId, boolean primary,
+		long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -67,6 +67,21 @@ public class EmailAddressServiceUtil {
 	public static void deleteEmailAddress(long emailAddressId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteEmailAddress(emailAddressId);
+	}
+
+	/**
+	* Returns the email address with the primary key.
+	*
+	* @param emailAddressId the primary key of the email address
+	* @return the email address with the primary key, or <code>null</code> if
+	an email address with the primary key could not be found or if
+	the user did not have permission to view the email address
+	* @throws PortalException if a portal exception occurred
+	*/
+	public static com.liferay.portal.model.EmailAddress fetchEmailAddress(
+		long emailAddressId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchEmailAddress(emailAddressId);
 	}
 
 	/**
@@ -100,7 +115,7 @@ public class EmailAddressServiceUtil {
 	}
 
 	public static com.liferay.portal.model.EmailAddress updateEmailAddress(
-		long emailAddressId, java.lang.String address, int typeId,
+		long emailAddressId, java.lang.String address, long typeId,
 		boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()

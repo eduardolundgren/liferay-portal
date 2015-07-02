@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatamapping.storage;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -78,7 +79,7 @@ public class Fields implements Iterable<Field>, Serializable {
 	}
 
 	public Set<Locale> getAvailableLocales() {
-		Set<Locale> availableLocales = new HashSet<Locale>();
+		Set<Locale> availableLocales = new HashSet<>();
 
 		for (Field field : _fieldsMap.values()) {
 			if (field.isPrivate()) {
@@ -126,6 +127,13 @@ public class Fields implements Iterable<Field>, Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+		int hash = HashUtil.hash(0, _fieldsMap);
+
+		return HashUtil.hash(hash, getFieldsList(true));
+	}
+
+	@Override
 	public Iterator<Field> iterator() {
 		return iterator(false);
 	}
@@ -155,7 +163,7 @@ public class Fields implements Iterable<Field>, Serializable {
 	}
 
 	protected List<Field> getFieldsList(boolean includePrivateFields) {
-		List<Field> fieldsList = new ArrayList<Field>();
+		List<Field> fieldsList = new ArrayList<>();
 
 		for (Field field : _fieldsMap.values()) {
 			if (!includePrivateFields && field.isPrivate()) {
@@ -168,6 +176,6 @@ public class Fields implements Iterable<Field>, Serializable {
 		return fieldsList;
 	}
 
-	private final Map<String, Field> _fieldsMap = new HashMap<String, Field>();
+	private final Map<String, Field> _fieldsMap = new HashMap<>();
 
 }

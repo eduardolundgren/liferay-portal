@@ -4,8 +4,9 @@
 	default-destroy-method="destroy"
 	default-init-method="afterPropertiesSet"
 	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
 >
 
 	<!-- Advice -->
@@ -25,18 +26,9 @@
 	<!-- Proxy -->
 
 	<bean id="com.liferay.portal.audit.AuditRouterProxyBean" class="com.liferay.portal.audit.AuditRouterProxyBean">
-		<property name="singleDestinationSynchronousMessageSender">
-			<bean class="com.liferay.portal.kernel.messaging.sender.DefaultSingleDestinationSynchronousMessageSender">
-				<property name="destinationName" value="liferay/audit" />
-				<property name="synchronousMessageSender" ref="com.liferay.portal.kernel.messaging.sender.DirectSynchronousMessageSender" />
-			</bean>
-		</property>
-		<property name="singleDestinationMessageSender">
-			<bean class="com.liferay.portal.kernel.messaging.sender.DefaultSingleDestinationMessageSender">
-				<property name="destinationName" value="liferay/audit" />
-				<property name="messageSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
-			</bean>
-		</property>
+		<property name="destinationName" value="liferay/audit" />
+		<property name="synchronousDestinationName" value="liferay/audit" />
+		<property name="synchronousMessageSenderMode" value="DIRECT" />
 	</bean>
 
 	<!-- Util -->
@@ -47,17 +39,16 @@
 
 	<!-- Messaging -->
 
-	<bean id="destination.audit" class="com.liferay.portal.kernel.messaging.ParallelDestination">
-		<property name="name" value="liferay/audit" />
-	</bean>
 	<bean id="messagingConfigurator.audit" class="com.liferay.portal.kernel.messaging.config.DefaultMessagingConfigurator">
-		<property name="destinations">
-			<list>
-				<ref bean="destination.audit" />
-			</list>
-		</property>
-		<property name="messageBus">
-			<ref bean="com.liferay.portal.kernel.messaging.MessageBus" />
+		<property name="destinationConfigurations">
+			<util:set>
+				<bean class="com.liferay.portal.kernel.messaging.DestinationConfiguration">
+					<constructor-arg name="destinationName" value="liferay/audit" />
+					<constructor-arg name="destinationType">
+						<util:constant static-field="com.liferay.portal.kernel.messaging.DestinationConfiguration.DESTINATION_TYPE_PARALLEL" />
+					</constructor-arg>
+				</bean>
+			</util:set>
 		</property>
 	</bean>
 </beans>

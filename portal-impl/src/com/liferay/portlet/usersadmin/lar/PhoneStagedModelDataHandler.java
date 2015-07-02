@@ -15,15 +15,18 @@
 package com.liferay.portlet.usersadmin.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Phone;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.PhoneLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author David Mendez Gonzalez
@@ -34,26 +37,36 @@ public class PhoneStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {Phone.class.getName()};
 
 	@Override
+	public void deleteStagedModel(Phone phone) {
+		PhoneLocalServiceUtil.deletePhone(phone);
+	}
+
+	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		Phone phone = fetchStagedModelByUuidAndCompanyId(
+		Phone phone = PhoneLocalServiceUtil.fetchPhoneByUuidAndCompanyId(
 			uuid, group.getCompanyId());
 
 		if (phone != null) {
-			PhoneLocalServiceUtil.deletePhone(phone);
+			deleteStagedModel(phone);
 		}
 	}
 
 	@Override
-	public Phone fetchStagedModelByUuidAndCompanyId(
+	public List<Phone> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return PhoneLocalServiceUtil.fetchPhoneByUuidAndCompanyId(
-			uuid, companyId);
+		List<Phone> phones = new ArrayList<>();
+
+		phones.add(
+			PhoneLocalServiceUtil.fetchPhoneByUuidAndCompanyId(
+				uuid, companyId));
+
+		return phones;
 	}
 
 	@Override
@@ -82,8 +95,9 @@ public class PhoneStagedModelDataHandler
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			phone);
 
-		Phone existingPhone = fetchStagedModelByUuidAndCompanyId(
-			phone.getUuid(), portletDataContext.getCompanyId());
+		Phone existingPhone =
+			PhoneLocalServiceUtil.fetchPhoneByUuidAndCompanyId(
+				phone.getUuid(), portletDataContext.getCompanyId());
 
 		Phone importedPhone = null;
 

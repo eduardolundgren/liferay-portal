@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,25 +33,30 @@ import java.util.concurrent.TimeUnit;
  */
 public class ServerEventUtil {
 
-	public static void retryServerConnection(long syncAccountId, long delay) {
-		Map<String, Object> parameters = new HashMap<String, Object>();
+	public static synchronized void retryServerConnection(
+		long syncAccountId, long delay) {
 
-		parameters.put("uuid", null);
+		ScheduledFuture scheduledFuture =
+			_retryServerConnectionScheduledFutures.get(syncAccountId);
+
+		if (scheduledFuture != null) {
+			scheduledFuture.cancel(false);
+		}
 
 		RetryServerConnectionEvent retryServerConnectionEvent =
-			new RetryServerConnectionEvent(syncAccountId, parameters);
+			new RetryServerConnectionEvent(
+				syncAccountId, Collections.<String, Object>emptyMap());
 
-		_scheduledExecutorService.schedule(
+		scheduledFuture = _scheduledExecutorService.schedule(
 			retryServerConnectionEvent, delay, TimeUnit.MILLISECONDS);
+
+		_retryServerConnectionScheduledFutures.put(
+			syncAccountId, scheduledFuture);
 	}
 
 	public static SyncAccount synchronizeSyncAccount(long syncAccountId) {
-		Map<String, Object> parameters = new HashMap<String, Object>();
-
-		parameters.put("uuid", null);
-
 		GetSyncContextEvent getSyncContextEvent = new GetSyncContextEvent(
-			syncAccountId, parameters);
+			syncAccountId, Collections.<String, Object>emptyMap());
 
 		getSyncContextEvent.run();
 
@@ -65,6 +71,8 @@ public class ServerEventUtil {
 		getUserSitesGroupsEvent.run();
 	}
 
+	private static final Map<Long, ScheduledFuture>
+		_retryServerConnectionScheduledFutures = new HashMap<>();
 	private static final ScheduledExecutorService _scheduledExecutorService =
 		Executors.newScheduledThreadPool(5);
 

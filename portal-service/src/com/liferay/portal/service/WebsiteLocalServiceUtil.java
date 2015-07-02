@@ -48,7 +48,7 @@ public class WebsiteLocalServiceUtil {
 	@Deprecated
 	public static com.liferay.portal.model.Website addWebsite(long userId,
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary)
+		long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addWebsite(userId, className, classPK, url, typeId, primary);
@@ -56,7 +56,7 @@ public class WebsiteLocalServiceUtil {
 
 	public static com.liferay.portal.model.Website addWebsite(long userId,
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary,
+		long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -230,7 +230,7 @@ public class WebsiteLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -321,7 +321,7 @@ public class WebsiteLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.Website updateWebsite(
-		long websiteId, java.lang.String url, int typeId, boolean primary)
+		long websiteId, java.lang.String url, long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().updateWebsite(websiteId, url, typeId, primary);
 	}

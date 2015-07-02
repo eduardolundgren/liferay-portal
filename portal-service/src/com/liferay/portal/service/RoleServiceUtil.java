@@ -129,6 +129,11 @@ public class RoleServiceUtil {
 		getService().deleteRole(roleId);
 	}
 
+	public static com.liferay.portal.model.Role fetchRole(long roleId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchRole(roleId);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -182,6 +187,18 @@ public class RoleServiceUtil {
 	public static com.liferay.portal.model.Role getRole(long roleId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRole(roleId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Role> getRoles(
+		long companyId, int[] types)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRoles(companyId, types);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Role> getRoles(
+		int type, java.lang.String subtype)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRoles(type, subtype);
 	}
 
 	/**
@@ -277,6 +294,21 @@ public class RoleServiceUtil {
 		java.lang.String[] names, boolean inherited)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().hasUserRoles(userId, companyId, names, inherited);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Role> search(
+		long companyId, java.lang.String keywords, java.lang.Integer[] types,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Role> obc) {
+		return getService()
+				   .search(companyId, keywords, types, params, start, end, obc);
+	}
+
+	public static int searchCount(long companyId, java.lang.String keywords,
+		java.lang.Integer[] types,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params) {
+		return getService().searchCount(companyId, keywords, types, params);
 	}
 
 	/**

@@ -16,9 +16,10 @@ package com.liferay.bookmarks.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +68,7 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 		attributes.put("treePath", getTreePath());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -153,6 +155,12 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -254,7 +262,7 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	* @return the create date of this bookmarks folder
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _bookmarksFolder.getCreateDate();
 	}
 
@@ -294,12 +302,22 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	}
 
 	/**
+	* Returns the last publish date of this bookmarks folder.
+	*
+	* @return the last publish date of this bookmarks folder
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _bookmarksFolder.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this bookmarks folder.
 	*
 	* @return the modified date of this bookmarks folder
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _bookmarksFolder.getModifiedDate();
 	}
 
@@ -410,7 +428,7 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	* @return the status date of this bookmarks folder
 	*/
 	@Override
-	public java.util.Date getStatusDate() {
+	public Date getStatusDate() {
 		return _bookmarksFolder.getStatusDate();
 	}
 
@@ -666,7 +684,7 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	* @param createDate the create date of this bookmarks folder
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_bookmarksFolder.setCreateDate(createDate);
 	}
 
@@ -719,12 +737,22 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	}
 
 	/**
+	* Sets the last publish date of this bookmarks folder.
+	*
+	* @param lastPublishDate the last publish date of this bookmarks folder
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_bookmarksFolder.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this bookmarks folder.
 	*
 	* @param modifiedDate the modified date of this bookmarks folder
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_bookmarksFolder.setModifiedDate(modifiedDate);
 	}
 
@@ -834,7 +862,7 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	* @param statusDate the status date of this bookmarks folder
 	*/
 	@Override
-	public void setStatusDate(java.util.Date statusDate) {
+	public void setStatusDate(Date statusDate) {
 		_bookmarksFolder.setStatusDate(statusDate);
 	}
 

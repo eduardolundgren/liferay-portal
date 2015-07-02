@@ -26,13 +26,15 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
-Role role = (Role)request.getAttribute(WebKeys.ROLE);
+long roleId = ParamUtil.getLong(request, "roleId");
+
+Role role = RoleServiceUtil.fetchRole(roleId);
 
 String portletResource = ParamUtil.getString(request, "portletResource");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/roles_admin/edit_role_permissions");
+portletURL.setParameter("mvcPath", "/html/portlet/roles_admin/edit_role_permissions.jsp");
 portletURL.setParameter(Constants.CMD, Constants.VIEW);
 portletURL.setParameter("tabs1", tabs1);
 portletURL.setParameter("tabs2", tabs2);
@@ -41,7 +43,7 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 %>
 
 <liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" varImpl="editPermissionsResourceURL">
-	<portlet:param name="struts_action" value="/roles_admin/edit_role_permissions" />
+	<portlet:param name="mvcPath" value="/html/portlet/roles_admin/view_resources.jsp" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" />
 	<portlet:param name="tabs1" value="roles" />
 	<portlet:param name="redirect" value="<%= backURL %>" />
@@ -49,7 +51,7 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 </liferay-portlet:resourceURL>
 
 <liferay-portlet:renderURL copyCurrentRenderParameters="<%= false %>" varImpl="editPermissionsURL">
-	<portlet:param name="struts_action" value="/roles_admin/edit_role_permissions" />
+	<portlet:param name="mvcPath" value="/html/portlet/roles_admin/view_resources.jsp" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" />
 	<portlet:param name="tabs1" value="roles" />
 	<portlet:param name="redirect" value="<%= backURL %>" />
@@ -162,9 +164,7 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 	function createLiveSearch() {
 		var instance = this;
 
-		var trim = A.Lang.trim;
-
-		var PermissionNavigationSearch = A.Component.create (
+		var PermissionNavigationSearch = A.Component.create(
 			{
 				AUGMENTS: [A.AutoCompleteBase],
 
@@ -190,7 +190,7 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 				function(item, index, collection) {
 					results.push(
 						{
-							data: trim(item.text()),
+							data: item.text().trim(),
 							node: item.ancestor()
 						}
 					);
@@ -246,8 +246,7 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 					}
 				);
 
-				AArray.each(
-					event.results,
+				event.results.forEach(
 					function(item, index) {
 						item.raw.node.removeClass('hide');
 					}
@@ -371,7 +370,7 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 				selectedGroupNames = selectedGroupNamesField.split('@@');
 			}
 
-			if (AUI().Array.indexOf(selectedGroupIds, event.groupid) == -1) {
+			if (selectedGroupIds.indexOf(event.groupid) == -1) {
 				selectedGroupIds.push(event.groupid);
 				selectedGroupNames.push(event.groupdescriptivename);
 			}
@@ -401,7 +400,6 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 	function <portlet:namespace />updateActions() {
 		var form = AUI.$(document.<portlet:namespace />fm);
 
-		form.fm('<%= Constants.CMD %>').val('actions');
 		form.fm('redirect').val('<%= portletURL.toString() %>');
 		form.fm('selectedTargets').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
 

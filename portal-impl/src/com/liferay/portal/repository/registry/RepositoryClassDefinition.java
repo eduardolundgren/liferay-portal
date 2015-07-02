@@ -14,31 +14,32 @@
 
 package com.liferay.portal.repository.registry;
 
-import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
+import com.liferay.portal.kernel.repository.RepositoryConfiguration;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.capabilities.ConfigurationCapability;
 import com.liferay.portal.kernel.repository.capabilities.RepositoryEventTriggerCapability;
-import com.liferay.portal.kernel.repository.cmis.CMISRepositoryHandler;
 import com.liferay.portal.kernel.repository.event.RepositoryEventTrigger;
-import com.liferay.portal.kernel.repository.registry.CapabilityRegistry;
 import com.liferay.portal.kernel.repository.registry.RepositoryDefiner;
 import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
-import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.repository.InitializedLocalRepository;
+import com.liferay.portal.repository.InitializedRepository;
 import com.liferay.portal.repository.capabilities.CapabilityLocalRepository;
 import com.liferay.portal.repository.capabilities.CapabilityRepository;
 import com.liferay.portal.repository.capabilities.ConfigurationCapabilityImpl;
 import com.liferay.portal.repository.capabilities.LiferayRepositoryEventTriggerCapability;
-import com.liferay.portal.repository.proxy.BaseRepositoryProxyBean;
+
+import java.util.Locale;
 
 /**
  * @author Adolfo Pérez
  */
 public class RepositoryClassDefinition
-	implements RepositoryFactory, RepositoryFactoryRegistry {
+	implements RepositoryConfiguration, RepositoryFactory,
+			   RepositoryFactoryRegistry {
 
 	public static final RepositoryClassDefinition fromRepositoryDefiner(
 		RepositoryDefiner repositoryDefiner) {
@@ -61,11 +62,11 @@ public class RepositoryClassDefinition
 	public LocalRepository createLocalRepository(long repositoryId)
 		throws PortalException {
 
-		LocalRepository localRepository =
-			_repositoryFactory.createLocalRepository(repositoryId);
+		InitializedLocalRepository initializedLocalRepository =
+			new InitializedLocalRepository();
 
 		DefaultCapabilityRegistry defaultCapabilityRegistry =
-			new DefaultCapabilityRegistry(localRepository);
+			new DefaultCapabilityRegistry(initializedLocalRepository);
 
 		_repositoryDefiner.registerCapabilities(defaultCapabilityRegistry);
 
@@ -73,11 +74,14 @@ public class RepositoryClassDefinition
 			new DefaultRepositoryEventRegistry(_rootRepositoryEventTrigger);
 
 		setUpCommonCapabilities(
-			localRepository, defaultCapabilityRegistry,
+			initializedLocalRepository, defaultCapabilityRegistry,
 			defaultRepositoryEventRegistry);
 
 		defaultCapabilityRegistry.registerCapabilityRepositoryEvents(
 			defaultRepositoryEventRegistry);
+
+		LocalRepository localRepository =
+			_repositoryFactory.createLocalRepository(repositoryId);
 
 		LocalRepository wrappedLocalRepository =
 			defaultCapabilityRegistry.invokeCapabilityWrappers(localRepository);
@@ -87,6 +91,9 @@ public class RepositoryClassDefinition
 				wrappedLocalRepository, defaultCapabilityRegistry,
 				defaultRepositoryEventRegistry);
 
+		initializedLocalRepository.setDocumentRepository(
+			capabilityLocalRepository);
+
 		return capabilityLocalRepository;
 	}
 
@@ -94,11 +101,11 @@ public class RepositoryClassDefinition
 	public Repository createRepository(long repositoryId)
 		throws PortalException {
 
-		Repository repository = _repositoryFactory.createRepository(
-			repositoryId);
+		InitializedRepository initializedRepository =
+			new InitializedRepository();
 
 		DefaultCapabilityRegistry defaultCapabilityRegistry =
-			new DefaultCapabilityRegistry(repository);
+			new DefaultCapabilityRegistry(initializedRepository);
 
 		_repositoryDefiner.registerCapabilities(defaultCapabilityRegistry);
 
@@ -106,11 +113,11 @@ public class RepositoryClassDefinition
 			new DefaultRepositoryEventRegistry(_rootRepositoryEventTrigger);
 
 		setUpCommonCapabilities(
-			repository, defaultCapabilityRegistry,
+			initializedRepository, defaultCapabilityRegistry,
 			defaultRepositoryEventRegistry);
 
-		setUpCapabilityRepositoryCapabilities(
-			repository, defaultCapabilityRegistry);
+		Repository repository = _repositoryFactory.createRepository(
+			repositoryId);
 
 		defaultCapabilityRegistry.registerCapabilityRepositoryEvents(
 			defaultRepositoryEventRegistry);
@@ -122,7 +129,27 @@ public class RepositoryClassDefinition
 			wrappedRepository, defaultCapabilityRegistry,
 			defaultRepositoryEventRegistry);
 
+		initializedRepository.setDocumentRepository(capabilityRepository);
+
 		return capabilityRepository;
+	}
+
+	public String getClassName() {
+		return _repositoryDefiner.getClassName();
+	}
+
+	public String getRepositoryTypeLabel(Locale locale) {
+		return _repositoryDefiner.getRepositoryTypeLabel(locale);
+	}
+
+	@Override
+	public String[] getSupportedConfigurations() {
+		return _repositoryDefiner.getSupportedConfigurations();
+	}
+
+	@Override
+	public String[][] getSupportedParameters() {
+		return _repositoryDefiner.getSupportedParameters();
 	}
 
 	@Override
@@ -141,39 +168,6 @@ public class RepositoryClassDefinition
 
 		_repositoryDefiner = repositoryDefiner;
 		_rootRepositoryEventTrigger = rootRepositoryEventTrigger;
-	}
-
-	protected CMISRepositoryHandler getCMISRepositoryHandler(
-		Repository repository) {
-
-		if (repository instanceof BaseRepositoryProxyBean) {
-			BaseRepositoryProxyBean baseRepositoryProxyBean =
-				(BaseRepositoryProxyBean)repository;
-
-			ClassLoaderBeanHandler classLoaderBeanHandler =
-				(ClassLoaderBeanHandler)ProxyUtil.getInvocationHandler(
-					baseRepositoryProxyBean.getProxyBean());
-
-			Object bean = classLoaderBeanHandler.getBean();
-
-			if (bean instanceof CMISRepositoryHandler) {
-				return (CMISRepositoryHandler)bean;
-			}
-		}
-
-		return null;
-	}
-
-	protected void setUpCapabilityRepositoryCapabilities(
-		Repository repository, CapabilityRegistry capabilityRegistry) {
-
-		CMISRepositoryHandler cmisRepositoryHandler = getCMISRepositoryHandler(
-			repository);
-
-		if (cmisRepositoryHandler != null) {
-			capabilityRegistry.addExportedCapability(
-				CMISRepositoryHandler.class, cmisRepositoryHandler);
-		}
 	}
 
 	protected void setUpCommonCapabilities(

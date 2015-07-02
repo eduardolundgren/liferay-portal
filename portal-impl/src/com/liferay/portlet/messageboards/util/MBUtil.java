@@ -62,13 +62,14 @@ import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
-import com.liferay.portlet.messageboards.MBSettings;
+import com.liferay.portlet.messageboards.MBGroupServiceSettings;
 import com.liferay.portlet.messageboards.model.MBBan;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
@@ -257,7 +258,7 @@ public class MBUtil {
 				collectMultipartContent(mimeMultipart, mbMailMessage);
 			}
 			else if (partContent instanceof String) {
-				Map<String, Object> options = new HashMap<String, Object>();
+				Map<String, Object> options = new HashMap<>();
 
 				options.put("emailPartToMBMessageBody", Boolean.TRUE);
 
@@ -346,12 +347,18 @@ public class MBUtil {
 		return categoryId;
 	}
 
+	public static long getCategoryId(String messageIdString) {
+		String[] parts = _getMessageIdStringParts(messageIdString);
+
+		return GetterUtil.getLong(parts[0]);
+	}
+
 	public static Set<Long> getCategorySubscriptionClassPKs(long userId) {
 		List<Subscription> subscriptions =
 			SubscriptionLocalServiceUtil.getUserSubscriptions(
 				userId, MBCategory.class.getName());
 
-		Set<Long> classPKs = new HashSet<Long>(subscriptions.size());
+		Set<Long> classPKs = new HashSet<>(subscriptions.size());
 
 		for (Subscription subscription : subscriptions) {
 			classPKs.add(subscription.getClassPK());
@@ -367,8 +374,7 @@ public class MBUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$CATEGORY_NAME$]",
@@ -428,8 +434,11 @@ public class MBUtil {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -458,8 +467,7 @@ public class MBUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$COMPANY_ID$]",
@@ -494,8 +502,12 @@ public class MBUtil {
 			"[$MESSAGE_USER_NAME$]",
 			LanguageUtil.get(
 				themeDisplay.getLocale(), "the-user-who-added-the-message"));
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -506,7 +518,7 @@ public class MBUtil {
 	}
 
 	public static List<Object> getEntries(Hits hits) {
-		List<Object> entries = new ArrayList<Object>();
+		List<Object> entries = new ArrayList<>();
 
 		for (Document document : hits.getDocs()) {
 			long categoryId = GetterUtil.getLong(
@@ -577,39 +589,34 @@ public class MBUtil {
 		return entries;
 	}
 
-	public static long getMessageId(String mailId) {
-		int x = mailId.indexOf(CharPool.LESS_THAN) + 1;
-		int y = mailId.indexOf(CharPool.AT);
+	public static long getMessageId(String messageIdString) {
+		String[] parts = _getMessageIdStringParts(messageIdString);
 
-		long messageId = 0;
+		return GetterUtil.getLong(parts[1]);
+	}
 
-		if ((x > 0 ) && (y != -1)) {
-			String temp = mailId.substring(x, y);
-
-			int z = temp.lastIndexOf(CharPool.PERIOD);
-
-			if (z != -1) {
-				messageId = GetterUtil.getLong(temp.substring(z + 1));
-			}
+	public static int getMessageIdStringOffset() {
+		if (PropsValues.POP_SERVER_SUBDOMAIN.length() == 0) {
+			return 1;
 		}
 
-		return messageId;
+		return 0;
 	}
 
 	public static long getParentMessageId(Message message) throws Exception {
 		long parentMessageId = -1;
 
-		String parentHeader = getParentMessageIdString(message);
+		String parentMessageIdString = getParentMessageIdString(message);
 
-		if (parentHeader != null) {
+		if (parentMessageIdString != null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Parent header " + parentHeader);
+				_log.debug("Parent header " + parentMessageIdString);
 			}
 
-			parentMessageId = getMessageId(parentHeader);
+			parentMessageId = getMessageId(parentMessageIdString);
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Previous message id " + parentMessageId);
+				_log.debug("Parent message id " + parentMessageId);
 			}
 		}
 
@@ -631,12 +638,13 @@ public class MBUtil {
 		if (ArrayUtil.isNotEmpty(references)) {
 			String reference = references[0];
 
-			int x = reference.lastIndexOf("<mb.");
+			int x = reference.lastIndexOf(
+				StringPool.LESS_THAN + MESSAGE_POP_PORTLET_PREFIX);
 
 			if (x > -1) {
-				int y = reference.indexOf(">", x);
+				int y = reference.indexOf(StringPool.GREATER_THAN, x);
 
-				parentHeader = reference.substring(x, y);
+				parentHeader = reference.substring(x, y + 1);
 			}
 		}
 
@@ -679,19 +687,16 @@ public class MBUtil {
 		return sb.toString();
 	}
 
-	public static String getSubjectForEmail(Message message) throws Exception {
-		long parentMessageId = getParentMessageId(message);
+	public static String getSubjectForEmail(MBMessage message)
+		throws Exception {
 
-		MBMessage parentMessage = MBMessageLocalServiceUtil.getMBMessage(
-			parentMessageId);
-
-		String subject = parentMessage.getSubject();
+		String subject = message.getSubject();
 
 		if (subject.startsWith("RE:")) {
 			return subject;
 		}
 		else {
-			return "RE: " + parentMessage.getSubject();
+			return "RE: " + message.getSubject();
 		}
 	}
 
@@ -714,11 +719,11 @@ public class MBUtil {
 	}
 
 	public static String[] getThreadPriority(
-			MBSettings mbSettings, String languageId, double value,
-			ThemeDisplay themeDisplay)
+			MBGroupServiceSettings mbGroupServiceSettings, String languageId,
+			double value, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		String[] priorities = mbSettings.getPriorities(languageId);
+		String[] priorities = mbGroupServiceSettings.getPriorities(languageId);
 
 		String[] priorityPair = _findThreadPriority(
 			value, themeDisplay, priorities);
@@ -727,7 +732,8 @@ public class MBUtil {
 			String defaultLanguageId = LocaleUtil.toLanguageId(
 				LocaleUtil.getSiteDefault());
 
-			priorities = mbSettings.getPriorities(defaultLanguageId);
+			priorities = mbGroupServiceSettings.getPriorities(
+				defaultLanguageId);
 
 			priorityPair = _findThreadPriority(value, themeDisplay, priorities);
 		}
@@ -740,7 +746,7 @@ public class MBUtil {
 			SubscriptionLocalServiceUtil.getUserSubscriptions(
 				userId, MBThread.class.getName());
 
-		Set<Long> classPKs = new HashSet<Long>(subscriptions.size());
+		Set<Long> classPKs = new HashSet<>(subscriptions.size());
 
 		for (Subscription subscription : subscriptions) {
 			classPKs.add(subscription.getClassPK());
@@ -762,12 +768,13 @@ public class MBUtil {
 	}
 
 	public static String getUserRank(
-			MBSettings mbSettings, String languageId, int posts)
+			MBGroupServiceSettings mbGroupServiceSettings, String languageId,
+			int posts)
 		throws Exception {
 
 		String rank = StringPool.BLANK;
 
-		String[] ranks = mbSettings.getRanks(languageId);
+		String[] ranks = mbGroupServiceSettings.getRanks(languageId);
 
 		for (int i = 0; i < ranks.length; i++) {
 			String[] kvp = StringUtil.split(ranks[i], CharPool.EQUAL);
@@ -787,7 +794,8 @@ public class MBUtil {
 	}
 
 	public static String[] getUserRank(
-			MBSettings mbSettings, String languageId, MBStatsUser statsUser)
+			MBGroupServiceSettings mbGroupServiceSettings, String languageId,
+			MBStatsUser statsUser)
 		throws Exception {
 
 		String[] rank = {StringPool.BLANK, StringPool.BLANK};
@@ -798,7 +806,7 @@ public class MBUtil {
 
 		long companyId = group.getCompanyId();
 
-		String[] ranks = mbSettings.getRanks(languageId);
+		String[] ranks = mbGroupServiceSettings.getRanks(languageId);
 
 		for (int i = 0; i < ranks.length; i++) {
 			String[] kvp = StringUtil.split(ranks[i], CharPool.EQUAL);
@@ -862,11 +870,11 @@ public class MBUtil {
 	}
 
 	public static boolean isValidMessageFormat(String messageFormat) {
-		String editorImpl = PropsUtil.get(BB_CODE_EDITOR_WYSIWYG_IMPL_KEY);
+		String editorName = PropsUtil.get(BB_CODE_EDITOR_WYSIWYG_IMPL_KEY);
 
 		if (messageFormat.equals("bbcode") &&
-			!(editorImpl.equals("bbcode") ||
-			  editorImpl.equals("ckeditor_bbcode"))) {
+			!(editorName.equals("bbcode") ||
+			  editorName.equals("ckeditor_bbcode"))) {
 
 			return false;
 		}
@@ -939,7 +947,7 @@ public class MBUtil {
 			defaultGroupRole.getRoleId());
 
 		if (defaultGroupActionIds == null) {
-			serviceContext.setGroupPermissions(new String[]{});
+			serviceContext.setGroupPermissions(new String[] {});
 		}
 		else {
 			serviceContext.setGroupPermissions(
@@ -951,7 +959,7 @@ public class MBUtil {
 			guestRole.getRoleId());
 
 		if (guestActionIds == null) {
-			serviceContext.setGuestPermissions(new String[]{});
+			serviceContext.setGuestPermissions(new String[] {});
 		}
 		else {
 			serviceContext.setGuestPermissions(
@@ -1132,6 +1140,17 @@ public class MBUtil {
 			WorkflowConstants.STATUS_APPROVED);
 	}
 
+	private static String[] _getMessageIdStringParts(String messageIdString) {
+		int pos = messageIdString.indexOf(CharPool.AT);
+
+		return StringUtil.split(
+			messageIdString.substring(
+				MBUtil.MESSAGE_POP_PORTLET_PREFIX.length() +
+					getMessageIdStringOffset(),
+				pos),
+			CharPool.PERIOD);
+	}
+
 	private static String _getParentMessageIdFromSubject(Message message)
 		throws Exception {
 
@@ -1203,6 +1222,6 @@ public class MBUtil {
 		return false;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(MBUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(MBUtil.class);
 
 }

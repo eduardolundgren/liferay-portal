@@ -87,6 +87,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -317,8 +318,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			defaultUser = userPersistence.create(userId);
 
 			defaultUser.setCompanyId(companyId);
-			defaultUser.setCreateDate(now);
-			defaultUser.setModifiedDate(now);
 			defaultUser.setDefaultUser(true);
 			defaultUser.setContactId(counterLocalService.increment());
 			defaultUser.setPassword("password");
@@ -363,8 +362,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			defaultContact.setCompanyId(defaultUser.getCompanyId());
 			defaultContact.setUserId(defaultUser.getUserId());
 			defaultContact.setUserName(StringPool.BLANK);
-			defaultContact.setCreateDate(now);
-			defaultContact.setModifiedDate(now);
 			defaultContact.setClassName(User.class.getName());
 			defaultContact.setClassPK(defaultUser.getUserId());
 			defaultContact.setAccountId(company.getAccountId());
@@ -915,7 +912,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		company.setHomeURL(homeURL);
 
-		PortalUtil.updateImageId(company, logo, logoBytes, "logoId",0 ,0, 0);
+		PortalUtil.updateImageId(company, logo, logoBytes, "logoId", 0, 0, 0);
 
 		companyPersistence.update(company);
 
@@ -1105,7 +1102,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				}
 			}
 
-			List<String> resetKeys = new ArrayList<String>();
+			List<String> resetKeys = new ArrayList<>();
 
 			for (Map.Entry<String, String> entry : properties.entrySet()) {
 				String key = entry.getKey();
@@ -1336,7 +1333,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		PasswordPolicy defaultPasswordPolicy =
 			passwordPolicyLocalService.getDefaultPasswordPolicy(companyId);
 
-		passwordPolicyLocalService.deletePasswordPolicy(defaultPasswordPolicy);
+		if (defaultPasswordPolicy != null) {
+			passwordPolicyLocalService.deletePasswordPolicy(
+				defaultPasswordPolicy);
+		}
 
 		// Portal preferences
 
@@ -1422,8 +1422,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		String legalType, String sicCode, String tickerSymbol, String industry,
 		String type, String size) {
 
-		Date now = new Date();
-
 		Account account = accountPersistence.fetchByPrimaryKey(
 			company.getAccountId());
 
@@ -1433,7 +1431,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			account = accountPersistence.create(accountId);
 
 			account.setCompanyId(company.getCompanyId());
-			account.setCreateDate(now);
 			account.setUserId(0);
 			account.setUserName(StringPool.BLANK);
 
@@ -1442,7 +1439,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			companyPersistence.update(company);
 		}
 
-		account.setModifiedDate(now);
 		account.setName(name);
 		account.setLegalName(legalName);
 		account.setLegalId(legalId);
@@ -1497,9 +1493,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 					LocaleException.TYPE_DISPLAY_SETTINGS);
 
 				le.setSourceAvailableLocales(
-					LocaleUtil.fromLanguageIds(PropsValues.LOCALES));
+					Arrays.asList(
+						LocaleUtil.fromLanguageIds(PropsValues.LOCALES)));
 				le.setTargetAvailableLocales(
-					LocaleUtil.fromLanguageIds(languageIdsArray));
+					Arrays.asList(
+						LocaleUtil.fromLanguageIds(languageIdsArray)));
 
 				throw le;
 			}
@@ -1588,7 +1586,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 						Group group = (Group)object;
 
-						if (!PortalUtil.isSystemGroup(group.getName()) &&
+						if (!PortalUtil.isSystemGroup(group.getGroupKey()) &&
 							!group.isCompany()) {
 
 							deleteGroup(group);

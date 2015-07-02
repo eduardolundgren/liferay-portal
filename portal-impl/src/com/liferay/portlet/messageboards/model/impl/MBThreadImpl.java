@@ -15,13 +15,13 @@
 package com.liferay.portlet.messageboards.model.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.lock.LockManagerUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
-import com.liferay.portal.service.LockLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
@@ -124,7 +124,7 @@ public class MBThreadImpl extends MBThreadBaseImpl {
 	@Override
 	public Lock getLock() {
 		try {
-			return LockLocalServiceUtil.getLock(
+			return LockManagerUtil.getLock(
 				MBThread.class.getName(), getThreadId());
 		}
 		catch (Exception e) {
@@ -135,7 +135,7 @@ public class MBThreadImpl extends MBThreadBaseImpl {
 
 	@Override
 	public long[] getParticipantUserIds() {
-		Set<Long> participantUserIds = new HashSet<Long>();
+		Set<Long> participantUserIds = new HashSet<>();
 
 		List<MBMessage> messages = MBMessageLocalServiceUtil.getThreadMessages(
 			getThreadId(), WorkflowConstants.STATUS_ANY);
@@ -150,7 +150,7 @@ public class MBThreadImpl extends MBThreadBaseImpl {
 	@Override
 	public boolean hasLock(long userId) {
 		try {
-			return LockLocalServiceUtil.hasLock(
+			return LockManagerUtil.hasLock(
 				userId, MBThread.class.getName(), getThreadId());
 		}
 		catch (Exception e) {
@@ -166,7 +166,7 @@ public class MBThreadImpl extends MBThreadBaseImpl {
 				return true;
 			}
 
-			return LockLocalServiceUtil.isLocked(
+			return LockManagerUtil.isLocked(
 				MBThread.class.getName(), getThreadId());
 		}
 		catch (Exception e) {

@@ -15,20 +15,18 @@
 package com.liferay.portlet.dynamicdatamapping.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.base.DDMStructureServiceBaseImpl;
 import com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission;
 import com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePermission;
-import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
+import com.liferay.portlet.dynamicdatamapping.util.DDMPermissionHandler;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,18 +46,21 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	public DDMStructure addStructure(
 			long userId, long groupId, long classNameId,
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
-			DDMForm ddmForm, ServiceContext serviceContext)
+			DDMForm ddmForm, DDMFormLayout ddmFormLayout, String storageType,
+			ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(classNameId);
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(classNameId),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.addStructure(
 			getUserId(), groupId, classNameId, nameMap, descriptionMap, ddmForm,
-			serviceContext);
+			ddmFormLayout, storageType, serviceContext);
 	}
 
 	/**
@@ -84,7 +85,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *             structure, if the XSD was not well-formed, or if a portal
 	 *             exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	 *             long, Map, Map, DDMForm, ServiceContext)}
+	 *             long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -94,11 +95,13 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			String xsd, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(classNameId);
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(classNameId),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.addStructure(
 			getUserId(), groupId, classNameId, nameMap, descriptionMap, xsd,
@@ -110,18 +113,21 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			long groupId, long parentStructureId, long classNameId,
 			String structureKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, DDMForm ddmForm,
-			String storageType, int type, ServiceContext serviceContext)
+			DDMFormLayout ddmFormLayout, String storageType, int type,
+			ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(classNameId);
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(classNameId),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.addStructure(
 			getUserId(), groupId, parentStructureId, classNameId, structureKey,
-			nameMap, descriptionMap, ddmForm, storageType, type,
+			nameMap, descriptionMap, ddmForm, ddmFormLayout, storageType, type,
 			serviceContext);
 	}
 
@@ -153,7 +159,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *             the structure, if the XSD is not well formed, or if a portal
 	 *             exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	 *             long, String, Map, Map, DDMForm, String, int,
+	 *             long, String, Map, Map, DDMForm, DDMFormLayout, String, int,
 	 *             ServiceContext)}
 	 */
 	@Deprecated
@@ -165,11 +171,13 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			int type, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(classNameId);
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(classNameId),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.addStructure(
 			getUserId(), groupId, parentStructureId, classNameId, structureKey,
@@ -181,18 +189,21 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			long userId, long groupId, String parentStructureKey,
 			long classNameId, String structureKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, DDMForm ddmForm,
-			String storageType, int type, ServiceContext serviceContext)
+			DDMFormLayout ddmFormLayout, String storageType, int type,
+			ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(classNameId);
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(classNameId),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.addStructure(
 			userId, groupId, parentStructureKey, classNameId, structureKey,
-			nameMap, descriptionMap, ddmForm, storageType, type,
+			nameMap, descriptionMap, ddmForm, ddmFormLayout, storageType, type,
 			serviceContext);
 	}
 
@@ -228,8 +239,8 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *             structure, if the XSD was not well-formed, or if a portal
 	 *             exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	 *             String, long, String, Map, Map, DDMForm, String, int,
-	 *             ServiceContext)}
+	 *             String, long, String, Map, Map, DDMForm, DDMFormLayout,
+	 *             String, int, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -240,11 +251,13 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			int type, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(classNameId);
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(classNameId),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.addStructure(
 			userId, groupId, parentStructureKey, classNameId, structureKey,
@@ -273,11 +286,16 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
+
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(structure.getClassNameId());
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(structure.getClassNameId()),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.copyStructure(
 			getUserId(), structureId, nameMap, descriptionMap, serviceContext);
@@ -288,11 +306,16 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			long structureId, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMDisplay ddmDisplay = DDMUtil.getDDMDisplay(serviceContext);
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
+
+		DDMPermissionHandler ddmPermissionHandler =
+			DDMUtil.getDDMPermissionHandler(structure.getClassNameId());
 
 		DDMPermission.check(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ddmDisplay.getResourceName(), ddmDisplay.getAddStructureActionId());
+			ddmPermissionHandler.getResourceName(structure.getClassNameId()),
+			ddmPermissionHandler.getAddStructureActionId());
 
 		return ddmStructureLocalService.copyStructure(
 			getUserId(), structureId, serviceContext);
@@ -348,13 +371,20 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	}
 
 	@Override
-	public List<DDMStructure> getJournalFolderStructures(
-			long[] groupIds, long journalFolderId, int restrictionType)
+	public DDMStructure fetchStructure(
+			long groupId, long classNameId, String structureKey,
+			boolean includeAncestorStructures)
 		throws PortalException {
 
-		return filterStructures(
-			ddmStructureLocalService.getJournalFolderStructures(
-				groupIds, journalFolderId, restrictionType));
+		DDMStructure ddmStructure = ddmStructureLocalService.fetchStructure(
+			groupId, classNameId, structureKey, includeAncestorStructures);
+
+		if (ddmStructure != null) {
+			DDMStructurePermission.check(
+				getPermissionChecker(), ddmStructure, ActionKeys.VIEW);
+		}
+
+		return ddmStructure;
 	}
 
 	/**
@@ -482,6 +512,18 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			groupIds, classNameId, start, end);
 	}
 
+	@Override
+	public void revertStructure(
+			long structureId, String version, ServiceContext serviceContext)
+		throws PortalException {
+
+		DDMStructurePermission.check(
+			getPermissionChecker(), structureId, ActionKeys.UPDATE);
+
+		ddmStructureLocalService.revertStructure(
+			getUserId(), structureId, version, serviceContext);
+	}
+
 	/**
 	 * Returns an ordered range of all the structures matching the groups and
 	 * class name IDs, and matching the keywords in the structure names and
@@ -499,8 +541,8 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *
 	 * @param  companyId the primary key of the structure's company
 	 * @param  groupIds the primary keys of the groups
-	 * @param  classNameIds the primary keys of the class names of the models
-	 *         the structures are related to
+	 * @param  classNameId the primary key of the class name of the model the
+	 *         structure is related to
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         structure's name or description (optionally <code>null</code>)
 	 * @param  start the lower bound of the range of structures to return
@@ -512,11 +554,11 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 */
 	@Override
 	public List<DDMStructure> search(
-		long companyId, long[] groupIds, long[] classNameIds, String keywords,
+		long companyId, long[] groupIds, long classNameId, String keywords,
 		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
 
 		return ddmStructureFinder.filterFindByKeywords(
-			companyId, groupIds, classNameIds, keywords, start, end,
+			companyId, groupIds, classNameId, keywords, start, end,
 			orderByComparator);
 	}
 
@@ -536,8 +578,8 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *
 	 * @param  companyId the primary key of the structure's company
 	 * @param  groupIds the primary keys of the groups
-	 * @param  classNameIds the primary keys of the class names of the models
-	 *         the structures are related to
+	 * @param  classNameId the primary key of the class name of the model the
+	 *         structure is related to
 	 * @param  name the name keywords
 	 * @param  description the description keywords
 	 * @param  storageType the structure's storage type. It can be "xml" or
@@ -556,12 +598,12 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 */
 	@Override
 	public List<DDMStructure> search(
-		long companyId, long[] groupIds, long[] classNameIds, String name,
+		long companyId, long[] groupIds, long classNameId, String name,
 		String description, String storageType, int type, boolean andOperator,
 		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
 
 		return ddmStructureFinder.filterFindByC_G_C_N_D_S_T(
-			companyId, groupIds, classNameIds, name, description, storageType,
+			companyId, groupIds, classNameId, name, description, storageType,
 			type, andOperator, start, end, orderByComparator);
 	}
 
@@ -571,18 +613,18 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *
 	 * @param  companyId the primary key of the structure's company
 	 * @param  groupIds the primary keys of the groups
-	 * @param  classNameIds the primary keys of the class names of the models
-	 *         the structures are related to
+	 * @param  classNameId the primary key of the class name of the model the
+	 *         structure is related to
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         structure's name or description (optionally <code>null</code>)
 	 * @return the number of matching structures
 	 */
 	@Override
 	public int searchCount(
-		long companyId, long[] groupIds, long[] classNameIds, String keywords) {
+		long companyId, long[] groupIds, long classNameId, String keywords) {
 
 		return ddmStructureFinder.filterCountByKeywords(
-			companyId, groupIds, classNameIds, keywords);
+			companyId, groupIds, classNameId, keywords);
 	}
 
 	/**
@@ -591,8 +633,8 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 *
 	 * @param  companyId the primary key of the structure's company
 	 * @param  groupIds the primary keys of the groups
-	 * @param  classNameIds the primary keys of the class names of the models
-	 *         the structure's are related to
+	 * @param  classNameId the primary key of the class name of the model the
+	 *         structure is related to
 	 * @param  name the name keywords
 	 * @param  description the description keywords
 	 * @param  storageType the structure's storage type. It can be "xml" or
@@ -606,11 +648,11 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 */
 	@Override
 	public int searchCount(
-		long companyId, long[] groupIds, long[] classNameIds, String name,
+		long companyId, long[] groupIds, long classNameId, String name,
 		String description, String storageType, int type, boolean andOperator) {
 
 		return ddmStructureFinder.filterCountByC_G_C_N_D_S_T(
-			companyId, groupIds, classNameIds, name, description, storageType,
+			companyId, groupIds, classNameId, name, description, storageType,
 			type, andOperator);
 	}
 
@@ -619,7 +661,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			long groupId, long parentStructureId, long classNameId,
 			String structureKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, DDMForm ddmForm,
-			ServiceContext serviceContext)
+			DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
 		throws PortalException {
 
 		DDMStructurePermission.check(
@@ -627,8 +669,8 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			ActionKeys.UPDATE);
 
 		return ddmStructureLocalService.updateStructure(
-			groupId, parentStructureId, classNameId, structureKey, nameMap,
-			descriptionMap, ddmForm, serviceContext);
+			getUserId(), groupId, parentStructureId, classNameId, structureKey,
+			nameMap, descriptionMap, ddmForm, ddmFormLayout, serviceContext);
 	}
 
 	/**
@@ -651,7 +693,8 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 * @throws     PortalException if the user did not have permission to update
 	 *             the structure or if a portal exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
-	 *             long, String, Map, Map, DDMForm, ServiceContext)}
+	 *             long, String, Map, Map, DDMForm, DDMFormLayout,
+	 *             ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -675,15 +718,16 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	public DDMStructure updateStructure(
 			long structureId, long parentStructureId,
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
-			DDMForm ddmForm, ServiceContext serviceContext)
+			DDMForm ddmForm, DDMFormLayout ddmFormLayout,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		DDMStructurePermission.check(
 			getPermissionChecker(), structureId, ActionKeys.UPDATE);
 
 		return ddmStructureLocalService.updateStructure(
-			structureId, parentStructureId, nameMap, descriptionMap, ddmForm,
-			serviceContext);
+			getUserId(), structureId, parentStructureId, nameMap,
+			descriptionMap, ddmForm, ddmFormLayout, serviceContext);
 	}
 
 	/**
@@ -702,7 +746,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 * @throws     PortalException if the user did not have permission to update
 	 *             the structure or if a portal exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
-	 *             Map, Map, DDMForm, ServiceContext)}
+	 *             Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -718,28 +762,6 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		return ddmStructureLocalService.updateStructure(
 			structureId, parentStructureId, nameMap, descriptionMap, definition,
 			serviceContext);
-	}
-
-	protected List<DDMStructure> filterStructures(List<DDMStructure> structures)
-		throws PortalException {
-
-		PermissionChecker permissionChecker = getPermissionChecker();
-
-		structures = ListUtil.copy(structures);
-
-		Iterator<DDMStructure> itr = structures.iterator();
-
-		while (itr.hasNext()) {
-			DDMStructure structure = itr.next();
-
-			if (!DDMStructurePermission.contains(
-					permissionChecker, structure, ActionKeys.VIEW)) {
-
-				itr.remove();
-			}
-		}
-
-		return structures;
 	}
 
 }

@@ -16,6 +16,7 @@ package com.liferay.portal.verify;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -27,6 +28,15 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Brian Wing Shun Chan
@@ -58,22 +68,24 @@ public class VerifyProperties extends VerifyProcess {
 
 		// portal.properties
 
+		Properties portalProperties = loadPortalProperties();
+
 		for (String[] keys : _MIGRATED_PORTAL_KEYS) {
 			String oldKey = keys[0];
 			String newKey = keys[1];
 
-			verifyMigratedPortalProperty(oldKey, newKey);
+			verifyMigratedPortalProperty(portalProperties, oldKey, newKey);
 		}
 
 		for (String[] keys : _RENAMED_PORTAL_KEYS) {
 			String oldKey = keys[0];
 			String newKey = keys[1];
 
-			verifyRenamedPortalProperty(oldKey, newKey);
+			verifyRenamedPortalProperty(portalProperties, oldKey, newKey);
 		}
 
 		for (String key : _OBSOLETE_PORTAL_KEYS) {
-			verifyObsoletePortalProperty(key);
+			verifyObsoletePortalProperty(portalProperties, key);
 		}
 
 		for (String[] keys : _MODULARIZED_PORTAL_KEYS) {
@@ -81,7 +93,8 @@ public class VerifyProperties extends VerifyProcess {
 			String newKey = keys[1];
 			String moduleName = keys[2];
 
-			verifyModularizedPortalProperty(oldKey, newKey, moduleName);
+			verifyModularizedPortalProperty(
+				portalProperties, oldKey, newKey, moduleName);
 		}
 
 		// Document library
@@ -93,14 +106,43 @@ public class VerifyProperties extends VerifyProcess {
 		verifyLDAPProperties();
 	}
 
-	protected boolean isPortalProperty(String key) {
-		String value = PropsUtil.get(key);
+	protected InputStream getPropertiesResourceAsStream(String resourceName)
+		throws FileNotFoundException {
 
-		if (value != null) {
-			return true;
+		File propertyFile = new File(resourceName);
+
+		if (propertyFile.exists()) {
+			return new FileInputStream(propertyFile);
 		}
 
-		return false;
+		ClassLoader classLoader = VerifyProperties.class.getClassLoader();
+
+		return classLoader.getResourceAsStream(resourceName);
+	}
+
+	protected Properties loadPortalProperties() {
+		Properties properties = new Properties();
+
+		List<String> propertiesResourceNames = ListUtil.fromArray(
+			PropsUtil.getArray("include-and-override"));
+
+		propertiesResourceNames.add(0, "portal.properties");
+
+		for (String propertyResourceName : propertiesResourceNames) {
+			try (InputStream inputStream = getPropertiesResourceAsStream(
+				propertyResourceName)) {
+
+				if (inputStream != null) {
+					properties.load(inputStream);
+				}
+			}
+			catch (IOException ioe) {
+				_log.error(
+					"Unable to load property " + propertyResourceName, ioe);
+			}
+		}
+
+		return properties;
 	}
 
 	protected void verifyLDAPProperties() throws Exception {
@@ -133,10 +175,11 @@ public class VerifyProperties extends VerifyProcess {
 		}
 	}
 
-	protected void verifyMigratedPortalProperty(String oldKey, String newKey)
+	protected void verifyMigratedPortalProperty(
+			Properties portalProperties, String oldKey, String newKey)
 		throws Exception {
 
-		if (isPortalProperty(oldKey)) {
+		if (portalProperties.containsKey(oldKey)) {
 			_log.error(
 				"Portal property \"" + oldKey +
 					"\" was migrated to the system property \"" + newKey +
@@ -158,18 +201,22 @@ public class VerifyProperties extends VerifyProcess {
 	}
 
 	protected void verifyModularizedPortalProperty(
-			String oldKey, String newKey, String moduleName)
+			Properties portalProperties, String oldKey, String newKey,
+			String moduleName)
 		throws Exception {
 
-		if (isPortalProperty(oldKey)) {
+		if (portalProperties.containsKey(oldKey)) {
 			_log.error(
 				"Portal property \"" + oldKey + "\" was modularized to " +
 					moduleName + " as \"" + newKey);
 		}
 	}
 
-	protected void verifyObsoletePortalProperty(String key) throws Exception {
-		if (isPortalProperty(key)) {
+	protected void verifyObsoletePortalProperty(
+			Properties portalProperties, String key)
+		throws Exception {
+
+		if (portalProperties.containsKey(key)) {
 			_log.error("Portal property \"" + key + "\" is obsolete");
 		}
 	}
@@ -182,10 +229,11 @@ public class VerifyProperties extends VerifyProcess {
 		}
 	}
 
-	protected void verifyRenamedPortalProperty(String oldKey, String newKey)
+	protected void verifyRenamedPortalProperty(
+			Properties portalProperties, String oldKey, String newKey)
 		throws Exception {
 
-		if (isPortalProperty(oldKey)) {
+		if (portalProperties.containsKey(oldKey)) {
 			_log.error(
 				"Portal property \"" + oldKey + "\" was renamed to \"" +
 					newKey + "\"");
@@ -210,6 +258,9 @@ public class VerifyProperties extends VerifyProcess {
 	};
 
 	private static final String[][] _MIGRATED_PORTAL_KEYS = new String[][] {
+		new String[] {
+			"cookie.http.only.names.excludes", "cookie.http.only.names.excludes"
+		},
 		new String[] {
 			"finalize.manager.thread.enabled",
 			"com.liferay.portal.kernel.memory.FinalizeManager.thread.enabled"
@@ -283,6 +334,167 @@ public class VerifyProperties extends VerifyProcess {
 
 	private static final String[][] _MODULARIZED_PORTAL_KEYS = {
 
+		// Asset
+
+		new String[] {
+			"asset.browser.search.with.database", "search.with.database",
+			"com.liferay.asset.browser.web"
+		},
+		new String[] {
+			"asset.categories.navigation.display.templates.config",
+			"display.templates.config",
+			"com.liferay.asset.categories.navigation.web"
+		},
+		new String[] {
+			"asset.publisher.check.interval", "check.interval",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.email.from.name", "email.from.name",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.email.from.address", "email.from.address",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.email.asset.entry.added.enabled",
+			"email.asset.entry.added.enabled", "com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.email.asset.entry.added.subject",
+			"email.asset.entry.added.subject", "com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.email.asset.entry.added.body",
+			"email.asset.entry.added.body", "com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.display.style.default", "display.style.default",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.display.styles", "display.styles",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.display.templates.config",
+			"display.templates.config", "com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.dynamic.subscription.limit",
+			"dynamic.subscription.limit", "com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.permission.checking.configurable",
+			"permission.checking.configurable",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.query.form.configuration",
+			"query.form.configuration", "com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.publisher.search.with.index", "search.with.index",
+			"com.liferay.asset.publisher.web"
+		},
+		new String[] {
+			"asset.tags.navigation.display.templates.config",
+			"display.templates.config", "com.liferay.asset.tags.navigation.web"
+		},
+
+		// Authentication Verifier
+
+		new String[] {
+			"auth.verifier.BasicAuthHeaderAutoLogin.basic_auth",
+			"auth.verifier.BasicAuthHeaderAuthVerifier.basic_auth",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.BasicAuthHeaderAutoLogin.hosts.allowed",
+			"auth.verifier.BasicAuthHeaderAuthVerifier.hosts.allowed",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.BasicAuthHeaderAutoLogin.urls.excludes",
+			"auth.verifier.BasicAuthHeaderAuthVerifier.urls.excludes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.BasicAuthHeaderAutoLogin.urls.includes",
+			"auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+
+		new String[] {
+			"auth.verifier.DigestAuthenticationAuthVerifier.digest_auth",
+			"auth.verifier.DigestAuthenticationAuthVerifier.digest_auth",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.DigestAuthenticationAuthVerifier.hosts.allowed",
+			"auth.verifier.DigestAuthenticationAuthVerifier.hosts.allowed",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.DigestAuthenticationAuthVerifier.urls.excludes",
+			"auth.verifier.DigestAuthenticationAuthVerifier.urls.excludes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.DigestAuthenticationAuthVerifier.urls.includes",
+			"auth.verifier.DigestAuthenticationAuthVerifier.urls.includes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+
+		new String[] {
+			"auth.verifier.ParameterAutoLogin.hosts.allowed",
+			"auth.verifier.RequestParameterAuthVerifier.hosts.allowed",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.ParameterAutoLogin.urls.excludes",
+			"auth.verifier.RequestParameterAuthVerifier.urls.excludes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.ParameterAutoLogin.urls.includes",
+			"auth.verifier.RequestParameterAuthVerifier.urls.includes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+
+		new String[] {
+			"auth.verifier.PortalSessionAuthVerifier.hosts.allowed",
+			"auth.verifier.PortalSessionAuthVerifier.hosts.allowed",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.PortalSessionAuthVerifier.urls.excludes",
+			"auth.verifier.PortalSessionAuthVerifier.urls.excludes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.PortalSessionAuthVerifier.urls.includes",
+			"auth.verifier.PortalSessionAuthVerifier.urls.includes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+
+		new String[] {
+			"auth.verifier.TunnelingServletAuthVerifier.hosts.allowed",
+			"auth.verifier.TunnelingServletAuthVerifier.hosts.allowed",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.TunnelingServletAuthVerifier.urls.excludes",
+			"auth.verifier.TunnelingServletAuthVerifier.urls.excludes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.TunnelingServletAuthVerifier.urls.includes",
+			"auth.verifier.TunnelingServletAuthVerifier.urls.includes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+
 		// Bookmarks
 
 		new String[] {
@@ -338,11 +550,746 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.bookmarks.service"
 		},
 
+		// Breadcrumb
+
+		new String[] {
+			"breadcrumb.display.style.default", "ddm.template.key.default",
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+		new String[] {
+			"breadcrumb.display.templates.config", "display.templates.config",
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+		new String[] {
+			"breadcrumb.show.guest.group", "show.guest.group",
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+		new String[] {
+			"breadcrumb.show.parent.groups", "show.parent.groups",
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+
+		// CAS
+
+		new String[] {
+			"cas.auth.enabled", "enabled", "com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.import.from.ldap", "import.from.ldap",
+			"com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.login.url", "login.url", "com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.logout.on.session.expiration", "logout.on.session.expiration",
+			"com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.logout.url", "logout.url",
+			"com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.no.such.user.redirect.url", "no.such.user.redirect.url",
+			"com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.server.name", "server.name",
+			"com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.server.url", "server.url",
+			"com.liferay.portal.security.sso.cas"
+		},
+		new String[] {
+			"cas.service.url", "service.url",
+			"com.liferay.portal.security.sso.cas"
+		},
+
+		// Currency Converter
+
+		new String[] {
+			"currency.converter.symbols", "symbols",
+			"com.liferay.currency.converter.web"
+		},
+
+		// Dynamic Data Lists
+
+		new String[] {
+			"dynamic.data.lists.error.template",
+			"dynamic.data.lists.error.template",
+			"com.liferay.dynamic.data.lists.web"
+		},
+		new String[] {
+			"dynamic.data.lists.storage.type",
+			"dynamic.data.lists.storage.type",
+			"com.liferay.dynamic.data.lists.web"
+		},
+
+		// Facebook Connect
+
+		new String[] {
+			"facebook.connect.auth.enabled", "enabled",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.app.id", "app.id",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.app.secret", "app.secret",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.graph.url", "graph.url",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.oauth.auth.url", "oauth.auth.url",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.oauth.redirect.url", "oauth.redirect.url",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.oauth.token.url", "oauth.token.url",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+		new String[] {
+			"facebook.connect.verified.account.required",
+			"verified.account.required",
+			"com.liferay.portal.security.sso.facebook.connect"
+		},
+
+		// FreeMarker Engine
+
+		new String[] {
+			"freemarker.engine.localized.lookup", "localized.lookup",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.macro.library", "macro.library",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.resource.modification.check.interval",
+			"resource.modification.check",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.restricted.classes", "restricted.classes",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.restricted.packages", "restricted.packages",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.template.exception.handler",
+			"template.exception.handler",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.template.parsers", "template.parsers",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"journal.template.freemarker.restricted.variables",
+			"restricted.variables", "com.liferay.portal.template.freemarker"
+		},
+
+		// IFrame
+
+		new String[] {"iframe.auth", "auth", "com.liferay.iframe.web"},
+		new String[] {
+			"iframe.auth-type", "auth.type", "com.liferay.iframe.web"
+		},
+		new String[] {
+			"iframe.form-method", "form.method", "com.liferay.iframe.web"
+		},
+		new String[] {
+			"iframe.hidden-variables", "hidden.variables",
+			"com.liferay.iframe.web"
+		},
+
 		// Journal
 
 		new String[] {
+			"journal.article.check.interval", "check.interval",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.article.comments.enabled",
+			"journal.article.comments.enabled", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.article.custom.tokens", "journal.article.custom.tokens",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.article.database.keyword.search.content",
+			"journal.article.database.keyword.search.content",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.article.expire.all.versions",
+			"journal.article.expire.all.versions", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.article.force.autogenerate.id",
+			"journal.article.force.autogenerate.id", "com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.article.form.add", "journal.article.form.add",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.article.form.default.values",
+			"journal.article.form.default.values", "com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.article.form.update", "journal.article.form.update",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.articles.search.with.index",
+			"journal.articles.search.with.index", "com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.article.storage.type", "journal.article.storage.type",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.article.token.page.break",
+			"journal.article.token.page.break", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.article.view.permission.check.enabled",
+			"journal.article.view.permission.check.enabled",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.articles.index.all.versions",
+			"journal.articles.index.all.versions", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.char.blacklist", "char.blacklist",
+			"com.liferay.journal.service"
+		},
+		new String[] {
 			"journal.content.publish.to.live.by.default",
 			"publish.to.live.by.default", "com.liferay.journal.content.web"
+		},
+		new String[] {
+			"journal.content.search.show.listed", "show.listed",
+			"com.liferay.journal.content.search.web"
+		},
+		new String[] {
+			"journal.default.display.view", "default.display.view",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.display.views", "display.views", "com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.email.from.name", "email.from.name",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.from.address", "email.from.address",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.added.enabled",
+			"email.article.added.enabled", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.added.subject",
+			"email.article.added.subject", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.added.body", "email.article.added.body",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.denied.enabled",
+			"email.article.approval.denied.enabled",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.denied.subject",
+			"email.article.approval.denied.subject",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.denied.body",
+			"email.article.approval.denied.body", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.granted.enabled",
+			"email.article.approval.granted.enabled",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.granted.subject",
+			"email.article.approval.granted.subject",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.granted.body",
+			"email.article.approval.granted.body", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.requested.enabled",
+			"email.article.approval.requested.enabled",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.requested.subject",
+			"email.article.approval.requested.subject",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.approval.requested.body",
+			"email.article.approval.requested.body",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.moved.to.folder.enabled",
+			"email.article.moved.to.folder.enabled",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.moved.to.folder.subject",
+			"email.article.moved.to.folder.subject",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.moved.from.folder.body",
+			"email.article.moved.from.folder.body",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.moved.from.folder.enabled",
+			"email.article.moved.from.folder.enabled",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.moved.from.folder.subject",
+			"email.article.moved.from.folder.subject",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.moved.from.folder.body",
+			"email.article.moved.from.folder.body",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.review.enabled",
+			"email.article.review.enabled", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.review.subject",
+			"email.article.review.subject", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.review.body", "email.article.review.body",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.updated.enabled",
+			"email.article.updated.enabled", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.updated.subject",
+			"email.article.updated.subject", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.email.article.updated.body", "email.article.updated.body",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.error.template[ftl]", "error.template[ftl]",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.error.template[vm]", "error.template[vm]",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.error.template[xsl]", "error.template[xsl]",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.feed.force.autogenerate.id",
+			"journal.feed.force.autogenerate.id", "com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.folder.icon.check.count",
+			"journal.folder.icon.check.count", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.lar.creation.strategy", "lar.creation.strategy",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.publish.to.live.by.default", "publish.to.live.by.defaul",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.publish.version.history.by.default",
+			"publish.version.history.by.default", "com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.sync.content.search.on.startup",
+			"sync.content.search.on.startup", "com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.template.language.content[css]",
+			"journal.article.template.language.content[css]",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.template.language.content[ftl]",
+			"journal.article.template.language.content[ftl]",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.template.language.content[vm]",
+			"journal.article.template.language.content[vm]",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.template.language.content[xsl]",
+			"journal.article.template.language.content[xsl]",
+			"com.liferay.journal.web"
+		},
+		new String[] {
+			"journal.transformer.listener", "transformer.listener",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.transformer.regex.pattern", "transformer.regex.pattern",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"journal.transformer.regex.replacement",
+			"transformer.regex.replacement", "com.liferay.journal.service"
+		},
+		new String[] {
+			"terms.of.use.journal.article.group.id",
+			"terms.of.use.journal.article.group.id",
+			"com.liferay.journal.service"
+		},
+		new String[] {
+			"terms.of.use.journal.article.id",
+			"terms.of.use.journal.article.id", "com.liferay.journal.service"
+		},
+
+		// Language
+
+		new String[] {
+			"language.display.style.default", "ddm.template.key.default",
+			"com.liferay.site.navigation.language.web"
+		},
+		new String[] {
+			"language.display.templates.config", "display.templates.config",
+			"com.liferay.site.navigation.language.web"
+		},
+
+		// LDAP
+
+		new String[] {
+			"ldap.auth.enabled", "enabled",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.method", "method",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.password.encryption.algorithm",
+			"passwordEncryptionAlgorithm",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.required", "required",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.export.enabled", "export.enabled", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.export.group.enabled", "export.group.enabled",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.factory.initial", "factory.initial", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.create.role.per.group", "import.create.role.per.group",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.enabled", "import.enabled", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.group.cache.enabled", "import.group.cache.enabled",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.group.search.filter.enabled",
+			"import.group.search.filter.enabled", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.interval", "import.interval", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.lock.expiration.time", "import.lock.expiration.time",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.method", "import.method", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.on.startup", "import.on.startup",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.user.password.autogenerated",
+			"import.user.password.autogenerated", "com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.user.password.default", "import.user.password.default",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.import.user.password.enabled", "import.user.password.enabled",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {"ldap.page.size", "page.size", "com.liferay.portal.ldap"},
+		new String[] {
+			"ldap.password.policy.enabled", "password.policy.enabled",
+			"com.liferay.portal.ldap"
+		},
+		new String[] {
+			"ldap.range.size", "range.size", "com.liferay.portal.ldap"
+		},
+		new String[] {"ldap.referral", "referral", "com.liferay.portal.ldap"},
+		new String[] {
+			"ldap.user.ignore.attributes", "user.ignore.attributes",
+			"com.liferay.portal.ldap"
+		},
+
+		// Lucene
+
+		new String[] {
+			"lucene.analyzer.max.tokens", "analyzer.max.tokens",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.buffer.size", "buffer.size",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.commit.batch.size", "commit.batch.size",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.commit.time.interval", "commit.time.interval",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {"lucene.dir", "dir", "com.liferay.portal.search.lucene"},
+		new String[] {
+			"lucene.merge.factor", "merge.factor",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.merge.policy", "merge.policy",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.merge.scheduler", "merge.scheduler",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.store.type", "store.type",
+			"com.liferay.portal.search.lucene"
+		},
+		new String[] {
+			"lucene.store.type.file.force.mmap", "store.type.file.force.mmp",
+			"com.liferay.portal.search.lucene"
+		},
+
+		// Monitoring
+
+		new String[] {
+			"monitoring.portal.request", "monitor.portal.request",
+			"com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.action.request",
+			"monitor.portlet.action.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.event.request", "monitor.portlet.event.request",
+			"com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.render.request",
+			"monitor.portlet.render.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.resource.request",
+			"monitor.portlet.resource.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.show.per.request.data.sample",
+			"show.per.request.data.sample", "com.liferay.portal.monitoring"
+		},
+
+		// Navigation
+
+		new String[] {
+			"navigation.display.style", "display.style",
+			"com.liferay.site.navigation.menu.web"
+		},
+		new String[] {
+			"navigation.display.style.default", "display.style.default",
+			"com.liferay.site.navigation.menu.web"
+		},
+		new String[] {
+			"navigation.display.style.options", "display.style.options",
+			"com.liferay.site.navigation.menu.web"
+		},
+
+		// Nested Portlets
+
+		new String[] {
+			"nested.portlets.layout.template.default",
+			"layout.template.default", "com.liferay.nested.portlets.web"
+		},
+		new String[] {
+			"nested.portlets.layout.template.unsupported",
+			"layout.template.unsupported", "com.liferay.nested.portlets.web"
+		},
+
+		// NTLM
+
+		new String[] {
+			"ntlm.auth.enabled", "enabled",
+			"com.liferay.portal.security.sso.ntlm"
+		},
+		new String[] {
+			"ntlm.auth.domain", "domain", "com.liferay.portal.security.sso.ntlm"
+		},
+		new String[] {
+			"ntlm.auth.domain.controller", "domain.controller",
+			"com.liferay.portal.security.sso.ntlm"
+		},
+		new String[] {
+			"ntlm.auth.domain.controller.name", "domain.controller.name",
+			"com.liferay.portal.security.sso.ntlm"
+		},
+		new String[] {
+			"ntlm.auth.negotiate.flags", "negotiate.flags",
+			"com.liferay.portal.security.sso.ntlm"
+		},
+		new String[] {
+			"ntlm.auth.service.account", "service.account",
+			"com.liferay.portal.security.sso.ntlm"
+		},
+		new String[] {
+			"ntlm.auth.service.password", "service.password",
+			"com.liferay.portal.security.sso.ntlm"
+		},
+
+		// OpenID
+
+		new String[] {
+			"open.id.auth.enabled", "enabled",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.providers", "providers",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.schema[default]", "ax.schema",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.type.email[default]", "ax.type.email",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.type.firstname[default]", "ax.type.firstname",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.type.lastname[default]", "ax.type.lastname",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.schema[yahoo]", "ax.schema",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.type.email[yahoo]", "ax.type.email",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.ax.type.fullname[yahoo]", "ax.type.fullname",
+			"com.liferay.portal.security.sso.openid"
+		},
+		new String[] {
+			"open.id.url[yahoo]", "url",
+			"com.liferay.portal.security.sso.openid"
+		},
+
+		// OpenSSO
+
+		new String[] {
+			"open.sso.auth.enabled", "enabled",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.email.address.attr", "email.address.attr",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.first.name.attr", "first.name.attr",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.last.name.attr", "last.name.attr",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.import.from.ldap", "import.from.ldap",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.login.url", "login.url",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.logout.on.session.expiration",
+			"logout.on.session.expiration",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.logout.url", "logout.url",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.screen.name.attr", "screen.name.attr",
+			"com.liferay.portal.security.sso.opensso"
+		},
+		new String[] {
+			"open.sso.service.url", "service.url",
+			"com.liferay.portal.security.sso.opensso"
 		},
 
 		// Polls
@@ -352,6 +1299,18 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.polls.service"
 		},
 
+		// Request Header
+
+		new String[] {
+			"request.header.auth.hosts.allowed", "authHostsAllowed",
+			"com.liferay.portal.security.auto.login.request.header"
+		},
+
+		new String[] {
+			"request.header.auth.import.from.ldap", "importFromLDAP",
+			"com.liferay.portal.security.auto.login.request.header"
+		},
+
 		// RSS
 
 		new String[] {
@@ -359,8 +1318,91 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.rss.web"
 		},
 
-		// XSL content
+		// Scripting
 
+		new String[] {
+			"scripting.forbidden.classes", "forbidden.classes",
+			"com.liferay.portal.scripting.javascript"
+		},
+
+		// Search
+
+		new String[] {
+			"search.facet.configuration", "facet.configuration",
+			"com.liferay.search.web"
+		},
+
+		// Site Map
+
+		new String[] {
+			"sitemap.display.templates.config", "display.templates.config",
+			"com.liferay.site.navigation.site.map.web"
+		},
+
+		// Tags Compiler
+
+		new String[] {
+			"tags.compiler.enabled", "enabled",
+			"com.liferay.asset.tags.compiler.web"
+		},
+
+		// Translator
+
+		new String[] {
+			"translator.default.languages", "translation.id",
+			"com.liferay.translator.web"
+		},
+		new String[] {
+			"translator.languages", "language.ids", "com.liferay.translator.web"
+		},
+
+		// Velocity Engine
+
+		new String[] {
+			"velocity.engine.directive.if.to.string.null.check",
+			"directive.if.to.string.null.check",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.resource.parsers", "resource.parsers",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.resource.modification.check.interval",
+			"resource.modification.check.interval",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.restricted.classes", "restricted.classes",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.restricted.packages", "restricted.packages",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.restricted.variables", "restricted.variables",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.velocimacro.library", "macro.library",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.logger", "logger",
+			"com.liferay.portal.template.velocity"
+		},
+		new String[] {
+			"velocity.engine.logger.category", "logger.category",
+			"com.liferay.portal.template.velocity"
+		},
+
+		// XSL Content
+
+		new String[] {
+			"xsl.content.valid.url.prefixes", "valid.url.prefixes",
+			"com.liferay.xsl.content.web"
+		},
 		new String[] {
 			"xsl.content.xml.doctype.declaration.allowed",
 			"xml.doctype.declaration.allowed", "com.liferay.xsl.content.web"
@@ -378,25 +1420,49 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"xsl.content.xsl.secure.processing.enabled",
 			"xsl.secure.processing.enabled", "com.liferay.xsl.content.web"
+		},
+
+		// XSL Engine
+
+		new String[] {
+			"xsl.template.secure.processing.enabled",
+			"secure.processing.enabled", "com.liferay.portal.template.xsl"
 		}
 	};
 
 	private static final String[] _OBSOLETE_PORTAL_KEYS = new String[] {
 		"amazon.access.key.id", "amazon.associate.tag",
 		"amazon.secret.access.key",
-		"asset.entry.increment.view.counter.enabled", "auth.max.failures.limit",
+		"asset.entry.increment.view.counter.enabled",
+		"asset.publisher.asset.entry.query.processors",
+		"asset.publisher.filter.unlistable.entries",
+		"asset.tag.permissions.enabled", "asset.tag.properties.default",
+		"asset.tag.properties.enabled", "auth.max.failures.limit",
+		"breadcrumb.display.style.options",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
 		"cluster.executor.heartbeat.interval",
 		"com.liferay.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
+		"com.liferay.portal.servlet.filters.charbufferpool." +
+			"CharBufferPoolFilter",
+		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
-		"commons.pool.enabled", "convert.processes",
+		"commons.pool.enabled", "company.settings.form.configuration",
+		"company.settings.form.identification",
+		"company.settings.form.miscellaneous", "company.settings.form.social",
+		"convert.processes", "discussion.thread.view",
 		"dl.file.entry.read.count.enabled",
+		"dynamic.data.lists.record.set.force.autogenerate.key",
 		"dynamic.data.lists.template.language.parser[ftl]",
 		"dynamic.data.lists.template.language.parser[vm]",
 		"dynamic.data.lists.template.language.parser[xsl]",
+		"dynamic.data.mapping.structure.private.field.names",
+		"dynamic.data.mapping.structure.private.field.datatype[_fieldsDisplay]",
+		"dynamic.data.mapping.structure.private.field.repeatable[" +
+			"_fieldsDisplay]",
 		"dynamic.data.mapping.template.language.types",
+		"editor.ckeditor.version", "editor.inline.editing.enabled",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.asset_publisher." +
 			"configuration.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.blogs.configuration." +
@@ -414,7 +1480,13 @@ public class VerifyProperties extends VerifyProcess {
 			"configuration.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.portal_settings." +
 			"email_notifications.jsp",
-		"ehcache.statistics.enabled", "index.filter.search.limit",
+		"ehcache.cache.manager.statistics.thread.pool.size",
+		"ehcache.statistics.enabled",
+		"hot.deploy.hook.custom.jsp.verification.enabled",
+		"hibernate.cache.region.factory_class",
+		"hibernate.cache.use_minimal_puts", "hibernate.cache.use_query_cache",
+		"hibernate.cache.use_second_level_cache",
+		"hibernate.cache.use_structured_entries", "index.filter.search.limit",
 		"invitation.email.max.recipients", "invitation.email.message.body",
 		"invitation.email.message.subject", "javax.persistence.validation.mode",
 		"jbi.workflow.url", "json.deserializer.strict.mode",
@@ -428,8 +1500,16 @@ public class VerifyProperties extends VerifyProcess {
 		"jpa.database.platform", "jpa.database.type", "jpa.load.time.weaver",
 		"jpa.provider", "jpa.provider.property.eclipselink.allow-zero-id",
 		"jpa.provider.property.eclipselink.logging.level",
-		"jpa.provider.property.eclipselink.logging.timestamp", "layout.types",
-		"lucene.analyzer", "lucene.store.jdbc.auto.clean.up",
+		"jpa.provider.property.eclipselink.logging.timestamp",
+		"language.display.style.options", "layout.edit.page[control_panel]",
+		"layout.first.pageable[control_panel]", "layout.form.add",
+		"layout.form.update", "layout.parentable[control_panel]",
+		"layout.reset.portlet.ids", "layout.set.form.update", "layout.types",
+		"layout.url[control_panel]", "layout.url.friendliable[control_panel]",
+		"layout.view.page[control_panel]", "lucene.analyzer",
+		"lucene.cluster.index.loading.sync.timeout", "lucene.file.extractor",
+		"lucene.file.extractor.regexp.strip", "lucene.replicate.write",
+		"lucene.store.jdbc.auto.clean.up",
 		"lucene.store.jdbc.auto.clean.up.enabled",
 		"lucene.store.jdbc.auto.clean.up.interval",
 		"lucene.store.jdbc.dialect.db2", "lucene.store.jdbc.dialect.derby",
@@ -441,19 +1521,36 @@ public class VerifyProperties extends VerifyProcess {
 		"message.boards.email.message.added.signature",
 		"message.boards.email.message.updated.signature",
 		"message.boards.thread.locking.enabled",
-		"nested.portlets.layout.template.default",
-		"nested.portlets.layout.template.unsupported", "portal.ctx",
+		"multicast.group.address[\"hibernate\"]",
+		"multicast.group.port[\"hibernate\"]",
+		"net.sf.ehcache.configurationResourceName",
+		"net.sf.ehcache.configurationResourceName.peerProviderProperties",
+		"organizations.form.add.identification", "organizations.form.add.main",
+		"organizations.form.add.miscellaneous",
+		"organizations.form.update.identification",
+		"organizations.form.update.main",
+		"organizations.form.update.miscellaneous", "portal.ctx",
 		"portal.security.manager.enable", "permissions.list.filter",
 		"permissions.thread.local.cache.max.size",
 		"permissions.user.check.algorithm", "persistence.provider",
 		"ratings.max.score", "ratings.min.score", "scheduler.classes",
-		"schema.run.minimal", "shard.available.names",
-		"velocity.engine.resource.manager",
-		"velocity.engine.resource.manager.cache.enabled",
-		"webdav.storage.class", "webdav.storage.show.edit.url",
-		"webdav.storage.show.view.url", "webdav.storage.tokens",
-		"wiki.email.page.added.signature", "wiki.email.page.updated.signature",
-		"xss.allow"
+		"schema.run.minimal", "search.container.page.iterator.page.values",
+		"service.builder.service.read.only.prefixes", "shard.available.names",
+		"siteminder.auth.enabled", "siteminder.import.from.ldap",
+		"siteminder.user.header", "sites.form.add.advanced",
+		"sites.form.add.main", "sites.form.add.miscellaneous",
+		"sites.form.add.seo", "sites.form.update.advanced",
+		"sites.form.update.main", "sites.form.update.miscellaneous",
+		"sites.form.update.seo", "staging.lock.enabled",
+		"table.mapper.cacheless.mapping.table.names", "tck.url",
+		"users.form.add.identification", "users.form.add.main",
+		"users.form.add.miscellaneous", "users.form.my.account.identification",
+		"users.form.my.account.main", "users.form.my.account.miscellaneous",
+		"users.form.update.identification", "users.form.update.main",
+		"users.form.update.miscellaneous", "webdav.storage.class",
+		"webdav.storage.show.edit.url", "webdav.storage.show.view.url",
+		"webdav.storage.tokens", "wiki.email.page.added.signature",
+		"wiki.email.page.updated.signature", "xss.allow"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = new String[] {
@@ -465,17 +1562,12 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"amazon.license.0", "amazon.access.key.id"
 		},
+		new String[] {"amazon.license.1", "amazon.access.key.id"},
+		new String[] {"amazon.license.2", "amazon.access.key.id"},
+		new String[] {"amazon.license.3", "amazon.access.key.id"},
+		new String[] {"cdn.host", "cdn.host.http"},
 		new String[] {
-			"amazon.license.1", "amazon.access.key.id"
-		},
-		new String[] {
-			"amazon.license.2", "amazon.access.key.id"
-		},
-		new String[] {
-			"amazon.license.3", "amazon.access.key.id"
-		},
-		new String[] {
-			"cdn.host", "cdn.host.http"
+			"cluster.executor.debug.enabled", "cluster.link.debug.enabled"
 		},
 		new String[] {
 			"com.liferay.portal.servlet.filters.compression.CompressionFilter",
@@ -529,12 +1621,8 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"dl.hook.file.system.root.dir", "dl.store.file.system.root.dir"
 		},
-		new String[] {
-			"dl.hook.impl", "dl.store.impl"
-		},
-		new String[] {
-			"dl.hook.jcr.fetch.delay", "dl.store.jcr.fetch.delay"
-		},
+		new String[] {"dl.hook.impl", "dl.store.impl"},
+		new String[] {"dl.hook.jcr.fetch.delay", "dl.store.jcr.fetch.delay"},
 		new String[] {
 			"dl.hook.jcr.fetch.max.failures", "dl.store.jcr.fetch.max.failures"
 		},
@@ -542,15 +1630,9 @@ public class VerifyProperties extends VerifyProcess {
 			"dl.hook.jcr.move.version.labels",
 			"dl.store.jcr.move.version.labels"
 		},
-		new String[] {
-			"dl.hook.s3.access.key", "dl.store.s3.access.key"
-		},
-		new String[] {
-			"dl.hook.s3.bucket.name", "dl.store.s3.bucket.name"
-		},
-		new String[] {
-			"dl.hook.s3.secret.key", "dl.store.s3.secret.key"
-		},
+		new String[] {"dl.hook.s3.access.key", "dl.store.s3.access.key"},
+		new String[] {"dl.hook.s3.bucket.name", "dl.store.s3.bucket.name"},
+		new String[] {"dl.hook.s3.secret.key", "dl.store.s3.secret.key"},
 		new String[] {
 			"editor.wysiwyg.portal-web.docroot.html.portlet.calendar." +
 				"edit_configuration.jsp",
@@ -589,9 +1671,7 @@ public class VerifyProperties extends VerifyProcess {
 			"field.editable.com.liferay.portal.model.User.screenName",
 			"field.editable.user.types"
 		},
-		new String[] {
-			"icon.menu.max.display.items", "menu.max.display.items"
-		},
+		new String[] {"icon.menu.max.display.items", "menu.max.display.items"},
 		new String[] {
 			"journal.error.template.freemarker", "journal.error.template[ftl]"
 		},
@@ -602,27 +1682,39 @@ public class VerifyProperties extends VerifyProcess {
 			"journal.error.template.xsl", "journal.error.template[xsl]"
 		},
 		new String[] {
-			"journal.template.freemarker.restricted.variables",
-			"freemarker.engine.restricted.variables"
-		},
-		new String[] {
 			"journal.template.velocity.restricted.variables",
 			"velocity.engine.restricted.variables"
 		},
 		new String[] {
-			"portal.instance.http.port",
-			"portal.instance.http.inet.socket.address"
+			"passwords.passwordpolicytoolkit.charset.lowercase",
+			"passwords.passwordpolicytoolkit.validator.charset.lowercase"
 		},
 		new String[] {
-			"portal.instance.https.port",
-			"portal.instance.https.inet.socket.address"
+			"passwords.passwordpolicytoolkit.charset.numbers",
+			"passwords.passwordpolicytoolkit.validator.charset.numbers"
+		},
+		new String[] {
+			"passwords.passwordpolicytoolkit.charset.symbols",
+			"passwords.passwordpolicytoolkit.validator.charset.symbols"
+		},
+		new String[] {
+			"passwords.passwordpolicytoolkit.charset.uppercase",
+			"passwords.passwordpolicytoolkit.validator.charset.uppercase"
+		},
+		new String[] {
+			"permissions.inline.sql.resource.block.query.threshhold",
+			"permissions.inline.sql.resource.block.query.threshold"
+		},
+		new String[] {
+			"portal.instance.http.port", "portal.instance.http.socket.address"
+		},
+		new String[] {
+			"portal.instance.https.port", "portal.instance.http.socket.address"
 		},
 		new String[] {
 			"referer.url.domains.allowed", "redirect.url.domains.allowed"
 		},
-		new String[] {
-			"referer.url.ips.allowed", "redirect.url.ips.allowed"
-		},
+		new String[] {"referer.url.ips.allowed", "redirect.url.ips.allowed"},
 		new String[] {
 			"referer.url.security.mode", "redirect.url.security.mode"
 		},
@@ -637,7 +1729,7 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.kernel.util.StringBundler.unsafe.create." +
 				"threshold",
 			"com.liferay.portal.kernel.util.StringBundler.threadlocal.buffer." +
-				"limit",
+				"limit"
 		}
 	};
 

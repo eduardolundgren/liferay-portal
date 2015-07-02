@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ColorScheme;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
@@ -182,7 +183,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public List<Layout> getAllChildren() {
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		for (Layout layout : getChildren()) {
 			layouts.add(layout);
@@ -260,7 +261,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public List<Layout> getAncestors() throws PortalException {
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		Layout layout = this;
 
@@ -407,7 +408,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 				group.getTypeSettingsProperties();
 
 			if (!GetterUtil.getBoolean(
-					typeSettingsProperties.getProperty("inheritLocales"),
+					typeSettingsProperties.getProperty(
+						GroupConstants.TYPE_SETTINGS_KEY_INHERIT_LOCALES),
 					true)) {
 
 				String[] locales = StringUtil.split(
@@ -439,7 +441,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public Map<Locale, String> getFriendlyURLMap() {
-		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(getPlid());
@@ -448,6 +450,21 @@ public class LayoutImpl extends LayoutBaseImpl {
 			friendlyURLMap.put(
 				LocaleUtil.fromLanguageId(layoutFriendlyURL.getLanguageId()),
 				layoutFriendlyURL.getFriendlyURL());
+		}
+
+		// If the site/portal default language changes, there may not exist a
+		// value for the new default language. In this situation, we will use
+		// the value from the previous default language.
+
+		Locale defaultSiteLocale = LocaleUtil.getSiteDefault();
+
+		if (Validator.isNull(friendlyURLMap.get(defaultSiteLocale))) {
+			Locale defaultLocale = LocaleUtil.fromLanguageId(
+				getDefaultLanguageId());
+
+			String defaultFriendlyURL = friendlyURLMap.get(defaultLocale);
+
+			friendlyURLMap.put(defaultSiteLocale, defaultFriendlyURL);
 		}
 
 		return friendlyURLMap;
@@ -459,7 +476,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 		return LocalizationUtil.updateLocalization(
 			friendlyURLMap, StringPool.BLANK, "FriendlyURL",
-			LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
 	}
 
 	/**
@@ -791,6 +808,11 @@ public class LayoutImpl extends LayoutBaseImpl {
 	}
 
 	@Override
+	public boolean hasSetModifiedDate() {
+		return true;
+	}
+
+	@Override
 	public boolean includeLayoutContent(
 			HttpServletRequest request, HttpServletResponse response)
 		throws Exception {
@@ -992,21 +1014,19 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public boolean isSupportsEmbeddedPortlets() {
-		if (isTypeArticle() || isTypeEmbedded() || isTypePanel() ||
-			isTypePortlet()) {
-
+		if (isTypeEmbedded() || isTypePanel() || isTypePortlet()) {
 			return true;
 		}
 
 		return false;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isTypeArticle() {
-		if (getType().equals(LayoutConstants.TYPE_ARTICLE)) {
-			return true;
-		}
-
 		return false;
 	}
 
@@ -1058,6 +1078,15 @@ public class LayoutImpl extends LayoutBaseImpl {
 	@Override
 	public boolean isTypeURL() {
 		if (getType().equals(LayoutConstants.TYPE_URL)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isTypeUserPersonalPanel() {
+		if (getType().equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL)) {
 			return true;
 		}
 
@@ -1282,7 +1311,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return url;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(LayoutImpl.class);
 
 	private static String[] _friendlyURLKeywords;
 

@@ -14,24 +14,21 @@
 
 package com.liferay.portlet.directory.util;
 
-import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.HitsOpenSearchImpl;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
-import com.liferay.portlet.usersadmin.util.UserIndexer;
 
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 
 import javax.portlet.PortletURL;
 
@@ -42,11 +39,15 @@ import javax.servlet.http.HttpServletRequest;
  * @author Marcellus Tavares
  * @author Ryan Park
  */
+@OSGiBeanProperties
 public class DirectoryOpenSearchImpl extends HitsOpenSearchImpl {
 
-	public static final String SEARCH_PATH = "/c/directory/open_search";
-
 	public static final String TITLE = "Liferay Directory Search: ";
+
+	@Override
+	public String getClassName() {
+		return User.class.getName();
+	}
 
 	@Override
 	public Indexer getIndexer() {
@@ -54,29 +55,8 @@ public class DirectoryOpenSearchImpl extends HitsOpenSearchImpl {
 	}
 
 	@Override
-	public String getPortletId() {
-		return UserIndexer.PORTLET_ID;
-	}
-
-	@Override
 	public String getSearchPath() {
-		return SEARCH_PATH;
-	}
-
-	@Override
-	public Summary getSummary(
-			Indexer indexer, Document document, Locale locale, String snippet,
-			PortletURL portletURL)
-		throws SearchException {
-
-		Summary summary = super.getSummary(
-			indexer, document, locale, snippet, portletURL);
-
-		portletURL = summary.getPortletURL();
-
-		portletURL.setParameter("struts_action", "/directory/view_user");
-
-		return summary;
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -96,8 +76,7 @@ public class DirectoryOpenSearchImpl extends HitsOpenSearchImpl {
 	protected LinkedHashMap<String, Object> getUserParams(
 		long companyId, String keywords) {
 
-		LinkedHashMap<String, Object> userParams =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> userParams = new LinkedHashMap<>();
 
 		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
 			companyId, User.class.getName());

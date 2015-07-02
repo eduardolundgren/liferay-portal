@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.messageboards.action;
 
+import com.liferay.portal.kernel.captcha.CaptchaConfigurationException;
 import com.liferay.portal.kernel.captcha.CaptchaMaxChallengesException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
@@ -50,7 +51,7 @@ import com.liferay.portlet.documentlibrary.FileNameException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerException;
 import com.liferay.portlet.messageboards.LockedThreadException;
-import com.liferay.portlet.messageboards.MBSettings;
+import com.liferay.portlet.messageboards.MBGroupServiceSettings;
 import com.liferay.portlet.messageboards.MessageBodyException;
 import com.liferay.portlet.messageboards.MessageSubjectException;
 import com.liferay.portlet.messageboards.NoSuchMessageException;
@@ -161,6 +162,7 @@ public class EditMessageAction extends PortletAction {
 				setForward(actionRequest, "portlet.message_boards.error");
 			}
 			else if (e instanceof AntivirusScannerException ||
+					 e instanceof CaptchaConfigurationException ||
 					 e instanceof CaptchaMaxChallengesException ||
 					 e instanceof CaptchaTextException ||
 					 e instanceof DuplicateFileException ||
@@ -363,10 +365,11 @@ public class EditMessageAction extends PortletAction {
 		String subject = ParamUtil.getString(actionRequest, "subject");
 		String body = ParamUtil.getString(actionRequest, "body");
 
-		MBSettings mbSettings = MBSettings.getInstance(groupId);
+		MBGroupServiceSettings mbGroupServiceSettings =
+			MBGroupServiceSettings.getInstance(groupId);
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
-			new ArrayList<ObjectValuePair<String, InputStream>>(5);
+			new ArrayList<>(5);
 
 		try {
 			UploadPortletRequest uploadPortletRequest =
@@ -383,8 +386,7 @@ public class EditMessageAction extends PortletAction {
 				}
 
 				ObjectValuePair<String, InputStream> inputStreamOVP =
-					new ObjectValuePair<String, InputStream>(
-						fileName, inputStream);
+					new ObjectValuePair<>(fileName, inputStream);
 
 				inputStreamOVPs.add(inputStreamOVP);
 			}
@@ -418,8 +420,9 @@ public class EditMessageAction extends PortletAction {
 
 					message = MBMessageServiceUtil.addMessage(
 						groupId, categoryId, subject, body,
-						mbSettings.getMessageFormat(), inputStreamOVPs,
-						anonymous, priority, allowPingbacks, serviceContext);
+						mbGroupServiceSettings.getMessageFormat(),
+						inputStreamOVPs, anonymous, priority, allowPingbacks,
+						serviceContext);
 
 					if (question) {
 						MBThreadLocalServiceUtil.updateQuestion(
@@ -432,12 +435,13 @@ public class EditMessageAction extends PortletAction {
 
 					message = MBMessageServiceUtil.addMessage(
 						parentMessageId, subject, body,
-						mbSettings.getMessageFormat(), inputStreamOVPs,
-						anonymous, priority, allowPingbacks, serviceContext);
+						mbGroupServiceSettings.getMessageFormat(),
+						inputStreamOVPs, anonymous, priority, allowPingbacks,
+						serviceContext);
 				}
 			}
 			else {
-				List<String> existingFiles = new ArrayList<String>();
+				List<String> existingFiles = new ArrayList<>();
 
 				for (int i = 1; i <= 5; i++) {
 					String path = ParamUtil.getString(

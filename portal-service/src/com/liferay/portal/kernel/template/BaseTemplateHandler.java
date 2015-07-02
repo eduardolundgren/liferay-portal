@@ -25,18 +25,24 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 
 import java.io.IOException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jorge Ferrer
  */
 @ProviderType
 public abstract class BaseTemplateHandler implements TemplateHandler {
+
+	@Override
+	public Map<String, Object> getCustomContextObjects() {
+		return Collections.emptyMap();
+	}
 
 	@Override
 	public List<Element> getDefaultTemplateElements() throws Exception {
@@ -51,7 +57,7 @@ public abstract class BaseTemplateHandler implements TemplateHandler {
 		String xml = StringUtil.read(
 			clazz.getClassLoader(), templatesConfigPath, false);
 
-		Document document = SAXReaderUtil.read(xml);
+		Document document = UnsecureSAXReaderUtil.read(xml);
 
 		Element rootElement = document.getRootElement();
 
@@ -59,14 +65,17 @@ public abstract class BaseTemplateHandler implements TemplateHandler {
 	}
 
 	@Override
+	public String getDefaultTemplateKey() {
+		return null;
+	}
+
+	@Override
 	public String[] getRestrictedVariables(String language) {
-		if (language.equals(TemplateConstants.LANG_TYPE_FTL)) {
-			return PropsUtil.getArray(
-				PropsKeys.FREEMARKER_ENGINE_RESTRICTED_VARIABLES);
-		}
-		else if (language.equals(TemplateConstants.LANG_TYPE_VM)) {
-			return PropsUtil.getArray(
-				PropsKeys.VELOCITY_ENGINE_RESTRICTED_VARIABLES);
+		TemplateManager templateManager =
+			TemplateManagerUtil.getTemplateManager(language);
+
+		if (templateManager != null) {
+			return templateManager.getRestrictedVariables();
 		}
 
 		return new String[0];

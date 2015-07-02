@@ -17,18 +17,18 @@ package com.liferay.portal.service.persistence.impl;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.log.CaptureAppender;
-import com.liferay.portal.log.Log4JLoggerTestUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.model.impl.AssetCategoryImpl;
@@ -230,11 +230,10 @@ public class PersistenceNestedSetsTreeManagerTest {
 	public void testError() {
 		_sessionFactoryInvocationHandler.setFailOpenSession(true);
 
-		CaptureAppender captureAppender =
-			Log4JLoggerTestUtil.configureLog4JLogger(
-				BasePersistenceImpl.class.getName(), Level.OFF);
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					BasePersistenceImpl.class.getName(), Level.OFF)) {
 
-		try {
 			try {
 				_nestedSetsTreeManager.doCountAncestors(0, 0, 0);
 
@@ -327,8 +326,6 @@ public class PersistenceNestedSetsTreeManagerTest {
 			}
 		}
 		finally {
-			captureAppender.close();
-
 			_sessionFactoryInvocationHandler.setFailOpenSession(false);
 		}
 	}
@@ -624,17 +621,15 @@ public class PersistenceNestedSetsTreeManagerTest {
 	protected void assertGetAncestors(
 		AssetCategory assetCategory, AssetCategory... ancestorAssetCategories) {
 
-		List<AssetCategory> expectedAssetCategories =
-			new ArrayList<AssetCategory>(
-				Arrays.asList(ancestorAssetCategories));
+		List<AssetCategory> expectedAssetCategories = new ArrayList<>(
+			Arrays.asList(ancestorAssetCategories));
 
 		expectedAssetCategories.add(assetCategory);
 
 		Collections.sort(expectedAssetCategories);
 
-		List<AssetCategory> actualAssetCategories =
-			new ArrayList<AssetCategory>(
-				_nestedSetsTreeManager.getAncestors(assetCategory));
+		List<AssetCategory> actualAssetCategories = new ArrayList<>(
+			_nestedSetsTreeManager.getAncestors(assetCategory));
 
 		Collections.sort(actualAssetCategories);
 
@@ -644,16 +639,15 @@ public class PersistenceNestedSetsTreeManagerTest {
 	protected void assertGetDescendants(
 		AssetCategory assetCategory, AssetCategory... childAssetCategories) {
 
-		List<AssetCategory> expectedAssetCategories =
-			new ArrayList<AssetCategory>(Arrays.asList(childAssetCategories));
+		List<AssetCategory> expectedAssetCategories = new ArrayList<>(
+			Arrays.asList(childAssetCategories));
 
 		expectedAssetCategories.add(assetCategory);
 
 		Collections.sort(expectedAssetCategories);
 
-		List<AssetCategory> actualAssetCategories =
-			new ArrayList<AssetCategory>(
-				_nestedSetsTreeManager.getDescendants(assetCategory));
+		List<AssetCategory> actualAssetCategories = new ArrayList<>(
+			_nestedSetsTreeManager.getDescendants(assetCategory));
 
 		Collections.sort(actualAssetCategories);
 
@@ -732,7 +726,7 @@ public class PersistenceNestedSetsTreeManagerTest {
 		}
 
 		private boolean _failOpenSession;
-		private Object _target;
+		private final Object _target;
 
 	}
 

@@ -94,7 +94,7 @@ public class QueryDefinition<T> {
 			return null;
 		}
 
-		return new TableNameOrderByComparator<T>(_orderByComparator, tableName);
+		return new TableNameOrderByComparator<>(_orderByComparator, tableName);
 	}
 
 	public int getStart() {
@@ -111,7 +111,7 @@ public class QueryDefinition<T> {
 
 	public void setAttribute(String name, Serializable value) {
 		if (_attributes == null) {
-			_attributes = new HashMap<String, Serializable>();
+			_attributes = new HashMap<>();
 		}
 
 		_attributes.put(name, value);

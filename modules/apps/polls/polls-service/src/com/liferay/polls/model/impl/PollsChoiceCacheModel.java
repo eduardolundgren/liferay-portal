@@ -18,6 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.polls.model.PollsChoice;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class PollsChoiceCacheModel implements CacheModel<PollsChoice>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof PollsChoiceCacheModel)) {
+			return false;
+		}
+
+		PollsChoiceCacheModel pollsChoiceCacheModel = (PollsChoiceCacheModel)obj;
+
+		if (choiceId == pollsChoiceCacheModel.choiceId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, choiceId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -65,6 +90,8 @@ public class PollsChoiceCacheModel implements CacheModel<PollsChoice>,
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -123,6 +150,13 @@ public class PollsChoiceCacheModel implements CacheModel<PollsChoice>,
 			pollsChoiceImpl.setDescription(description);
 		}
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			pollsChoiceImpl.setLastPublishDate(null);
+		}
+		else {
+			pollsChoiceImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		pollsChoiceImpl.resetOriginalValues();
 
 		return pollsChoiceImpl;
@@ -141,6 +175,7 @@ public class PollsChoiceCacheModel implements CacheModel<PollsChoice>,
 		questionId = objectInput.readLong();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -182,6 +217,8 @@ public class PollsChoiceCacheModel implements CacheModel<PollsChoice>,
 		else {
 			objectOutput.writeUTF(description);
 		}
+
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public String uuid;
@@ -195,4 +232,5 @@ public class PollsChoiceCacheModel implements CacheModel<PollsChoice>,
 	public long questionId;
 	public String name;
 	public String description;
+	public long lastPublishDate;
 }

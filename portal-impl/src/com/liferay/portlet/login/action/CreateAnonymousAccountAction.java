@@ -15,13 +15,11 @@
 package com.liferay.portlet.login.action;
 
 import com.liferay.portal.CompanyMaxUsersException;
-import com.liferay.portal.ContactFirstNameException;
-import com.liferay.portal.ContactFullNameException;
-import com.liferay.portal.ContactLastNameException;
+import com.liferay.portal.ContactNameException;
 import com.liferay.portal.EmailAddressException;
 import com.liferay.portal.GroupFriendlyURLException;
-import com.liferay.portal.ReservedUserEmailAddressException;
 import com.liferay.portal.UserEmailAddressException;
+import com.liferay.portal.kernel.captcha.CaptchaConfigurationException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -133,14 +131,12 @@ public class CreateAnonymousAccountAction extends PortletAction {
 
 				writeJSON(actionRequest, actionResponse, jsonObject);
 			}
-			else if (e instanceof CaptchaTextException ||
+			else if (e instanceof CaptchaConfigurationException ||
+					 e instanceof CaptchaTextException ||
 					 e instanceof CompanyMaxUsersException ||
-					 e instanceof ContactFirstNameException ||
-					 e instanceof ContactFullNameException ||
-					 e instanceof ContactLastNameException ||
+					 e instanceof ContactNameException ||
 					 e instanceof EmailAddressException ||
 					 e instanceof GroupFriendlyURLException ||
-					 e instanceof ReservedUserEmailAddressException ||
 					 e instanceof UserEmailAddressException) {
 
 				SessionErrors.add(actionRequest, e.getClass(), e);
@@ -216,8 +212,8 @@ public class CreateAnonymousAccountAction extends PortletAction {
 		String openId = StringPool.BLANK;
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		int prefixId = 0;
-		int suffixId = 0;
+		long prefixId = 0;
+		long suffixId = 0;
 		boolean male = true;
 		int birthdayMonth = 0;
 		int birthdayDay = 1;
@@ -298,8 +294,8 @@ public class CreateAnonymousAccountAction extends PortletAction {
 		String firstName = null;
 		String middleName = null;
 		String lastName = null;
-		int prefixId = 0;
-		int suffixId = 0;
+		long prefixId = 0;
+		long suffixId = 0;
 		boolean male = true;
 		int birthdayMonth = 0;
 		int birthdayDay = 1;

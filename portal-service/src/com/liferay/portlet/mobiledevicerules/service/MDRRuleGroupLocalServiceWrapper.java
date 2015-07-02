@@ -266,7 +266,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _mdrRuleGroupLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -386,8 +386,19 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	}
 
 	@Override
+	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> getRuleGroups(
+		long[] groupIds, int start, int end) {
+		return _mdrRuleGroupLocalService.getRuleGroups(groupIds, start, end);
+	}
+
+	@Override
 	public int getRuleGroupsCount(long groupId) {
 		return _mdrRuleGroupLocalService.getRuleGroupsCount(groupId);
+	}
+
+	@Override
+	public int getRuleGroupsCount(long[] groupIds) {
+		return _mdrRuleGroupLocalService.getRuleGroupsCount(groupIds);
 	}
 
 	/**

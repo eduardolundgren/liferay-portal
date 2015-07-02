@@ -27,13 +27,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.upgrade.v6_2_0.util.JournalFeedTable;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
-import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.util.JournalConverterUtil;
 
 import java.sql.Connection;
@@ -136,10 +131,11 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 			addDDMStructure(
 				uuid_, ddmStructureId, groupId, companyId, userId, userName,
 				createDate, modifiedDate, parentDDMStructureId,
-				PortalUtil.getClassNameId(JournalArticle.class.getName()),
+				PortalUtil.getClassNameId(
+					"com.liferay.portlet.journal.model.JournalArticle"),
 				ddmStructureKey, name, description, xsd,
-				PropsValues.JOURNAL_ARTICLE_STORAGE_TYPE,
-				DDMStructureConstants.TYPE_DEFAULT);
+				PropsUtil.get("journal.article.storage.type"),
+				_DDM_STRUCTURE_TYPE_DEFAULT);
 		}
 	}
 
@@ -224,7 +220,14 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		updateStructures();
 		updateTemplates();
 
+		updateAssetEntryClassTypeId();
+
 		super.doUpgrade();
+	}
+
+	protected long getDDMStructureClassNameId() {
+		return PortalUtil.getClassNameId(
+			"com.liferay.portlet.dynamicdatamapping.model.DDMStructure");
 	}
 
 	protected long getDDMStructureId(long groupId, String structureId) {
@@ -267,6 +270,37 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		return new String[] {
 			"56_INSTANCE_%", "62_INSTANCE_%", "101_INSTANCE_%"
 		};
+	}
+
+	protected void updateAssetEntryClassTypeId() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select groupId, resourcePrimKey, structureId from " +
+					"JournalArticle where structureId != ''");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long groupId = rs.getLong("groupId");
+				long resourcePrimKey = rs.getLong("resourcePrimKey");
+				String structureId = rs.getString("structureId");
+
+				long ddmStructureId = getDDMStructureId(groupId, structureId);
+
+				runSQL(
+					"update AssetEntry set classTypeId = " +
+						ddmStructureId + " where classPK = " + resourcePrimKey);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
 	}
 
 	protected void updatePreferencesClassPKs(
@@ -360,12 +394,13 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 
 		updateResourcePermission(
 			companyId, "com.liferay.portlet.journal.model.JournalStructure",
-			DDMStructure.class.getName(), id_, ddmStructureId);
+			"com.liferay.portlet.dynamicdatamapping.model.DDMStructure", id_,
+			ddmStructureId);
 
 		_ddmStructureIds.put(groupId + "#" + structureId, ddmStructureId);
 		_ddmStructurePKs.put(id_, ddmStructureId);
 
-		return 0;
+		return ddmStructureId;
 	}
 
 	protected long updateStructure(String structureId) throws Exception {
@@ -458,23 +493,22 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 
 				long ddmTemplateId = increment();
 
-				long classNameId = PortalUtil.getClassNameId(
-					DDMStructure.class.getName());
+				long classNameId = getDDMStructureClassNameId();
 
 				long classPK = getDDMStructureId(groupId, structureId);
 
 				addDDMTemplate(
 					uuid_, ddmTemplateId, groupId, companyId, userId, userName,
 					createDate, modifiedDate, classNameId, classPK, templateId,
-					name, description,
-					DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
-					DDMTemplateConstants.TEMPLATE_MODE_CREATE, language, script,
-					cacheable, smallImage, smallImageId, smallImageURL);
+					name, description, _DDM_TEMPLATE_TYPE_DISPLAY,
+					_DDM_TEMPLATE_MODE_CREATE, language, script, cacheable,
+					smallImage, smallImageId, smallImageURL);
 
 				updateResourcePermission(
 					companyId,
 					"com.liferay.portlet.journal.model.JournalTemplate",
-					DDMTemplate.class.getName(), id_, ddmTemplateId);
+					"com.liferay.portlet.dynamicdatamapping.model.DDMTemplate",
+					id_, ddmTemplateId);
 			}
 		}
 		finally {
@@ -524,15 +558,21 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		return PortletPreferencesFactoryUtil.toXML(preferences);
 	}
 
+	private static final int _DDM_STRUCTURE_TYPE_DEFAULT = 0;
+
+	private static final String _DDM_TEMPLATE_MODE_CREATE = "create";
+
+	private static final String _DDM_TEMPLATE_TYPE_DISPLAY = "display";
+
 	private static final String _PORTLET_ID_ASSET_PUBLISHER = "101";
 
 	private static final String _PORTLET_ID_JOURNAL_CONTENT = "56";
 
 	private static final String _PORTLET_ID_JOURNAL_CONTENT_LIST = "62";
 
-	private static Log _log = LogFactoryUtil.getLog(UpgradeJournal.class);
+	private static final Log _log = LogFactoryUtil.getLog(UpgradeJournal.class);
 
-	private Map<String, Long> _ddmStructureIds = new HashMap<String, Long>();
-	private Map<Long, Long> _ddmStructurePKs = new HashMap<Long, Long>();
+	private final Map<String, Long> _ddmStructureIds = new HashMap<>();
+	private final Map<Long, Long> _ddmStructurePKs = new HashMap<>();
 
 }

@@ -44,7 +44,6 @@ import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetada
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypeFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypePersistence;
-import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureLinkPersistence;
 
 import java.io.Serializable;
 
@@ -311,7 +310,7 @@ public abstract class DLFileEntryMetadataLocalServiceBaseImpl
 	 *
 	 * @return the document library file entry metadata local service
 	 */
-	public com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalService getDLFileEntryMetadataLocalService() {
+	public DLFileEntryMetadataLocalService getDLFileEntryMetadataLocalService() {
 		return dlFileEntryMetadataLocalService;
 	}
 
@@ -321,7 +320,7 @@ public abstract class DLFileEntryMetadataLocalServiceBaseImpl
 	 * @param dlFileEntryMetadataLocalService the document library file entry metadata local service
 	 */
 	public void setDLFileEntryMetadataLocalService(
-		com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService) {
+		DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService) {
 		this.dlFileEntryMetadataLocalService = dlFileEntryMetadataLocalService;
 	}
 
@@ -437,44 +436,6 @@ public abstract class DLFileEntryMetadataLocalServiceBaseImpl
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
 		this.classNamePersistence = classNamePersistence;
-	}
-
-	/**
-	 * Returns the d d m structure link local service.
-	 *
-	 * @return the d d m structure link local service
-	 */
-	public com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService getDDMStructureLinkLocalService() {
-		return ddmStructureLinkLocalService;
-	}
-
-	/**
-	 * Sets the d d m structure link local service.
-	 *
-	 * @param ddmStructureLinkLocalService the d d m structure link local service
-	 */
-	public void setDDMStructureLinkLocalService(
-		com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService ddmStructureLinkLocalService) {
-		this.ddmStructureLinkLocalService = ddmStructureLinkLocalService;
-	}
-
-	/**
-	 * Returns the d d m structure link persistence.
-	 *
-	 * @return the d d m structure link persistence
-	 */
-	public DDMStructureLinkPersistence getDDMStructureLinkPersistence() {
-		return ddmStructureLinkPersistence;
-	}
-
-	/**
-	 * Sets the d d m structure link persistence.
-	 *
-	 * @param ddmStructureLinkPersistence the d d m structure link persistence
-	 */
-	public void setDDMStructureLinkPersistence(
-		DDMStructureLinkPersistence ddmStructureLinkPersistence) {
-		this.ddmStructureLinkPersistence = ddmStructureLinkPersistence;
 	}
 
 	/**
@@ -615,8 +576,8 @@ public abstract class DLFileEntryMetadataLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalService.class)
-	protected com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService;
+	@BeanReference(type = DLFileEntryMetadataLocalService.class)
+	protected DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService;
 	@BeanReference(type = DLFileEntryMetadataPersistence.class)
 	protected DLFileEntryMetadataPersistence dlFileEntryMetadataPersistence;
 	@BeanReference(type = DLFileEntryMetadataFinder.class)
@@ -629,10 +590,6 @@ public abstract class DLFileEntryMetadataLocalServiceBaseImpl
 	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService.class)
-	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService ddmStructureLinkLocalService;
-	@BeanReference(type = DDMStructureLinkPersistence.class)
-	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService dlFileEntryTypeLocalService;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryTypeService.class)

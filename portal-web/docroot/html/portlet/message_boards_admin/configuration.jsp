@@ -17,7 +17,9 @@
 <%@ include file="/html/portlet/message_boards/init.jsp" %>
 
 <%
-mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getParameterMap());
+Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+
+mbGroupServiceSettings = MBGroupServiceSettings.getInstance(themeDisplay.getSiteGroupId(), request.getParameterMap());
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL">
@@ -53,7 +55,7 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 
 		<liferay-ui:section>
 			<aui:fieldset>
-				<aui:input name="preferences--allowAnonymousPosting--" type="checkbox" value="<%= mbSettings.isAllowAnonymousPosting() %>" />
+				<aui:input name="preferences--allowAnonymousPosting--" type="checkbox" value="<%= mbGroupServiceSettings.isAllowAnonymousPosting() %>" />
 
 				<aui:input helpMessage="message-boards-message-subscribe-by-default-help" label="subscribe-by-default" name="preferences--subscribeByDefault--" type="checkbox" value="<%= subscribeByDefault %>" />
 
@@ -90,11 +92,11 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 
 		<liferay-ui:section>
 			<aui:fieldset>
-				<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" value="<%= mbSettings.getEmailFromName() %>" />
+				<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" value="<%= mbGroupServiceSettings.getEmailFromName() %>" />
 
-				<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" value="<%= mbSettings.getEmailFromAddress() %>" />
+				<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" value="<%= mbGroupServiceSettings.getEmailFromAddress() %>" />
 
-				<aui:input label="html-format" name="preferences--emailHtmlFormat--" type="checkbox" value="<%= mbSettings.isEmailHtmlFormat() %>" />
+				<aui:input label="html-format" name="preferences--emailHtmlFormat--" type="checkbox" value="<%= mbGroupServiceSettings.isEmailHtmlFormat() %>" />
 			</aui:fieldset>
 
 			<aui:fieldset cssClass="definition-of-terms" label="definition-of-terms">
@@ -122,26 +124,26 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 		</liferay-ui:section>
 
 		<%
-		Map<String, String> emailDefinitionTerms = MBUtil.getEmailDefinitionTerms(renderRequest, mbSettings.getEmailFromAddress(), mbSettings.getEmailFromName());
+		Map<String, String> emailDefinitionTerms = MBUtil.getEmailDefinitionTerms(renderRequest, mbGroupServiceSettings.getEmailFromAddress(), mbGroupServiceSettings.getEmailFromName());
 		%>
 
 		<liferay-ui:section>
 			<liferay-ui:email-notification-settings
-				emailBody="<%= mbSettings.getEmailMessageAddedBodyXml() %>"
+				emailBody="<%= mbGroupServiceSettings.getEmailMessageAddedBodyXml() %>"
 				emailDefinitionTerms="<%= emailDefinitionTerms %>"
-				emailEnabled="<%= mbSettings.isEmailMessageAddedEnabled() %>"
+				emailEnabled="<%= mbGroupServiceSettings.isEmailMessageAddedEnabled() %>"
 				emailParam="emailMessageAdded"
-				emailSubject="<%= mbSettings.getEmailMessageAddedSubjectXml() %>"
+				emailSubject="<%= mbGroupServiceSettings.getEmailMessageAddedSubjectXml() %>"
 			/>
 		</liferay-ui:section>
 
 		<liferay-ui:section>
 			<liferay-ui:email-notification-settings
-				emailBody="<%= mbSettings.getEmailMessageUpdatedBodyXml() %>"
+				emailBody="<%= mbGroupServiceSettings.getEmailMessageUpdatedBodyXml() %>"
 				emailDefinitionTerms="<%= emailDefinitionTerms %>"
-				emailEnabled="<%= mbSettings.isEmailMessageUpdatedEnabled() %>"
+				emailEnabled="<%= mbGroupServiceSettings.isEmailMessageUpdatedEnabled() %>"
 				emailParam="emailMessageUpdated"
-				emailSubject="<%= mbSettings.getEmailMessageUpdatedSubjectXml() %>"
+				emailSubject="<%= mbGroupServiceSettings.getEmailMessageUpdatedSubjectXml() %>"
 			/>
 		</liferay-ui:section>
 
@@ -161,13 +163,13 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 					<aui:select label="localized-language" name="prioritiesLanguageId" onChange='<%= renderResponse.getNamespace() + "updatePrioritiesLanguage();" %>' showEmptyOption="<%= true %>">
 
 						<%
-						for (int i = 0; i < locales.length; i++) {
-							if (locales[i].equals(defaultLocale)) {
+						for (Locale curLocale : locales) {
+							if (curLocale.equals(defaultLocale)) {
 								continue;
 							}
 						%>
 
-							<aui:option label="<%= locales[i].getDisplayName(locale) %>" selected="<%= currentLanguageId.equals(LocaleUtil.toLanguageId(locales[i])) %>" value="<%= LocaleUtil.toLanguageId(locales[i]) %>" />
+							<aui:option label="<%= curLocale.getDisplayName(locale) %>" selected="<%= currentLanguageId.equals(LocaleUtil.toLanguageId(curLocale)) %>" value="<%= LocaleUtil.toLanguageId(curLocale) %>" />
 
 						<%
 						}
@@ -197,7 +199,7 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 					</tr>
 
 					<%
-					priorities = mbSettings.getPriorities(defaultLanguageId);
+					priorities = mbGroupServiceSettings.getPriorities(defaultLanguageId);
 
 					for (int i = 0; i < 10; i++) {
 						String name = StringPool.BLANK;
@@ -276,12 +278,12 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 					</table>
 
 					<%
-					for (int i = 0; i < locales.length; i++) {
-						if (locales[i].equals(defaultLocale)) {
+					for (Locale curLocale : locales) {
+						if (curLocale.equals(defaultLocale)) {
 							continue;
 						}
 
-						String[] tempPriorities = mbSettings.getPriorities(LocaleUtil.toLanguageId(locales[i]));
+						String[] tempPriorities = mbGroupServiceSettings.getPriorities(LocaleUtil.toLanguageId(curLocale));
 
 						for (int j = 0; j < 10; j++) {
 							String name = StringPool.BLANK;
@@ -305,9 +307,9 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 							}
 					%>
 
-							<aui:input name='<%= "priorityName" + j + "_" + LocaleUtil.toLanguageId(locales[i]) %>' type="hidden" value="<%= name %>" />
-							<aui:input name='<%= "priorityImage" + j + "_" + LocaleUtil.toLanguageId(locales[i]) %>' type="hidden" value="<%= image %>" />
-							<aui:input name='<%= "priorityValue" + j + "_" + LocaleUtil.toLanguageId(locales[i]) %>' type="hidden" value="<%= value %>" />
+							<aui:input name='<%= "priorityName" + j + "_" + LocaleUtil.toLanguageId(curLocale) %>' type="hidden" value="<%= name %>" />
+							<aui:input name='<%= "priorityImage" + j + "_" + LocaleUtil.toLanguageId(curLocale) %>' type="hidden" value="<%= image %>" />
+							<aui:input name='<%= "priorityValue" + j + "_" + LocaleUtil.toLanguageId(curLocale) %>' type="hidden" value="<%= value %>" />
 
 					<%
 						}
@@ -401,13 +403,13 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 						<aui:select label="localized-language" name="ranksLanguageId" onChange='<%= renderResponse.getNamespace() + "updateRanksLanguage();" %>' showEmptyOption="<%= true %>">
 
 							<%
-							for (int i = 0; i < locales.length; i++) {
-								if (locales[i].equals(defaultLocale)) {
+							for (Locale curLocale : locales) {
+								if (curLocale.equals(defaultLocale)) {
 									continue;
 								}
 							%>
 
-								<aui:option label="<%= locales[i].getDisplayName(locale) %>" selected="<%= currentLanguageId.equals(LocaleUtil.toLanguageId(locales[i])) %>" value="<%= LocaleUtil.toLanguageId(locales[i]) %>" />
+								<aui:option label="<%= curLocale.getDisplayName(locale) %>" selected="<%= currentLanguageId.equals(LocaleUtil.toLanguageId(curLocale)) %>" value="<%= LocaleUtil.toLanguageId(curLocale) %>" />
 
 							<%
 							}
@@ -418,18 +420,18 @@ mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId(), request.getPa
 				</tr>
 				<tr>
 					<td>
-						<aui:input cssClass="lfr-textarea-container" label="" name='<%= "ranks_" + defaultLanguageId %>' title="ranks" type="textarea" value="<%= StringUtil.merge(mbSettings.getRanks(defaultLanguageId), StringPool.NEW_LINE) %>" />
+						<aui:input cssClass="lfr-textarea-container" label="" name='<%= "ranks_" + defaultLanguageId %>' title="ranks" type="textarea" value="<%= StringUtil.merge(mbGroupServiceSettings.getRanks(defaultLanguageId), StringPool.NEW_LINE) %>" />
 					</td>
 					<td>
 
 						<%
-						for (int i = 0; i < locales.length; i++) {
-							if (locales[i].equals(defaultLocale)) {
+						for (Locale curLocale : locales) {
+							if (curLocale.equals(defaultLocale)) {
 								continue;
 							}
 						%>
 
-							<aui:input name='<%= "ranks_" + LocaleUtil.toLanguageId(locales[i]) %>' type="hidden" value="<%= StringUtil.merge(mbSettings.getRanks(LocaleUtil.toLanguageId(locales[i])), StringPool.NEW_LINE) %>" />
+							<aui:input name='<%= "ranks_" + LocaleUtil.toLanguageId(curLocale) %>' type="hidden" value="<%= StringUtil.merge(mbGroupServiceSettings.getRanks(LocaleUtil.toLanguageId(curLocale)), StringPool.NEW_LINE) %>" />
 
 						<%
 						}

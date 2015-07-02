@@ -15,13 +15,13 @@
 package com.liferay.portlet.dynamicdatamapping.util.test;
 
 import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
@@ -103,7 +103,7 @@ public class DDMTemplateTestUtil {
 			String script, Locale defaultLocale)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(defaultLocale, "Test Template");
 
@@ -113,9 +113,9 @@ public class DDMTemplateTestUtil {
 		serviceContext.setAddGuestPermissions(true);
 
 		return DDMTemplateLocalServiceUtil.addTemplate(
-			TestPropsValues.getUserId(), groupId, classNameId, classPK, nameMap,
-			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null, language,
-			script, serviceContext);
+			TestPropsValues.getUserId(), groupId, classNameId, classPK, 0,
+			nameMap, null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
+			language, script, serviceContext);
 	}
 
 	public static DDMTemplate addTemplate(

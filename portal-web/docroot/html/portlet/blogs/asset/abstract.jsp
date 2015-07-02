@@ -17,30 +17,35 @@
 <%@ include file="/html/portlet/blogs/init.jsp" %>
 
 <%
-int abstractLength = (Integer)request.getAttribute(WebKeys.ASSET_PUBLISHER_ABSTRACT_LENGTH);
+int abstractLength = GetterUtil.getInteger(request.getAttribute(WebKeys.ASSET_ENTRY_ABSTRACT_LENGTH), AssetUtil.ASSET_ENTRY_ABSTRACT_LENGTH);
+AssetRenderer assetRenderer = (AssetRenderer)request.getAttribute(WebKeys.ASSET_RENDERER);
 
 BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
+
+Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletDisplay.getId());
 %>
+
+<liferay-util:html-top outputKey="blogs_common_main_css">
+	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathContext(request) + "/html/portlet/blogs/css/common_main.css", portlet.getTimestamp()) %>" rel="stylesheet" type="text/css" />
+</liferay-util:html-top>
 
 <c:if test="<%= entry.isSmallImage() %>">
 	<div class="asset-small-image">
-		<img alt="" class="asset-small-image img-thumbnail" src="<%= HtmlUtil.escape(entry.getEntryImageURL(themeDisplay)) %>" width="150" />
+		<img alt="" class="asset-small-image img-thumbnail" src="<%= HtmlUtil.escape(entry.getSmallImageURL(themeDisplay)) %>" width="150" />
 	</div>
 </c:if>
 
-<%
-String summary = HtmlUtil.escape(entry.getDescription());
+<div class="portlet-blogs">
+	<div class="entry-body">
 
-summary = HtmlUtil.replaceNewLine(summary);
+		<%
+		String coverImageURL = entry.getCoverImageURL(themeDisplay);
+		%>
 
-if (Validator.isNull(summary)) {
-	summary = HtmlUtil.escape(entry.getSubtitle());
-	summary = HtmlUtil.replaceNewLine(summary);
-}
+		<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
+			<div class="cover-image-container" style="background-image: url(<%= coverImageURL %>)"></div>
+		</c:if>
 
-if (Validator.isNull(summary)) {
-	summary = HtmlUtil.stripHtml(entry.getContent());
-}
-%>
-
-<%= StringUtil.shorten(summary, abstractLength) %>
+		<%= StringUtil.shorten(HtmlUtil.stripHtml(assetRenderer.getSummary()), abstractLength) %>
+	</div>
+</div>

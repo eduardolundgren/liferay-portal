@@ -39,7 +39,7 @@ import com.liferay.portlet.documentlibrary.util.DLUtil;
  * @author Adolfo Pérez
  */
 public class LiferayWorkflowCapability
-	implements RepositoryWrapperAware, WorkflowCapability {
+	implements RepositoryWrapperAware, WorkflowCapability, WorkflowSupport {
 
 	@Override
 	public void addFileEntry(
@@ -76,7 +76,8 @@ public class LiferayWorkflowCapability
 				fileEntry.getFileEntryId(), serviceContext);
 
 		if ((serviceContext.getWorkflowAction() ==
-				WorkflowConstants.ACTION_PUBLISH) && !keepFileVersionLabel) {
+				WorkflowConstants.ACTION_PUBLISH) &&
+			!keepFileVersionLabel) {
 
 			DLFileVersion latestDLFileVersion =
 				DLFileVersionLocalServiceUtil.getLatestFileVersion(
@@ -86,6 +87,13 @@ public class LiferayWorkflowCapability
 				userId, latestDLFileVersion, DLSyncConstants.EVENT_UPDATE,
 				serviceContext);
 		}
+	}
+
+	@Override
+	public int getStatus(FileEntry fileEntry) {
+		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
+
+		return dlFileEntry.getStatus();
 	}
 
 	@Override
@@ -133,7 +141,7 @@ public class LiferayWorkflowCapability
 
 		if (dlFileVersion.isApproved() ||
 			(serviceContext.getWorkflowAction() ==
-					WorkflowConstants.ACTION_PUBLISH)) {
+				WorkflowConstants.ACTION_PUBLISH)) {
 
 			return dlFileVersion;
 		}

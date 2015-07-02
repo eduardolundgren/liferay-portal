@@ -1,0 +1,937 @@
+<definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="Sites Administration" />
+
+	<set-up>
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<execute macro="Organization#tearDownCP" />
+
+		<execute macro="Site#tearDownCP" />
+
+		<execute macro="User#tearDownCP" />
+	</tear-down>
+
+	<command name="AddMember" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+	</command>
+
+	<command name="AddMembersSiteUser" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+	</command>
+
+	<command name="AddSiteTeam" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Teams" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team Description" />
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+
+		<execute macro="Team#viewCP">
+			<var name="teamDescription" value="Site Team Description" />
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+	</command>
+
+	<command name="AddSiteTeams" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Teams" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team1 Description" />
+			<var name="teamName" value="Site Team1 Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team2 Description" />
+			<var name="teamName" value="Site Team2 Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team3 Description" />
+			<var name="teamName" value="Site Team3 Name" />
+		</execute>
+
+		<execute macro="Team#viewCP">
+			<var name="teamDescription" value="Site Team1 Description" />
+			<var name="teamName" value="Site Team1 Name" />
+		</execute>
+
+		<execute macro="Team#viewCP">
+			<var name="teamDescription" value="Site Team2 Description" />
+			<var name="teamName" value="Site Team2 Name" />
+		</execute>
+
+		<execute macro="Team#viewCP">
+			<var name="teamDescription" value="Site Team3 Description" />
+			<var name="teamName" value="Site Team3 Name" />
+		</execute>
+	</command>
+
+	<command name="AssignMembersSiteTeamUser" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Teams" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team Description" />
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+
+		<execute macro="Team#assignMembersCP">
+			<var name="siteName" value="Site Name" />
+			<var name="teamName" value="Site Team Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#viewMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="teamName" value="Site Team Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+	</command>
+
+	<command name="DeleteNoLiferaySite" priority="4">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<var name="key_siteName" value="Liferay" />
+
+		<execute function="Type" locator1="CPSites#BASIC_SEARCH_FIELD" value1="Liferay" />
+		<execute function="AssertClick" locator1="CPSites#BASIC_SEARCH_BUTTON" value1="Search" />
+
+		<execute function="AssertTextEquals" locator1="CPSites#SITE_TABLE_NAME" value1="Liferay" />
+		<execute function="AssertElementPresent" locator1="CPSites#SITE_TABLE_CHECKBOX_DISABLED" />
+		<execute function="Click" locator1="CPSites#SITE_TABLE_ACTIONS" />
+		<execute function="AssertElementNotPresent" locator1="CPSites#SITE_MENULIST_DELETE" value1="Delete" />
+		<execute function="AssertClickNoError" locator1="CPSites#SITE_MENULIST_DEACTIVATE" value1="Deactivate" />
+		<execute function="Confirm" value1="Are you sure you want to deactivate this?" />
+
+		<execute function="AssertTextEquals" locator1="CPSites#ERROR_MESSAGE_1" value1="Your request failed to complete." />
+		<execute function="AssertTextEquals" locator1="CPSites#ERROR_MESSAGE_2" value1="The site cannot be deleted or deactivated because you are accessing the site." />
+	</command>
+
+	<command name="DeleteSiteTeam" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Teams" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team Description" />
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+
+		<execute macro="Team#deleteCP">
+			<var name="teamDescription" value="Site Team Description" />
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+
+		<execute macro="Team#viewDefaultCP">
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+	</command>
+
+	<command name="EditSiteTeam" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Teams" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription" value="Site Team Description" />
+			<var name="teamName" value="Site Team Name" />
+		</execute>
+
+		<execute macro="Team#editCP">
+			<var name="teamDescriptionEdit" value="Site Team Description Edit" />
+			<var name="teamName" value="Site Team Name" />
+			<var name="teamNameEdit" value="Site Team Name Edit" />
+		</execute>
+
+		<execute macro="Team#viewCP">
+			<var name="teamDescription" value="Site Team Description Edit" />
+			<var name="teamName" value="Site Team Name Edit" />
+		</execute>
+	</command>
+
+	<command name="LimitMembershipParentSite" priority="4">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="parentSiteName" value="Site Name" />
+			<var name="siteLimitMembership" value="Yes" />
+			<var name="siteName" value="Child SiteName" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Child SiteName" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Child SiteName" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Child SiteName" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="childSiteName" value="Site Name" />
+			<var name="siteScopeName" value="Child SiteName" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Child SiteName" />
+		</execute>
+
+		<execute macro="Site#removeMemberCP">
+			<var name="siteName" value="Child SiteName" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#removeMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Child SiteName" />
+		</execute>
+
+		<execute macro="Site#viewLimitMembershipParentSiteCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Child SiteName" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+	</command>
+
+	<command name="OrganizationsView" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addCP">
+			<var name="orgName" value="Organization Name 1" />
+			<var name="orgType" value="Regular Organization" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addSiteCP">
+			<var name="orgName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="allowManualMembershipManagement" value="true" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addMemberCP">
+			<var name="orgName" value="Organization Name 1" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#manageMembershipOptionsInSites">
+			<var name="allowManualMembershipManagement" value="true" />
+			<var name="orgName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Organization Name 1" />
+		</execute>
+
+		<execute function="AssertTextEquals" locator1="CPSitememberships#USER_TABLE_LABEL" value1="1 User" />
+
+		<execute macro="Site#viewMemberOrganizationCP">
+			<var name="orgName" value="Organization Name 1" />
+			<var name="toolTip" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addCP">
+			<var name="orgName" value="Organization Name 2" />
+			<var name="orgType" value="Regular Organization" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addCP">
+			<var name="orgName" value="Organization Name 3" />
+			<var name="orgType" value="Regular Organization" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteScopeName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Site#addMemberOrganizationCP">
+			<var name="orgName" value="Organization Name 2" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Site#viewMemberOrganizationCP">
+			<var name="orgName" value="Organization Name 2" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Site#addMemberOrganizationCP">
+			<var name="orgName" value="Organization Name 3" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Organization Name 1" />
+		</execute>
+
+		<execute macro="Site#viewMemberOrganizationCP">
+			<var name="orgName" value="Organization Name 3" />
+		</execute>
+	</command>
+
+	<command name="RemoveMember" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#addMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#removeMemberCP">
+			<var name="siteName" value="Site Name" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+	</command>
+
+	<command name="ViewNoManualMembershipManagement" priority="4">
+		<execute macro="Site#manageMembershipOptions">
+			<var name="allowManualMembershipManagement" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+		</execute>
+
+		<execute macro="Site#manageMembershipOptions">
+			<var name="allowManualMembershipManagement" value="false" />
+		</execute>
+
+		<execute macro="Page#openURL" />
+
+		<execute function="AssertClick#assertTextClickAtClickDockbar" locator1="Dockbar#ADMIN" value1="Admin" />
+		<execute function="AssertElementNotPresent" locator1="Dockbar#ADMIN_SITE_ADMINISTRATION_USERS" value1="Users" />
+	</command>
+
+	<command name="WebContentAdministrationSiteMembershipsPagination" priority="3">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addMultipleCP">
+			<var name="usersEmailsList" value="userfn1@liferay.com,userfn2@liferay.com,userfn3@liferay.com,userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com,userfn7@liferay.com,userfn8@liferay.com,userfn9@liferay.com,userfn10@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#addAllMembersCP" />
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#viewMemberListCP">
+			<var name="usersEmailsList" value="userfn1@liferay.com,userfn2@liferay.com,userfn3@liferay.com,userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com,userfn7@liferay.com,userfn8@liferay.com,userfn9@liferay.com,userfn10@liferay.com" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="Test" />
+			<var name="userLastName" value="Test" />
+			<var name="userScreenName" value="test" />
+		</execute>
+
+		<execute function="AssertClick" locator1="CPSitememberships#NAVIGATION_USERS" value1="Users" />
+		<execute function="AssertClick" locator1="CPSitememberships#USER_PAGE_NAVIGATION_ITEMS_PER_PAGE" value1="20 Items per Page" />
+		<execute function="Click" locator1="CPSitememberships#USER_ITEMS_PER_PAGE_MENULIST_FIVE_ITEMS_PER_PAGE" />
+		<execute function="AssertTextEquals" locator1="CPSitememberships#USER_PAGE_NAVIGATION_PAGE_NUMBER" value1="Page 1 of 3" />
+		<execute function="AssertClick" locator1="CPSitememberships#USER_PAGE_NAVIGATION_NEXT_BUTTON" value1="Next" />
+		<execute function="AssertTextEquals" locator1="CPSitememberships#USER_PAGE_NAVIGATION_PAGE_NUMBER" value1="Page 2 of 3" />
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn1@liferay.com,userfn2@liferay.com,userfn3@liferay.com,userfn10@liferay.com" />
+		</execute>
+
+		<execute macro="Site#viewMemberListCP">
+			<var name="usersEmailsList" value="userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com,userfn7@liferay.com,userfn8@liferay.com" />
+		</execute>
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn9@liferay.com" />
+		</execute>
+
+		<execute function="Click" locator1="CPSitememberships#USER_PAGE_NAVIGATION_FIRST_BUTTON" />
+		<execute function="AssertTextEquals" locator1="CPSitememberships#USER_PAGE_NAVIGATION_PAGE_NUMBER" value1="Page 1 of 3" />
+
+		<execute macro="Site#viewMemberListCP">
+			<var name="usersEmailsList" value="userfn1@liferay.com,userfn2@liferay.com,userfn3@liferay.com,userfn10@liferay.com" />
+		</execute>
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com,userfn7@liferay.com,userfn8@liferay.com" />
+		</execute>
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn9@liferay.com" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="Test" />
+			<var name="userLastName" value="Test" />
+			<var name="userScreenName" value="test" />
+		</execute>
+
+		<execute function="Click" locator1="CPSitememberships#USER_PAGE_NAVIGATION_LAST_BUTTON" />
+		<execute function="AssertTextEquals" locator1="CPSitememberships#USER_PAGE_NAVIGATION_PAGE_NUMBER" value1="Page 3 of 3" />
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn1@liferay.com,userfn2@liferay.com,userfn3@liferay.com,userfn10@liferay.com" />
+		</execute>
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com,userfn7@liferay.com,userfn8@liferay.com" />
+		</execute>
+
+		<execute macro="Site#viewMemberListCP">
+			<var name="usersEmailsList" value="userfn9@liferay.com" />
+		</execute>
+
+		<execute function="AssertClick" locator1="CPSitememberships#USER_PAGE_NAVIGATION_PREVIOUS_BUTTON" value1="Previous" />
+		<execute function="AssertTextEquals" locator1="CPSitememberships#USER_PAGE_NAVIGATION_PAGE_NUMBER" value1="Page 2 of 3" />
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn1@liferay.com,userfn2@liferay.com,userfn3@liferay.com,userfn10@liferay.com" />
+		</execute>
+
+		<execute macro="Site#viewMemberListCP">
+			<var name="usersEmailsList" value="userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com,userfn7@liferay.com,userfn8@liferay.com" />
+		</execute>
+
+		<execute macro="Site#assertMemberListNotVisibleCP">
+			<var name="usersEmailsList" value="userfn9@liferay.com" />
+		</execute>
+	</command>
+
+	<command name="WebContentAdministrationSiteMembershipsSearch" priority="4">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="4568@liferay.com" />
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="5670@liferay.com" />
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="9758@liferay.com" />
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Memberships" />
+		</execute>
+
+		<execute macro="Site#addAllMembersCP" />
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userFirstNameSearchValue" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userFirstNameSearchValue" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userFirstNameSearchValue" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userFirstNameSearchValue" value="Test" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+			<var name="userScreenNameSearchValue" value="user1" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+			<var name="userScreenNameSearchValue" value="screen" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+			<var name="userScreenNameSearchValue" value="member" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="4568@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="4" />
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="4568@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="5" />
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="4568@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="6" />
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="5670@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="7" />
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="4568@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="8" />
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#viewMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="5670@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="0" />
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userEmailAddress" value="4568@liferay.com" />
+			<var name="userEmailAddressSearchValue" value="9" />
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest1" />
+			<var name="userLastName" value="One" />
+			<var name="userLastNameSearchValue" value="One" />
+			<var name="userScreenName" value="user1" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest2" />
+			<var name="userLastName" value="Two" />
+			<var name="userLastNameSearchValue" value="Two" />
+			<var name="userScreenName" value="screen2" />
+		</execute>
+
+		<execute macro="Site#searchMemberCP">
+			<var name="userFirstName" value="userfnTest3" />
+			<var name="userLastName" value="Three" />
+			<var name="userLastNameSearchValue" value="Three" />
+			<var name="userScreenName" value="member3" />
+		</execute>
+	</command>
+</definition>

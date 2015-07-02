@@ -134,7 +134,7 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 
 			rs = ps.executeQuery();
 
-			bitwiseValues = new HashMap<String, Long>();
+			bitwiseValues = new HashMap<>();
 
 			while (rs.next()) {
 				String actionId = rs.getString("actionId");
@@ -254,11 +254,9 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 			long groupId, String key, String defaultLanguageId)
 		throws Exception {
 
-		Map<Locale, String> localizationMap = new HashMap<Locale, String>();
+		Map<Locale, String> localizationMap = new HashMap<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 			localizationMap.put(locale, LanguageUtil.get(locale, key));
 		}
 
@@ -266,10 +264,11 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 			localizationMap, StringPool.BLANK, key, defaultLanguageId);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(UpgradeBaseJournal.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		UpgradeBaseJournal.class);
 
-	private Map<String, Map<String, Long>> _bitwiseValues =
-		new HashMap<String, Map<String, Long>>();
-	private Map<String, Long> _roleIds = new HashMap<String, Long>();
+	private final Map<String, Map<String, Long>> _bitwiseValues =
+		new HashMap<>();
+	private final Map<String, Long> _roleIds = new HashMap<>();
 
 }

@@ -28,6 +28,24 @@ import java.util.Set;
  */
 public class DDMFormFieldOptions implements Serializable {
 
+	public DDMFormFieldOptions() {
+	}
+
+	public DDMFormFieldOptions(DDMFormFieldOptions ddmFormFieldOptions) {
+		_defaultLocale = ddmFormFieldOptions._defaultLocale;
+
+		Map<String, LocalizedValue> options = ddmFormFieldOptions._options;
+
+		for (String optionValue : options.keySet()) {
+			LocalizedValue localizedValue = options.get(optionValue);
+
+			for (Locale locale : localizedValue.getAvailableLocales()) {
+				addOptionLabel(
+					optionValue, locale, localizedValue.getString(locale));
+			}
+		}
+	}
+
 	public void addOption(String value) {
 		_options.put(value, new LocalizedValue(_defaultLocale));
 	}
@@ -67,7 +85,6 @@ public class DDMFormFieldOptions implements Serializable {
 	}
 
 	private Locale _defaultLocale = LocaleUtil.getDefault();
-	private final Map<String, LocalizedValue> _options =
-		new LinkedHashMap<String, LocalizedValue>();
+	private final Map<String, LocalizedValue> _options = new LinkedHashMap<>();
 
 }

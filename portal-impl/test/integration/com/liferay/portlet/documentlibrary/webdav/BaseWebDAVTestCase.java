@@ -15,6 +15,7 @@
 package com.liferay.portlet.documentlibrary.webdav;
 
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
 import com.liferay.portal.kernel.webdav.methods.Method;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.webdav.WebDAVServlet;
 
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class BaseWebDAVTestCase {
 		}
 
 		if (headers == null) {
-			headers = new HashMap<String, String>();
+			headers = new HashMap<>();
 		}
 
 		headers.put(HttpHeaders.USER_AGENT, getUserAgent());
@@ -150,7 +150,7 @@ public class BaseWebDAVTestCase {
 			byte[] responseBody =
 				mockHttpServletResponse.getContentAsByteArray();
 
-			Map<String, String> responseHeaders = new HashMap<String, String>();
+			Map<String, String> responseHeaders = new HashMap<>();
 
 			for (String name : mockHttpServletResponse.getHeaderNames()) {
 				responseHeaders.put(
@@ -171,7 +171,7 @@ public class BaseWebDAVTestCase {
 		String destination, int depth, boolean overwrite) {
 
 		if (headers == null) {
-			headers = new HashMap<String, String>();
+			headers = new HashMap<>();
 		}
 
 		headers.put("Depth", getDepth(depth));
@@ -199,7 +199,7 @@ public class BaseWebDAVTestCase {
 		Map<String, String> headers = null;
 
 		if (Validator.isNotNull(lock)) {
-			headers = new HashMap<String, String>();
+			headers = new HashMap<>();
 
 			headers.put("If", "<opaquelocktoken:" + lock + ">");
 		}
@@ -219,7 +219,7 @@ public class BaseWebDAVTestCase {
 		String path, Map<String, String> headers, int depth) {
 
 		if (headers == null) {
-			headers = new HashMap<String, String>();
+			headers = new HashMap<>();
 		}
 
 		headers.put("Depth", getDepth(depth));
@@ -240,7 +240,7 @@ public class BaseWebDAVTestCase {
 		Map<String, String> headers = null;
 
 		if (Validator.isNotNull(lock)) {
-			headers = new HashMap<String, String>();
+			headers = new HashMap<>();
 
 			headers.put("If", "<opaquelocktoken:" + lock + ">");
 		}
@@ -252,7 +252,7 @@ public class BaseWebDAVTestCase {
 		Map<String, String> headers = null;
 
 		if (Validator.isNotNull(lock)) {
-			headers = new HashMap<String, String>();
+			headers = new HashMap<>();
 
 			headers.put("Lock-Token", "<opaquelocktoken:" + lock + ">");
 		}
@@ -316,6 +316,14 @@ public class BaseWebDAVTestCase {
 		return new String(data);
 	}
 
+	protected String getFolderName() {
+		return _FOLDER_NAME;
+	}
+
+	protected String getGroupFriendlyURL() {
+		return _GROUP_FRIENDLY_URL;
+	}
+
 	protected String getUserAgent() {
 		return _DEFAULT_USER_AGENT;
 	}
@@ -323,6 +331,10 @@ public class BaseWebDAVTestCase {
 	private static final String _CONTEXT_PATH = "/webdav";
 
 	private static final String _DEFAULT_USER_AGENT = "Liferay-litmus";
+
+	private static final String _FOLDER_NAME = "WebDAVTest";
+
+	private static final String _GROUP_FRIENDLY_URL = "/guest";
 
 	private static final String _LOCK_XML =
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
@@ -335,7 +347,7 @@ public class BaseWebDAVTestCase {
 		"</D:lockinfo>\n";
 
 	private static final String _PATH_INFO_PREFACE =
-		"/guest/document_library/WebDAVTest/";
+		_GROUP_FRIENDLY_URL + "/document_library/" + _FOLDER_NAME + "/";
 
 	private static final String _PROPFIND_XML =
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+

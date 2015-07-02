@@ -42,9 +42,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_role_assignments.
 	searchContainer="<%= new UserSearch(renderRequest, portletURL) %>"
 	var="userSearchContainer"
 >
-	<liferay-ui:search-form
-		page="/html/portlet/users_admin/user_search.jsp"
-	/>
+	<liferay-ui:user-search-form />
 
 	<%
 	UserSearchTerms searchTerms = (UserSearchTerms)userSearchContainer.getSearchTerms();
@@ -52,7 +50,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_role_assignments.
 	LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
 
 	if (tabs3.equals("current")) {
-		userParams.put("usersRoles", new Long(role.getRoleId()));
+		userParams.put("usersRoles", Long.valueOf(role.getRoleId()));
 	}
 	%>
 

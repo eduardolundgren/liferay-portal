@@ -15,10 +15,7 @@
 package com.liferay.portlet.layoutprototypes.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -28,17 +25,30 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Daniela Zapata Riesco
  */
+@OSGiBeanProperties
 public class LayoutPrototypeStagedModelDataHandler
-	extends BaseStagedModelDataHandler <LayoutPrototype> {
+	extends BaseStagedModelDataHandler<LayoutPrototype> {
 
 	public static final String[] CLASS_NAMES =
 		{LayoutPrototype.class.getName()};
+
+	@Override
+	public void deleteStagedModel(LayoutPrototype layoutPrototype)
+		throws PortalException {
+
+		LayoutPrototypeLocalServiceUtil.deleteLayoutPrototype(layoutPrototype);
+	}
 
 	@Override
 	public void deleteStagedModel(
@@ -47,21 +57,27 @@ public class LayoutPrototypeStagedModelDataHandler
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		LayoutPrototype layoutPrototype = fetchStagedModelByUuidAndCompanyId(
-			uuid, group.getCompanyId());
+		LayoutPrototype layoutPrototype =
+			LayoutPrototypeLocalServiceUtil.
+				fetchLayoutPrototypeByUuidAndCompanyId(
+					uuid, group.getCompanyId());
 
 		if (layoutPrototype != null) {
-			LayoutPrototypeLocalServiceUtil.deleteLayoutPrototype(
-				layoutPrototype);
+			deleteStagedModel(layoutPrototype);
 		}
 	}
 
 	@Override
-	public LayoutPrototype fetchStagedModelByUuidAndCompanyId(
+	public List<LayoutPrototype> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return LayoutPrototypeLocalServiceUtil.
-			fetchLayoutPrototypeByUuidAndCompanyId(uuid, companyId);
+		List<LayoutPrototype> layoutPrototypes = new ArrayList<>();
+
+		layoutPrototypes.add(
+			LayoutPrototypeLocalServiceUtil.
+				fetchLayoutPrototypeByUuidAndCompanyId(uuid, companyId));
+
+		return layoutPrototypes;
 	}
 
 	@Override
@@ -109,9 +125,10 @@ public class LayoutPrototypeStagedModelDataHandler
 
 		if (portletDataContext.isDataStrategyMirror()) {
 			LayoutPrototype existingLayoutPrototype =
-				fetchStagedModelByUuidAndCompanyId(
-					layoutPrototype.getUuid(),
-					portletDataContext.getCompanyId());
+				LayoutPrototypeLocalServiceUtil.
+					fetchLayoutPrototypeByUuidAndCompanyId(
+						layoutPrototype.getUuid(),
+						portletDataContext.getCompanyId());
 
 			if (existingLayoutPrototype == null) {
 				serviceContext.setUuid(layoutPrototype.getUuid());

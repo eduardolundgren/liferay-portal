@@ -23,7 +23,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 %>
 
 <liferay-portlet:renderURL varImpl="searchURL">
-	<portlet:param name="struts_action" value="/blogs/search" />
+	<portlet:param name="mvcPath" value="/html/portlet/blogs/search.jsp" />
 </liferay-portlet:renderURL>
 
 <aui:form action="<%= searchURL %>" method="get" name="fm">
@@ -38,7 +38,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 	<aui:nav-bar>
 		<aui:nav-bar-search>
 			<div class="form-search">
-				<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" id="keywords1" name="keywords" placeholder='<%= LanguageUtil.get(locale, "keywords") %>' />
+				<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" id="keywords1" name="keywords" placeholder='<%= LanguageUtil.get(request, "keywords") %>' />
 			</div>
 		</aui:nav-bar-search>
 	</aui:nav-bar>
@@ -46,7 +46,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 	<%
 	PortletURL portletURL = renderResponse.createRenderURL();
 
-	portletURL.setParameter("struts_action", "/blogs/search");
+	portletURL.setParameter("mvcPath", "/html/portlet/blogs/search.jsp");
 	portletURL.setParameter("redirect", redirect);
 	portletURL.setParameter("keywords", keywords);
 	%>
@@ -70,15 +70,10 @@ String keywords = ParamUtil.getString(request, "keywords");
 		Hits hits = indexer.search(searchContext);
 
 		searchContainer.setTotal(hits.getLength());
-
-		PortletURL hitURL = renderResponse.createRenderURL();
-
-		hitURL.setParameter("struts_action", "/blogs/view_entry");
-		hitURL.setParameter("redirect", currentURL);
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= SearchResultUtil.getSearchResults(hits, locale, hitURL) %>"
+			results="<%= SearchResultUtil.getSearchResults(hits, locale) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -89,23 +84,21 @@ String keywords = ParamUtil.getString(request, "keywords");
 			<%
 			BlogsEntry entry = BlogsEntryLocalServiceUtil.getEntry(searchResult.getClassPK());
 
-			entry = entry.toEscapedModel();
-
 			Summary summary = searchResult.getSummary();
 			%>
 
 			<portlet:renderURL var="rowURL">
-				<portlet:param name="struts_action" value="/blogs/view_entry" />
+				<portlet:param name="mvcRenderCommandName" value="/blogs/view_entry" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
 				<portlet:param name="urlTitle" value="<%= entry.getUrlTitle() %>" />
 			</portlet:renderURL>
 
 			<liferay-ui:app-view-search-entry
+				commentRelatedSearchResults="<%= searchResult.getCommentRelatedSearchResults() %>"
 				cssClass='<%= MathUtil.isEven(index) ? "search" : "search alt" %>'
 				description="<%= (summary != null) ? summary.getContent() : entry.getDescription() %>"
-				mbMessages="<%= searchResult.getMBMessages() %>"
 				queryTerms="<%= hits.getQueryTerms() %>"
-				thumbnailSrc="<%= Validator.isNotNull(entry.getEntryImageURL(themeDisplay)) ? entry.getEntryImageURL(themeDisplay) : StringPool.BLANK %>"
+				thumbnailSrc="<%= Validator.isNotNull(entry.getSmallImageURL(themeDisplay)) ? entry.getSmallImageURL(themeDisplay) : StringPool.BLANK %>"
 				title="<%= (summary != null) ? summary.getTitle() : entry.getTitle() %>"
 				url="<%= rowURL %>"
 			/>

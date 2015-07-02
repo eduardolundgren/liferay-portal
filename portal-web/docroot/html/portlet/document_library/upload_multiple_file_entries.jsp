@@ -27,7 +27,7 @@ long repositoryId = BeanParamUtil.getLong(fileEntry, request, "repositoryId");
 
 if (repositoryId <= 0) {
 
-	// add_asset.jspf only passes in groupId
+	// <liferay-ui:asset_add_button /> only passes in groupId
 
 	repositoryId = BeanParamUtil.getLong(fileEntry, request, "groupId");
 }
@@ -80,9 +80,9 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 							tempFileURL: {
 								method: Liferay.Service.bind('/dlapp/get-temp-file-names'),
 								params: {
-									groupId: <%= scopeGroupId %>,
 									folderId: <%= folderId %>,
-									folderName: 'com.liferay.portlet.documentlibrary.action.EditFileEntryAction'
+									folderName: 'com.liferay.portlet.documentlibrary.action.EditFileEntryAction',
+									groupId: <%= scopeGroupId %>
 								}
 							},
 							tempRandomSuffix: '<%= EditFileEntryAction.TEMP_RANDOM_SUFFIX %>',
@@ -137,11 +137,18 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 							A.io.request(
 								document.<portlet:namespace />fm2.action,
 								{
-									dataType: 'JSON',
-									form: {
-										id: document.<portlet:namespace />fm2
-									},
 									after: {
+										failure: function(event, id, obj) {
+											var selectedItems = A.all('#<portlet:namespace />fileUpload li.selected');
+
+											selectedItems.removeClass('selectable').removeClass('selected').addClass('upload-error');
+
+											selectedItems.append('<span class="error-message"><%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-deleting-the-file") %></span>');
+
+											selectedItems.all('input').remove(true);
+
+											commonFileMetadataContainer.loadingmask.hide();
+										},
 										success: function(event, id, obj) {
 											var jsonArray = this.get('responseData');
 
@@ -201,18 +208,13 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 											}
 
 											Liferay.fire('filesSaved');
-										},
-										failure: function(event, id, obj) {
-											var selectedItems = A.all('#<portlet:namespace />fileUpload li.selected');
 
-											selectedItems.removeClass('selectable').removeClass('selected').addClass('upload-error');
-
-											selectedItems.append('<span class="error-message"><%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-deleting-the-file") %></span>');
-
-											selectedItems.all('input').remove(true);
-
-											commonFileMetadataContainer.loadingmask.hide();
+											commonFileMetadataContainer.unplug(A.LoadingMask);
 										}
+									},
+									dataType: 'JSON',
+									form: {
+										id: document.<portlet:namespace />fm2
 									}
 								}
 							);

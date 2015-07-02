@@ -289,10 +289,10 @@ public class SimpleCaptchaImpl implements Captcha {
 
 	protected Integer incrementCounter(Integer count) {
 		if (count == null) {
-			count = new Integer(1);
+			count = Integer.valueOf(1);
 		}
 		else {
-			count = new Integer(count.intValue() + 1);
+			count = Integer.valueOf(count.intValue() + 1);
 		}
 
 		return count;
@@ -465,7 +465,8 @@ public class SimpleCaptchaImpl implements Captcha {
 	private static final String _TAGLIB_PATH =
 		"/html/taglib/ui/captcha/simplecaptcha.jsp";
 
-	private static Log _log = LogFactoryUtil.getLog(SimpleCaptchaImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SimpleCaptchaImpl.class);
 
 	private BackgroundProducer[] _backgroundProducers;
 	private GimpyRenderer[] _gimpyRenderers;

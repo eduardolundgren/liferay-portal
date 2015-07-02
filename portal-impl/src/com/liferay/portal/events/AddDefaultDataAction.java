@@ -24,16 +24,6 @@ public class AddDefaultDataAction extends SimpleAction {
 
 	@Override
 	public void run(String[] ids) throws ActionException {
-		SimpleAction addDefaultDocumentLibraryStructuresAction =
-			new AddDefaultDocumentLibraryStructuresAction();
-
-		addDefaultDocumentLibraryStructuresAction.run(ids);
-
-		SimpleAction addDefaultJournalStructuresAction =
-			new AddDefaultJournalStructuresAction();
-
-		addDefaultJournalStructuresAction.run(ids);
-
 		SimpleAction addDefaultLayoutPrototypesAction =
 			new AddDefaultLayoutPrototypesAction();
 
@@ -43,16 +33,6 @@ public class AddDefaultDataAction extends SimpleAction {
 			new AddDefaultLayoutSetPrototypesAction();
 
 		addDefaultLayoutSetPrototypesAction.run(ids);
-
-		SimpleAction addDefaultDDMStructuresAction =
-			new AddDefaultDDMStructuresAction();
-
-		addDefaultDDMStructuresAction.run(ids);
-
-		SimpleAction addDefaultDDMTemplatesAction =
-			new AddDefaultDDMTemplatesAction();
-
-		addDefaultDDMTemplatesAction.run(ids);
 	}
 
 }

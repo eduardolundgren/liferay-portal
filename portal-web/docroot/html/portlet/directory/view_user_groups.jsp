@@ -25,9 +25,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("view.jsp-portletURL");
 >
 	<aui:input disabled="<%= true %>" name="userGroupsRedirect" type="hidden" value="<%= portletURL.toString() %>" />
 
-	<liferay-ui:search-form
-		page="/html/portlet/directory/user_group_search.jsp"
-	/>
+	<liferay-ui:user-group-search-form />
 
 	<%
 	UserGroupDisplayTerms searchTerms = (UserGroupDisplayTerms)searchContainer.getSearchTerms();
@@ -46,7 +44,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("view.jsp-portletURL");
 		userGroupParams.put("userGroupsGroups", SitesUtil.filterGroups(groups, PropsValues.MY_SITES_DIRECTORY_SITE_EXCLUDES));
 	}
 	else if (portletName.equals(PortletKeys.SITE_MEMBERS_DIRECTORY)) {
-		userGroupParams.put("userGroupsGroups", new Long(themeDisplay.getScopeGroupId()));
+		userGroupParams.put("userGroupsGroups", Long.valueOf(themeDisplay.getScopeGroupId()));
 	}
 	%>
 

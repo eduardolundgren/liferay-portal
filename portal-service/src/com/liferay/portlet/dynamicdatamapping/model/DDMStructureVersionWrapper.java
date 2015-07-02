@@ -61,11 +61,16 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 		attributes.put("createDate", getCreateDate());
 		attributes.put("structureId", getStructureId());
 		attributes.put("version", getVersion());
+		attributes.put("parentStructureId", getParentStructureId());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
 		attributes.put("definition", getDefinition());
 		attributes.put("storageType", getStorageType());
 		attributes.put("type", getType());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
 
 		return attributes;
 	}
@@ -120,6 +125,12 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 			setVersion(version);
 		}
 
+		Long parentStructureId = (Long)attributes.get("parentStructureId");
+
+		if (parentStructureId != null) {
+			setParentStructureId(parentStructureId);
+		}
+
 		String name = (String)attributes.get("name");
 
 		if (name != null) {
@@ -149,6 +160,30 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 		if (type != null) {
 			setType(type);
 		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	@Override
@@ -160,6 +195,15 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	public int compareTo(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructureVersion ddmStructureVersion) {
 		return _ddmStructureVersion.compareTo(ddmStructureVersion);
+	}
+
+	/**
+	* @deprecated As of 6.1.0, replaced by {@link #isApproved()}
+	*/
+	@Deprecated
+	@Override
+	public boolean getApproved() {
+		return _ddmStructureVersion.getApproved();
 	}
 
 	@Override
@@ -183,8 +227,19 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	* @return the create date of this d d m structure version
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _ddmStructureVersion.getCreateDate();
+	}
+
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMForm getDDMForm() {
+		return _ddmStructureVersion.getDDMForm();
+	}
+
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout getDDMFormLayout()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructureVersion.getDDMFormLayout();
 	}
 
 	@Override
@@ -276,7 +331,7 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	* @return the locales and localized descriptions of this d d m structure version
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+	public Map<java.util.Locale, java.lang.String> getDescriptionMap() {
 		return _ddmStructureVersion.getDescriptionMap();
 	}
 
@@ -368,8 +423,18 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	* @return the locales and localized names of this d d m structure version
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getNameMap() {
+	public Map<java.util.Locale, java.lang.String> getNameMap() {
 		return _ddmStructureVersion.getNameMap();
+	}
+
+	/**
+	* Returns the parent structure ID of this d d m structure version.
+	*
+	* @return the parent structure ID of this d d m structure version
+	*/
+	@Override
+	public long getParentStructureId() {
+		return _ddmStructureVersion.getParentStructureId();
 	}
 
 	/**
@@ -388,6 +453,56 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	}
 
 	/**
+	* Returns the status of this d d m structure version.
+	*
+	* @return the status of this d d m structure version
+	*/
+	@Override
+	public int getStatus() {
+		return _ddmStructureVersion.getStatus();
+	}
+
+	/**
+	* Returns the status by user ID of this d d m structure version.
+	*
+	* @return the status by user ID of this d d m structure version
+	*/
+	@Override
+	public long getStatusByUserId() {
+		return _ddmStructureVersion.getStatusByUserId();
+	}
+
+	/**
+	* Returns the status by user name of this d d m structure version.
+	*
+	* @return the status by user name of this d d m structure version
+	*/
+	@Override
+	public java.lang.String getStatusByUserName() {
+		return _ddmStructureVersion.getStatusByUserName();
+	}
+
+	/**
+	* Returns the status by user uuid of this d d m structure version.
+	*
+	* @return the status by user uuid of this d d m structure version
+	*/
+	@Override
+	public java.lang.String getStatusByUserUuid() {
+		return _ddmStructureVersion.getStatusByUserUuid();
+	}
+
+	/**
+	* Returns the status date of this d d m structure version.
+	*
+	* @return the status date of this d d m structure version
+	*/
+	@Override
+	public Date getStatusDate() {
+		return _ddmStructureVersion.getStatusDate();
+	}
+
+	/**
 	* Returns the storage type of this d d m structure version.
 	*
 	* @return the storage type of this d d m structure version
@@ -395,6 +510,12 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	@Override
 	public java.lang.String getStorageType() {
 		return _ddmStructureVersion.getStorageType();
+	}
+
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getStructure()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructureVersion.getStructure();
 	}
 
 	/**
@@ -472,9 +593,39 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 		return _ddmStructureVersion.hashCode();
 	}
 
+	/**
+	* Returns <code>true</code> if this d d m structure version is approved.
+	*
+	* @return <code>true</code> if this d d m structure version is approved; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isApproved() {
+		return _ddmStructureVersion.isApproved();
+	}
+
 	@Override
 	public boolean isCachedModel() {
 		return _ddmStructureVersion.isCachedModel();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m structure version is denied.
+	*
+	* @return <code>true</code> if this d d m structure version is denied; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isDenied() {
+		return _ddmStructureVersion.isDenied();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m structure version is a draft.
+	*
+	* @return <code>true</code> if this d d m structure version is a draft; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isDraft() {
+		return _ddmStructureVersion.isDraft();
 	}
 
 	@Override
@@ -482,9 +633,59 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 		return _ddmStructureVersion.isEscapedModel();
 	}
 
+	/**
+	* Returns <code>true</code> if this d d m structure version is expired.
+	*
+	* @return <code>true</code> if this d d m structure version is expired; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isExpired() {
+		return _ddmStructureVersion.isExpired();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m structure version is inactive.
+	*
+	* @return <code>true</code> if this d d m structure version is inactive; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isInactive() {
+		return _ddmStructureVersion.isInactive();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m structure version is incomplete.
+	*
+	* @return <code>true</code> if this d d m structure version is incomplete; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isIncomplete() {
+		return _ddmStructureVersion.isIncomplete();
+	}
+
 	@Override
 	public boolean isNew() {
 		return _ddmStructureVersion.isNew();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m structure version is pending.
+	*
+	* @return <code>true</code> if this d d m structure version is pending; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isPending() {
+		return _ddmStructureVersion.isPending();
+	}
+
+	/**
+	* Returns <code>true</code> if this d d m structure version is scheduled.
+	*
+	* @return <code>true</code> if this d d m structure version is scheduled; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isScheduled() {
+		return _ddmStructureVersion.isScheduled();
 	}
 
 	@Override
@@ -526,8 +727,14 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	* @param createDate the create date of this d d m structure version
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_ddmStructureVersion.setCreateDate(createDate);
+	}
+
+	@Override
+	public void setDDMForm(
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm) {
+		_ddmStructureVersion.setDDMForm(ddmForm);
 	}
 
 	/**
@@ -587,7 +794,7 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		Map<java.util.Locale, java.lang.String> descriptionMap) {
 		_ddmStructureVersion.setDescriptionMap(descriptionMap);
 	}
 
@@ -599,7 +806,7 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.util.Locale defaultLocale) {
 		_ddmStructureVersion.setDescriptionMap(descriptionMap, defaultLocale);
 	}
@@ -677,8 +884,7 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	* @param nameMap the locales and localized names of this d d m structure version
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap) {
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap) {
 		_ddmStructureVersion.setNameMap(nameMap);
 	}
 
@@ -689,8 +895,7 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	* @param defaultLocale the default locale
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Locale defaultLocale) {
 		_ddmStructureVersion.setNameMap(nameMap, defaultLocale);
 	}
@@ -698,6 +903,16 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	@Override
 	public void setNew(boolean n) {
 		_ddmStructureVersion.setNew(n);
+	}
+
+	/**
+	* Sets the parent structure ID of this d d m structure version.
+	*
+	* @param parentStructureId the parent structure ID of this d d m structure version
+	*/
+	@Override
+	public void setParentStructureId(long parentStructureId) {
+		_ddmStructureVersion.setParentStructureId(parentStructureId);
 	}
 
 	/**
@@ -713,6 +928,56 @@ public class DDMStructureVersionWrapper implements DDMStructureVersion,
 	@Override
 	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
 		_ddmStructureVersion.setPrimaryKeyObj(primaryKeyObj);
+	}
+
+	/**
+	* Sets the status of this d d m structure version.
+	*
+	* @param status the status of this d d m structure version
+	*/
+	@Override
+	public void setStatus(int status) {
+		_ddmStructureVersion.setStatus(status);
+	}
+
+	/**
+	* Sets the status by user ID of this d d m structure version.
+	*
+	* @param statusByUserId the status by user ID of this d d m structure version
+	*/
+	@Override
+	public void setStatusByUserId(long statusByUserId) {
+		_ddmStructureVersion.setStatusByUserId(statusByUserId);
+	}
+
+	/**
+	* Sets the status by user name of this d d m structure version.
+	*
+	* @param statusByUserName the status by user name of this d d m structure version
+	*/
+	@Override
+	public void setStatusByUserName(java.lang.String statusByUserName) {
+		_ddmStructureVersion.setStatusByUserName(statusByUserName);
+	}
+
+	/**
+	* Sets the status by user uuid of this d d m structure version.
+	*
+	* @param statusByUserUuid the status by user uuid of this d d m structure version
+	*/
+	@Override
+	public void setStatusByUserUuid(java.lang.String statusByUserUuid) {
+		_ddmStructureVersion.setStatusByUserUuid(statusByUserUuid);
+	}
+
+	/**
+	* Sets the status date of this d d m structure version.
+	*
+	* @param statusDate the status date of this d d m structure version
+	*/
+	@Override
+	public void setStatusDate(Date statusDate) {
+		_ddmStructureVersion.setStatusDate(statusDate);
 	}
 
 	/**

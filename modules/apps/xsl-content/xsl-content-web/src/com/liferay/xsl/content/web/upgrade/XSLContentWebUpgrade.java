@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
+import com.liferay.xsl.content.web.constants.XSLContentPortletKeys;
 
 import java.util.Collections;
 
@@ -30,9 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Raymond Augé
  */
-@Component(
-	immediate = true, service = XSLContentWebUpgrade.class
-)
+@Component(immediate = true, service = XSLContentWebUpgrade.class)
 public class XSLContentWebUpgrade {
 
 	@Reference(unbind = "-")
@@ -53,10 +52,7 @@ public class XSLContentWebUpgrade {
 			@Override
 			protected String[][] getRenamePortletIdsArray() {
 				return new String[][] {
-					new String[] {
-						"102",
-						"com_liferay_xsl_content_web_portlet_XSLContentPortlet"
-					}
+					new String[] {"102", XSLContentPortletKeys.XSL_CONTENT}
 				};
 			}
 
@@ -64,7 +60,7 @@ public class XSLContentWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.xsl.content.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

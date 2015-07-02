@@ -128,6 +128,8 @@ public interface Http {
 
 	public boolean isSecure(String url);
 
+	public String normalizePath(String uri);
+
 	public Map<String, String[]> parameterMapFromString(String queryString);
 
 	public String parameterMapToString(Map<String, String[]> parameterMap);
@@ -330,7 +332,7 @@ public interface Http {
 			}
 
 			if (_fileParts == null) {
-				_fileParts = new ArrayList<FilePart>();
+				_fileParts = new ArrayList<>();
 			}
 
 			FilePart filePart = new FilePart(
@@ -341,7 +343,7 @@ public interface Http {
 
 		public void addHeader(String name, String value) {
 			if (_headers == null) {
-				_headers = new HashMap<String, String>();
+				_headers = new HashMap<>();
 			}
 
 			_headers.put(name, value);
@@ -354,7 +356,7 @@ public interface Http {
 			}
 
 			if (_parts == null) {
-				_parts = new HashMap<String, String>();
+				_parts = new HashMap<>();
 			}
 
 			_parts.put(name, value);
@@ -555,7 +557,7 @@ public interface Http {
 
 		public void addHeader(String name, String value) {
 			if (_headers == null) {
-				_headers = new HashMap<String, String>();
+				_headers = new HashMap<>();
 			}
 
 			_headers.put(StringUtil.toLowerCase(name), value);

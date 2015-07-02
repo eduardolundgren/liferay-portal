@@ -1,0 +1,434 @@
+<html>
+<head>
+<title>Button</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Button</td></tr>
+</thead>
+<tbody>
+<tr>
+	<td>ACTIVATE_ACCOUNT</td>
+	<td>//button[contains(.,'Activate Account')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD</td>
+	<td>//a[contains(.,'Add')]|//button[contains(.,'Add')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_ATTACHMENTS</td>
+	<td>//button[contains(.,'Add Attachments')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_CUSTOM_FIELD</td>
+	<td>//button[contains(.,'Add Custom Field')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_ENTRY</td>
+	<td>//button[contains(.,'Add Entry')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_FOLDER</td>
+	<td>//a[contains(.,'Add Folder')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_PAGE</td>
+	<td>//a[contains(.,'Add Page')] | //button[contains(.,'Add Page')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_SUBFOLDER</td>
+	<td>//a[contains(.,'Add Subfolder')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_PAGE_VARIATION</td>
+	<td>//button[contains(.,'Add Page Variation')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_TAGS</td>
+	<td>//button[contains(.,'Add')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_TEAM</td>
+	<td>//a[contains(.,'Add Team')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_WIKI</td>
+	<td>//a[contains(@id,'addNodeButton') and contains(.,'Add Wiki')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BACK_BUTTON</td>
+	<td>//a[@title='Back']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BROWSE</td>
+	<td>//input[@id='_195_fileName']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CALCULATE</td>
+	<td>//button[contains(.,'Calculate')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CANCEL</td>
+	<td>//a[contains(@id,'cancel') and contains(@class,'btn')]|//button[contains(.,'Cancel')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CANCEL_CHECKOUT</td>
+	<td>//button[contains(.,'Cancel Checkout')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHANGE</td>
+	<td>//button[contains(.,'Change')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHOOSE</td>
+	<td>//button[contains(.,'Choose')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHOOSE_THIS_FOLDER</td>
+	<td>//button[contains(.,'Choose This Folder')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CLOSE</td>
+	<td>//button[contains(.,'Close')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CLOSE_IFRAME</td>
+	<td>//button[contains(.,'×')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CLOSE_PANEL</td>
+	<td>//button[contains(@id,'closePanelAdd')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMPARE_VERSIONS</td>
+	<td>//button[contains(@id,'compare')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTINUE</td>
+	<td>//button[contains(.,'Continue')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONVERT</td>
+	<td>//button[contains(.,'Convert')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COPY</td>
+	<td>//button[contains(.,'Copy')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEACTIVATE</td>
+	<td>//button[contains(.,'Deactivate')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DELETE</td>
+	<td>//button[contains(.,'Delete')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENTS_AND_MEDIA</td>
+	<td>//div[@data-fieldname='${key_fieldName}']/div/button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DONE</td>
+	<td>//button[contains(.,'Done')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EDIT</td>
+	<td>//a[contains(@id,'edit') and contains(@class,'btn')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIELD_FILTER_APPLY</td>
+	<td>//tr[contains(.,'${key_fieldName}')]//button[contains(.,'Apply')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIND</td>
+	<td>//button[contains(.,'Find')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>I_AGREE</td>
+	<td>//button[contains(.,'I Agree')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>I_DISAGREE_BUTTON</td>
+	<td>//button[contains(.,'I Disagree')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ITEMS_PER_PAGE</td>
+	<td>//a[contains(@title,'Items per Page')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MERGE</td>
+	<td>//button[contains(.,'Merge')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MOVE</td>
+	<td>//button[contains(.,'Move')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MOVE_TO_RECYCLE_BIN</td>
+	<td>//button[contains(.,'Move to the Recycle Bin')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MOVE_THREAD</td>
+	<td>//button[contains(.,'Move Thread')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MOVE_AVAILABLE_TO_CURRENT</td>
+	<td>//button[@title='Move selected items from Available to Current.']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MOVE_CURRENT_TO_AVAILABLE</td>
+	<td>//button[@title='Move selected items from Current to Available.']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NEW_TEMPLATE</td>
+	<td>//a[@role='menuitem' and contains(.,'New')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OK</td>
+	<td>//button[contains(.,'OK')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_SELECT</td>
+	<td>//a[contains(@title,'Page') and contains(@title,'of')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PARENT_FOLDER_REMOVE</td>
+	<td>//button[contains(@id,'removeFolderButton')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PARENT_FOLDER_SELECT</td>
+	<td>//button[contains(@id,'selectFolderButton')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PERMISSIONS</td>
+	<td>//a[contains(.,'Permissions') and contains(@class,'btn')] | //button[contains(.,'Permissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>POST</td>
+	<td>//button[contains(.,'Post')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW</td>
+	<td>//button[contains(.,'Preview')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PUBLISH</td>
+	<td>//button[contains(.,'Publish')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PUBLISH_LOCALIZED</td>
+	<td>//button[contains(@id,'publishButton')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REMOVE</td>
+	<td>//button[contains(.,'Remove')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REMOVE_REDIRECT</td>
+	<td>//button[contains(.,'Remove Redirect')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RENAME</td>
+	<td>//button[contains(.,'Rename')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPLY</td>
+	<td>//button[contains(.,'Reply')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPLY_AS</td>
+	<td>//button[contains(.,'Reply as...')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPLY_BUTTON</td>
+	<td>//button[contains(.,'Reply')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RESET_CHANGES</td>
+	<td>//button[contains(.,'Reset Changes')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RESTORE</td>
+	<td>//button[contains(.,'Restore')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAVE</td>
+	<td>//button[contains(.,'Save')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAVE_AND_CHECKIN_BUTTON</td>
+	<td>//button[contains(.,'Save and Checkin')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAVE_AND_CONTINUE</td>
+	<td>//button[contains(.,'Save and Continue')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAVE_AS_DRAFT</td>
+	<td>//button[contains(.,'Save as Draft')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH</td>
+	<td>//button[contains(.,'Search')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT</td>
+	<td>//a[contains(.,'Select') and contains(@class,'btn')] | //button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_FILE</td>
+	<td>//button[contains(.,'Select File')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_PAGES</td>
+	<td>//button[contains(.,'Select Pages')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_CATEGORIES</td>
+	<td>//button[contains(.,'Select Categories')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_SCOPE</td>
+	<td>//div[contains (@class,'btn-group')]/a[@title='Default']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_WEB_CONTENT</td>
+	<td>//button[contains(.,'Select Web Content')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEND</td>
+	<td>//button[contains(.,'Send')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SHARE</td>
+	<td>//button[contains(.,'Share')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SIGN_IN</td>
+	<td>//button[contains(.,'Sign In')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SIGN_IN_PNG</td>
+	<td>portal/buttons/sign_in_button.png</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SOURCE</td>
+	<td>//a[@role='button' and (@title='Source')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBMIT</td>
+	<td>//button[@type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBMIT_FOR_PUBLICATION</td>
+	<td>//button[contains(.,'Submit for Publication')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>UNLOCK</td>
+	<td>//button[contains(.,'Unlock')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>UPDATE</td>
+	<td>//button[contains(.,'Update')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>UPDATE_ASSOCIATIONS</td>
+	<td>//button[contains(.,'Update Associations')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VIEW_HISTORY</td>
+	<td>//button[contains(.,'View History')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WEB_CONTENT_CHOOSE</td>
+	<td>//tr[contains(.,'${key_webContentTitle}')]/td/button</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

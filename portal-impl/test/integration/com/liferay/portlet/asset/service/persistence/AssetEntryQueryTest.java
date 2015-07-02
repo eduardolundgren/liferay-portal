@@ -17,20 +17,20 @@ package com.liferay.portlet.asset.service.persistence;
 import com.liferay.portal.kernel.cache.Lifecycle;
 import com.liferay.portal.kernel.cache.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
@@ -42,12 +42,12 @@ import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.asset.service.impl.AssetEntryServiceImpl;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
-import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
 import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.RatingsEntryServiceUtil;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import org.junit.Assert;
@@ -76,41 +76,41 @@ public class AssetEntryQueryTest {
 
 		AssetVocabulary vocabulary =
 			AssetVocabularyLocalServiceUtil.addVocabulary(
-				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-				serviceContext);
+				TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
+				RandomTestUtil.randomString(), serviceContext);
 
 		_assetVocabularyId = vocabulary.getVocabularyId();
 
 		AssetCategory fashionCategory =
 			AssetCategoryLocalServiceUtil.addCategory(
-				TestPropsValues.getUserId(), "Fashion", _assetVocabularyId,
-				serviceContext);
+				TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
+				"Fashion", _assetVocabularyId, serviceContext);
 
 		_fashionAssetCategoryId = fashionCategory.getCategoryId();
 
 		AssetCategory foodCategory = AssetCategoryLocalServiceUtil.addCategory(
-			TestPropsValues.getUserId(), "Food", _assetVocabularyId,
-			serviceContext);
+			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
+			"Food", _assetVocabularyId, serviceContext);
 
 		_foodAssetCategoryId = foodCategory.getCategoryId();
 
 		AssetCategory healthCategory =
 			AssetCategoryLocalServiceUtil.addCategory(
-				TestPropsValues.getUserId(), "Health", _assetVocabularyId,
-				serviceContext);
+				TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
+				"Health", _assetVocabularyId, serviceContext);
 
 		_healthAssetCategoryId = healthCategory.getCategoryId();
 
 		AssetCategory sportCategory = AssetCategoryLocalServiceUtil.addCategory(
-			TestPropsValues.getUserId(), "Sport", _assetVocabularyId,
-			serviceContext);
+			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
+			"Sport", _assetVocabularyId, serviceContext);
 
 		_sportAssetCategoryId = sportCategory.getCategoryId();
 
 		AssetCategory travelCategory =
 			AssetCategoryLocalServiceUtil.addCategory(
-				TestPropsValues.getUserId(), "Travel", _assetVocabularyId,
-				serviceContext);
+				TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
+				"Travel", _assetVocabularyId, serviceContext);
 
 		_travelAssetCategoryId = travelCategory.getCategoryId();
 
@@ -553,9 +553,8 @@ public class AssetEntryQueryTest {
 	}
 
 	protected AssetEntryQuery buildAssetEntryQuery(
-			long groupId, long[] assetCategoryIds, String[] assetTagNames,
-			boolean any, boolean not)
-		throws PortalException {
+		long groupId, long[] assetCategoryIds, String[] assetTagNames,
+		boolean any, boolean not) {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
@@ -575,7 +574,6 @@ public class AssetEntryQueryTest {
 		}
 
 		assetEntryQuery.setGroupIds(new long[] {groupId});
-		assetEntryQuery.setListable(true);
 
 		return assetEntryQuery;
 	}
@@ -589,7 +587,6 @@ public class AssetEntryQueryTest {
 		assetEntryQuery.setAndOperator(andOperator);
 		assetEntryQuery.setDescription(description);
 		assetEntryQuery.setGroupIds(new long[] {groupId});
-		assetEntryQuery.setListable(true);
 		assetEntryQuery.setTitle(title);
 		assetEntryQuery.setUserName(userName);
 
@@ -643,7 +640,6 @@ public class AssetEntryQueryTest {
 
 		assetEntryQuery.setGroupIds(new long[] {groupId});
 		assetEntryQuery.setKeywords(keywords);
-		assetEntryQuery.setListable(true);
 
 		return assetEntryQuery;
 	}
@@ -675,12 +671,12 @@ public class AssetEntryQueryTest {
 			TestPropsValues.getUserId(), StringUtil.randomString(),
 			StringPool.BLANK, StringUtil.randomString(),
 			RandomTestUtil.randomString(), 1, 1, 1965, 0, 0, true, true, null,
-			null, null, serviceContext);
+			StringPool.BLANK, null, null, serviceContext);
 
 		BlogsEntry blogsEntry2 = BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), title, StringPool.BLANK, description,
 			RandomTestUtil.randomString(), 1, 1, 1965, 0, 0, true, true, null,
-			null, null, serviceContext);
+			StringPool.BLANK, null, null, serviceContext);
 
 		threadLocalCache.removeAll();
 
@@ -739,7 +735,7 @@ public class AssetEntryQueryTest {
 		BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), title1, StringPool.BLANK,
 			StringPool.BLANK, RandomTestUtil.randomString(), 1, 1, 1965, 0, 0,
-			true, true, null, null, null, serviceContext);
+			true, true, null, StringPool.BLANK, null, null, serviceContext);
 
 		if (assetCategoryIds2 != null) {
 			serviceContext.setAssetCategoryIds(assetCategoryIds2);
@@ -752,7 +748,7 @@ public class AssetEntryQueryTest {
 		BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), title2, StringPool.BLANK,
 			StringPool.BLANK, RandomTestUtil.randomString(), 1, 1, 1965, 0, 0,
-			true, true, null, null, null, serviceContext);
+			true, true, null, StringPool.BLANK, null, null, serviceContext);
 
 		threadLocalCache.removeAll();
 
@@ -791,12 +787,12 @@ public class AssetEntryQueryTest {
 			TestPropsValues.getUserId(), StringUtil.randomString(),
 			StringPool.BLANK, StringUtil.randomString(),
 			RandomTestUtil.randomString(), 1, 1, 1965, 0, 0, true, true, null,
-			null, null, serviceContext);
+			StringPool.BLANK, null, null, serviceContext);
 
 		BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), title, StringPool.BLANK, description,
 			RandomTestUtil.randomString(), 1, 1, 1965, 0, 0, true, true, null,
-			null, null, serviceContext);
+			StringPool.BLANK, null, null, serviceContext);
 
 		threadLocalCache.removeAll();
 
@@ -831,11 +827,21 @@ public class AssetEntryQueryTest {
 
 		threadLocalCache.removeAll();
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		Calendar displayDateCalendar = CalendarFactoryUtil.getCalendar(
+			2012, 1, 1);
+
 		for (int i = 0; i < scores.length; i++) {
-			BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
+			BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
+				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), displayDateCalendar.getTime(),
+				serviceContext);
 
 			RatingsEntryServiceUtil.updateEntry(
-				BlogsEntry.class.getName(), entry.getEntryId(), scores[i]);
+				BlogsEntry.class.getName(), blogsEntry.getEntryId(), scores[i]);
 		}
 
 		threadLocalCache.removeAll();
@@ -870,8 +876,18 @@ public class AssetEntryQueryTest {
 
 		threadLocalCache.removeAll();
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		Calendar displayDateCalendar = CalendarFactoryUtil.getCalendar(
+			2012, 1, 1);
+
 		for (int i = 0; i < viewCounts.length; i++) {
-			BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
+			BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
+				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), displayDateCalendar.getTime(),
+				serviceContext);
 
 			AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
 				BlogsEntry.class.getName(), entry.getEntryId());

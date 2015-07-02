@@ -87,6 +87,17 @@ public class LayoutSetPrototypeServiceImpl
 	}
 
 	@Override
+	public LayoutSetPrototype fetchLayoutSetPrototype(long layoutSetPrototypeId)
+		throws PortalException {
+
+		LayoutSetPrototypePermissionUtil.check(
+			getPermissionChecker(), layoutSetPrototypeId, ActionKeys.VIEW);
+
+		return layoutSetPrototypeLocalService.fetchLayoutSetPrototype(
+			layoutSetPrototypeId);
+	}
+
+	@Override
 	public LayoutSetPrototype getLayoutSetPrototype(long layoutSetPrototypeId)
 		throws PortalException {
 
@@ -104,7 +115,7 @@ public class LayoutSetPrototypeServiceImpl
 		throws PortalException {
 
 		List<LayoutSetPrototype> filteredLayoutSetPrototypes =
-			new ArrayList<LayoutSetPrototype>();
+			new ArrayList<>();
 
 		List<LayoutSetPrototype> layoutSetPrototypes =
 			layoutSetPrototypeLocalService.search(

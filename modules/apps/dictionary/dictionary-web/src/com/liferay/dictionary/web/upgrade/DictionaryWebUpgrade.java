@@ -31,9 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  * @author Peter Fellwock
  */
-@Component(
-	immediate = true, service = DictionaryWebUpgrade.class
-)
+@Component(immediate = true, service = DictionaryWebUpgrade.class)
 public class DictionaryWebUpgrade {
 
 	@Reference(unbind = "-")
@@ -65,7 +63,7 @@ public class DictionaryWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.dictionary.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

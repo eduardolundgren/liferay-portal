@@ -142,7 +142,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	public com.liferay.portal.model.Organization addOrganization(long userId,
 		long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organizationLocalService.addOrganization(userId,
@@ -182,7 +182,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	@Override
 	public com.liferay.portal.model.Organization addOrganization(long userId,
 		long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -500,7 +500,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _organizationLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -805,19 +805,25 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Returns all the organization IDs associated with the user. If
-	* <code>includeAdministrative</code> is <code>true</code>, the result
-	* includes those organization IDs that are indirectly associated to the
-	* user because he is an administrator or owner of the organization.
+	* Returns all the IDs of organizations with which the user is explicitly
+	* associated, optionally including the IDs of organizations that the user
+	* administers or owns.
+	*
+	* <p>
+	* A user is considered to be <i>explicitly</i> associated with an
+	* organization if his account is individually created within the
+	* organization or if the user is later added to it.
+	* </p>
 	*
 	* @param userId the primary key of the user
-	* @param includeAdministrative whether to include organizations that are
-	indirectly associated to the user because he is an administrator
-	or owner of the organization
-	* @return the organization IDs of organizations associated with the user
+	* @param includeAdministrative whether to include the IDs of organizations
+	that the user administers or owns, even if he's not a member of
+	the organizations
+	* @return the IDs of organizations with which the user is explicitly
+	associated, optionally including the IDs of organizations that
+	the user administers or owns
 	* @throws PortalException if a user with the primary key could not be found
 	or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long[] getUserOrganizationIds(long userId,
@@ -834,16 +840,23 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Returns all the organizations associated with the user. If
-	* <code>includeAdministrative</code> is <code>true</code>, the result
-	* includes those organizations that are indirectly associated to the user
-	* because he is an administrator or owner of the organization.
+	* Returns all the organizations with which the user is explicitly
+	* associated, optionally including the organizations that the user
+	* administers or owns.
+	*
+	* <p>
+	* A user is considered to be <i>explicitly</i> associated with an
+	* organization if his account is individually created within the
+	* organization or if the user is later added as a member.
+	* </p>
 	*
 	* @param userId the primary key of the user
-	* @param includeAdministrative whether to include organizations that are
-	indirectly associated to the user because he is an administrator
-	or owner of the organization
-	* @return the organizations associated with the user
+	* @param includeAdministrative whether to include the IDs of organizations
+	that the user administers or owns, even if he's not a member of
+	the organizations
+	* @return the organizations with which the user is explicitly associated,
+	optionally including the organizations that the user administers
+	or owns
 	* @throws PortalException if a user with the primary key could not be found
 	*/
 	@Override
@@ -1508,8 +1521,9 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	public com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, boolean recursable,
-		long regionId, long countryId, int statusId, java.lang.String comments,
-		boolean site, com.liferay.portal.service.ServiceContext serviceContext)
+		long regionId, long countryId, long statusId,
+		java.lang.String comments, boolean site,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organizationLocalService.updateOrganization(companyId,
 			organizationId, parentOrganizationId, name, type, recursable,
@@ -1546,7 +1560,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	public com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean logo,
+		long countryId, long statusId, java.lang.String comments, boolean logo,
 		byte[] logoBytes, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1580,14 +1594,14 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	information was invalid
 	* @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
 	long, long, String, String, long, long, int, String, boolean,
-	boolean, byte[], ServiceContext)}
+	byte[], boolean, ServiceContext)}
 	*/
 	@Deprecated
 	@Override
 	public com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organizationLocalService.updateOrganization(companyId,

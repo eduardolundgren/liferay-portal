@@ -15,15 +15,18 @@
 package com.liferay.portlet.usersadmin.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Website;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.WebsiteLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author David Mendez Gonzalez
@@ -40,20 +43,31 @@ public class WebsiteStagedModelDataHandler
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		Website website = fetchStagedModelByUuidAndCompanyId(
-			uuid, group.getCompanyId());
+		Website website =
+			WebsiteLocalServiceUtil.fetchWebsiteByUuidAndCompanyId(
+				uuid, group.getCompanyId());
 
 		if (website != null) {
-			WebsiteLocalServiceUtil.deleteWebsite(website);
+			deleteStagedModel(website);
 		}
 	}
 
 	@Override
-	public Website fetchStagedModelByUuidAndCompanyId(
+	public void deleteStagedModel(Website website) {
+		WebsiteLocalServiceUtil.deleteWebsite(website);
+	}
+
+	@Override
+	public List<Website> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return WebsiteLocalServiceUtil.fetchWebsiteByUuidAndCompanyId(
-			uuid, companyId);
+		List<Website> websites = new ArrayList<>();
+
+		websites.add(
+			WebsiteLocalServiceUtil.fetchWebsiteByUuidAndCompanyId(
+				uuid, companyId));
+
+		return websites;
 	}
 
 	@Override
@@ -84,8 +98,9 @@ public class WebsiteStagedModelDataHandler
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			website);
 
-		Website existingWebsite = fetchStagedModelByUuidAndCompanyId(
-			website.getUuid(), portletDataContext.getCompanyGroupId());
+		Website existingWebsite =
+			WebsiteLocalServiceUtil.fetchWebsiteByUuidAndCompanyId(
+				website.getUuid(), portletDataContext.getCompanyGroupId());
 
 		Website importedWebsite = null;
 

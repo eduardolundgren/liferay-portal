@@ -17,7 +17,6 @@ package com.liferay.portlet.documentlibrary.util;
 import com.liferay.portal.fabric.InputResource;
 import com.liferay.portal.fabric.OutputResource;
 import com.liferay.portal.kernel.image.GhostscriptUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -44,7 +43,9 @@ import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.model.DLProcessorConstants;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
 import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.File;
@@ -124,6 +125,11 @@ public class PDFProcessorImpl
 		throws Exception {
 
 		return doGetThumbnailFileSize(fileVersion, index);
+	}
+
+	@Override
+	public String getType() {
+		return DLProcessorConstants.PDF_PROCESSOR;
 	}
 
 	@Override
@@ -383,6 +389,15 @@ public class PDFProcessorImpl
 					destinationFileVersion.getFileEntryId(),
 					destinationFileVersion.getVersion());
 
+				if (Validator.equals(
+						"PWC", destinationFileVersion.getVersion())) {
+
+					File file = new File(
+						DocumentConversionUtil.getFilePath(tempFileId, "pdf"));
+
+					FileUtil.delete(file);
+				}
+
 				File file = DocumentConversionUtil.convert(
 					tempFileId, inputStream, extension, "pdf");
 
@@ -455,7 +470,7 @@ public class PDFProcessorImpl
 		String tempFileId = DLUtil.getTempFileId(
 			fileVersion.getFileEntryId(), fileVersion.getVersion());
 
-		List<String> arguments = new ArrayList<String>();
+		List<String> arguments = new ArrayList<>();
 
 		arguments.add("-sDEVICE=png16m");
 
@@ -737,9 +752,10 @@ public class PDFProcessorImpl
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PDFProcessorImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PDFProcessorImpl.class);
 
-	private List<Long> _fileVersionIds = new Vector<Long>();
+	private final List<Long> _fileVersionIds = new Vector<>();
 	private boolean _ghostscriptInitialized;
 
 	private static class LiferayPDFBoxProcessCallable
@@ -799,28 +815,28 @@ public class PDFProcessorImpl
 
 		private static final long serialVersionUID = 1L;
 
-		private Map<String, String> _customLogSettings;
-		private int _dpi;
-		private String _extension;
-		private boolean _generatePreview;
-		private boolean _generateThumbnail;
-		private int _height;
+		private final Map<String, String> _customLogSettings;
+		private final int _dpi;
+		private final String _extension;
+		private final boolean _generatePreview;
+		private final boolean _generateThumbnail;
+		private final int _height;
 
 		@InputResource
-		private File _inputFile;
+		private final File _inputFile;
 
-		private String _liferayHome;
-
-		@OutputResource
-		private File[] _previewFiles;
-
-		private String _serverId;
-		private String _thumbnailExtension;
+		private final String _liferayHome;
 
 		@OutputResource
-		private File _thumbnailFile;
+		private final File[] _previewFiles;
 
-		private int _width;
+		private final String _serverId;
+		private final String _thumbnailExtension;
+
+		@OutputResource
+		private final File _thumbnailFile;
+
+		private final int _width;
 
 	}
 

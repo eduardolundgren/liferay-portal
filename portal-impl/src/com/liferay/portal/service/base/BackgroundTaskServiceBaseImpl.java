@@ -25,8 +25,6 @@ import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.service.BackgroundTaskService;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.persistence.BackgroundTaskPersistence;
-import com.liferay.portal.service.persistence.LockFinder;
-import com.liferay.portal.service.persistence.LockPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.util.PortalUtil;
@@ -77,7 +75,7 @@ public abstract class BackgroundTaskServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the background task remote service
 	 */
-	public com.liferay.portal.service.BackgroundTaskService getBackgroundTaskService() {
+	public BackgroundTaskService getBackgroundTaskService() {
 		return backgroundTaskService;
 	}
 
@@ -87,7 +85,7 @@ public abstract class BackgroundTaskServiceBaseImpl extends BaseServiceImpl
 	 * @param backgroundTaskService the background task remote service
 	 */
 	public void setBackgroundTaskService(
-		com.liferay.portal.service.BackgroundTaskService backgroundTaskService) {
+		BackgroundTaskService backgroundTaskService) {
 		this.backgroundTaskService = backgroundTaskService;
 	}
 
@@ -127,61 +125,6 @@ public abstract class BackgroundTaskServiceBaseImpl extends BaseServiceImpl
 	public void setCounterLocalService(
 		com.liferay.counter.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the lock local service.
-	 *
-	 * @return the lock local service
-	 */
-	public com.liferay.portal.service.LockLocalService getLockLocalService() {
-		return lockLocalService;
-	}
-
-	/**
-	 * Sets the lock local service.
-	 *
-	 * @param lockLocalService the lock local service
-	 */
-	public void setLockLocalService(
-		com.liferay.portal.service.LockLocalService lockLocalService) {
-		this.lockLocalService = lockLocalService;
-	}
-
-	/**
-	 * Returns the lock persistence.
-	 *
-	 * @return the lock persistence
-	 */
-	public LockPersistence getLockPersistence() {
-		return lockPersistence;
-	}
-
-	/**
-	 * Sets the lock persistence.
-	 *
-	 * @param lockPersistence the lock persistence
-	 */
-	public void setLockPersistence(LockPersistence lockPersistence) {
-		this.lockPersistence = lockPersistence;
-	}
-
-	/**
-	 * Returns the lock finder.
-	 *
-	 * @return the lock finder
-	 */
-	public LockFinder getLockFinder() {
-		return lockFinder;
-	}
-
-	/**
-	 * Sets the lock finder.
-	 *
-	 * @param lockFinder the lock finder
-	 */
-	public void setLockFinder(LockFinder lockFinder) {
-		this.lockFinder = lockFinder;
 	}
 
 	/**
@@ -318,18 +261,12 @@ public abstract class BackgroundTaskServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.service.BackgroundTaskLocalService.class)
 	protected com.liferay.portal.service.BackgroundTaskLocalService backgroundTaskLocalService;
-	@BeanReference(type = com.liferay.portal.service.BackgroundTaskService.class)
-	protected com.liferay.portal.service.BackgroundTaskService backgroundTaskService;
+	@BeanReference(type = BackgroundTaskService.class)
+	protected BackgroundTaskService backgroundTaskService;
 	@BeanReference(type = BackgroundTaskPersistence.class)
 	protected BackgroundTaskPersistence backgroundTaskPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
-	@BeanReference(type = com.liferay.portal.service.LockLocalService.class)
-	protected com.liferay.portal.service.LockLocalService lockLocalService;
-	@BeanReference(type = LockPersistence.class)
-	protected LockPersistence lockPersistence;
-	@BeanReference(type = LockFinder.class)
-	protected LockFinder lockFinder;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
 	@BeanReference(type = com.liferay.portal.service.UserService.class)

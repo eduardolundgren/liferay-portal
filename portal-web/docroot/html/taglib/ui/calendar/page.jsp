@@ -54,7 +54,7 @@ int weekNumber = 1;
 %>
 
 <div class="taglib-calendar">
-	<table class="table table-bordered table-hover table-striped calendar-panel">
+	<table class="calendar-panel table table-bordered table-hover table-striped">
 
 	<thead class="table-columns">
 	<c:if test="<%= Validator.isNotNull(headerPattern) || (headerFormat != null) %>">
@@ -141,7 +141,7 @@ int weekNumber = 1;
 			tempCal.set(Calendar.DATE, i);
 			tempCal.set(Calendar.YEAR, selYear);
 
-			boolean hasData = (data != null) && data.contains(new Integer(i));
+			boolean hasData = (data != null) && data.contains(Integer.valueOf(i));
 
 			String cssClass = "";
 

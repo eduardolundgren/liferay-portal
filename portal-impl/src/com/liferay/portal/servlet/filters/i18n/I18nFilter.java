@@ -49,14 +49,14 @@ import org.apache.struts.Globals;
 public class I18nFilter extends BasePortalFilter {
 
 	public static final String SKIP_FILTER =
-		I18nFilter.class.getName() + "SKIP_FILTER";
+		I18nFilter.class.getName() + "#SKIP_FILTER";
 
 	public static Set<String> getLanguageIds() {
 		return _languageIds;
 	}
 
 	public static void setLanguageIds(Set<String> languageIds) {
-		_languageIds = new HashSet<String>();
+		_languageIds = new HashSet<>();
 
 		for (String languageId : languageIds) {
 			languageId = languageId.substring(1);
@@ -71,7 +71,9 @@ public class I18nFilter extends BasePortalFilter {
 	public boolean isFilterEnabled(
 		HttpServletRequest request, HttpServletResponse response) {
 
-		if (!isAlreadyFiltered(request) && !isForwardedByI18nServlet(request)) {
+		if (!isAlreadyFiltered(request) && !isForwardedByI18nServlet(request) &&
+			!isWidget(request)) {
+
 			return true;
 		}
 		else {
@@ -180,6 +182,15 @@ public class I18nFilter extends BasePortalFilter {
 		}
 	}
 
+	protected boolean isWidget(HttpServletRequest request) {
+		if (request.getAttribute(WebKeys.WIDGET) != null) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	protected String prependI18nLanguageId(
 		HttpServletRequest request, int prependFriendlyUrlStyle) {
 
@@ -252,7 +263,7 @@ public class I18nFilter extends BasePortalFilter {
 		response.sendRedirect(redirect);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(I18nFilter.class);
+	private static final Log _log = LogFactoryUtil.getLog(I18nFilter.class);
 
 	private static Set<String> _languageIds;
 

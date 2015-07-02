@@ -17,13 +17,14 @@ package com.liferay.portlet.documentlibrary.trash;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.trash.BaseTrashRenderer;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
-import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
+import com.liferay.portlet.documentlibrary.model.DLFileShortcutConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 
@@ -31,8 +32,6 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 
 /**
  * @author Zsolt Berentey
@@ -41,7 +40,7 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 
 	public static final String TYPE = "shortcut";
 
-	public DLFileShortcutTrashRenderer(DLFileShortcut fileShortcut)
+	public DLFileShortcutTrashRenderer(FileShortcut fileShortcut)
 		throws PortalException {
 
 		_fileShortcut = fileShortcut;
@@ -52,7 +51,7 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 
 	@Override
 	public String getClassName() {
-		return DLFileShortcut.class.getName();
+		return DLFileShortcutConstants.getClassName();
 	}
 
 	@Override
@@ -96,14 +95,14 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(AssetRenderer.TEMPLATE_ABSTRACT) ||
 			template.equals(AssetRenderer.TEMPLATE_FULL_CONTENT)) {
 
-			renderRequest.setAttribute(
+			portletRequest.setAttribute(
 				WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY, _fileEntry);
 
 			return "/html/portlet/document_library/asset/" + template + ".jsp";
@@ -113,6 +112,6 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 	}
 
 	private final FileEntry _fileEntry;
-	private final DLFileShortcut _fileShortcut;
+	private final FileShortcut _fileShortcut;
 
 }

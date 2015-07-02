@@ -1,0 +1,91 @@
+<definition>
+	<var name="userFirstName" value="Test" />
+	<var name="userLastName" value="Test" />
+
+	<command name="runSmoke" summary-ignore="true">
+		<execute macro="Page#addPG">
+			<var name="defaultURL" value="${defaultURL}" />
+			<var name="nodePort" value="${nodePort}" />
+			<var name="pageName" value="Test Page1" />
+			<var name="pageTemplateName" value="${pageTemplateName}" />
+			<var name="pageType" value="${pageType}" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="defaultURL" value="${defaultURL}" />
+			<var name="nodePort" value="${nodePort}" />
+			<var name="pageName" value="Test Page2" />
+			<var name="pageTemplateName" value="${pageTemplateName}" />
+			<var name="pageType" value="${pageType}" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="defaultURL" value="${defaultURL}" />
+			<var name="nodePort" value="${nodePort}" />
+			<var name="pageName" value="Test Page3" />
+			<var name="pageTemplateName" value="${pageTemplateName}" />
+			<var name="pageType" value="${pageType}" />
+		</execute>
+
+		<var name="pageName" value="Test Page1" />
+		<var name="portletBody" value="Welcome to Liferay Portal" />
+		<var name="portletName" value="Hello World" />
+
+		<task summary="Add a '${portletName}' portlet to the page named '${pageName}'">
+			<execute macro="Navigator#gotoPage">
+				<var name="pageName" value="${pageName}" />
+			</execute>
+
+			<execute macro="Portlet#addPG">
+				<var name="i" value="${i}" />
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Portlet#viewTitle">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Portlet#viewBody">
+				<var name="portletBody" value="${portletBody}" />
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Navigator#gotoPage">
+				<var name="pageName" value="${pageName}" />
+			</execute>
+
+			<execute macro="Portlet#viewTitle">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Portlet#viewBody">
+				<var name="portletBody" value="${portletBody}" />
+				<var name="portletName" value="${portletName}" />
+			</execute>
+		</task>
+
+		<var name="portletName" value="Blogs" />
+		<var name="portletTitle" value="Blogs" />
+
+		<task macro-summary="Page#gotoContentCP">
+			<execute macro="Page#gotoContentCP">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="SiteAdmin#viewPortletTitle">
+				<var name="portletTitle" value="${portletTitle}" />
+			</execute>
+		</task>
+	</command>
+
+	<command name="viewWelcomePage" summary="View default welcome page while signed in as '${userFirstName} ${userLastName}'">
+		<execute function="AssertTextEquals" locator1="Home#BREADCRUMB_1" value1="Welcome" />
+
+		<execute function="AssertTextEquals#assertText" locator1="PGSignin#PORTLET_TITLE" value1="Sign In" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="PGSignin#PORTLET_CONTENT" value1="You are signed in as" />
+		<execute function="AssertTextEquals" locator1="PGSignin#PORTLET_CONTENT_USER_NAME" value1="${userFirstName} ${userLastName}" />
+
+		<execute function="AssertTextEquals#assertText" locator1="PGHelloworld#PORTLET_TITLE" value1="Hello World" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="PGHelloworld#PORTLET_CONTENT" value1="Welcome to Liferay Portal" />
+	</command>
+</definition>

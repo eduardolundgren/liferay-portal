@@ -16,6 +16,8 @@ package com.liferay.sync.engine.documentlibrary.event;
 
 import com.liferay.sync.engine.SyncEngine;
 import com.liferay.sync.engine.documentlibrary.handler.Handler;
+import com.liferay.sync.engine.documentlibrary.util.BatchEvent;
+import com.liferay.sync.engine.documentlibrary.util.BatchEventManager;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncAccountService;
@@ -23,6 +25,9 @@ import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
 
 import java.util.Map;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,28 +45,47 @@ public abstract class BaseEvent implements Event {
 		_parameters = parameters;
 	}
 
+	@Override
+	public void cancel() {
+		if (_httpGet != null) {
+			_httpGet.abort();
+		}
+
+		if (_httpPost != null) {
+			_httpPost.abort();
+		}
+	}
+
 	public void executeAsynchronousGet(String urlPath) throws Exception {
 		Session session = SessionManager.getSession(_syncAccountId);
 
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			_syncAccountId);
+		_httpGet = new HttpGet(urlPath);
 
-		session.executeAsynchronousGet(
-			syncAccount.getUrl() + urlPath, _handler);
+		session.asynchronousExecute(_httpGet, _handler);
 	}
 
 	public void executeAsynchronousPost(
 			String urlPath, Map<String, Object> parameters)
 		throws Exception {
 
-		Session session = SessionManager.getSession(_syncAccountId);
-
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			_syncAccountId);
 
-		session.executeAsynchronousPost(
+		executeAsynchronousPost(
 			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
 			_handler);
+	}
+
+	public void executeAsynchronousPost(
+			String urlPath, Map<String, Object> parameters,
+			Handler<Void> handler)
+		throws Exception {
+
+		Session session = SessionManager.getSession(_syncAccountId);
+
+		_httpPost = new HttpPost(urlPath);
+
+		session.asynchronousExecute(_httpPost, parameters, handler);
 	}
 
 	public void executeGet(String urlPath) throws Exception {
@@ -70,7 +94,9 @@ public abstract class BaseEvent implements Event {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			_syncAccountId);
 
-		session.executeGet(syncAccount.getUrl() + urlPath, _handler);
+		_httpGet = new HttpGet(syncAccount.getUrl() + urlPath);
+
+		session.execute(_httpGet, _handler);
 	}
 
 	public void executePost(String urlPath, Map<String, Object> parameters)
@@ -81,12 +107,11 @@ public abstract class BaseEvent implements Event {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			_syncAccountId);
 
-		session.executePost(
-			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
-			_handler);
-	}
+		_httpPost = new HttpPost(
+			syncAccount.getUrl() + "/api/jsonws" + urlPath);
 
-	public abstract Handler<Void> getHandler();
+		session.execute(_httpPost, parameters, _handler);
+	}
 
 	@Override
 	public Map<String, Object> getParameters() {
@@ -101,6 +126,11 @@ public abstract class BaseEvent implements Event {
 	@Override
 	public long getSyncAccountId() {
 		return _syncAccountId;
+	}
+
+	@Override
+	public String getURLPath() {
+		return _urlPath;
 	}
 
 	@Override
@@ -135,7 +165,11 @@ public abstract class BaseEvent implements Event {
 	}
 
 	protected void processAsynchronousRequest() throws Exception {
-		executeAsynchronousPost(_urlPath, _parameters);
+		BatchEvent batchEvent = BatchEventManager.getBatchEvent(_syncAccountId);
+
+		if (!batchEvent.addEvent(this)) {
+			executeAsynchronousPost(_urlPath, _parameters);
+		}
 	}
 
 	protected void processRequest() throws Exception {
@@ -146,6 +180,8 @@ public abstract class BaseEvent implements Event {
 		BaseEvent.class);
 
 	private Handler<Void> _handler;
+	private HttpGet _httpGet;
+	private HttpPost _httpPost;
 	private final Map<String, Object> _parameters;
 	private final long _syncAccountId;
 	private final String _urlPath;

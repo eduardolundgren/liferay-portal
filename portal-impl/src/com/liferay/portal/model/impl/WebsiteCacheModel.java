@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -39,6 +40,33 @@ import java.util.Date;
 @ProviderType
 public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 	MVCCModel {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof WebsiteCacheModel)) {
+			return false;
+		}
+
+		WebsiteCacheModel websiteCacheModel = (WebsiteCacheModel)obj;
+
+		if ((websiteId == websiteCacheModel.websiteId) &&
+				(mvccVersion == websiteCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, websiteId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
 	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
@@ -153,7 +181,7 @@ public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
 		url = objectInput.readUTF();
-		typeId = objectInput.readInt();
+		typeId = objectInput.readLong();
 		primary = objectInput.readBoolean();
 	}
 
@@ -192,7 +220,7 @@ public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 			objectOutput.writeUTF(url);
 		}
 
-		objectOutput.writeInt(typeId);
+		objectOutput.writeLong(typeId);
 		objectOutput.writeBoolean(primary);
 	}
 
@@ -207,6 +235,6 @@ public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 	public long classNameId;
 	public long classPK;
 	public String url;
-	public int typeId;
+	public long typeId;
 	public boolean primary;
 }

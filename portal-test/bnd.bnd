@@ -1,10 +1,28 @@
 Bundle-Name: Liferay Portal Test
-Bundle-Version: 6.2.0
+Bundle-Version: 7.0.0
 Export-Package:\
-	com.liferay.portal.test.randomizerbumpers,\
-	com.liferay.portal.util.test
+	com.liferay.portal.kernel.test,\
+	com.liferay.portal.kernel.test.randomizerbumpers,\
+	com.liferay.portal.kernel.test.rule,\
+	com.liferay.portal.kernel.test.rule.callback,\
+	com.liferay.portal.kernel.test.search,\
+	com.liferay.portal.kernel.test.util,\
+	com.liferay.portlet.asset.service.persistence.test,\
+	com.liferay.portlet.documentlibrary.util.test,\
+	com.liferay.portlet.dynamicdatamapping.util.test,\
+	com.liferay.portlet.expando.util.test,\
+	com.liferay.portlet.messageboards.util.test,\
+	com.liferay.portlet.ratings.util.test,\
+	junit.*,\
+	org.hamcrest.*,\
+	org.junit.*,\
+	org.junit.runner.*,\
+	org.springframework.mock.web,\
+	org.springframework.mock.web.portlet
+Import-Package: *;resolution:=optional
 Include-Resource:\
 	classes,\
-	@${project.dir}/../lib/development/dumbster.jar,\
 	@${project.dir}/../lib/development/hamcrest-core.jar,\
-	@${project.dir}/../lib/development/junit.jar
+	@${project.dir}/../lib/development/junit.jar,\
+	@${project.dir}/../lib/development/spring-test.jar,\
+	@${project.dir}/../lib/portal/aspectj-rt.jar

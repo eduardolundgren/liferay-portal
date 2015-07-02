@@ -85,8 +85,7 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 			throw new IllegalStateException();
 		}
 
-		Map<String, Object> properties = new HashMap<String, Object>(
-			_properties);
+		Map<String, Object> properties = new HashMap<>(_properties);
 
 		Registry registry = RegistryUtil.getRegistry();
 
@@ -104,7 +103,7 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 			throw new IllegalArgumentException("Service is null");
 		}
 
-		properties = new HashMap<String, Object>(properties);
+		properties = new HashMap<>(properties);
 
 		properties.putAll(_properties);
 
@@ -254,7 +253,7 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 
 	@Override
 	public List<S> subList(int fromIndex, int toIndex) {
-		List<S> list = new ArrayList<S>();
+		List<S> list = new ArrayList<>();
 
 		List<EntryWrapper> subList = _services.subList(fromIndex, toIndex);
 
@@ -293,7 +292,7 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 	}
 
 	private Filter _getFilter(Filter filter, Class<S> clazz) {
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("objectClass", clazz.getName());
 
@@ -318,9 +317,8 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 	private final Filter _filter;
 	private final Map<String, Object> _properties;
 	private final ServiceRegistrationMap<S> _serviceRegistrations =
-		new ServiceRegistrationMap<S>();
-	private final List<EntryWrapper> _services =
-		new CopyOnWriteArrayList<EntryWrapper>();
+		new ServiceRegistrationMap<>();
+	private final List<EntryWrapper> _services = new CopyOnWriteArrayList<>();
 	private final ServiceTracker<S, S> _serviceTracker;
 
 	private class DefaultServiceTrackerCustomizer
@@ -422,8 +420,8 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 			return entryWrapper._serviceReference.compareTo(_serviceReference);
 		}
 
-		private S _service;
-		private ServiceReference<S> _serviceReference;
+		private final S _service;
+		private final ServiceReference<S> _serviceReference;
 
 	}
 
@@ -482,7 +480,7 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 			throw new UnsupportedOperationException();
 		}
 
-		private ListIterator<EntryWrapper> _listIterator;
+		private final ListIterator<EntryWrapper> _listIterator;
 
 	}
 

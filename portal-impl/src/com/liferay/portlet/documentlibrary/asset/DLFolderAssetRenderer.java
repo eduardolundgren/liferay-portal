@@ -27,6 +27,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
@@ -42,8 +43,6 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -85,11 +84,15 @@ public class DLFolderAssetRenderer
 				return "icon-drive";
 			}
 
+			if (!PropsValues.DL_FOLDER_ICON_CHECK_COUNT) {
+				return "icon-folder-open";
+			}
+
 			List<Long> subfolderIds = DLAppServiceUtil.getSubfolderIds(
 				_folder.getRepositoryId(), _folder.getFolderId(), false);
 
 			if (!subfolderIds.isEmpty()) {
-				return "icon-folder-close";
+				return "icon-folder-open";
 			}
 
 			int count = DLAppServiceUtil.getFoldersFileEntriesCount(
@@ -98,7 +101,7 @@ public class DLFolderAssetRenderer
 				WorkflowConstants.STATUS_APPROVED);
 
 			if (count > 0) {
-				return "icon-folder-close";
+				return "icon-folder-open";
 			}
 		}
 		catch (PrincipalException pe) {
@@ -114,7 +117,8 @@ public class DLFolderAssetRenderer
 	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
 		try {
-			if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
+			if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT &&
+				DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
 					_folder.getRepositoryId(), _folder.getFolderId(),
 					WorkflowConstants.STATUS_APPROVED, true) > 0) {
 
@@ -149,12 +153,16 @@ public class DLFolderAssetRenderer
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		if (!PropsValues.DL_FOLDER_ICON_CHECK_COUNT) {
+			return themeDisplay.getPathThemeImages() +
+				"/file_system/large/folder_empty_document.png";
+		}
+
 		int foldersCount = DLAppServiceUtil.getFoldersCount(
 			_folder.getRepositoryId(), _folder.getFolderId());
-		int entriesCount =
-			DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(
-				_folder.getRepositoryId(), _folder.getFolderId(),
-				WorkflowConstants.STATUS_APPROVED);
+		int entriesCount = DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(
+			_folder.getRepositoryId(), _folder.getFolderId(),
+			WorkflowConstants.STATUS_APPROVED);
 
 		if ((entriesCount > 0) || (foldersCount > 0)) {
 			return themeDisplay.getPathThemeImages() +
@@ -266,14 +274,14 @@ public class DLFolderAssetRenderer
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_ABSTRACT) ||
 			template.equals(TEMPLATE_FULL_CONTENT)) {
 
-			renderRequest.setAttribute(
+			portletRequest.setAttribute(
 				WebKeys.DOCUMENT_LIBRARY_FOLDER, _folder);
 
 			return "/html/portlet/document_library/asset/folder_" + template +

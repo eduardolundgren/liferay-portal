@@ -39,9 +39,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_role_assignments.
 	rowChecker="<%= new UserGroupRoleChecker(renderResponse, role) %>"
 	searchContainer="<%= new UserGroupSearch(renderRequest, portletURL) %>"
 >
-	<liferay-ui:search-form
-		page="/html/portlet/user_groups_admin/user_group_search.jsp"
-	/>
+	<liferay-ui:user-group-search-form />
 
 	<%
 	UserGroupDisplayTerms searchTerms = (UserGroupDisplayTerms)searchContainer.getSearchTerms();
@@ -49,7 +47,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_role_assignments.
 	LinkedHashMap<String, Object> userGroupParams = new LinkedHashMap<String, Object>();
 
 	if (tabs3.equals("current")) {
-		userGroupParams.put("userGroupsRoles", new Long(role.getRoleId()));
+		userGroupParams.put("userGroupsRoles", Long.valueOf(role.getRoleId()));
 	}
 
 	total = UserGroupLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), userGroupParams);

@@ -14,9 +14,10 @@
 
 package com.liferay.portlet.layoutsadmin.lar;
 
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.lar.test.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutFriendlyURL;
@@ -25,15 +26,10 @@ import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.journal.model.JournalFolderConstants;
-import com.liferay.portlet.journal.util.test.JournalTestUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,44 +54,11 @@ public class LayoutStagedModelDataHandlerTest
 			TransactionalTestRule.INSTANCE);
 
 	@Test
-	public void testTypeArticle() throws Exception {
-		initExport();
-
-		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			new HashMap<String, List<StagedModel>>();
-
-		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			stagingGroup.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString());
-
-		addDependentStagedModel(
-			dependentStagedModelsMap, JournalArticle.class, journalArticle);
-
-		Layout layout = LayoutTestUtil.addTypeArticleLayout(
-			stagingGroup.getGroupId(), journalArticle.getArticleId());
-
-		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, layout);
-
-		StagedModelDataHandlerUtil.exportStagedModel(
-			portletDataContext, layout);
-
-		validateExport(portletDataContext, layout, dependentStagedModelsMap);
-
-		initImport();
-
-		Layout exportedLayout = (Layout)readExportedStagedModel(layout);
-
-		StagedModelDataHandlerUtil.importStagedModel(
-			portletDataContext, exportedLayout);
-	}
-
-	@Test
 	public void testTypeLinkToLayout() throws Exception {
 		initExport();
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			new HashMap<String, List<StagedModel>>();
+			new HashMap<>();
 
 		Layout linkedLayout = LayoutTestUtil.addLayout(stagingGroup);
 
@@ -169,7 +132,7 @@ public class LayoutStagedModelDataHandlerTest
 		throws Exception {
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			new HashMap<String, List<StagedModel>>();
+			new HashMap<>();
 
 		Layout parentLayout = LayoutTestUtil.addLayout(group);
 

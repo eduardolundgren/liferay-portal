@@ -21,6 +21,7 @@ import com.liferay.portal.UserActiveException;
 import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.UserLockoutException;
 import com.liferay.portal.UserReminderQueryException;
+import com.liferay.portal.kernel.captcha.CaptchaConfigurationException;
 import com.liferay.portal.kernel.captcha.CaptchaException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
@@ -84,16 +85,25 @@ public class ForgotPasswordAction extends PortletAction {
 			}
 		}
 		catch (Exception e) {
-			if (e instanceof CaptchaTextException ||
-				e instanceof NoSuchUserException ||
-				e instanceof RequiredReminderQueryException ||
-				e instanceof SendPasswordException ||
-				e instanceof UserActiveException ||
-				e instanceof UserEmailAddressException ||
-				e instanceof UserLockoutException ||
-				e instanceof UserReminderQueryException) {
+			if (e instanceof CaptchaConfigurationException ||
+				e instanceof CaptchaTextException ||
+				e instanceof UserEmailAddressException) {
 
 				SessionErrors.add(actionRequest, e.getClass());
+			}
+			else if (e instanceof NoSuchUserException ||
+					 e instanceof RequiredReminderQueryException ||
+					 e instanceof SendPasswordException ||
+					 e instanceof UserActiveException ||
+					 e instanceof UserLockoutException ||
+					 e instanceof UserReminderQueryException) {
+
+				if (PropsValues.LOGIN_SECURE_FORGOT_PASSWORD) {
+					sendRedirect(actionRequest, actionResponse);
+				}
+				else {
+					SessionErrors.add(actionRequest, e.getClass(), e);
+				}
 			}
 			else {
 				PortalUtil.sendError(e, actionRequest, actionResponse);
@@ -217,10 +227,7 @@ public class ForgotPasswordAction extends PortletAction {
 			throw new UserActiveException();
 		}
 
-		if (user.isLockout()) {
-			throw new UserLockoutException.PasswordPolicyLockout(
-				user, user.getPasswordPolicy());
-		}
+		UserLocalServiceUtil.checkLockout(user);
 
 		return user;
 	}

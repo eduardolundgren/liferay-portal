@@ -17,7 +17,6 @@ package com.liferay.portlet.documentlibrary.service.permission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
-import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -32,6 +31,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.portlet.exportimport.staging.permission.StagingPermissionUtil;
 
 /**
  * @author Brian Wing Shun Chan
@@ -50,7 +50,9 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		if (!contains(permissionChecker, dlFileEntry, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, DLFileEntry.class.getName(),
+				dlFileEntry.getFileEntryId(), actionId);
 		}
 	}
 
@@ -60,7 +62,9 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		if (!fileEntry.containsPermission(permissionChecker, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, FileEntry.class.getName(),
+				fileEntry.getFileEntryId(), actionId);
 		}
 	}
 
@@ -70,7 +74,9 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		if (!contains(permissionChecker, fileEntryId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, FileEntry.class.getName(), fileEntryId,
+				actionId);
 		}
 	}
 

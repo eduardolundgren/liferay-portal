@@ -16,9 +16,10 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 		attributes.put("questionId", getQuestionId());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -136,6 +138,12 @@ public class PollsChoiceWrapper implements PollsChoice,
 		if (description != null) {
 			setDescription(description);
 		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
 	}
 
 	@Override
@@ -179,7 +187,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 	* @return the create date of this polls choice
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _pollsChoice.getCreateDate();
 	}
 
@@ -262,7 +270,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 	* @return the locales and localized descriptions of this polls choice
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+	public Map<java.util.Locale, java.lang.String> getDescriptionMap() {
 		return _pollsChoice.getDescriptionMap();
 	}
 
@@ -282,12 +290,22 @@ public class PollsChoiceWrapper implements PollsChoice,
 	}
 
 	/**
+	* Returns the last publish date of this polls choice.
+	*
+	* @return the last publish date of this polls choice
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _pollsChoice.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this polls choice.
 	*
 	* @return the modified date of this polls choice
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _pollsChoice.getModifiedDate();
 	}
 
@@ -440,7 +458,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 	* @param createDate the create date of this polls choice
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_pollsChoice.setCreateDate(createDate);
 	}
 
@@ -491,7 +509,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		Map<java.util.Locale, java.lang.String> descriptionMap) {
 		_pollsChoice.setDescriptionMap(descriptionMap);
 	}
 
@@ -503,7 +521,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.util.Locale defaultLocale) {
 		_pollsChoice.setDescriptionMap(descriptionMap, defaultLocale);
 	}
@@ -537,12 +555,22 @@ public class PollsChoiceWrapper implements PollsChoice,
 	}
 
 	/**
+	* Sets the last publish date of this polls choice.
+	*
+	* @param lastPublishDate the last publish date of this polls choice
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_pollsChoice.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this polls choice.
 	*
 	* @param modifiedDate the modified date of this polls choice
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_pollsChoice.setModifiedDate(modifiedDate);
 	}
 

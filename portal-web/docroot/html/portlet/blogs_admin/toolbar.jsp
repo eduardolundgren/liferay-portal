@@ -23,25 +23,35 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem");
 <aui:nav-bar>
 	<aui:nav cssClass="navbar-nav">
 		<portlet:renderURL var="viewEntriesURL">
-			<portlet:param name="struts_action" value="/blogs_admin/view" />
+			<portlet:param name="mvcRenderCommandName" value="/blogs_admin/view" />
 		</portlet:renderURL>
 
 		<c:if test="<%= BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ENTRY) %>">
 			<portlet:renderURL var="addEntryURL">
-				<portlet:param name="struts_action" value="/blogs_admin/edit_entry" />
+				<portlet:param name="mvcRenderCommandName" value="/blogs/edit_entry" />
 				<portlet:param name="redirect" value="<%= viewEntriesURL %>" />
 				<portlet:param name="backURL" value="<%= viewEntriesURL %>" />
 			</portlet:renderURL>
 
-			<aui:nav-item href="<%= addEntryURL %>" iconCssClass="icon-plus" label="add" selected='<%= toolbarItem.equals("add") %>' />
+			<aui:nav-item href="<%= addEntryURL %>" iconCssClass="icon-plus" label="add-blog-entry" selected='<%= toolbarItem.equals("add") %>' />
+		</c:if>
+
+		<c:if test="<%= BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS) %>">
+			<liferay-security:permissionsURL
+				modelResource="com.liferay.portlet.blogs"
+				modelResourceDescription="<%= HtmlUtil.escape(themeDisplay.getScopeGroupName()) %>"
+				resourcePrimKey="<%= String.valueOf(scopeGroupId) %>"
+				var="permissionsURL"
+				windowState="<%= LiferayWindowState.POP_UP.toString() %>"
+			/>
+
+			<aui:nav-item href="<%= permissionsURL %>" label="permissions" title="edit-permissions" useDialog="<%= true %>" />
 		</c:if>
 	</aui:nav>
 
-	<c:if test="<%= showBlogEntriesSearch %>">
-		<aui:nav-bar-search>
-			<div class="form-search">
-				<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" id="keywords1" name="keywords" placeholder='<%= LanguageUtil.get(locale, "keywords") %>' />
-			</div>
-		</aui:nav-bar-search>
-	</c:if>
+	<aui:nav-bar-search>
+		<div class="form-search">
+			<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" id="keywords1" name="keywords" placeholder='<%= LanguageUtil.get(request, "keywords") %>' />
+		</div>
+	</aui:nav-bar-search>
 </aui:nav-bar>

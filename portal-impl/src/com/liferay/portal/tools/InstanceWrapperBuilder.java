@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
@@ -58,7 +58,7 @@ public class InstanceWrapperBuilder {
 		try {
 			File file = new File(xml);
 
-			Document document = SAXReaderUtil.read(file);
+			Document document = UnsecureSAXReaderUtil.read(file);
 
 			Element rootElement = document.getRootElement();
 
@@ -147,7 +147,7 @@ public class InstanceWrapperBuilder {
 				sb.append("> ");
 			}
 
-			sb.append(_getTypeGenericsName(javaMethod.getReturns()));
+			sb.append(_getTypeGenericsName(javaMethod.getReturnType()));
 			sb.append(" ");
 			sb.append(methodName);
 			sb.append(StringPool.OPEN_PARENTHESIS);
@@ -176,7 +176,7 @@ public class InstanceWrapperBuilder {
 
 			Type[] thrownExceptions = javaMethod.getExceptions();
 
-			Set<String> newExceptions = new LinkedHashSet<String>();
+			Set<String> newExceptions = new LinkedHashSet<>();
 
 			for (int j = 0; j < thrownExceptions.length; j++) {
 				Type thrownException = thrownExceptions[j];
@@ -197,7 +197,7 @@ public class InstanceWrapperBuilder {
 
 			sb.append("{\n");
 
-			if (!javaMethod.getReturns().getValue().equals("void")) {
+			if (!javaMethod.getReturnType().getValue().equals("void")) {
 				sb.append("return ");
 			}
 

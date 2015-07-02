@@ -17,12 +17,10 @@
 <%@ include file="/html/taglib/ddm/html/init.jsp" %>
 
 <div class="lfr-ddm-container" id="<%= randomNamespace %>">
-	<c:if test="<%= Validator.isNotNull(xsd) %>">
+	<c:if test="<%= ddmForm != null %>">
 
 		<%
 		pageContext.setAttribute("checkRequired", checkRequired);
-
-		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(xsd);
 
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext = new DDMFormFieldRenderingContext();
 
@@ -42,7 +40,7 @@
 		<aui:input name="<%= ddmFormValuesInputName %>" type="hidden" />
 
 		<aui:script use="liferay-ddm-form">
-			new Liferay.DDM.Form(
+			var liferayDDMForm = new Liferay.DDM.Form(
 				{
 					container: '#<%= randomNamespace %>',
 					ddmFormValuesInput: '#<portlet:namespace /><%= ddmFormValuesInputName %>',
@@ -77,5 +75,15 @@
 					</c:if>
 				}
 			);
+
+			var onDestroyPortlet = function(event) {
+				if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+					liferayDDMForm.destroy();
+
+					Liferay.detach('destroyPortlet', onDestroyPortlet);
+				}
+			};
+
+			Liferay.on('destroyPortlet', onDestroyPortlet);
 		</aui:script>
 	</c:if>

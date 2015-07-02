@@ -31,9 +31,12 @@ import com.liferay.portal.repository.capabilities.TemporaryFileEntriesCapability
  */
 public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 
+	public static final String CLASS_NAME =
+		TemporaryFileEntryRepository.class.getName();
+
 	@Override
 	public String getClassName() {
-		return TemporaryFileEntryRepository.class.getName();
+		return CLASS_NAME;
 	}
 
 	@Override
@@ -42,14 +45,14 @@ public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 	}
 
 	@Override
-	public void registerCapabilities(CapabilityRegistry capabilityRegistry) {
-		DocumentRepository documentRepository =
-			capabilityRegistry.getDocumentRepository();
+	public void registerCapabilities(
+		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
+
+		DocumentRepository documentRepository = capabilityRegistry.getTarget();
 
 		capabilityRegistry.addExportedCapability(
 			BulkOperationCapability.class,
-			new LiferayBulkOperationCapability(
-				documentRepository.getRepositoryId()));
+			new LiferayBulkOperationCapability(documentRepository));
 		capabilityRegistry.addExportedCapability(
 			TemporaryFileEntriesCapability.class,
 			new TemporaryFileEntriesCapabilityImpl(documentRepository));

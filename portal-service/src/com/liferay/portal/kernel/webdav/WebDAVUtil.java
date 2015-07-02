@@ -180,7 +180,7 @@ public class WebDAVUtil {
 		// Guest
 
 		if (user.isDefaultUser()) {
-			List<Group> groups = new ArrayList<Group>();
+			List<Group> groups = new ArrayList<>();
 
 			Group group = GroupLocalServiceUtil.getGroup(
 				user.getCompanyId(), GroupConstants.GUEST);
@@ -192,10 +192,9 @@ public class WebDAVUtil {
 
 		// Communities
 
-		Set<Group> groups = new HashSet<Group>();
+		Set<Group> groups = new HashSet<>();
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("usersGroups", user.getUserId());
 
@@ -219,7 +218,7 @@ public class WebDAVUtil {
 			groups.add(user.getGroup());
 		}
 
-		List<Group> groupsList = new ArrayList<Group>(groups);
+		List<Group> groupsList = new ArrayList<>(groups);
 
 		Collections.sort(groupsList, orderByComparator);
 
@@ -281,7 +280,7 @@ public class WebDAVUtil {
 			return StringPool.BLANK;
 		}
 		else {
-			return pathArray[pathArray.length - 1];
+			return HttpUtil.decodeURL(pathArray[pathArray.length - 1]);
 		}
 	}
 
@@ -398,15 +397,15 @@ public class WebDAVUtil {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(WebDAVUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(WebDAVUtil.class);
 
-	private static WebDAVUtil _instance = new WebDAVUtil();
+	private static final WebDAVUtil _instance = new WebDAVUtil();
 
-	private ServiceRegistrationMap<WebDAVStorage> _serviceRegistrations =
-		new ServiceRegistrationMap<WebDAVStorage>();
-	private ServiceTracker<WebDAVStorage, WebDAVStorage> _serviceTracker;
-	private Map<String, WebDAVStorage> _storageMap =
-		new ConcurrentSkipListMap<String, WebDAVStorage>();
+	private final ServiceRegistrationMap<WebDAVStorage> _serviceRegistrations =
+		new ServiceRegistrationMap<>();
+	private final ServiceTracker<WebDAVStorage, WebDAVStorage> _serviceTracker;
+	private final Map<String, WebDAVStorage> _storageMap =
+		new ConcurrentSkipListMap<>();
 
 	private class WebDAVStorageServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<WebDAVStorage, WebDAVStorage> {

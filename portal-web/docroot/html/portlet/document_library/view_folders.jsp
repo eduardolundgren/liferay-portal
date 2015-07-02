@@ -19,6 +19,9 @@
 <%
 String browseBy = ParamUtil.getString(request, "browseBy");
 
+String curEntry = ParamUtil.getString(request, "curEntry");
+String deltaEntry = ParamUtil.getString(request, "deltaEntry");
+
 Folder folder = (Folder)request.getAttribute("view.jsp-folder");
 
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
@@ -75,9 +78,11 @@ else if ((folderId != rootFolderId) || expandFolder) {
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/document_library/view");
+portletURL.setParameter("curEntry", curEntry);
+portletURL.setParameter("deltaEntry", deltaEntry);
 portletURL.setParameter("folderId", String.valueOf(folderId));
 
-SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
+SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "curFolder", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
 searchContainer.setTotal(total);
 
@@ -344,6 +349,12 @@ else {
 						request.setAttribute("view_entries.jsp-folderId", String.valueOf(curFolder.getFolderId()));
 						request.setAttribute("view_entries.jsp-folderSelected", String.valueOf(folderId == curFolder.getFolderId()));
 						request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
+
+						String iconCssClass = "icon-folder-close";
+
+						if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0)) {
+							iconCssClass = "icon-folder-open";
+						}
 					%>
 
 						<portlet:renderURL var="viewURL">
@@ -354,7 +365,7 @@ else {
 						<aui:nav-item
 							cssClass="folder list-group-item navigation-entry"
 							href="<%= viewURL %>"
-							iconCssClass='<%= (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0) ? "icon-folder-open" : "icon-folder-close" %>'
+							iconCssClass="<%= iconCssClass %>"
 							label="<%= curFolder.getName() %>"
 							localizeLabel="<%= false %>"
 							selected="<%= (curFolder.getFolderId() == folderId) %>"

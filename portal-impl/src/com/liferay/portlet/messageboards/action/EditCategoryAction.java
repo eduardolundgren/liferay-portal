@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.messageboards.action;
 
+import com.liferay.portal.kernel.captcha.CaptchaConfigurationException;
 import com.liferay.portal.kernel.captcha.CaptchaMaxChallengesException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
@@ -39,6 +40,7 @@ import com.liferay.portlet.messageboards.MailingListOutUserNameException;
 import com.liferay.portlet.messageboards.NoSuchCategoryException;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.MBCategoryServiceUtil;
+import com.liferay.portlet.trash.service.TrashEntryServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
@@ -79,6 +81,9 @@ public class EditCategoryAction extends PortletAction {
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteCategories(actionRequest, true);
 			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restoreTrashEntries(actionRequest);
+			}
 			else if (cmd.equals(Constants.SUBSCRIBE)) {
 				subscribeCategory(actionRequest);
 			}
@@ -96,7 +101,8 @@ public class EditCategoryAction extends PortletAction {
 
 				setForward(actionRequest, "portlet.message_boards.error");
 			}
-			else if (e instanceof CaptchaMaxChallengesException ||
+			else if (e instanceof CaptchaConfigurationException ||
+					 e instanceof CaptchaMaxChallengesException ||
 					 e instanceof CaptchaTextException ||
 					 e instanceof CategoryNameException ||
 					 e instanceof MailingListEmailAddressException ||
@@ -161,7 +167,7 @@ public class EditCategoryAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "deleteCategoryIds"), 0L);
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteCategoryId : deleteCategoryIds) {
 			if (moveToTrash) {
@@ -180,6 +186,17 @@ public class EditCategoryAction extends PortletAction {
 			TrashUtil.addTrashSessionMessages(actionRequest, trashedModels);
 
 			hideDefaultSuccessMessage(actionRequest);
+		}
+	}
+
+	protected void restoreTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] restoreTrashEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
+
+		for (long restoreTrashEntryId : restoreTrashEntryIds) {
+			TrashEntryServiceUtil.restoreEntry(restoreTrashEntryId);
 		}
 	}
 

@@ -20,12 +20,16 @@
 
 <%
 String backURL = (String)request.getAttribute("liferay-ui:form-navigator:backURL");
-String[][] categorySections = (String[][])request.getAttribute("liferay-ui:form-navigator:categorySections");
-String[] categoryNames = (String[])request.getAttribute("liferay-ui:form-navigator:categoryNames");
+String[][] categorySectionKeys = (String[][])request.getAttribute("liferay-ui:form-navigator:categorySectionKeys");
+String[][] categorySectionLabels = (String[][])request.getAttribute("liferay-ui:form-navigator:categorySectionLabels");
+String[] categoryLabels = (String[])request.getAttribute("liferay-ui:form-navigator:categoryLabels");
+String[] deprecatedCategorySections = (String[])request.getAttribute("liferay-ui:form-navigator:deprecatedCategorySections");
 String displayStyle = (String)request.getAttribute("liferay-ui:form-navigator:displayStyle");
+Object formModelBean = request.getAttribute("liferay-ui:form-navigator:formModelBean");
 String formName = GetterUtil.getString((String)request.getAttribute("liferay-ui:form-navigator:formName"));
 String htmlBottom = (String)request.getAttribute("liferay-ui:form-navigator:htmlBottom");
 String htmlTop = (String)request.getAttribute("liferay-ui:form-navigator:htmlTop");
+String id = (String)request.getAttribute("liferay-ui:form-navigator:id");
 String jspPath = (String)request.getAttribute("liferay-ui:form-navigator:jspPath");
 boolean showButtons = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:form-navigator:showButtons"));
 
@@ -35,22 +39,16 @@ if (Validator.isNull(backURL)) {
 	backURL = redirect;
 }
 
+PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
 if (Validator.isNull(backURL)) {
-	PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
 	backURL = portletURL.toString();
-}
-
-String[] allSections = new String[0];
-
-for (String[] categorySection : categorySections) {
-	allSections = ArrayUtil.append(allSections, categorySection);
 }
 
 String curSection = StringPool.BLANK;
 
-if (categorySections[0].length > 0) {
-	curSection = categorySections[0][0];
+if (categorySectionKeys[0].length > 0) {
+	curSection = categorySectionKeys[0][0];
 }
 
 String historyKey = ParamUtil.getString(request, "historyKey");
@@ -96,26 +94,23 @@ if (Validator.isNotNull(historyKey)) {
 					<%= Validator.isNotNull(htmlBottom) ? htmlBottom : StringPool.BLANK %>
 				</liferay-util:buffer>
 
-				<liferay-util:buffer var="formSectionsBuffer">
+				<%
+				String contentCssClass = "form-navigator-content";
 
-					<%
-					String contentCssClass = "form-navigator-content";
+				if (!displayStyle.equals("steps")) {
+					contentCssClass += " col-md-8";
+				}
+				%>
 
-					if (!displayStyle.equals("steps")) {
-						contentCssClass += " col-md-8 col-md-pull-4";
-					}
-					%>
-
-					<div class="<%= contentCssClass %>">
-						<%@ include file="/html/taglib/ui/form_navigator/sections.jspf" %>
-					</div>
-				</liferay-util:buffer>
+				<div class="<%= contentCssClass %>">
+					<%@ include file="/html/taglib/ui/form_navigator/sections.jspf" %>
+				</div>
 
 				<%
 				String listGroupCssClass = "form-navigator list-group nav";
 
 				if (!displayStyle.equals("steps")) {
-					listGroupCssClass += " col-md-4 col-md-push-8";
+					listGroupCssClass += " col-md-4";
 				}
 				%>
 
@@ -133,11 +128,12 @@ if (Validator.isNotNull(historyKey)) {
 
 					boolean error = false;
 
-					for (int i = 0; i < categoryNames.length; i++) {
-						String category = categoryNames[i];
-						String[] sections = categorySections[i];
+					for (int i = 0; i < categoryLabels.length; i++) {
+						String category = categoryLabels[i];
+						String[] sectionKeys = categorySectionKeys[i];
+						String[] sectionLabels = categorySectionLabels[i];
 
-						if (sections.length > 0) {
+						if (sectionKeys.length > 0) {
 					%>
 
 							<c:if test="<%= Validator.isNotNull(category) %>">
@@ -153,8 +149,11 @@ if (Validator.isNotNull(historyKey)) {
 
 							int step = 1;
 
-							for (String section : sections) {
-								String sectionId = namespace + _getSectionId(section);
+							for (int j = 0; j < sectionKeys.length; j++) {
+								String sectionKey = sectionKeys[j];
+								String sectionLabel = sectionLabels[j];
+
+								String sectionId = namespace + _getSectionId(sectionKey);
 
 								Boolean show = (Boolean)request.getAttribute(WebKeys.FORM_NAVIGATOR_SECTION_SHOW + sectionId);
 
@@ -167,10 +166,10 @@ if (Validator.isNotNull(historyKey)) {
 								if (sectionId.equals(namespace + errorSection)) {
 									cssClass += " section-error";
 
-									curSection = section;
+									curSection = sectionKey;
 								}
 
-								if (curSection.equals(section) || curSection.equals(sectionId)) {
+								if (curSection.equals(sectionKey) || curSection.equals(sectionId)) {
 									cssClass += " active";
 								}
 
@@ -187,12 +186,12 @@ if (Validator.isNotNull(historyKey)) {
 											<c:when test='<%= displayStyle.equals("steps") %>'>
 												<span class="number"><liferay-ui:message key="<%= String.valueOf(step) %>" /></span>
 
-												<span class="message"><liferay-ui:message key="<%= section %>" /></span>
+												<span class="message"><liferay-ui:message key="<%= sectionLabel %>" /></span>
 
 												<aui:icon cssClass="tab-icon" image="long-arrow-right" />
 											</c:when>
 											<c:otherwise>
-												<liferay-ui:message key="<%= section %>" />
+												<liferay-ui:message key="<%= sectionLabel %>" />
 											</c:otherwise>
 										</c:choose>
 
@@ -214,8 +213,6 @@ if (Validator.isNotNull(historyKey)) {
 						<%= formNavigatorBottom %>
 					</c:if>
 				</ul>
-
-				<%= formSectionsBuffer %>
 
 				<c:if test='<%= displayStyle.equals("steps") %>'>
 					<%= formNavigatorBottom %>
@@ -253,7 +250,7 @@ if (Validator.isNotNull(historyKey)) {
 
 									var scrollLeft = listNode.get('scrollLeft');
 
-									return (activeTabNode.getX() + scrollLeft) - listNode.getX();
+									return activeTabNode.getX() + scrollLeft - listNode.getX();
 								}
 							}
 						}
@@ -284,7 +281,7 @@ if (Validator.isNotNull(historyKey)) {
 					</c:if>
 
 					Liferay.fire('formNavigator:reveal' + sectionId);
-				};
+				}
 
 				function updateSectionError() {
 					var tabNode = tabview.get('selection').get('boundingBox');
@@ -317,7 +314,7 @@ if (Validator.isNotNull(historyKey)) {
 					var redirect = A.one('#<portlet:namespace />redirect');
 
 					if (redirect) {
-						var url = new A.Url(redirect.val() || location.href);
+						var url = new A.Url(redirect.val() || '<%= portletURL %>');
 
 						url.setAnchor(null);
 						url.setParameter('<portlet:namespace />historyKey', sectionId);
@@ -331,7 +328,7 @@ if (Validator.isNotNull(historyKey)) {
 				tabview.after(
 					'selectionChange',
 					function(event) {
-						var tab = event.newVal
+						var tab = event.newVal;
 
 						var boundingBox = tab.get('boundingBox');
 
@@ -398,12 +395,14 @@ if (Validator.isNotNull(historyKey)) {
 					String focusField = (String)request.getAttribute("liferay-ui:error:focusField");
 					%>
 
+					var focusField;
+
 					<c:choose>
 						<c:when test="<%= Validator.isNotNull(focusField) %>">
-							var focusField = formNode.one('#<portlet:namespace /><%= focusField %>');
+							focusField = formNode.one('#<portlet:namespace /><%= focusField %>');
 						</c:when>
 						<c:otherwise>
-							var focusField = formNode.one('.form-section.active input:not([type="hidden"]).field');
+							focusField = formNode.one('.form-section.active input:not([type="hidden"]).field');
 						</c:otherwise>
 					</c:choose>
 

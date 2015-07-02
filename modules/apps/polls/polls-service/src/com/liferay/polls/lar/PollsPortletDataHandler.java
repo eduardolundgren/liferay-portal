@@ -23,16 +23,16 @@ import com.liferay.polls.model.impl.PollsVoteImpl;
 import com.liferay.polls.service.PollsChoiceLocalServiceUtil;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
 import com.liferay.polls.service.PollsVoteLocalServiceUtil;
-import com.liferay.polls.service.permission.PollsPermission;
+import com.liferay.polls.service.permission.PollsResourcePermissionChecker;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.lar.BasePortletDataHandler;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
-import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portlet.exportimport.lar.BasePortletDataHandler;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataHandlerBoolean;
+import com.liferay.portlet.exportimport.lar.PortletDataHandlerControl;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
+import com.liferay.portlet.exportimport.xstream.XStreamAliasRegistryUtil;
 
 import java.util.List;
 
@@ -92,7 +92,8 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		portletDataContext.addPortletPermissions(PollsPermission.RESOURCE_NAME);
+		portletDataContext.addPortletPermissions(
+			PollsResourcePermissionChecker.RESOURCE_NAME);
 
 		Element rootElement = addExportDataRootElement(portletDataContext);
 
@@ -135,7 +136,7 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 		throws Exception {
 
 		portletDataContext.importPortletPermissions(
-			PollsPermission.RESOURCE_NAME);
+			PollsResourcePermissionChecker.RESOURCE_NAME);
 
 		Element questionsElement = portletDataContext.getImportDataGroupElement(
 			PollsQuestion.class);

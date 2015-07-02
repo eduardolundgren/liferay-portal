@@ -14,12 +14,24 @@
 
 package com.liferay.portlet.documentlibrary.webdav;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
 import com.liferay.portal.kernel.webdav.methods.Method;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +39,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 /**
  * <p>
@@ -40,7 +51,6 @@ import org.junit.runners.MethodSorters;
  *
  * @author Alexander Chow
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WebDAVOSXTest extends BaseWebDAVTestCase {
 
 	@ClassRule
@@ -50,25 +60,53 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 			new LiferayIntegrationTestRule(),
 			WebDAVEnvironmentConfigTestRule.INSTANCE);
 
-	@Test
-	public void testMSOffice0Setup() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		Class<?> clazz = getClass();
 
 		_testFileBytes = FileUtil.getBytes(clazz, _OFFICE_TEST_DOCX);
 		_testMetaBytes = FileUtil.getBytes(clazz, _OFFICE_TEST_META_DOCX);
 		_testDeltaBytes = FileUtil.getBytes(clazz, _OFFICE_TEST_DELTA_DOCX);
+
+		servicePut(_TEST_FILE_NAME, _testFileBytes, getLock(_TEST_FILE_NAME));
+	}
+
+	@Test
+	public void testGetFileWithEscapedCharactersInFileName() throws Exception {
+		FileEntry fileEntry = null;
+
+		try {
+			Group group = GroupLocalServiceUtil.getFriendlyURLGroup(
+				PortalUtil.getDefaultCompanyId(), getGroupFriendlyURL());
+
+			Folder folder = DLAppLocalServiceUtil.getFolder(
+				group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				getFolderName());
+
+			fileEntry = DLAppLocalServiceUtil.addFileEntry(
+				TestPropsValues.getUserId(), group.getGroupId(),
+				folder.getFolderId(), _TEST_FILE_NAME_ILLEGAL_CHARACTERS,
+				ContentTypes.APPLICATION_MSWORD,
+				_TEST_FILE_NAME_ILLEGAL_CHARACTERS, StringPool.BLANK,
+				StringPool.BLANK, _testFileBytes,
+				ServiceContextTestUtil.getServiceContext(group.getGroupId()));
+
+			String fileName = HttpUtil.encodeURL(
+				_TEST_FILE_NAME_ILLEGAL_CHARACTERS);
+
+			assertCode(HttpServletResponse.SC_OK, serviceGet(fileName));
+		}
+		finally {
+			if (fileEntry != null) {
+				DLAppLocalServiceUtil.deleteFileEntry(
+					fileEntry.getFileEntryId());
+			}
+		}
 	}
 
 	@Test
 	public void testMSOffice1Create() throws Exception {
 		Tuple tuple = null;
-
-		assertCode(
-			HttpServletResponse.SC_NOT_FOUND, servicePropFind(_TEST_FILE_NAME));
-		assertCode(
-			HttpServletResponse.SC_CREATED,
-			servicePut(
-				_TEST_FILE_NAME, _testFileBytes, getLock(_TEST_FILE_NAME)));
 
 		for (int i = 0; i < 3; i++) {
 			lock(HttpServletResponse.SC_OK, _TEST_FILE_NAME);
@@ -386,6 +424,9 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 
 	private static final String _TEST_FILE_NAME = "Test.docx";
 
+	private static final String _TEST_FILE_NAME_ILLEGAL_CHARACTERS =
+		"Test/0.docx";
+
 	private static final String _TEST_META_NAME = "._Test.docx";
 
 	private static final String _USER_AGENT =
@@ -395,6 +436,6 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 	private static byte[] _testFileBytes;
 	private static byte[] _testMetaBytes;
 
-	private Map<String, String> _lockMap = new HashMap<String, String>();
+	private final Map<String, String> _lockMap = new HashMap<>();
 
 }

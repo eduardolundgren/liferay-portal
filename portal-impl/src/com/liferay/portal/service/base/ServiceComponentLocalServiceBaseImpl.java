@@ -37,6 +37,7 @@ import com.liferay.portal.model.ServiceComponent;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ServiceComponentLocalService;
+import com.liferay.portal.service.persistence.ServiceComponentFinder;
 import com.liferay.portal.service.persistence.ServiceComponentPersistence;
 import com.liferay.portal.util.PortalUtil;
 
@@ -303,7 +304,7 @@ public abstract class ServiceComponentLocalServiceBaseImpl
 	 *
 	 * @return the service component local service
 	 */
-	public com.liferay.portal.service.ServiceComponentLocalService getServiceComponentLocalService() {
+	public ServiceComponentLocalService getServiceComponentLocalService() {
 		return serviceComponentLocalService;
 	}
 
@@ -313,7 +314,7 @@ public abstract class ServiceComponentLocalServiceBaseImpl
 	 * @param serviceComponentLocalService the service component local service
 	 */
 	public void setServiceComponentLocalService(
-		com.liferay.portal.service.ServiceComponentLocalService serviceComponentLocalService) {
+		ServiceComponentLocalService serviceComponentLocalService) {
 		this.serviceComponentLocalService = serviceComponentLocalService;
 	}
 
@@ -334,6 +335,25 @@ public abstract class ServiceComponentLocalServiceBaseImpl
 	public void setServiceComponentPersistence(
 		ServiceComponentPersistence serviceComponentPersistence) {
 		this.serviceComponentPersistence = serviceComponentPersistence;
+	}
+
+	/**
+	 * Returns the service component finder.
+	 *
+	 * @return the service component finder
+	 */
+	public ServiceComponentFinder getServiceComponentFinder() {
+		return serviceComponentFinder;
+	}
+
+	/**
+	 * Sets the service component finder.
+	 *
+	 * @param serviceComponentFinder the service component finder
+	 */
+	public void setServiceComponentFinder(
+		ServiceComponentFinder serviceComponentFinder) {
+		this.serviceComponentFinder = serviceComponentFinder;
 	}
 
 	/**
@@ -417,10 +437,12 @@ public abstract class ServiceComponentLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portal.service.ServiceComponentLocalService.class)
-	protected com.liferay.portal.service.ServiceComponentLocalService serviceComponentLocalService;
+	@BeanReference(type = ServiceComponentLocalService.class)
+	protected ServiceComponentLocalService serviceComponentLocalService;
 	@BeanReference(type = ServiceComponentPersistence.class)
 	protected ServiceComponentPersistence serviceComponentPersistence;
+	@BeanReference(type = ServiceComponentFinder.class)
+	protected ServiceComponentFinder serviceComponentFinder;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)

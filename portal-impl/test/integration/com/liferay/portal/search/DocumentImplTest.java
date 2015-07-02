@@ -27,21 +27,21 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.SearchContextTestUtil;
-import com.liferay.portal.util.test.UserTestUtil;
-import com.liferay.portlet.usersadmin.util.UserIndexer;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class DocumentImplTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_indexer = IndexerRegistryUtil.getIndexer(UserIndexer.class);
+		_indexer = IndexerRegistryUtil.getIndexer(User.class);
 
 		_indexerPostProcessor = new BaseIndexerPostProcessor() {
 
@@ -108,7 +108,7 @@ public class DocumentImplTest {
 				"user", StringPool.BLANK);
 
 			User user = UserTestUtil.addUser(
-				screenName, false, firstName, "Smith", null);
+				screenName, LocaleUtil.getDefault(), firstName, "Smith", null);
 
 			_indexer.reindex(user);
 		}
@@ -343,7 +343,7 @@ public class DocumentImplTest {
 	}
 
 	protected Double[] getDoubleArray(Document document) {
-		List<Double> list = new ArrayList<Double>();
+		List<Double> list = new ArrayList<>();
 
 		for (String value : document.getValues(_FIELD_DOUBLE_ARRAY)) {
 			list.add(Double.valueOf(value));
@@ -353,7 +353,7 @@ public class DocumentImplTest {
 	}
 
 	protected Float[] getFloatArray(Document document) {
-		List<Float> list = new ArrayList<Float>();
+		List<Float> list = new ArrayList<>();
 
 		for (String value : document.getValues(_FIELD_FLOAT_ARRAY)) {
 			list.add(Float.valueOf(value));
@@ -363,7 +363,7 @@ public class DocumentImplTest {
 	}
 
 	protected Integer[] getIntegerArray(Document document) {
-		List<Integer> list = new ArrayList<Integer>();
+		List<Integer> list = new ArrayList<>();
 
 		for (String value : document.getValues(_FIELD_INTEGER_ARRAY)) {
 			list.add(Integer.valueOf(value));
@@ -373,7 +373,7 @@ public class DocumentImplTest {
 	}
 
 	protected Long[] getLongArray(Document document) {
-		List<Long> list = new ArrayList<Long>();
+		List<Long> list = new ArrayList<>();
 
 		for (String value : document.getValues(_FIELD_LONG_ARRAY)) {
 			list.add(Long.valueOf(value));
@@ -513,21 +513,19 @@ public class DocumentImplTest {
 	private static final String[] _SCREEN_NAMES_ODD_MIXED =
 		new String[] {"firstuser", "fifthuser", "thirduser"};
 
-	private Map<String, Double[]> _doubleArrays =
-		new HashMap<String, Double[]>();
-	private Map<String, Double> _doubles = new HashMap<String, Double>();
-	private Map<String, Float[]> _floatArrays = new HashMap<String, Float[]>();
-	private Map<String, Float> _floats = new HashMap<String, Float>();
+	private final Map<String, Double[]> _doubleArrays = new HashMap<>();
+	private final Map<String, Double> _doubles = new HashMap<>();
+	private final Map<String, Float[]> _floatArrays = new HashMap<>();
+	private final Map<String, Float> _floats = new HashMap<>();
 
 	@DeleteAfterTestRun
 	private Group _group;
 
 	private Indexer _indexer;
 	private IndexerPostProcessor _indexerPostProcessor;
-	private Map<String, Integer[]> _integerArrays =
-		new HashMap<String, Integer[]>();
-	private Map<String, Integer> _integers = new HashMap<String, Integer>();
-	private Map<String, Long[]> _longArrays = new HashMap<String, Long[]>();
-	private Map<String, Long> _longs = new HashMap<String, Long>();
+	private final Map<String, Integer[]> _integerArrays = new HashMap<>();
+	private final Map<String, Integer> _integers = new HashMap<>();
+	private final Map<String, Long[]> _longArrays = new HashMap<>();
+	private final Map<String, Long> _longs = new HashMap<>();
 
 }

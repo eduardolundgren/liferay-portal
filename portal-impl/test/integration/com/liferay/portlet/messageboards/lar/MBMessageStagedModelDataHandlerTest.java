@@ -14,24 +14,38 @@
 
 package com.liferay.portlet.messageboards.lar;
 
+import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.lar.BaseWorkflowedStagedModelDataHandlerTestCase;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.lar.test.BaseWorkflowedStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.persistence.RepositoryUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.exportimport.lar.ExportImportClassedModelUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.portlet.messageboards.model.MBCategory;
+import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBMessageConstants;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
+import com.liferay.portlet.messageboards.service.MBCategoryServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.util.test.MBTestUtil;
 
@@ -65,9 +79,16 @@ public class MBMessageStagedModelDataHandlerTest
 		throws Exception {
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			new HashMap<String, List<StagedModel>>();
+			new HashMap<>();
 
-		MBCategory category = MBTestUtil.addCategory(group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		MBCategory category = MBCategoryServiceUtil.addCategory(
+			TestPropsValues.getUserId(),
+			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
+			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, MBCategory.class, category);
@@ -90,9 +111,18 @@ public class MBMessageStagedModelDataHandlerTest
 			MBTestUtil.getInputStreamOVPs(
 				"attachment.txt", getClass(), StringPool.BLANK);
 
-		MBMessage message = MBTestUtil.addMessageWithWorkflowAndAttachments(
-			group.getGroupId(), category.getCategoryId(), true,
-			objectValuePairs);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+
+		MBMessage message = MBMessageLocalServiceUtil.addMessage(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			group.getGroupId(), category.getCategoryId(), 0, 0,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			MBMessageConstants.DEFAULT_FORMAT, objectValuePairs, false, 0.0,
+			false, serviceContext);
 
 		MBMessageLocalServiceUtil.updateAnswer(message, true, false);
 
@@ -127,15 +157,68 @@ public class MBMessageStagedModelDataHandlerTest
 	protected List<StagedModel> addWorkflowedStagedModels(Group group)
 		throws Exception {
 
-		List<StagedModel> stagedModels = new ArrayList<StagedModel>();
+		List<StagedModel> stagedModels = new ArrayList<>();
 
-		stagedModels.add(
-			MBTestUtil.addMessageWithWorkflow(group.getGroupId(), true));
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
 
-		stagedModels.add(
-			MBTestUtil.addMessageWithWorkflow(group.getGroupId(), false));
+		MBMessage approvedMessage = MBTestUtil.addMessageWithWorkflow(
+			TestPropsValues.getUserId(), group.getGroupId(),
+			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), true,
+			serviceContext);
+
+		stagedModels.add(approvedMessage);
+
+		MBMessage pendingMessage = MBTestUtil.addMessageWithWorkflow(
+			TestPropsValues.getUserId(), group.getGroupId(),
+			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
+			serviceContext);
+
+		stagedModels.add(pendingMessage);
 
 		return stagedModels;
+	}
+
+	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		@SuppressWarnings("rawtypes")
+		StagedModelDataHandler stagedModelDataHandler =
+			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
+				ExportImportClassedModelUtil.getClassName(stagedModel));
+
+		stagedModelDataHandler.deleteStagedModel(stagedModel);
+
+		for (List<StagedModel> dependentStagedModels :
+				dependentStagedModelsMap.values()) {
+
+			for (StagedModel dependentStagedModel : dependentStagedModels) {
+				try {
+					stagedModelDataHandler =
+						StagedModelDataHandlerRegistryUtil.
+							getStagedModelDataHandler(
+								ExportImportClassedModelUtil.getClassName(
+									dependentStagedModel));
+
+					stagedModelDataHandler.deleteStagedModel(
+						dependentStagedModel);
+				}
+				catch (NoSuchModelException nsme) {
+					if (!(nsme instanceof NoSuchFileEntryException) &&
+						!(nsme instanceof NoSuchFolderException)) {
+
+						throw nsme;
+					}
+				}
+			}
+		}
 	}
 
 	@Override

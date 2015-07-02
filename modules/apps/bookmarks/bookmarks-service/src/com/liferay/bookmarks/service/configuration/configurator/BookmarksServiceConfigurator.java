@@ -14,7 +14,7 @@
 
 package com.liferay.bookmarks.service.configuration.configurator;
 
-import com.liferay.bookmarks.upgrade.BookmarksServicesUpgrade;
+import com.liferay.bookmarks.upgrade.BookmarksServiceUpgrade;
 import com.liferay.portal.service.configuration.ServiceComponentConfiguration;
 import com.liferay.portal.service.configuration.configurator.ServiceConfigurator;
 import com.liferay.portal.spring.extender.loader.ModuleResourceLoader;
@@ -29,9 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Miguel Pastor
  */
-@Component(
-	immediate = true, service = BookmarksServiceConfigurator.class
-)
+@Component(immediate = true, service = BookmarksServiceConfigurator.class)
 public class BookmarksServiceConfigurator {
 
 	@Activate
@@ -58,8 +56,8 @@ public class BookmarksServiceConfigurator {
 	}
 
 	@Reference(unbind = "-")
-	protected void setBookmarksServicesUpgrade(
-		BookmarksServicesUpgrade bookmarksServicesUpgrade) {
+	protected void setBookmarksServiceUpgrade(
+		BookmarksServiceUpgrade bookmarksServiceUpgrade) {
 	}
 
 	@Reference(unbind = "-")

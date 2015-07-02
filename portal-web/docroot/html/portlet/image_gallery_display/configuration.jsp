@@ -17,14 +17,10 @@
 <%@ include file="/html/portlet/image_gallery_display/init.jsp" %>
 
 <%
-dlPortletInstanceSettings = DLPortletInstanceSettings.getInstance(layout, portletId, request.getParameterMap());
-
-IGConfigurationDisplayContext igConfigurationDisplayContext = new IGConfigurationDisplayContext(request, dlPortletInstanceSettings);
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(igRequestHelper);
 %>
 
-<liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL">
-	<liferay-portlet:param name="settingsScope" value="portletInstance" />
-</liferay-portlet:actionURL>
+<liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
 
 <liferay-portlet:renderURL portletConfiguration="<%= true %>" var="configurationRenderURL" />
 
@@ -50,23 +46,18 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = new IGConfiguratio
 				<aui:field-wrapper label="show-media-type">
 					<liferay-ui:input-move-boxes
 						leftBoxName="currentMimeTypes"
-						leftList="<%= igConfigurationDisplayContext.getCurrentMimeTypes() %>"
+						leftList="<%= dlPortletInstanceSettingsHelper.getCurrentMimeTypes() %>"
 						leftReorder="true"
 						leftTitle="current"
 						rightBoxName="availableMimeTypes"
-						rightList="<%= igConfigurationDisplayContext.getAvailableMimeTypes() %>"
+						rightList="<%= dlPortletInstanceSettingsHelper.getAvailableMimeTypes() %>"
 						rightTitle="available"
 					/>
 				</aui:field-wrapper>
 
 				<div class="display-template">
-
-					<%
-					TemplateHandler templateHandler = TemplateHandlerRegistryUtil.getTemplateHandler(FileEntry.class.getName());
-					%>
-
 					<liferay-ui:ddm-template-selector
-						classNameId="<%= PortalUtil.getClassNameId(templateHandler.getClassName()) %>"
+						className="<%= FileEntry.class.getName() %>"
 						displayStyle="<%= displayStyle %>"
 						displayStyleGroupId="<%= displayStyleGroupId %>"
 						refreshURL="<%= configurationRenderURL %>"
@@ -78,14 +69,14 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = new IGConfiguratio
 
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="imageGalleryDisplayFoldersListingPanel" persistState="<%= true %>" title="folders-listing">
 			<aui:fieldset>
-				<aui:field-wrapper label="root-folder">
+				<aui:field-wrapper>
 					<div class="form-group">
 						<aui:input label="root-folder" name="rootFolderName" type="resource" value="<%= rootFolderName %>" />
 
 						<aui:button name="openFolderSelectorButton" value="select" />
 
 						<%
-						String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('rootFolderId', 'rootFolderName', '" + renderResponse.getNamespace() + "');";
+						String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + renderResponse.getNamespace() + "');";
 						%>
 
 						<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />

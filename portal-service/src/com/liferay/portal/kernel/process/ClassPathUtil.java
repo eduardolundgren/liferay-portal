@@ -53,7 +53,7 @@ import javax.servlet.ServletException;
 public class ClassPathUtil {
 
 	public static Set<URL> getClassPathURLs(ClassLoader classLoader) {
-		Set<URL> urls = new LinkedHashSet<URL>();
+		Set<URL> urls = new LinkedHashSet<>();
 
 		while (classLoader != null) {
 			if (classLoader instanceof URLClassLoader) {
@@ -73,7 +73,7 @@ public class ClassPathUtil {
 
 		String[] paths = StringUtil.split(classPath, File.pathSeparatorChar);
 
-		Set<URL> urls = new LinkedHashSet<URL>();
+		Set<URL> urls = new LinkedHashSet<>();
 
 		for (String path : paths) {
 			File file = new File(path);
@@ -303,7 +303,7 @@ public class ClassPathUtil {
 		return sb.toString();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ClassPathUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(ClassPathUtil.class);
 
 	private static String _globalClassPath;
 	private static String _portalClassPath;

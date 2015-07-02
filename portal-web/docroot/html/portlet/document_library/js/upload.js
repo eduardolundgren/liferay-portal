@@ -2,9 +2,9 @@ AUI.add(
 	'document-library-upload',
 	function(A) {
 		var AArray = A.Array;
+		var HistoryManager = Liferay.HistoryManager;
 		var Lang = A.Lang;
 		var LString = Lang.String;
-		var HistoryManager = Liferay.HistoryManager;
 		var UploaderQueue = A.Uploader.Queue;
 
 		var isNumber = Lang.isNumber;
@@ -12,17 +12,29 @@ AUI.add(
 
 		var sub = Lang.sub;
 
-		var DOC = A.config.doc;
-
 		var CSS_ACTIVE_AREA = 'active-area';
 
 		var CSS_APP_VIEW_ENTRY = 'app-view-entry-taglib';
 
+		var CSS_DISPLAY_DESCRIPTIVE = 'display-descriptive';
+
+		var CSS_DISPLAY_ICON = 'display-icon';
+
+		var CSS_DOCUMENT_ENTRIES_PAGINATION = 'document-entries-pagination';
+
+		var CSS_ENTRIES_EMPTY = 'entries-empty';
+
 		var CSS_ENTRY_DISPLAY_STYLE = 'entry-display-style';
+
+		var CSS_ENTRY_LINK = 'entry-link';
 
 		var CSS_ENTRY_SELECTOR = 'entry-selector';
 
+		var CSS_ENTRY_TITLE_TEXT = 'entry-title-text';
+
 		var CSS_ICON = 'icon';
+
+		var CSS_SEARCHCONTAINER = 'searchcontainer';
 
 		var CSS_TAGLIB_ICON = 'taglib-icon';
 
@@ -33,6 +45,8 @@ AUI.add(
 		var CSS_UPLOAD_SUCCESS = 'upload-success';
 
 		var CSS_UPLOAD_WARNING = 'upload-warning';
+
+		var DOC = A.config.doc;
 
 		var ERROR_RESULTS_MIXED = 1;
 
@@ -46,37 +60,37 @@ AUI.add(
 
 		var REGEX_VIDEO = /\.(avi|flv|mpe|mpg|mpeg|mov|m4v|ogg|wmv)$/i;
 
-		var STR_DOT = '.';
-
 		var SELECTOR_DATA_FOLDER = '[data-folder="true"]';
 
 		var SELECTOR_DATA_FOLDER_DATA_TITLE = '[data-folder="true"][data-title]';
 
-		var SELECTOR_DISPLAY_DESCRIPTIVE = '.display-descriptive';
+		var STR_DOT = '.';
 
-		var SELECTOR_DISPLAY_ICON = '.display-icon';
+		var SELECTOR_DISPLAY_DESCRIPTIVE = STR_DOT + CSS_DISPLAY_DESCRIPTIVE;
 
-		var SELECTOR_DOCUMENT_ENTRIES_PAGINATION = '.document-entries-pagination';
+		var SELECTOR_DISPLAY_ICON = STR_DOT + CSS_DISPLAY_ICON;
 
-		var SELECTOR_ENTRIES_EMPTY = '.entries-empty';
+		var SELECTOR_DOCUMENT_ENTRIES_PAGINATION = STR_DOT + CSS_DOCUMENT_ENTRIES_PAGINATION;
+
+		var SELECTOR_ENTRIES_EMPTY = STR_DOT + CSS_ENTRIES_EMPTY;
 
 		var SELECTOR_ENTRY_DISPLAY_STYLE = STR_DOT + CSS_ENTRY_DISPLAY_STYLE;
 
-		var SELECTOR_ENTRY_LINK = '.entry-link';
+		var SELECTOR_ENTRY_LINK = STR_DOT + CSS_ENTRY_LINK;
 
 		var SELECTOR_ENTRY_SELECTOR = STR_DOT + CSS_ENTRY_SELECTOR;
 
-		var SELECTOR_ENTRY_TITLE_TEXT = '.entry-title-text';
+		var SELECTOR_ENTRY_TITLE_TEXT = STR_DOT + CSS_ENTRY_TITLE_TEXT;
 
 		var SELECTOR_IMAGE_ICON = 'img.icon';
 
-		var SELECTOR_SEARCH_CONTAINER = '.searchcontainer';
+		var SELECTOR_SEARCH_CONTAINER = STR_DOT + CSS_SEARCHCONTAINER;
 
 		var SELECTOR_TAGLIB_ICON = STR_DOT + CSS_TAGLIB_ICON;
 
-		var STR_BOUNDING_BOX = 'boundingBox';
-
 		var STR_BLANK = '';
+
+		var STR_BOUNDING_BOX = 'boundingBox';
 
 		var STR_CONTENT_BOX = 'contentBox';
 
@@ -115,15 +129,17 @@ AUI.add(
 		var STR_THUMBNAIL_PATH = PATH_THEME_IMAGES + '/file_system/large/';
 
 		var TPL_ENTRY_ROW_TITLE = '<span class="' + CSS_APP_VIEW_ENTRY + STR_SPACE + CSS_ENTRY_DISPLAY_STYLE + '">' +
-			'<a class="' + CSS_TAGLIB_ICON + '">' +
-				'<img alt="" class="' + CSS_ICON + '" src="' + PATH_THEME_IMAGES + '/file_system/small/page.png" />' +
-				'<span class="' + CSS_TAGLIB_TEXT + '">{0}</span>' +
-			'</a>' +
-		'</span>';
+				'<a class="' + CSS_TAGLIB_ICON + '">' +
+					'<img alt="" class="' + CSS_ICON + '" src="' + PATH_THEME_IMAGES + '/file_system/small/page.png" />' +
+					'<span class="' + CSS_TAGLIB_TEXT + '">{0}</span>' +
+				'</a>' +
+			'</span>';
 
 		var TPL_ERROR_FOLDER = new A.Template(
 			'<span class="lfr-status-success-label">{validFilesLength}</span>',
+
 			'<span class="lfr-status-error-label">{invalidFilesLength}</span>',
+
 			'<ul class="list-unstyled">',
 				'<tpl for="invalidFiles">',
 					'<li><b>{name}</b>: {errorMessage}</li>',
@@ -131,7 +147,7 @@ AUI.add(
 			'</ul>'
 		);
 
-		var TPL_HIDDEN_CHECK_BOX =  '<input class="hide ' + CSS_ENTRY_SELECTOR + '" name="{0}" type="checkbox" value="">';
+		var TPL_HIDDEN_CHECK_BOX = '<input class="hide ' + CSS_ENTRY_SELECTOR + '" name="{0}" type="checkbox" value="">';
 
 		var TPL_IMAGE_THUMBNAIL = themeDisplay.getPathContext() + '/documents/{0}/{1}/{2}';
 
@@ -156,7 +172,7 @@ AUI.add(
 
 							return val;
 						},
-						validator: Lang.isArray,
+						validator: Array.isArray,
 						value: []
 					},
 
@@ -193,7 +209,7 @@ AUI.add(
 
 					maxFileSize: {
 						validator: function(val) {
-							return (isNumber(val) && (val > 0));
+							return isNumber(val) && val > 0;
 						},
 						value: 0
 					},
@@ -284,8 +300,7 @@ AUI.add(
 
 						var queue = instance._getUploader().queue;
 
-						AArray.each(
-							files,
+						files.forEach(
 							function(item, index) {
 								queue.addToQueueBottom(item);
 							}
@@ -297,8 +312,8 @@ AUI.add(
 
 						var handles = instance._handles;
 
-						var uploader = instance._getUploader();
 						var displayStyle = instance._getDisplayStyle();
+						var uploader = instance._getUploader();
 
 						if (data.folder) {
 							handles.push(
@@ -354,7 +369,7 @@ AUI.add(
 								if (dataTransfer && dataTransfer.types) {
 									var dataTransferTypes = dataTransfer.types || [];
 
-									if ((AArray.indexOf(dataTransferTypes, 'Files') > -1) && (AArray.indexOf(dataTransferTypes, 'text/html') === -1)) {
+									if (AArray.indexOf(dataTransferTypes, 'Files') > -1 && AArray.indexOf(dataTransferTypes, 'text/html') === -1) {
 										event.halt();
 
 										dataTransfer.dropEffect = 'copy';
@@ -363,7 +378,7 @@ AUI.add(
 
 										var target = event.target;
 
-										docElement.toggleClass('upload-drop-active', (target.compareTo(entriesContainer) || entriesContainer.contains(target)));
+										docElement.toggleClass('upload-drop-active', target.compareTo(entriesContainer) || entriesContainer.contains(target));
 
 										removeCssClassTask();
 									}
@@ -379,13 +394,12 @@ AUI.add(
 								if (dataTransfer) {
 									var dataTransferTypes = dataTransfer.types || [];
 
-									if ((AArray.indexOf(dataTransferTypes, 'Files') > -1) && (AArray.indexOf(dataTransferTypes, 'text/html') === -1)) {
+									if (AArray.indexOf(dataTransferTypes, 'Files') > -1 && AArray.indexOf(dataTransferTypes, 'text/html') === -1) {
 										event.halt();
 
 										var dragDropFiles = AArray(dataTransfer.files);
 
-										event.fileList = AArray.map(
-											dragDropFiles,
+										event.fileList = dragDropFiles.map(
 											function(item, index) {
 												return new A.FileHTML5(item);
 											}
@@ -407,10 +421,10 @@ AUI.add(
 
 								var dataTransferTypes = dataTransfer.types;
 
-								if ((AArray.indexOf(dataTransferTypes, 'Files') > -1) && (AArray.indexOf(dataTransferTypes, 'text/html') === -1)) {
+								if (AArray.indexOf(dataTransferTypes, 'Files') > -1 && AArray.indexOf(dataTransferTypes, 'text/html') === -1) {
 									var parentElement = event.target.ancestor(SELECTOR_ENTRY_DISPLAY_STYLE);
 
-									parentElement.toggleClass(CSS_ACTIVE_AREA, (event.type == 'dragover'));
+									parentElement.toggleClass(CSS_ACTIVE_AREA, event.type == 'dragover');
 								}
 							},
 							SELECTOR_DATA_FOLDER
@@ -436,8 +450,7 @@ AUI.add(
 					_combineFileLists: function(fileList, queuedFiles) {
 						var instance = this;
 
-						AArray.each(
-							queuedFiles,
+						queuedFiles.forEach(
 							function(item, index) {
 								fileList.push(item);
 							}
@@ -509,8 +522,7 @@ AUI.add(
 
 						var searchContainer = Liferay.SearchContainer.get(searchContainerNode.attr('id'));
 
-						var columnValues = AArray.map(
-							instance._columnNames,
+						var columnValues = instance._columnNames.map(
 							function(item, index) {
 								var value = STR_BLANK;
 
@@ -609,8 +621,7 @@ AUI.add(
 						var fileList = currentUploadData.fileList;
 
 						if (!currentUploadData.folder) {
-							AArray.each(
-								fileList,
+							fileList.forEach(
 								function(item, index) {
 									item.overlay.destroy();
 
@@ -671,14 +682,8 @@ AUI.add(
 						if (!tooltipDelegate) {
 							tooltipDelegate = new A.TooltipDelegate(
 								{
-									formatter: function() {
-										var tooltip = this;
-
-										tooltip.set('zIndex', 2);
-
-										var node = tooltip.get('trigger');
-
-										return node.attr('data-message');
+									formatter: function(val) {
+										return instance._formatTooltip(val, this);
 									},
 									trigger: '.app-view-entry.upload-error',
 									visible: false
@@ -715,6 +720,16 @@ AUI.add(
 						}
 					},
 
+					_formatTooltip: function(val, tooltip) {
+						var instance = this;
+
+						tooltip.set('zIndex', 2);
+
+						var node = tooltip.get('trigger');
+
+						return node.attr('data-message');
+					},
+
 					_getCurrentUploadData: function() {
 						var instance = this;
 
@@ -745,7 +760,7 @@ AUI.add(
 						var displayStyle = HistoryManager.get(displayStyleNamespace) || instance._displayStyle;
 
 						if (style) {
-							displayStyle = (style == displayStyle);
+							displayStyle = style == displayStyle;
 						}
 
 						return displayStyle;
@@ -859,7 +874,7 @@ AUI.add(
 
 						var dataFolder = folderEntry && folderEntry.one('[data-folder-id]');
 
-						return (dataFolder && Lang.toInt(dataFolder.attr('data-folder-id')) || instance.get(STR_FOLDER_ID));
+						return dataFolder && Lang.toInt(dataFolder.attr('data-folder-id')) || instance.get(STR_FOLDER_ID);
 					},
 
 					_getUploader: function() {
@@ -919,9 +934,9 @@ AUI.add(
 						var message;
 
 						try {
-							responseData = A.JSON.parse(responseData);
+							responseData = JSON.parse(responseData);
 						}
-						catch (err) {
+						catch (e) {
 						}
 
 						if (Lang.isObject(responseData)) {
@@ -962,7 +977,7 @@ AUI.add(
 							instance._uploadURL = Liferay.Util.addParams(
 								{
 									redirect: redirect,
-									ts: Lang.now()
+									ts: Date.now()
 								},
 								uploadURL
 							);
@@ -983,7 +998,7 @@ AUI.add(
 
 						var queue = uploader && uploader.queue;
 
-						return !!(queue && ((queue.queuedFiles.length > 0) || (queue.numberOfUploads > 0) || !A.Object.isEmpty(queue.currentFiles)) && (queue._currentState == UploaderQueue.UPLOADING));
+						return !!queue && (queue.queuedFiles.length > 0 || queue.numberOfUploads > 0 || !A.Object.isEmpty(queue.currentFiles)) && queue._currentState == UploaderQueue.UPLOADING;
 					},
 
 					_onDataRequest: function(event) {
@@ -1033,7 +1048,7 @@ AUI.add(
 
 							var folderNode = null;
 
-							var folder = (key !== instance.get(STR_FOLDER_ID));
+							var folder = key !== instance.get(STR_FOLDER_ID);
 
 							if (folder) {
 								folderNode = instance._getFolderEntryNode(target);
@@ -1072,9 +1087,9 @@ AUI.add(
 								instance._displayEntryError(fileNode, response.message, displayStyle);
 							}
 							else {
-								var displayStyleList = (displayStyle == STR_LIST);
+								var displayStyleList = displayStyle == STR_LIST;
 
-								var fileEntryId = A.JSON.parse(event.data).fileEntryId;
+								var fileEntryId = JSON.parse(event.data).fileEntryId;
 
 								if (!displayStyleList) {
 									instance._updateThumbnail(fileNode, file.name);
@@ -1114,9 +1129,9 @@ AUI.add(
 
 						var invalidFilesLength = invalidFiles.length;
 
-						var hasErrors = (invalidFilesLength !== 0);
+						var hasErrors = invalidFilesLength !== 0;
 
-						if (hasErrors && (invalidFilesLength !== totalFilesLength)) {
+						if (hasErrors && invalidFilesLength !== totalFilesLength) {
 							hasErrors = ERROR_RESULTS_MIXED;
 						}
 
@@ -1243,7 +1258,7 @@ AUI.add(
 
 						var folderId = instance._getTargetFolderId(target);
 
-						var folder = (folderId !== instance.get(STR_FOLDER_ID));
+						var folder = folderId !== instance.get(STR_FOLDER_ID);
 
 						if (folder) {
 							var folderEntryNode = instance._getFolderEntryNode(target);
@@ -1264,8 +1279,7 @@ AUI.add(
 						else {
 							var displayStyle = instance._getDisplayStyle();
 
-							AArray.map(
-								filesPartition.matches,
+							filesPartition.matches.map(
 								function(file) {
 									var entryNode = instance._createEntryNode(file.name, file.size, displayStyle);
 
@@ -1273,8 +1287,7 @@ AUI.add(
 								}
 							);
 
-							AArray.map(
-								filesPartition.rejects,
+							filesPartition.rejects.map(
 								function(file) {
 									var entryNode = instance._createEntryNode(file.name, file.size, displayStyle);
 
@@ -1308,7 +1321,7 @@ AUI.add(
 
 								var strings = instance._strings;
 
-								if ((maxFileSize !== 0) && (size > maxFileSize)) {
+								if (maxFileSize !== 0 && size > maxFileSize) {
 									errorMessage = sub(strings.invalidFileSize, [instance.formatStorage(instance._maxFileSize)]);
 								}
 								else if (size === 0) {

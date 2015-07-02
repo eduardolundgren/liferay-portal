@@ -16,14 +16,7 @@ package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataException;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Element;
@@ -37,6 +30,12 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUt
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataException;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +51,13 @@ public class DLFileEntryTypeStagedModelDataHandler
 		{DLFileEntryType.class.getName()};
 
 	@Override
+	public void deleteStagedModel(DLFileEntryType fileEntryType)
+		throws PortalException {
+
+		DLFileEntryTypeLocalServiceUtil.deleteFileEntryType(fileEntryType);
+	}
+
+	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
@@ -60,26 +66,8 @@ public class DLFileEntryTypeStagedModelDataHandler
 			uuid, groupId);
 
 		if (dlFileEntryType != null) {
-			DLFileEntryTypeLocalServiceUtil.deleteFileEntryType(
-				dlFileEntryType);
+			deleteStagedModel(dlFileEntryType);
 		}
-	}
-
-	@Override
-	public DLFileEntryType fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<DLFileEntryType> fileEntryTypes =
-			DLFileEntryTypeLocalServiceUtil.
-				getDLFileEntryTypesByUuidAndCompanyId(
-					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					new StagedModelModifiedDateComparator<DLFileEntryType>());
-
-		if (ListUtil.isEmpty(fileEntryTypes)) {
-			return null;
-		}
-
-		return fileEntryTypes.get(0);
 	}
 
 	@Override
@@ -91,6 +79,16 @@ public class DLFileEntryTypeStagedModelDataHandler
 	}
 
 	@Override
+	public List<DLFileEntryType> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return DLFileEntryTypeLocalServiceUtil.
+			getDLFileEntryTypesByUuidAndCompanyId(
+				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new StagedModelModifiedDateComparator<DLFileEntryType>());
+	}
+
+	@Override
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -99,7 +97,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 	public Map<String, String> getReferenceAttributes(
 		PortletDataContext portletDataContext, DLFileEntryType fileEntryType) {
 
-		Map<String, String> referenceAttributes = new HashMap<String, String>();
+		Map<String, String> referenceAttributes = new HashMap<>();
 
 		referenceAttributes.put(
 			"file-entry-type-key", fileEntryType.getFileEntryTypeKey());
@@ -140,10 +138,10 @@ public class DLFileEntryTypeStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long liveGroupId = GetterUtil.getLong(
-			referenceElement.attributeValue("live-group-id"));
+		long groupId = GetterUtil.getLong(
+			referenceElement.attributeValue("group-id"));
 
-		liveGroupId = MapUtil.getLong(groupIds, liveGroupId);
+		groupId = MapUtil.getLong(groupIds, groupId);
 
 		String fileEntryTypeKey = referenceElement.attributeValue(
 			"file-entry-type-key");
@@ -153,7 +151,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 		DLFileEntryType existingFileEntryType = null;
 
 		existingFileEntryType = fetchExistingFileEntryType(
-			uuid, liveGroupId, fileEntryTypeKey, preloaded);
+			uuid, groupId, fileEntryTypeKey, preloaded);
 
 		Map<Long, Long> fileEntryTypeIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -178,10 +176,10 @@ public class DLFileEntryTypeStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long liveGroupId = GetterUtil.getLong(
-			referenceElement.attributeValue("live-group-id"));
+		long groupId = GetterUtil.getLong(
+			referenceElement.attributeValue("group-id"));
 
-		liveGroupId = MapUtil.getLong(groupIds, liveGroupId);
+		groupId = MapUtil.getLong(groupIds, groupId);
 
 		String fileEntryTypeKey = referenceElement.attributeValue(
 			"file-entry-type-key");
@@ -189,7 +187,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 			referenceElement.attributeValue("preloaded"));
 
 		DLFileEntryType existingFileEntryType = fetchExistingFileEntryType(
-			uuid, liveGroupId, fileEntryTypeKey, preloaded);
+			uuid, groupId, fileEntryTypeKey, preloaded);
 
 		if (existingFileEntryType == null) {
 			return false;

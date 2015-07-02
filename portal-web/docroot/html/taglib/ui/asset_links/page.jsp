@@ -68,9 +68,8 @@ if (assetEntryId > 0) {
 				if (assetRenderer.hasViewPermission(permissionChecker)) {
 					String asseLinktEntryTitle = assetLinkEntry.getTitle(locale);
 
-					LiferayPortletURL assetPublisherURL = new PortletURLImpl(request, PortletKeys.ASSET_PUBLISHER, plid, PortletRequest.RENDER_PHASE);
+					PortletURL assetPublisherURL = PortletProviderUtil.getPortletURL(request, assetRenderer.getClassName(), PortletProvider.Action.VIEW);
 
-					assetPublisherURL.setParameter("struts_action", "/asset_publisher/view_content");
 					assetPublisherURL.setParameter("redirect", currentURL);
 					assetPublisherURL.setParameter("assetEntryId", String.valueOf(assetLinkEntry.getEntryId()));
 					assetPublisherURL.setParameter("type", assetRendererFactory.getType());
@@ -83,12 +82,7 @@ if (assetEntryId > 0) {
 						assetPublisherURL.setParameter("urlTitle", assetRenderer.getUrlTitle());
 					}
 
-					if (themeDisplay.isStatePopUp()) {
-						assetPublisherURL.setWindowState(LiferayWindowState.POP_UP);
-					}
-					else {
-						assetPublisherURL.setWindowState(WindowState.MAXIMIZED);
-					}
+					assetPublisherURL.setWindowState(WindowState.MAXIMIZED);
 
 					String viewFullContentURLString = assetPublisherURL.toString();
 
@@ -97,6 +91,14 @@ if (assetEntryId > 0) {
 					String urlViewInContext = assetRenderer.getURLViewInContext((LiferayPortletRequest)portletRequest, (LiferayPortletResponse)portletResponse, viewFullContentURLString);
 
 					urlViewInContext = HttpUtil.setParameter(urlViewInContext, "inheritRedirect", true);
+
+					String method = null;
+					String target = "_self";
+
+					if (themeDisplay.isStatePopUp()) {
+						method = "get";
+						target = "_blank";
+					}
 			%>
 
 					<li class="asset-links-list-item">
@@ -104,6 +106,8 @@ if (assetEntryId > 0) {
 							iconCssClass="<%= assetRenderer.getIconCssClass() %>"
 							label="<%= true %>"
 							message="<%= asseLinktEntryTitle %>"
+							method="<%= method %>"
+							target="<%= target %>"
 							url="<%= urlViewInContext %>"
 						/>
 					</li>

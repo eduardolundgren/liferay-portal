@@ -16,6 +16,7 @@ package com.liferay.portlet.asset.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -39,10 +40,36 @@ import java.util.Date;
 @ProviderType
 public class AssetTagCacheModel implements CacheModel<AssetTag>, Externalizable {
 	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(19);
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
 
-		sb.append("{tagId=");
+		if (!(obj instanceof AssetTagCacheModel)) {
+			return false;
+		}
+
+		AssetTagCacheModel assetTagCacheModel = (AssetTagCacheModel)obj;
+
+		if (tagId == assetTagCacheModel.tagId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, tagId);
+	}
+
+	@Override
+	public String toString() {
+		StringBundler sb = new StringBundler(21);
+
+		sb.append("{uuid=");
+		sb.append(uuid);
+		sb.append(", tagId=");
 		sb.append(tagId);
 		sb.append(", groupId=");
 		sb.append(groupId);
@@ -68,6 +95,13 @@ public class AssetTagCacheModel implements CacheModel<AssetTag>, Externalizable 
 	@Override
 	public AssetTag toEntityModel() {
 		AssetTagImpl assetTagImpl = new AssetTagImpl();
+
+		if (uuid == null) {
+			assetTagImpl.setUuid(StringPool.BLANK);
+		}
+		else {
+			assetTagImpl.setUuid(uuid);
+		}
 
 		assetTagImpl.setTagId(tagId);
 		assetTagImpl.setGroupId(groupId);
@@ -111,6 +145,7 @@ public class AssetTagCacheModel implements CacheModel<AssetTag>, Externalizable 
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
+		uuid = objectInput.readUTF();
 		tagId = objectInput.readLong();
 		groupId = objectInput.readLong();
 		companyId = objectInput.readLong();
@@ -125,6 +160,13 @@ public class AssetTagCacheModel implements CacheModel<AssetTag>, Externalizable 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
+		if (uuid == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(uuid);
+		}
+
 		objectOutput.writeLong(tagId);
 		objectOutput.writeLong(groupId);
 		objectOutput.writeLong(companyId);
@@ -150,6 +192,7 @@ public class AssetTagCacheModel implements CacheModel<AssetTag>, Externalizable 
 		objectOutput.writeInt(assetCount);
 	}
 
+	public String uuid;
 	public long tagId;
 	public long groupId;
 	public long companyId;

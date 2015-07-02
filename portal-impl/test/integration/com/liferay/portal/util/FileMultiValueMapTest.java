@@ -14,9 +14,9 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -36,7 +36,7 @@ public class FileMultiValueMapTest extends MultiValueMapTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		multiValueMap = new FileMultiValueMap<Integer, String>();
+		multiValueMap = new FileMultiValueMap<>();
 	}
 
 }

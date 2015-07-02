@@ -56,7 +56,7 @@ public class ClassUtil {
 	public static Set<String> getClasses(Reader reader, String className)
 		throws IOException {
 
-		Set<String> classes = new HashSet<String>();
+		Set<String> classes = new HashSet<>();
 
 		StreamTokenizer st = new StreamTokenizer(reader);
 
@@ -259,26 +259,22 @@ public class ClassUtil {
 
 		s = s.trim();
 
-		List<String> tokens = new ArrayList<String>();
+		List<String> tokens = new ArrayList<>();
 
 		Matcher annotationNameMatcher = _ANNOTATION_NAME_REGEXP.matcher(s);
 		Matcher annotationParametersMatcher =
 			_ANNOTATION_PARAMETERS_REGEXP.matcher(s);
 
 		if (annotationNameMatcher.matches()) {
-			String annotationName = annotationNameMatcher.group();
-
-			tokens.add(annotationName.replace("@", ""));
+			tokens.add(annotationNameMatcher.group(1));
 		}
 		else if (annotationParametersMatcher.matches()) {
-			String annotationName = annotationParametersMatcher.group(1);
-
-			tokens.add(annotationName);
+			tokens.add(annotationParametersMatcher.group(1));
 
 			String annotationParameters = null;
 
 			if (s.trim().endsWith(")")) {
-				annotationParameters = annotationParametersMatcher.group(2);
+				annotationParameters = annotationParametersMatcher.group(3);
 			}
 			else {
 				StringBundler sb = new StringBundler();
@@ -367,13 +363,14 @@ public class ClassUtil {
 	}
 
 	private static final Pattern _ANNOTATION_NAME_REGEXP = Pattern.compile(
-		"@(\\w+)$");
+		"@(\\w+)\\.?(\\w*)$");
 
 	private static final Pattern _ANNOTATION_PARAMETERS_REGEXP =
-		Pattern.compile("@(\\w+)\\({0,1}\\{{0,1}([^)}]+)\\}{0,1}\\){0,1}");
+		Pattern.compile(
+			"@(\\w+)\\.?(\\w*)\\({0,1}\\{{0,1}([^)}]+)\\}{0,1}\\){0,1}");
 
 	private static final String _CLASS_EXTENSION = ".class";
 
-	private static Log _log = LogFactoryUtil.getLog(ClassUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(ClassUtil.class);
 
 }

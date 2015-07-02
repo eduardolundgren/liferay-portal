@@ -16,6 +16,7 @@ package com.liferay.portal.events;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.events.ActionException;
+import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -26,6 +27,7 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.DefaultLayoutPrototypesUtil;
 import com.liferay.portal.util.PortletKeys;
 
 import java.util.HashMap;
@@ -36,8 +38,7 @@ import java.util.Map;
 /**
  * @author Sergio González
  */
-public class AddDefaultLayoutSetPrototypesAction
-	extends BaseDefaultLayoutPrototypesAction {
+public class AddDefaultLayoutSetPrototypesAction extends SimpleAction {
 
 	@Override
 	public void run(String[] ids) throws ActionException {
@@ -69,12 +70,10 @@ public class AddDefaultLayoutSetPrototypesAction
 			}
 		}
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			nameMap.put(locale, LanguageUtil.get(locale, nameKey));
 			descriptionMap.put(
 				locale, LanguageUtil.get(locale, descriptionKey));
@@ -113,71 +112,23 @@ public class AddDefaultLayoutSetPrototypesAction
 
 		// Home layout
 
-		Layout layout = addLayout(layoutSet, "home", "/home", "2_columns_i");
-
-		String portletId = addPortletId(layout, PortletKeys.SEARCH, "column-2");
-
-		Map<String, String> preferences = new HashMap<String, String>();
-
-		preferences.put("portletSetupShowBorders", Boolean.FALSE.toString());
-
-		updatePortletSetup(layout, portletId, preferences);
-
-		portletId = addPortletId(layout, PortletKeys.LANGUAGE, "column-2");
-
-		preferences = new HashMap<String, String>();
-
-		preferences.put("displayStyle", "3");
-
-		updatePortletSetup(layout, portletId, preferences);
-
-		portletId = addPortletId(
-			layout, PortletKeys.ASSET_PUBLISHER, "column-2");
-
-		preferences = new HashMap<String, String>();
-
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			preferences.put(
-				"portletSetupTitle_" + locale,
-				LanguageUtil.get(locale, "recent-content"));
-		}
-
-		preferences.put("portletSetupUseCustomTitle", Boolean.TRUE.toString());
-
-		updatePortletSetup(layout, portletId, preferences);
+		DefaultLayoutPrototypesUtil.addLayout(
+			layoutSet, "home", "/home", "2_columns_i");
 
 		// Documents layout
 
-		layout = addLayout(
+		Layout layout = DefaultLayoutPrototypesUtil.addLayout(
 			layoutSet, "documents-and-media", "/documents", "1_column");
 
-		portletId = addPortletId(
+		String portletId = DefaultLayoutPrototypesUtil.addPortletId(
 			layout, PortletKeys.DOCUMENT_LIBRARY, "column-1");
 
-		preferences = new HashMap<String, String>();
+		Map<String, String> preferences = new HashMap<>();
 
 		preferences.put("portletSetupShowBorders", Boolean.FALSE.toString());
 
-		updatePortletSetup(layout, portletId, preferences);
-
-		portletId = addPortletId(
-			layout, PortletKeys.ASSET_PUBLISHER, "column-2");
-
-		preferences = new HashMap<String, String>();
-
-		preferences.put("anyAssetType", Boolean.FALSE.toString());
-
-		for (Locale locale : locales) {
-			preferences.put(
-				"portletSetupTitle_" + locale,
-				LanguageUtil.get(locale, "upcoming-events"));
-		}
-
-		preferences.put("portletSetupUseCustomTitle", Boolean.TRUE.toString());
-
-		updatePortletSetup(layout, portletId, preferences);
+		DefaultLayoutPrototypesUtil.updatePortletSetup(
+			layout, portletId, preferences);
 	}
 
 	protected void addPublicSite(
@@ -197,47 +148,19 @@ public class AddDefaultLayoutSetPrototypesAction
 
 		// Home layout
 
-		Layout layout = addLayout(layoutSet, "home", "/home", "2_columns_iii");
+		Layout layout = DefaultLayoutPrototypesUtil.addLayout(
+			layoutSet, "home", "/home", "2_columns_iii");
 
-		addPortletId(layout, PortletKeys.MESSAGE_BOARDS, "column-1");
+		DefaultLayoutPrototypesUtil.addPortletId(
+			layout, PortletKeys.MESSAGE_BOARDS, "column-1");
 
-		String portletId = addPortletId(layout, PortletKeys.SEARCH, "column-2");
-
-		Map<String, String> preferences = new HashMap<String, String>();
-
-		preferences.put("portletSetupShowBorders", Boolean.FALSE.toString());
-
-		updatePortletSetup(layout, portletId, preferences);
-
-		addPortletId(layout, PortletKeys.USER_STATISTICS, "column-2");
-
-		portletId = addPortletId(
-			layout, PortletKeys.ASSET_PUBLISHER, "column-2");
-
-		preferences = new HashMap<String, String>();
-
-		preferences.put("anyAssetType", Boolean.FALSE.toString());
-
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			preferences.put(
-				"portletSetupTitle_" + locale,
-				LanguageUtil.get(locale, "upcoming-events"));
-		}
-
-		preferences.put("portletSetupUseCustomTitle", Boolean.TRUE.toString());
-
-		updatePortletSetup(layout, portletId, preferences);
+		DefaultLayoutPrototypesUtil.addPortletId(
+			layout, PortletKeys.USER_STATISTICS, "column-2");
 
 		// Wiki layout
 
-		layout = addLayout(layoutSet, "wiki", "/wiki", "2_columns_iii");
-
-		addPortletId(layout, PortletKeys.WIKI, "column-1");
-		addPortletId(
-			layout, PortletKeys.ASSET_CATEGORIES_NAVIGATION, "column-2");
-		addPortletId(layout, PortletKeys.TAGS_CLOUD, "column-2");
+		DefaultLayoutPrototypesUtil.addLayout(
+			layoutSet, "wiki", "/wiki", "2_columns_iii");
 	}
 
 	protected void doRun(long companyId) throws Exception {

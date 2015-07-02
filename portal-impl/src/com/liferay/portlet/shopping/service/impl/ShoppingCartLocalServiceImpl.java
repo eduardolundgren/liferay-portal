@@ -35,7 +35,6 @@ import com.liferay.portlet.shopping.service.base.ShoppingCartLocalServiceBaseImp
 import com.liferay.portlet.shopping.util.ShoppingUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -77,8 +76,7 @@ public class ShoppingCartLocalServiceImpl
 	public Map<ShoppingCartItem, Integer> getItems(
 		long groupId, String itemIds) {
 
-		Map<ShoppingCartItem, Integer> items =
-			new TreeMap<ShoppingCartItem, Integer>();
+		Map<ShoppingCartItem, Integer> items = new TreeMap<>();
 
 		String[] itemIdsArray = StringUtil.split(itemIds);
 
@@ -99,10 +97,10 @@ public class ShoppingCartLocalServiceImpl
 					Integer count = items.get(cartItem);
 
 					if (count == null) {
-						count = new Integer(1);
+						count = Integer.valueOf(1);
 					}
 					else {
-						count = new Integer(count.intValue() + 1);
+						count = Integer.valueOf(count.intValue() + 1);
 					}
 
 					items.put(cartItem, count);
@@ -119,7 +117,7 @@ public class ShoppingCartLocalServiceImpl
 			int altShipping, boolean insure)
 		throws PortalException {
 
-		List<Long> badItemIds = new ArrayList<Long>();
+		List<Long> badItemIds = new ArrayList<>();
 
 		Map<ShoppingCartItem, Integer> items = getItems(groupId, itemIds);
 
@@ -186,7 +184,6 @@ public class ShoppingCartLocalServiceImpl
 		}
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		ShoppingCart cart = null;
 
@@ -197,7 +194,6 @@ public class ShoppingCartLocalServiceImpl
 			cart.setCompanyId(user.getCompanyId());
 			cart.setUserId(userId);
 			cart.setUserName(user.getFullName());
-			cart.setCreateDate(now);
 		}
 		else {
 			cart = shoppingCartPersistence.fetchByG_U(groupId, userId);
@@ -211,11 +207,9 @@ public class ShoppingCartLocalServiceImpl
 				cart.setCompanyId(user.getCompanyId());
 				cart.setUserId(userId);
 				cart.setUserName(user.getFullName());
-				cart.setCreateDate(now);
 			}
 		}
 
-		cart.setModifiedDate(now);
 		cart.setItemIds(checkItemIds(groupId, itemIds));
 		cart.setCouponCodes(couponCodes);
 		cart.setAltShipping(altShipping);

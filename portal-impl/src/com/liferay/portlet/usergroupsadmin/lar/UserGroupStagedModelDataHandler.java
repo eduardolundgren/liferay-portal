@@ -15,15 +15,18 @@
 package com.liferay.portlet.usergroupsadmin.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author David Mendez Gonzalez
@@ -44,16 +47,26 @@ public class UserGroupStagedModelDataHandler
 			uuid, group.getCompanyId());
 
 		if (userGroup != null) {
-			UserGroupLocalServiceUtil.deleteUserGroup(userGroup);
+			deleteStagedModel(userGroup);
 		}
 	}
 
 	@Override
-	public UserGroup fetchStagedModelByUuidAndCompanyId(
+	public void deleteStagedModel(UserGroup userGroup) throws PortalException {
+		UserGroupLocalServiceUtil.deleteUserGroup(userGroup);
+	}
+
+	@Override
+	public List<UserGroup> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return UserGroupLocalServiceUtil.fetchUserGroupByUuidAndCompanyId(
-			uuid, companyId);
+		List<UserGroup> userGroups = new ArrayList<>();
+
+		userGroups.add(
+			UserGroupLocalServiceUtil.fetchUserGroupByUuidAndCompanyId(
+				uuid, companyId));
+
+		return userGroups;
 	}
 
 	@Override

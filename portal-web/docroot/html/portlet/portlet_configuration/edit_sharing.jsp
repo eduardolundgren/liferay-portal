@@ -24,7 +24,7 @@ Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(),
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/portlet_configuration/edit_sharing");
+portletURL.setParameter("mvcPath", "/html/portlet/portlet_configuration/edit_sharing.jsp");
 portletURL.setParameter("redirect", redirect);
 portletURL.setParameter("returnToFullPageURL", returnToFullPageURL);
 portletURL.setParameter("portletResource", portletResource);
@@ -36,8 +36,8 @@ String widgetURL = PortalUtil.getWidgetURL(portlet, themeDisplay);
 	<liferay-util:param name="tabs1" value="sharing" />
 </liferay-util:include>
 
-<portlet:actionURL var="editSharingURL">
-	<portlet:param name="struts_action" value="/portlet_configuration/edit_sharing" />
+<portlet:actionURL name="editSharing" var="editSharingURL">
+	<portlet:param name="mvcPath" value="/html/portlet/portlet_configuration/edit_sharing.jsp" />
 </portlet:actionURL>
 
 <aui:form action="<%= editSharingURL %>" method="post" name="fm">
@@ -47,7 +47,7 @@ String widgetURL = PortalUtil.getWidgetURL(portlet, themeDisplay);
 	<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 
 	<liferay-ui:tabs
-		names="any-website,facebook,opensocial-gadget,netvibes,friends"
+		names="any-website,facebook,opensocial-gadget,netvibes"
 		refresh="<%= false %>"
 	>
 		<liferay-ui:section>
@@ -67,7 +67,7 @@ String widgetURL = PortalUtil.getWidgetURL(portlet, themeDisplay);
 	Liferay.Widget({ url: '<%= widgetURL %>'});
 	</script></liferay-util:buffer>
 
-				<aui:input cssClass="lfr-textarea" label="code" name="widgetScript" onClick="Liferay.Util.selectAndCopy(this);" type="textarea" value="<%= textAreaContent %>" />
+				<aui:input cssClass="lfr-textarea" label="code" name="widgetScript" onClick="this.select();" type="textarea" value="<%= textAreaContent %>" />
 
 				<aui:input label='<%= LanguageUtil.format(request, "allow-users-to-add-x-to-any-website", HtmlUtil.escape(portletDisplay.getTitle()), false) %>' name="widgetShowAddAppLink" type="checkbox" value="<%= widgetShowAddAppLink %>" />
 			</aui:fieldset>
@@ -150,17 +150,6 @@ String widgetURL = PortalUtil.getWidgetURL(portlet, themeDisplay);
 				<aui:input name="netvibesWidgetURL" type="resource" value="<%= PortalUtil.getNetvibesURL(portlet, themeDisplay) %>" />
 
 				<aui:input label='<%= LanguageUtil.format(request, "allow-users-to-add-x-to-netvibes-pages", HtmlUtil.escape(portletDisplay.getTitle()), false) %>' name="netvibesShowAddAppLink" type="checkbox" value="<%= netvibesShowAddAppLink %>" />
-			</aui:fieldset>
-		</liferay-ui:section>
-
-		<liferay-ui:section>
-			<aui:fieldset>
-
-				<%
-				boolean appShowShareWithFriendsLink = GetterUtil.getBoolean(portletPreferences.getValue("lfrAppShowShareWithFriendsLink", null));
-				%>
-
-				<aui:input label='<%= LanguageUtil.format(request, "allow-users-to-share-x-with-friends", HtmlUtil.escape(portletDisplay.getTitle()), false) %>' name="appShowShareWithFriendsLink" type="checkbox" value="<%= appShowShareWithFriendsLink %>" />
 			</aui:fieldset>
 		</liferay-ui:section>
 	</liferay-ui:tabs>

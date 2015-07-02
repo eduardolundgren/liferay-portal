@@ -39,8 +39,8 @@ public class DefaultSearchResultPermissionFilter
 
 	@Override
 	protected void filterHits(Hits hits, SearchContext searchContext) {
-		List<Document> docs = new ArrayList<Document>();
-		List<Float> scores = new ArrayList<Float>();
+		List<Document> docs = new ArrayList<>();
+		List<Float> scores = new ArrayList<>();
 
 		Document[] documents = hits.getDocs();
 
@@ -61,13 +61,13 @@ public class DefaultSearchResultPermissionFilter
 				document.get(Field.ENTRY_CLASS_PK));
 
 			try {
-				if ((indexer == null) || (indexer.isFilterSearch() &&
+				if ((indexer == null) ||
+					(indexer.isFilterSearch() &&
 					 indexer.hasPermission(
 						 _permissionChecker, entryClassName, entryClassPK,
 						 ActionKeys.VIEW) &&
 					 indexer.isVisibleRelatedEntry(entryClassPK, status)) ||
-					!indexer.isFilterSearch() ||
-					!indexer.isPermissionAware()) {
+					!indexer.isFilterSearch() || !indexer.isPermissionAware()) {
 
 					docs.add(document);
 					scores.add(hits.score(i));
@@ -94,7 +94,7 @@ public class DefaultSearchResultPermissionFilter
 		return _baseIndexer.doSearch(searchContext);
 	}
 
-	private BaseIndexer _baseIndexer;
-	private PermissionChecker _permissionChecker;
+	private final BaseIndexer _baseIndexer;
+	private final PermissionChecker _permissionChecker;
 
 }

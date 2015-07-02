@@ -17,9 +17,7 @@
 <%@ include file="/html/portlet/document_library_display/init.jsp" %>
 
 <%
-DLEntryListDisplayContext dlEntriesListDisplayContext = new DLEntryListDisplayContext(request, dlPortletInstanceSettings);
-
-DLActionsDisplayContext dlActionsDisplayContext = dlEntriesListDisplayContext.getDLActionsDisplayContext();
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlDisplayRequestHelper);
 
 String topLink = ParamUtil.getString(request, "topLink", "home");
 
@@ -58,8 +56,8 @@ if (permissionChecker.isContentReviewer(user.getCompanyId(), scopeGroupId)) {
 	status = WorkflowConstants.STATUS_ANY;
 }
 
-String[] folderColumns = dlEntriesListDisplayContext.getFolderColumns();
-String[] fileEntryColumns = dlEntriesListDisplayContext.getFileEntryColumns();
+String[] folderColumns = dlPortletInstanceSettingsHelper.getFolderColumns();
+String[] fileEntryColumns = dlPortletInstanceSettingsHelper.getFileEntryColumns();
 
 int foldersCount = DLAppServiceUtil.getFoldersCount(repositoryId, folderId);
 int fileEntriesCount = DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(repositoryId, folderId, status);
@@ -88,7 +86,14 @@ request.setAttribute("view.jsp-viewFolder", Boolean.TRUE.toString());
 request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntryQuery));
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <liferay-util:include page="/html/portlet/document_library/top_links.jsp" />
 
@@ -112,7 +117,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 		</c:if>
 
 		<aui:row>
-			<aui:col cssClass="lfr-asset-column lfr-asset-column-details" width="<%= dlActionsDisplayContext.isFolderMenuVisible() ? 75 : 100 %>">
+			<aui:col cssClass="lfr-asset-column lfr-asset-column-details" width="<%= dlPortletInstanceSettingsHelper.isFolderMenuVisible() ? 75 : 100 %>">
 				<liferay-ui:panel-container extended="<%= false %>" id='<%= renderResponse.getNamespace() + "documentLibraryDisplayInfoPanelContainer" %>' persistState="<%= true %>">
 					<c:if test="<%= folder != null %>">
 						<c:if test="<%= Validator.isNotNull(folder.getDescription()) %>">
@@ -193,7 +198,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 				</liferay-ui:panel-container>
 			</aui:col>
 
-			<c:if test="<%= dlActionsDisplayContext.isFolderMenuVisible() %>">
+			<c:if test="<%= dlPortletInstanceSettingsHelper.isFolderMenuVisible() %>">
 				<aui:col cssClass="lfr-asset-column lfr-asset-column-actions" last="<%= true %>" width="<%= 25 %>">
 					<div class="lfr-asset-summary">
 						<liferay-ui:icon
@@ -229,63 +234,61 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 
 	</c:when>
 	<c:when test='<%= topLink.equals("mine") || topLink.equals("recent") %>'>
-		<aui:row>
-			<liferay-ui:header
-				backURL="<%= redirect %>"
-				title="<%= topLink %>"
+		<liferay-ui:header
+			backURL="<%= redirect %>"
+			title="<%= topLink %>"
+		/>
+
+		<%
+		long groupFileEntriesUserId = 0;
+
+		if (topLink.equals("mine") && themeDisplay.isSignedIn()) {
+			groupFileEntriesUserId = user.getUserId();
+
+			status = WorkflowConstants.STATUS_ANY;
+		}
+		%>
+
+		<liferay-ui:search-container
+			delta="<%= dlPortletInstanceSettings.getFileEntriesPerPage() %>"
+			deltaConfigurable="<%= false %>"
+			emptyResultsMessage="there-are-no-documents"
+			iteratorURL="<%= portletURL %>"
+			total="<%= DLAppServiceUtil.getGroupFileEntriesCount(repositoryId, groupFileEntriesUserId, defaultFolderId, null, status) %>"
+		>
+
+			<liferay-ui:search-container-results
+				results="<%= DLAppServiceUtil.getGroupFileEntries(repositoryId, groupFileEntriesUserId, defaultFolderId, null, status, searchContainer.getStart(), searchContainer.getEnd(), null) %>"
 			/>
 
-			<%
-			long groupFileEntriesUserId = 0;
-
-			if (topLink.equals("mine") && themeDisplay.isSignedIn()) {
-				groupFileEntriesUserId = user.getUserId();
-
-				status = WorkflowConstants.STATUS_ANY;
-			}
-			%>
-
-			<liferay-ui:search-container
-				delta="<%= dlPortletInstanceSettings.getFileEntriesPerPage() %>"
-				deltaConfigurable="<%= false %>"
-				emptyResultsMessage="there-are-no-documents"
-				iteratorURL="<%= portletURL %>"
-				total="<%= DLAppServiceUtil.getGroupFileEntriesCount(repositoryId, groupFileEntriesUserId, defaultFolderId, null, status) %>"
+			<liferay-ui:search-container-row
+				className="com.liferay.portal.kernel.repository.model.FileEntry"
+				escapedModel="<%= true %>"
+				keyProperty="fileEntryId"
+				modelVar="fileEntry"
 			>
 
-				<liferay-ui:search-container-results
-					results="<%= DLAppServiceUtil.getGroupFileEntries(repositoryId, groupFileEntriesUserId, defaultFolderId, null, status, searchContainer.getStart(), searchContainer.getEnd(), null) %>"
-				/>
+				<%
+				FileShortcut fileShortcut = null;
 
-				<liferay-ui:search-container-row
-					className="com.liferay.portal.kernel.repository.model.FileEntry"
-					escapedModel="<%= true %>"
-					keyProperty="fileEntryId"
-					modelVar="fileEntry"
-				>
+				String rowHREF = null;
 
-					<%
-					DLFileShortcut fileShortcut = null;
+				if (DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.VIEW)) {
+					PortletURL viewFileEntryURL = renderResponse.createRenderURL();
 
-					String rowHREF = null;
+					viewFileEntryURL.setParameter("struts_action", "/document_library_display/view_file_entry");
+					viewFileEntryURL.setParameter("redirect", currentURL);
+					viewFileEntryURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
 
-					if (DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.VIEW)) {
-						PortletURL viewFileEntryURL = renderResponse.createRenderURL();
+					rowHREF = viewFileEntryURL.toString();
+				}
+				%>
 
-						viewFileEntryURL.setParameter("struts_action", "/document_library_display/view_file_entry");
-						viewFileEntryURL.setParameter("redirect", currentURL);
-						viewFileEntryURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
+				<%@ include file="/html/portlet/document_library/file_entry_columns.jspf" %>
+			</liferay-ui:search-container-row>
 
-						rowHREF = viewFileEntryURL.toString();
-					}
-					%>
-
-					<%@ include file="/html/portlet/document_library/file_entry_columns.jspf" %>
-				</liferay-ui:search-container-row>
-
-				<liferay-ui:search-iterator />
-			</liferay-ui:search-container>
-		</aui:row>
+			<liferay-ui:search-iterator />
+		</liferay-ui:search-container>
 
 		<%
 		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, topLink), currentURL);

@@ -19,9 +19,9 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.security.ac.AccessControlled;
 
 /**
  * Provides the remote service interface for PluginSetting. Methods of this
@@ -62,6 +62,5 @@ public interface PluginSettingService extends BaseService {
 
 	public com.liferay.portal.model.PluginSetting updatePluginSetting(
 		long companyId, java.lang.String pluginId, java.lang.String pluginType,
-		java.lang.String roles, boolean active)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String roles, boolean active) throws PortalException;
 }

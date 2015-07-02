@@ -113,7 +113,7 @@ public class BackgroundTaskStatusRegistryImpl
 			return future.get();
 		}
 		catch (Exception e) {
-			_log.error("Uanble to retrieve status from master node", e);
+			_log.error("Unable to retrieve status from master node", e);
 		}
 
 		return null;
@@ -123,7 +123,7 @@ public class BackgroundTaskStatusRegistryImpl
 		BackgroundTaskStatusRegistryImpl.class);
 
 	private final Map<Long, BackgroundTaskStatus> _backgroundTaskStatuses =
-		new HashMap<Long, BackgroundTaskStatus>();
+		new HashMap<>();
 	private final ReadWriteLock _readWriteLock = new ReentrantReadWriteLock();
 
 }

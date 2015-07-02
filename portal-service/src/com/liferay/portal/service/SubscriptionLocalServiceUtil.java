@@ -198,6 +198,11 @@ public class SubscriptionLocalServiceUtil {
 		getService().deleteSubscriptions(userId);
 	}
 
+	public static void deleteSubscriptions(long userId, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteSubscriptions(userId, groupId);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
@@ -274,6 +279,12 @@ public class SubscriptionLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
+	}
+
+	public static com.liferay.portal.model.Subscription fetchSubscription(
+		long companyId, long userId, java.lang.String className, long classPK) {
+		return getService()
+				   .fetchSubscription(companyId, userId, className, classPK);
 	}
 
 	public static com.liferay.portal.model.Subscription fetchSubscription(

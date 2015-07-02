@@ -14,7 +14,7 @@
 
 package com.liferay.portal.verify.model;
 
-import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
+import com.liferay.portlet.documentlibrary.model.DLFileShortcutConstants;
 
 /**
  * @author Brian Wing Shun Chan
@@ -23,7 +23,7 @@ public class DLFileShortcutVerifiableModel implements VerifiableResourcedModel {
 
 	@Override
 	public String getModelName() {
-		return DLFileShortcut.class.getName();
+		return DLFileShortcutConstants.getClassName();
 	}
 
 	@Override
@@ -34,6 +34,11 @@ public class DLFileShortcutVerifiableModel implements VerifiableResourcedModel {
 	@Override
 	public String getTableName() {
 		return "DLFileShortcut";
+	}
+
+	@Override
+	public String getUserIdColumnName() {
+		return "userId";
 	}
 
 }

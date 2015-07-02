@@ -16,8 +16,8 @@ package com.liferay.portlet.dynamicdatamapping.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
@@ -46,7 +46,7 @@ public class DDMFormTemplateSynchonizer {
 
 	public void synchronize() throws PortalException {
 		for (DDMTemplate ddmTemplate : getDDMFormTemplates()) {
-			DDMForm templateDDMForm = DDMFormXSDDeserializerUtil.deserialize(
+			DDMForm templateDDMForm = DDMFormJSONDeserializerUtil.deserialize(
 				ddmTemplate.getScript());
 
 			synchronizeDDMFormFields(
@@ -91,7 +91,7 @@ public class DDMFormTemplateSynchonizer {
 	protected DDMFormField getDDMFormField(
 		List<DDMFormField> ddmFormFields, String name) {
 
-		Queue<DDMFormField> queue = new LinkedList<DDMFormField>(ddmFormFields);
+		Queue<DDMFormField> queue = new LinkedList<>(ddmFormFields);
 
 		DDMFormField ddmFormField = null;
 
@@ -108,12 +108,6 @@ public class DDMFormTemplateSynchonizer {
 
 	protected List<DDMTemplate> getDDMFormTemplates() {
 		return _ddmFormTemplates;
-	}
-
-	protected String serializeDDMForm(DDMForm templateDDMForm) {
-		String script = DDMFormXSDSerializerUtil.serialize(templateDDMForm);
-
-		return DDMXMLUtil.formatXML(script);
 	}
 
 	protected void synchronizeDDMFormFieldRequiredProperty(
@@ -164,14 +158,14 @@ public class DDMFormTemplateSynchonizer {
 	protected void updateDDMTemplate(
 		DDMTemplate ddmTemplate, DDMForm templateDDMForm) {
 
-		String script = serializeDDMForm(templateDDMForm);
+		String script = DDMFormJSONSerializerUtil.serialize(templateDDMForm);
 
 		ddmTemplate.setScript(script);
 
 		DDMTemplateLocalServiceUtil.updateDDMTemplate(ddmTemplate);
 	}
 
-	private List<DDMTemplate> _ddmFormTemplates = new ArrayList<DDMTemplate>();
-	private DDMForm _structureDDMForm;
+	private List<DDMTemplate> _ddmFormTemplates = new ArrayList<>();
+	private final DDMForm _structureDDMForm;
 
 }

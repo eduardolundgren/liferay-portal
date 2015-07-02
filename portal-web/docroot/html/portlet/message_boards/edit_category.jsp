@@ -37,21 +37,13 @@ String displayStyle = BeanParamUtil.getString(category, request, "displayStyle",
 
 MBMailingList mailingList = null;
 
-try {
-	if (categoryId > 0) {
-		mailingList = MBMailingListLocalServiceUtil.getCategoryMailingList(scopeGroupId, categoryId);
-	}
-}
-catch (NoSuchMailingListException nsmle) {
+if (categoryId > 0) {
+	mailingList = MBMailingListLocalServiceUtil.fetchCategoryMailingList(scopeGroupId, categoryId);
 }
 
 if ((category == null) && (mailingList == null)) {
-	try {
-		if (parentCategoryId > 0) {
-			mailingList = MBMailingListLocalServiceUtil.getCategoryMailingList(scopeGroupId, parentCategoryId);
-		}
-	}
-	catch (NoSuchMailingListException nsmle) {
+	if (parentCategoryId > 0) {
+		mailingList = MBMailingListLocalServiceUtil.fetchCategoryMailingList(scopeGroupId, parentCategoryId);
 	}
 }
 
@@ -91,6 +83,7 @@ else {
 	<aui:input name="mbCategoryId" type="hidden" value="<%= categoryId %>" />
 	<aui:input name="parentCategoryId" type="hidden" value="<%= parentCategoryId %>" />
 
+	<liferay-ui:error exception="<%= CaptchaConfigurationException.class %>" message="a-captcha-error-occurred-please-contact-an-administrator" />
 	<liferay-ui:error exception="<%= CaptchaMaxChallengesException.class %>" message="maximum-number-of-captcha-attempts-exceeded" />
 	<liferay-ui:error exception="<%= CaptchaTextException.class %>" message="text-verification-failed" />
 	<liferay-ui:error exception="<%= CategoryNameException.class %>" message="please-enter-a-valid-name" />

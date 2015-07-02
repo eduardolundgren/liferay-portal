@@ -16,9 +16,10 @@ package com.liferay.portlet.documentlibrary.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -289,7 +290,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @return the create date of this document library folder
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _dlFolder.getCreateDate();
 	}
 
@@ -354,7 +355,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @return the last post date of this document library folder
 	*/
 	@Override
-	public java.util.Date getLastPostDate() {
+	public Date getLastPostDate() {
 		return _dlFolder.getLastPostDate();
 	}
 
@@ -364,7 +365,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @return the modified date of this document library folder
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _dlFolder.getModifiedDate();
 	}
 
@@ -507,7 +508,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @return the status date of this document library folder
 	*/
 	@Override
-	public java.util.Date getStatusDate() {
+	public Date getStatusDate() {
 		return _dlFolder.getStatusDate();
 	}
 
@@ -803,7 +804,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @param createDate the create date of this document library folder
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_dlFolder.setCreateDate(createDate);
 	}
 
@@ -881,7 +882,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @param lastPostDate the last post date of this document library folder
 	*/
 	@Override
-	public void setLastPostDate(java.util.Date lastPostDate) {
+	public void setLastPostDate(Date lastPostDate) {
 		_dlFolder.setLastPostDate(lastPostDate);
 	}
 
@@ -891,7 +892,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @param modifiedDate the modified date of this document library folder
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_dlFolder.setModifiedDate(modifiedDate);
 	}
 
@@ -1021,7 +1022,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	* @param statusDate the status date of this document library folder
 	*/
 	@Override
-	public void setStatusDate(java.util.Date statusDate) {
+	public void setStatusDate(Date statusDate) {
 		_dlFolder.setStatusDate(statusDate);
 	}
 

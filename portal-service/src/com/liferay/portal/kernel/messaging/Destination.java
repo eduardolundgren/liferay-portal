@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public interface Destination {
 
-	public void addDestinationEventListener(
+	public boolean addDestinationEventListener(
 		DestinationEventListener destinationEventListener);
 
 	public void close();
@@ -31,6 +31,8 @@ public interface Destination {
 	public void copyDestinationEventListeners(Destination destination);
 
 	public void copyMessageListeners(Destination destination);
+
+	public void destroy();
 
 	public DestinationStatistics getDestinationStatistics();
 
@@ -49,7 +51,7 @@ public interface Destination {
 	public boolean register(
 		MessageListener messageListener, ClassLoader classloader);
 
-	public void removeDestinationEventListener(
+	public boolean removeDestinationEventListener(
 		DestinationEventListener destinationEventListener);
 
 	public void removeDestinationEventListeners();

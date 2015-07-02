@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.cache;
 
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 
 import java.io.Serializable;
 
@@ -22,6 +23,7 @@ import java.io.Serializable;
  * @author Brian Wing Shun Chan
  * @author Michael Young
  */
+@OSGiBeanProperties(service = SingleVMPoolUtil.class)
 public class SingleVMPoolUtil {
 
 	public static void clear() {
@@ -29,15 +31,16 @@ public class SingleVMPoolUtil {
 	}
 
 	public static <K extends Serializable, V> PortalCache<K, V> getCache(
-		String name) {
+		String portalCacheName) {
 
-		return (PortalCache<K, V>)getSingleVMPool().getCache(name);
+		return (PortalCache<K, V>)getSingleVMPool().getCache(portalCacheName);
 	}
 
 	public static <K extends Serializable, V> PortalCache<K, V> getCache(
-		String name, boolean blocking) {
+		String portalCacheName, boolean blocking) {
 
-		return (PortalCache<K, V>)getSingleVMPool().getCache(name, blocking);
+		return (PortalCache<K, V>)getSingleVMPool().getCache(
+			portalCacheName, blocking);
 	}
 
 	public static <K extends Serializable, V> PortalCacheManager<K, V>
@@ -52,8 +55,8 @@ public class SingleVMPoolUtil {
 		return _singleVMPool;
 	}
 
-	public static void removeCache(String name) {
-		getSingleVMPool().removeCache(name);
+	public static void removeCache(String portalCacheName) {
+		getSingleVMPool().removeCache(portalCacheName);
 	}
 
 	public void setSingleVMPool(SingleVMPool singleVMPool) {

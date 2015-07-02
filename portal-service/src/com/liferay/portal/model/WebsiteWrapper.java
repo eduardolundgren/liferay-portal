@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -137,7 +138,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 			setUrl(url);
 		}
 
-		Integer typeId = (Integer)attributes.get("typeId");
+		Long typeId = (Long)attributes.get("typeId");
 
 		if (typeId != null) {
 			setTypeId(typeId);
@@ -206,7 +207,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	* @return the create date of this website
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _website.getCreateDate();
 	}
 
@@ -221,7 +222,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	* @return the modified date of this website
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _website.getModifiedDate();
 	}
 
@@ -272,7 +273,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	* @return the type ID of this website
 	*/
 	@Override
-	public int getTypeId() {
+	public long getTypeId() {
 		return _website.getTypeId();
 	}
 
@@ -417,13 +418,12 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	* @param createDate the create date of this website
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_website.setCreateDate(createDate);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_website.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -445,7 +445,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	* @param modifiedDate the modified date of this website
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_website.setModifiedDate(modifiedDate);
 	}
 
@@ -495,7 +495,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	* @param typeId the type ID of this website
 	*/
 	@Override
-	public void setTypeId(int typeId) {
+	public void setTypeId(long typeId) {
 		_website.setTypeId(typeId);
 	}
 
@@ -560,7 +560,7 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Website> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Website> toCacheModel() {
 		return _website.toCacheModel();
 	}
 

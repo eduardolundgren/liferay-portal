@@ -24,8 +24,6 @@ String uploadExceptionRedirect = ParamUtil.getString(request, "uploadExceptionRe
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
-String referringPortletResourceRootPortletId = PortletConstants.getRootPortletId(referringPortletResource);
-
 String uploadProgressId = "dlFileEntryUploadProgress";
 
 FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
@@ -36,7 +34,7 @@ long repositoryId = BeanParamUtil.getLong(fileEntry, request, "repositoryId");
 
 if (repositoryId <= 0) {
 
-	// add_asset.jspf only passes in groupId
+	// <liferay-ui:asset_add_button /> only passes in groupId
 
 	repositoryId = BeanParamUtil.getLong(fileEntry, request, "groupId");
 }
@@ -96,7 +94,7 @@ boolean checkedOut = false;
 boolean hasLock = false;
 boolean pending = false;
 
-Lock lock = null;
+com.liferay.portal.kernel.lock.Lock lock = null;
 
 if (fileEntry != null) {
 	approved = fileVersion.isApproved();
@@ -115,10 +113,10 @@ if ((checkedOut || pending) && !dlPortletInstanceSettings.isEnableFileEntryDraft
 DLEditFileEntryDisplayContext dlEditFileEntryDisplayContext = null;
 
 if (fileEntry == null) {
-	dlEditFileEntryDisplayContext = DLEditFileEntryDisplayContextUtil.getDLEditFileEntryDisplayContext(request, response, dlFileEntryType);
+	dlEditFileEntryDisplayContext = DLDisplayContextProviderUtil.getDLEditFileEntryDisplayContext(request, response, dlFileEntryType);
 }
 else {
-	dlEditFileEntryDisplayContext = DLEditFileEntryDisplayContextUtil.getDLEditFileEntryDisplayContext(request, response, fileEntry);
+	dlEditFileEntryDisplayContext = DLDisplayContextProviderUtil.getDLEditFileEntryDisplayContext(request, response, fileEntry);
 }
 %>
 
@@ -236,7 +234,16 @@ else {
 	<aui:model-context bean="<%= fileVersion %>" model="<%= DLFileVersion.class %>" />
 
 	<c:if test="<%= fileVersion != null %>">
-		<aui:workflow-status model="<%= DLFileEntry.class %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= fileVersion.getStatus() %>" version="<%= fileVersion.getVersion() %>" />
+
+		<%
+		String version = null;
+
+		if (dlEditFileEntryDisplayContext.isVersionInfoVisible()) {
+			version = fileVersion.getVersion();
+		}
+		%>
+
+		<aui:workflow-status model="<%= DLFileEntry.class %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= fileVersion.getStatus() %>" version="<%= version %>" />
 	</c:if>
 
 	<aui:fieldset>
@@ -267,11 +274,11 @@ else {
 		<div class="form-group">
 			<aui:input label="folder" name="folderName" type="resource" value="<%= folderName %>" />
 
-			<c:if test="<%= referringPortletResourceRootPortletId.equals(PortletKeys.ASSET_PUBLISHER) && (fileEntryId == 0) %>">
+			<c:if test="<%= dlEditFileEntryDisplayContext.isFolderSelectionVisible() %>">
 				<aui:button name="selectFolderButton" value="select" />
 
 				<%
-				String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('folderId', 'folderName', '" + renderResponse.getNamespace() + "');";
+				String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('folderId', 'folderName', this, '" + renderResponse.getNamespace() + "');";
 				%>
 
 				<aui:button disabled="<%= folderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
@@ -378,7 +385,9 @@ else {
 								try {
 									DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
 
-									fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
+									DDMFormValues ddmFormValues = StorageEngineUtil.getDDMFormValues(fileEntryMetadata.getDDMStorageId());
+
+									fields = DDMFormValuesToFieldsConverterUtil.convert(ddmStructure, ddmFormValues);
 								}
 								catch (Exception e) {
 								}
@@ -448,9 +457,9 @@ else {
 			</aui:field-wrapper>
 		</c:if>
 
-		<c:if test="<%= approved %>">
+		<c:if test="<%= approved && dlEditFileEntryDisplayContext.isVersionInfoVisible() %>">
 			<div class="alert alert-info">
-				<liferay-ui:message key="a-new-version-will-be-created-automatically-if-this-content-is-modified" />
+				<liferay-ui:message key="a-new-version-is-created-automatically-if-this-content-is-modified" />
 			</div>
 		</c:if>
 
@@ -489,7 +498,6 @@ else {
 <liferay-ui:upload-progress
 	id="<%= uploadProgressId %>"
 	message="uploading"
-	redirect="<%= redirect %>"
 />
 
 <aui:script>

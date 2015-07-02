@@ -13,6 +13,7 @@ _sass_cache_*.css
 cobertura.ser
 
 **/.sonar
+**/pmd-reports
 
 /*.ant-*
 /*.ipr
@@ -101,13 +102,6 @@ cobertura.ser
 /portal-impl/test/portal-test-ext.properties
 /portal-impl/test/test-portal-impl-ext.properties
 
-/portal-pacl/*.iml
-/portal-pacl/*.ipr
-/portal-pacl/*.iws
-/portal-pacl/classes
-/portal-pacl/portal-pacl*.asc
-/portal-pacl/portal-pacl*.jar
-
 /portal-service/*.iml
 /portal-service/*.ipr
 /portal-service/*.iws
@@ -152,6 +146,8 @@ cobertura.ser
 /portal-web/docroot/wsrp
 
 /portal-web/docroot/html/ALLOY_ZIP
+
+/portal-web/docroot/html/css/common/bourbon
 
 /portal-web/docroot/html/css/portal/aui_deprecated.css
 /portal-web/docroot/html/css/portal/bootstrap.css
@@ -297,7 +293,5 @@ cobertura.ser
 /util-taglib/*.ipr
 /util-taglib/*.iws
 /util-taglib/classes
-/util-taglib/src/META-INF/liferay-aui.tld
-/util-taglib/src/META-INF/liferay-portlet_2_0.tld
 /util-taglib/util-taglib*.asc
 /util-taglib/util-taglib*.jar

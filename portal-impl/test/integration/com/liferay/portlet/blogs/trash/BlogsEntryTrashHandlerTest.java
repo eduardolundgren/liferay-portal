@@ -15,24 +15,21 @@
 package com.liferay.portlet.blogs.trash;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
-import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
-import com.liferay.portlet.trash.BaseTrashHandlerTestCase;
-
-import java.io.Serializable;
-
-import java.util.HashMap;
+import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
+import com.liferay.portlet.trash.test.BaseTrashHandlerTestCase;
+import com.liferay.portlet.trash.test.WhenIsAssetableBaseModel;
+import com.liferay.portlet.trash.test.WhenIsIndexableBaseModel;
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -44,7 +41,9 @@ import org.junit.Test;
  * @author Julio Camarero
  */
 @Sync
-public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
+public class BlogsEntryTrashHandlerTest
+	extends BaseTrashHandlerTestCase
+	implements WhenIsAssetableBaseModel, WhenIsIndexableBaseModel {
 
 	@ClassRule
 	@Rule
@@ -53,126 +52,285 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testDeleteTrashVersions() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndDeleteWithParentIsNotRestorable()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndParent() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashBaseModelAndParentAndDeleteGroupTrashEntries()
 		throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashBaseModelAndParentAndDeleteParent() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndParentAndDeleteParentNoMoveableFromTrash()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashBaseModelAndParentAndRestoreModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndParentAndRestoreModelIsVisible()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndParentIsInContainerBaseModel()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndParentIsNotVisible() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndTrashParentAndDeleteParentIsNotRestorable()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelAndTrashParentIsNotRestorable()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelIsInTrashContainer() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashBaseModelWithParentIsRestorable() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashDuplicate() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashGrandparentBaseModel() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashGrandparentBaseModelAndRestoreParentModel()
 		throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashGrandparentBaseModelAndRestoreParentModelIsNotInTrashContainer()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashGrandparentBaseModelAndRestoreParentModelIsVisible()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashGrandparentBaseModelIsNotVisible() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashIsRestorableBaseModel() throws Exception {
 	}
 
-	@Ignore()
-	@Override
-	@Test
-	public void testTrashIsRestorableBaseModelWithParent1() throws Exception {
-	}
-
-	@Ignore()
-	@Override
-	@Test
-	public void testTrashIsRestorableBaseModelWithParent2() throws Exception {
-	}
-
-	@Ignore()
-	@Override
-	@Test
-	public void testTrashIsRestorableBaseModelWithParent3() throws Exception {
-	}
-
-	@Ignore()
-	@Override
-	@Test
-	public void testTrashIsRestorableBaseModelWithParent4() throws Exception {
-	}
-
-	@Ignore()
-	@Override
-	@Test
-	public void testTrashMoveBaseModel() throws Exception {
-	}
-
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashMyBaseModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashParent() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashParentAndDeleteGroupTrashEntries() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testTrashParentAndDeleteParent() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
-	public void testTrashRecentBaseModel() throws Exception {
+	public void testTrashParentAndRestoreBaseModelIsVisible() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashParentAndRestoreIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashParentIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashParentIsNotVisible() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashParentWithBaseModelIsInTrashContainer()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashParentWithBaseModelIsIsNotVisible() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionBaseModelAndDelete() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndDeleteIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndDeleteIsNotFound()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionBaseModelAndRestore() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndRestoreIndexable()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionBaseModelAndRestoreIsVisible()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModel() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelAndCustomRestore()
+		throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testTrashVersionParentBaseModelAndRestore() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelAndRestoreIsNotInTrashContainer()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelAndRestoreIsVisible()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIndexable() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testTrashVersionParentBaseModelIsNotVisible() throws Exception {
 	}
 
 	@Override
@@ -181,39 +339,9 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		String title = getSearchKeywords();
-		String subtitle = StringPool.BLANK;
-		String description = "Description";
-		String content = "Content";
-		int displayDateMonth = 1;
-		int displayDateDay = 1;
-		int displayDateYear = 2012;
-		int displayDateHour = 12;
-		int displayDateMinute = 0;
-		boolean allowPingbacks = true;
-		boolean allowTrackbacks = true;
-		String[] trackbacks = new String[0];
-		ImageSelector coverImageImageSelector = null;
-		ImageSelector smallImageImageSelector = null;
-
-		serviceContext = (ServiceContext)serviceContext.clone();
-
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
-
-		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
-			TestPropsValues.getUserId(), title, subtitle, description, content,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-			coverImageImageSelector, smallImageImageSelector, serviceContext);
-
-		if (approved) {
-			entry = BlogsEntryLocalServiceUtil.updateStatus(
-				TestPropsValues.getUserId(), entry.getEntryId(),
-				WorkflowConstants.STATUS_APPROVED, serviceContext,
-				new HashMap<String, Serializable>());
-		}
-
-		return entry;
+		return BlogsTestUtil.addEntryWithWorkflow(
+			TestPropsValues.getUserId(), getSearchKeywords(), approved,
+			serviceContext);
 	}
 
 	@Override
@@ -230,8 +358,8 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 	protected int getNotInTrashBaseModelsCount(BaseModel<?> parentBaseModel)
 		throws Exception {
 
-		QueryDefinition<BlogsEntry> queryDefinition =
-			new QueryDefinition<BlogsEntry>(WorkflowConstants.STATUS_ANY);
+		QueryDefinition<BlogsEntry> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY);
 
 		return BlogsEntryLocalServiceUtil.getGroupEntriesCount(
 			(Long)parentBaseModel.getPrimaryKeyObj(), queryDefinition);

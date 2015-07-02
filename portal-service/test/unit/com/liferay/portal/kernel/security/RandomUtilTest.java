@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.security;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -101,7 +101,7 @@ public class RandomUtilTest {
 		}
 
 		private int _index;
-		private int[] _values;
+		private final int[] _values;
 
 	}
 

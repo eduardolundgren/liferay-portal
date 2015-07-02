@@ -19,6 +19,7 @@ import com.thoughtworks.selenium.Selenium;
 /**
  * @author Brian Wing Shun Chan
  */
+@SuppressWarnings("deprecation")
 public interface LiferaySelenium extends Selenium {
 
 	public void antCommand(String fileName, String target) throws Exception;
@@ -77,6 +78,8 @@ public interface LiferaySelenium extends Selenium {
 
 	public void assertNotVisible(String locator) throws Exception;
 
+	public void assertPartialConfirmation(String pattern) throws Exception;
+
 	public void assertPartialText(String locator, String pattern)
 		throws Exception;
 
@@ -116,8 +119,6 @@ public interface LiferaySelenium extends Selenium {
 
 	public String getCurrentYear();
 
-	public String getDependenciesDirName();
-
 	public String getEmailBody(String index) throws Exception;
 
 	public String getEmailSubject(String index) throws Exception;
@@ -137,6 +138,8 @@ public interface LiferaySelenium extends Selenium {
 	public String getProjectDirName();
 
 	public String getSikuliImagesDirName();
+
+	public String getTestDependenciesDirName();
 
 	public void goBackAndWait();
 
@@ -268,9 +271,9 @@ public interface LiferaySelenium extends Selenium {
 
 	public void stopLogger();
 
-	public void tap(String locator);
-
 	public void typeAceEditor(String locator, String value);
+
+	public void typeCKEditor(String locator, String value);
 
 	public void typeFrame(String locator, String value);
 

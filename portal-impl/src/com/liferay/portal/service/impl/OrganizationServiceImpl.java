@@ -120,7 +120,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public Organization addOrganization(
 			long parentOrganizationId, String name, String type,
-			boolean recursable, long regionId, long countryId, int statusId,
+			boolean recursable, long regionId, long countryId, long statusId,
 			String comments, boolean site, List<Address> addresses,
 			List<EmailAddress> emailAddresses, List<OrgLabor> orgLabors,
 			List<Phone> phones, List<Website> websites,
@@ -169,7 +169,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public Organization addOrganization(
 			long parentOrganizationId, String name, String type,
-			boolean recursable, long regionId, long countryId, int statusId,
+			boolean recursable, long regionId, long countryId, long statusId,
 			String comments, boolean site, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -213,7 +213,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public Organization addOrganization(
 			long parentOrganizationId, String name, String type, long regionId,
-			long countryId, int statusId, String comments, boolean site,
+			long countryId, long statusId, String comments, boolean site,
 			List<Address> addresses, List<EmailAddress> emailAddresses,
 			List<OrgLabor> orgLabors, List<Phone> phones,
 			List<Website> websites, ServiceContext serviceContext)
@@ -296,7 +296,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public Organization addOrganization(
 			long parentOrganizationId, String name, String type, long regionId,
-			long countryId, int statusId, String comments, boolean site,
+			long countryId, long statusId, String comments, boolean site,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -377,6 +377,30 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	}
 
 	/**
+	 * Returns the organization with the primary key.
+	 *
+	 * @param  organizationId the primary key of the organization
+	 * @return the organization with the primary key, or <code>null</code> if an
+	 *         organization with the primary key could not be found or if the
+	 *         user did not have permission to view the organization
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public Organization fetchOrganization(long organizationId)
+		throws PortalException {
+
+		Organization organization = organizationLocalService.fetchOrganization(
+			organizationId);
+
+		if (organization != null) {
+			OrganizationPermissionUtil.check(
+				getPermissionChecker(), organizationId, ActionKeys.VIEW);
+		}
+
+		return organization;
+	}
+
+	/**
 	 * Returns all the organizations which the user has permission to manage.
 	 *
 	 * @param      actionId the permitted action
@@ -401,8 +425,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 				null, null, null, 0, max);
 		}
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		List<Organization> userOrganizations =
 			organizationLocalService.getUserOrganizations(
@@ -560,10 +583,17 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	}
 
 	/**
-	 * Returns all the organizations associated with the user.
+	 * Returns all the organizations with which the user is explicitly
+	 * associated.
+	 *
+	 * <p>
+	 * A user is considered to be <i>explicitly</i> associated with an
+	 * organization if his account is individually created within the
+	 * organization or if the user is later added as a member.
+	 * </p>
 	 *
 	 * @param  userId the primary key of the user
-	 * @return the organizations associated with the user
+	 * @return the organizations with which the user is explicitly associated
 	 * @throws PortalException if a user with the primary key could not be found
 	 */
 	@Override
@@ -670,8 +700,8 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 *             the new information was invalid
 	 * @deprecated As of 6.2.0, replaced by {@link #updateOrganization(long,
 	 *             long, String, String, long, long, int, String, boolean,
+	 *             byte[], boolean, java.util.List, java.util.List,
 	 *             java.util.List, java.util.List, java.util.List,
-	 *             java.util.List, java.util.List, boolean, byte[],
 	 *             ServiceContext)}
 	 */
 	@Deprecated
@@ -679,7 +709,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
 			String type, boolean recursable, long regionId, long countryId,
-			int statusId, String comments, boolean site,
+			long statusId, String comments, boolean site,
 			List<Address> addresses, List<EmailAddress> emailAddresses,
 			List<OrgLabor> orgLabors, List<Phone> phones,
 			List<Website> websites, ServiceContext serviceContext)
@@ -725,7 +755,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
 			String type, boolean recursable, long regionId, long countryId,
-			int statusId, String comments, boolean site,
+			long statusId, String comments, boolean site,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -768,7 +798,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
-			String type, long regionId, long countryId, int statusId,
+			String type, long regionId, long countryId, long statusId,
 			String comments, boolean logo, byte[] logoBytes, boolean site,
 			List<Address> addresses, List<EmailAddress> emailAddresses,
 			List<OrgLabor> orgLabors, List<Phone> phones,
@@ -877,15 +907,15 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 *             the new information was invalid
 	 * @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
 	 *             long, String, String, long, long, int, String, boolean,
+	 *             byte[], boolean, java.util.List, java.util.List,
 	 *             java.util.List, java.util.List, java.util.List,
-	 *             java.util.List, java.util.List, boolean, byte[],
 	 *             ServiceContext)}
 	 */
 	@Deprecated
 	@Override
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
-			String type, long regionId, long countryId, int statusId,
+			String type, long regionId, long countryId, long statusId,
 			String comments, boolean site, List<Address> addresses,
 			List<EmailAddress> emailAddresses, List<OrgLabor> orgLabors,
 			List<Phone> phones, List<Website> websites,
@@ -925,7 +955,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
-			String type, long regionId, long countryId, int statusId,
+			String type, long regionId, long countryId, long statusId,
 			String comments, boolean site, ServiceContext serviceContext)
 		throws PortalException {
 

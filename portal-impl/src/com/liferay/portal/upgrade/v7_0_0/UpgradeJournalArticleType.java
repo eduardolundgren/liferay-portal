@@ -28,7 +28,6 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetCategoryConstants;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
-import com.liferay.portlet.journal.model.JournalArticle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -93,7 +92,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 			Map<String, Long> bitwiseValues = getBitwiseValues(
 				AssetCategory.class.getName());
 
-			List<String> actionIds = new ArrayList<String>();
+			List<String> actionIds = new ArrayList<>();
 
 			actionIds.add(ActionKeys.VIEW);
 
@@ -187,7 +186,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 			Map<String, Long> bitwiseValues = getBitwiseValues(
 				AssetVocabulary.class.getName());
 
-			List<String> actionIds = new ArrayList<String>();
+			List<String> actionIds = new ArrayList<>();
 
 			actionIds.add(ActionKeys.VIEW);
 
@@ -234,7 +233,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 
 			rs = ps.executeQuery();
 
-			List<String> types = new ArrayList<String>();
+			List<String> types = new ArrayList<>();
 
 			while (rs.next()) {
 				types.add(rs.getString("type_"));
@@ -259,7 +258,10 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 				"select entryId from AssetEntry where classNameId = ? and " +
 					"classPK = ?");
 
-			ps.setLong(1, PortalUtil.getClassNameId(JournalArticle.class));
+			ps.setLong(
+				1,
+				PortalUtil.getClassNameId(
+					"com.liferay.portlet.journal.model.JournalArticle"));
 			ps.setLong(2, classPK);
 
 			rs = ps.executeQuery();
@@ -392,7 +394,8 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 
 				assetVocabularySettingsHelper.setClassNameIdsAndClassTypePKs(
 					new long[] {
-						PortalUtil.getClassNameId(JournalArticle.class)
+						PortalUtil.getClassNameId(
+							"com.liferay.portlet.journal.model.JournalArticle")
 					},
 					new long[] {-1}, new boolean[] {false});
 
@@ -402,7 +405,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 					assetVocabularySettingsHelper.toString());
 
 				Map<String, Long> journalArticleTypesToAssetCategoryIds =
-					new HashMap<String, Long>();
+					new HashMap<>();
 
 				int i = 1;
 
@@ -427,7 +430,7 @@ public class UpgradeJournalArticleType extends UpgradeBaseJournal {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeJournalArticleType.class);
 
 }

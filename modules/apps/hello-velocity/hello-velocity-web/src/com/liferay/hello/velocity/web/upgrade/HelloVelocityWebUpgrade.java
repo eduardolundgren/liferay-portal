@@ -31,9 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Peter Fellwock
  */
-@Component(
-	immediate = true, service = HelloVelocityWebUpgrade.class
-)
+@Component(immediate = true, service = HelloVelocityWebUpgrade.class)
 public class HelloVelocityWebUpgrade {
 
 	@Reference(unbind = "-")
@@ -66,7 +64,7 @@ public class HelloVelocityWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			HelloVelocityPortlet.class.getName(),
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

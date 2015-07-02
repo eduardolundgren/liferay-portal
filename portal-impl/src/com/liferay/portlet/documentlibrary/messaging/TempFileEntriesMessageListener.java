@@ -21,12 +21,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.repository.LocalRepository;
+import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesCapability;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.service.RepositoryLocalServiceUtil;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public class TempFileEntriesMessageListener extends BaseMessageListener {
 
@@ -34,7 +35,7 @@ public class TempFileEntriesMessageListener extends BaseMessageListener {
 		LocalRepository localRepository = null;
 
 		try {
-			localRepository = RepositoryLocalServiceUtil.getLocalRepositoryImpl(
+			localRepository = RepositoryProviderUtil.getLocalRepository(
 				repository.getRepositoryId());
 		}
 		catch (PortalException pe) {

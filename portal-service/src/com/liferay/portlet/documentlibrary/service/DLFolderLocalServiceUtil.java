@@ -460,7 +460,7 @@ public class DLFolderLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -729,13 +729,13 @@ public class DLFolderLocalServiceUtil {
 		return getService().hasFolderLock(userId, folderId);
 	}
 
-	public static com.liferay.portal.model.Lock lockFolder(long userId,
+	public static com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().lockFolder(userId, folderId);
 	}
 
-	public static com.liferay.portal.model.Lock lockFolder(long userId,
+	public static com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
 		long folderId, java.lang.String owner, boolean inheritable,
 		long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {

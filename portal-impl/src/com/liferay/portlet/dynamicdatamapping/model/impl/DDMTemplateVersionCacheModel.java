@@ -16,6 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersion>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DDMTemplateVersionCacheModel)) {
+			return false;
+		}
+
+		DDMTemplateVersionCacheModel ddmTemplateVersionCacheModel = (DDMTemplateVersionCacheModel)obj;
+
+		if (templateVersionId == ddmTemplateVersionCacheModel.templateVersionId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, templateVersionId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("{templateVersionId=");
 		sb.append(templateVersionId);
@@ -55,6 +80,10 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 		sb.append(userName);
 		sb.append(", createDate=");
 		sb.append(createDate);
+		sb.append(", classNameId=");
+		sb.append(classNameId);
+		sb.append(", classPK=");
+		sb.append(classPK);
 		sb.append(", templateId=");
 		sb.append(templateId);
 		sb.append(", version=");
@@ -67,6 +96,14 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 		sb.append(language);
 		sb.append(", script=");
 		sb.append(script);
+		sb.append(", status=");
+		sb.append(status);
+		sb.append(", statusByUserId=");
+		sb.append(statusByUserId);
+		sb.append(", statusByUserName=");
+		sb.append(statusByUserName);
+		sb.append(", statusDate=");
+		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -95,6 +132,8 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 			ddmTemplateVersionImpl.setCreateDate(new Date(createDate));
 		}
 
+		ddmTemplateVersionImpl.setClassNameId(classNameId);
+		ddmTemplateVersionImpl.setClassPK(classPK);
 		ddmTemplateVersionImpl.setTemplateId(templateId);
 
 		if (version == null) {
@@ -132,6 +171,23 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 			ddmTemplateVersionImpl.setScript(script);
 		}
 
+		ddmTemplateVersionImpl.setStatus(status);
+		ddmTemplateVersionImpl.setStatusByUserId(statusByUserId);
+
+		if (statusByUserName == null) {
+			ddmTemplateVersionImpl.setStatusByUserName(StringPool.BLANK);
+		}
+		else {
+			ddmTemplateVersionImpl.setStatusByUserName(statusByUserName);
+		}
+
+		if (statusDate == Long.MIN_VALUE) {
+			ddmTemplateVersionImpl.setStatusDate(null);
+		}
+		else {
+			ddmTemplateVersionImpl.setStatusDate(new Date(statusDate));
+		}
+
 		ddmTemplateVersionImpl.resetOriginalValues();
 
 		return ddmTemplateVersionImpl;
@@ -145,12 +201,18 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
+		classNameId = objectInput.readLong();
+		classPK = objectInput.readLong();
 		templateId = objectInput.readLong();
 		version = objectInput.readUTF();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
 		language = objectInput.readUTF();
 		script = objectInput.readUTF();
+		status = objectInput.readInt();
+		statusByUserId = objectInput.readLong();
+		statusByUserName = objectInput.readUTF();
+		statusDate = objectInput.readLong();
 	}
 
 	@Override
@@ -169,6 +231,8 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 		}
 
 		objectOutput.writeLong(createDate);
+		objectOutput.writeLong(classNameId);
+		objectOutput.writeLong(classPK);
 		objectOutput.writeLong(templateId);
 
 		if (version == null) {
@@ -205,6 +269,18 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 		else {
 			objectOutput.writeUTF(script);
 		}
+
+		objectOutput.writeInt(status);
+		objectOutput.writeLong(statusByUserId);
+
+		if (statusByUserName == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(statusByUserName);
+		}
+
+		objectOutput.writeLong(statusDate);
 	}
 
 	public long templateVersionId;
@@ -213,10 +289,16 @@ public class DDMTemplateVersionCacheModel implements CacheModel<DDMTemplateVersi
 	public long userId;
 	public String userName;
 	public long createDate;
+	public long classNameId;
+	public long classPK;
 	public long templateId;
 	public String version;
 	public String name;
 	public String description;
 	public String language;
 	public String script;
+	public int status;
+	public long statusByUserId;
+	public String statusByUserName;
+	public long statusDate;
 }

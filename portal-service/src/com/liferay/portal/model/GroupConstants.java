@@ -42,8 +42,12 @@ public class GroupConstants {
 	public static final int MEMBERSHIP_RESTRICTION_TO_PARENT_SITE_MEMBERS = 1;
 
 	public static final String[] SYSTEM_GROUPS = {
-		CONTROL_PANEL, GUEST, GroupConstants.USER_PERSONAL_SITE
+		CONTROL_PANEL, GUEST, GroupConstants.USER_PERSONAL_PANEL,
+		GroupConstants.USER_PERSONAL_SITE
 	};
+
+	public static final String TYPE_SETTINGS_KEY_INHERIT_LOCALES =
+		"inheritLocales";
 
 	public static final int TYPE_SITE_OPEN = 1;
 
@@ -60,6 +64,11 @@ public class GroupConstants {
 	public static final int TYPE_SITE_SYSTEM = 4;
 
 	public static final String TYPE_SITE_SYSTEM_LABEL = "system";
+
+	public static final String USER_PERSONAL_PANEL = "User Personal Panel";
+
+	public static final String USER_PERSONAL_PANEL_FRIENDLY_URL =
+		"/user_personal_panel";
 
 	public static final String USER_PERSONAL_SITE = "User Personal Site";
 

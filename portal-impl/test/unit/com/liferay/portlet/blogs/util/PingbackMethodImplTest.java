@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.security.pacl.permission.PortalSocketPermission;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.xmlrpc.Fault;
@@ -30,13 +31,13 @@ import com.liferay.portal.model.Portlet;
 import com.liferay.portal.service.PortletLocalService;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFunction;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalService;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
@@ -221,7 +222,7 @@ public class PingbackMethodImplTest extends PowerMockito {
 		).addComment(
 			Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(),
 			Mockito.anyLong(), Mockito.anyString(),
-			(ServiceContext)Mockito.any()
+			Mockito.<ServiceContextFunction>any()
 		);
 
 		execute();
@@ -245,7 +246,7 @@ public class PingbackMethodImplTest extends PowerMockito {
 			Matchers.eq(
 				"[...] " + _EXCERPT_BODY + " [...] " + "[url=" + _SOURCE_URI +
 					"]" + _READ_MORE + "[/url]"),
-			(ServiceContext)Mockito.any()
+			Mockito.<ServiceContextFunction>any()
 		);
 	}
 
@@ -566,7 +567,7 @@ public class PingbackMethodImplTest extends PowerMockito {
 			Matchers.eq(
 				"[...] " + excerpt + " [...] [url=" + _SOURCE_URI + "]" +
 					_READ_MORE + "[/url]"),
-			(ServiceContext)Matchers.any()
+			Matchers.<ServiceContextFunction>any()
 		);
 	}
 

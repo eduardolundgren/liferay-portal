@@ -20,7 +20,7 @@
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 FileEntry fileEntry = null;
-DLFileShortcut fileShortcut = null;
+FileShortcut fileShortcut = null;
 
 if (row != null) {
 	Object result = row.getObject();
@@ -38,6 +38,9 @@ if (row != null) {
 	else if (result instanceof FileEntry) {
 		fileEntry = (FileEntry)result;
 	}
+	else if (result instanceof FileShortcut) {
+		fileShortcut = (FileShortcut)result;
+	}
 	else if (result instanceof TrashEntry) {
 		TrashEntry trashEntry = (TrashEntry)result;
 
@@ -50,21 +53,11 @@ if (row != null) {
 			fileShortcut = DLAppLocalServiceUtil.getFileShortcut(trashEntry.getClassPK());
 		}
 	}
-	else {
-		fileShortcut = (DLFileShortcut)result;
-	}
 }
 else {
 	if (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY)) {
-		if (request.getAttribute("view_file_entry.jsp-fileEntry") != null) {
-			fileEntry = (FileEntry)request.getAttribute("view_file_entry.jsp-fileEntry");
-
-			if (request.getAttribute("view_file_entry.jsp-fileShortcut") != null) {
-				fileShortcut = (DLFileShortcut)request.getAttribute("view_file_entry.jsp-fileShortcut");
-			}
-		}
-		else {
-			fileShortcut = (DLFileShortcut)request.getAttribute("view_file_shortcut.jsp-fileShortcut");
+		if (request.getAttribute("search.jsp-fileEntry") != null) {
+			fileEntry = (FileEntry)request.getAttribute("search.jsp-fileEntry");
 		}
 	}
 	else {
@@ -72,82 +65,31 @@ else {
 			fileEntry = (FileEntry)request.getAttribute("view_entries.jsp-fileEntry");
 
 			if (request.getAttribute("view_entries.jsp-fileShortcut") != null) {
-				fileShortcut = (DLFileShortcut)request.getAttribute("view_entries.jsp-fileShortcut");
+				fileShortcut = (FileShortcut)request.getAttribute("view_entries.jsp-fileShortcut");
 			}
-		}
-		else {
-			fileShortcut = (DLFileShortcut)request.getAttribute("view_file_shortcut.jsp-fileShortcut");
 		}
 	}
 }
 
-long folderId = 0;
+DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = null;
 
-if (fileShortcut != null) {
-	folderId = fileShortcut.getFolderId();
-
-	fileEntry = DLAppLocalServiceUtil.getFileEntry(fileShortcut.getToFileEntryId());
+if (fileShortcut == null) {
+	dlViewFileVersionDisplayContext = DLDisplayContextProviderUtil.getDLViewFileVersionDisplayContext(request, response, fileEntry.getFileVersion());
 }
-else if (fileEntry != null) {
-	folderId = fileEntry.getFolderId();
+else {
+	dlViewFileVersionDisplayContext = DLDisplayContextProviderUtil.getDLViewFileVersionDisplayContext(request, response, fileShortcut);
 }
 
-boolean checkedOut = fileEntry.isCheckedOut();
-boolean hasLock = fileEntry.hasLock();
-
-PortletURL viewFolderURL = liferayPortletResponse.createRenderURL();
-
-viewFolderURL.setParameter("struts_action", "/document_library/view");
-viewFolderURL.setParameter("folderId", String.valueOf(folderId));
-
-if (fileShortcut != null) {
-	fileEntry = DLAppLocalServiceUtil.getFileEntry(fileShortcut.getToFileEntryId());
-}
-
-DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, dlPortletInstanceSettings);
-DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = DLViewFileVersionDisplayContextUtil.getDLFileVersionActionsDisplayContext(request, response, fileEntry.getFileVersion());
+DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlRequestHelper);
 %>
 
-<liferay-util:buffer var="iconMenu">
-	<liferay-ui:icon-menu direction='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? "down" : "left" %>' extended="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? false : true %>" icon="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : null %>" message='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : "actions" %>' showExpanded="<%= false %>" showWhenSingleIcon="<%= dlActionsDisplayContext.isShowWhenSingleIconActionButton() %>" triggerCssClass="btn btn-default">
-		<c:choose>
-			<c:when test="<%= (fileShortcut == null) %>">
-
-				<%
-				for (MenuItem menuItem : dlViewFileVersionDisplayContext.getMenuItems()) {
-				%>
-
-					<liferay-ui:menu-item menuItem="<%= menuItem %>" />
-
-				<%
-				}
-				%>
-
-			</c:when>
-			<c:otherwise>
-				<%@ include file="/html/portlet/document_library/action/download.jspf" %>
-				<%@ include file="/html/portlet/document_library/action/open_document.jspf" %>
-				<%@ include file="/html/portlet/document_library/action/view_original.jspf" %>
-				<%@ include file="/html/portlet/document_library/action/edit.jspf" %>
-				<%@ include file="/html/portlet/document_library/action/move.jspf" %>
-				<%@ include file="/html/portlet/document_library/action/permissions.jspf" %>
-				<%@ include file="/html/portlet/document_library/action/delete.jspf" %>
-			</c:otherwise>
-		</c:choose>
-	</liferay-ui:icon-menu>
-</liferay-util:buffer>
-
 <c:choose>
-	<c:when test="<%= portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) && !dlActionsDisplayContext.isShowMinimalActionsButton() %>">
-
-		<%= iconMenu %>
-
+	<c:when test="<%= portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) && !dlVisualizationHelper.isShowMinimalActionsButton() %>">
+		<liferay-ui:menu menu="<%= dlViewFileVersionDisplayContext.getMenu() %>" />
 	</c:when>
 	<c:otherwise>
 		<span class="entry-action overlay">
-
-			<%= iconMenu %>
-
+			<liferay-ui:menu menu="<%= dlViewFileVersionDisplayContext.getMenu() %>" />
 		</span>
 	</c:otherwise>
 </c:choose>

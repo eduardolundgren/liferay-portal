@@ -85,7 +85,7 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 
 	@Override
 	public Object invoke() throws Exception {
-		Map<String, Object> resultsMap = new LinkedHashMap<String, Object>();
+		Map<String, Object> resultsMap = new LinkedHashMap<>();
 
 		resultsMap.put("contextName", _contextName);
 		resultsMap.put("basePath", _basePath);
@@ -113,7 +113,7 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 			return jsonSerializer.serializeDeep(_resultsMap);
 		}
 
-		private Map<String, Object> _resultsMap;
+		private final Map<String, Object> _resultsMap;
 
 	}
 
@@ -125,8 +125,7 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 				_contextName);
 
 		List<Map<String, Object>> jsonWebServiceActionMappingMaps =
-			new ArrayList<Map<String, Object>>(
-				jsonWebServiceActionMappings.size());
+			new ArrayList<>(jsonWebServiceActionMappings.size());
 
 		for (JSONWebServiceActionMapping jsonWebServiceActionMapping :
 				jsonWebServiceActionMappings) {
@@ -134,7 +133,7 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 			String path = jsonWebServiceActionMapping.getPath();
 
 			Map<String, Object> jsonWebServiceActionMappingMap =
-				new LinkedHashMap<String, Object>();
+				new LinkedHashMap<>();
 
 			if (jsonWebServiceActionMapping.isDeprecated()) {
 				jsonWebServiceActionMappingMap.put("deprecated", Boolean.TRUE);
@@ -162,8 +161,8 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 			MethodParameter[] methodParameters =
 				jsonWebServiceActionMapping.getMethodParameters();
 
-			List<Map<String, String>> parametersList =
-				new ArrayList<Map<String, String>>(methodParameters.length);
+			List<Map<String, String>> parametersList = new ArrayList<>(
+				methodParameters.length);
 
 			for (int i = 0; i < methodParameters.length; i++) {
 				MethodParameter methodParameter = methodParameters[i];
@@ -177,8 +176,7 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 					throw new PortalException(cnfe);
 				}
 
-				Map<String, String> parameterMap =
-					new HashMap<String, String>();
+				Map<String, String> parameterMap = new HashMap<>();
 
 				if (javadocMethod != null) {
 					String parameterComment = javadocMethod.getParameterComment(
@@ -202,8 +200,7 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 
 			jsonWebServiceActionMappingMap.put("path", path);
 
-			Map<String, String> returnsMap =
-				new LinkedHashMap<String, String>();
+			Map<String, String> returnsMap = new LinkedHashMap<>();
 
 			if (javadocMethod != null) {
 				String returnComment = javadocMethod.getReturnComment();
@@ -249,12 +246,12 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 	}
 
 	private List<Map<String, Object>> _buildTypes() {
-		List<Map<String, Object>> types = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> types = new ArrayList<>();
 
 		for (int i = 0; i < _types.size(); i++) {
 			Class<?> type = _types.get(i);
 
-			Map<String, Object> map = new LinkedHashMap<String, Object>();
+			Map<String, Object> map = new LinkedHashMap<>();
 
 			types.add(map);
 
@@ -437,10 +434,10 @@ public class JSONWebServiceDiscoverAction implements JSONWebServiceAction {
 		return className.concat(StringPool.POUND).concat(method.getName());
 	}
 
-	private String _basePath;
-	private String _baseURL;
-	private String _contextName;
-	private JSONWebServiceNaming _jsonWebServiceNaming;
-	private List<Class<?>> _types = new ArrayList<Class<?>>();
+	private final String _basePath;
+	private final String _baseURL;
+	private final String _contextName;
+	private final JSONWebServiceNaming _jsonWebServiceNaming;
+	private final List<Class<?>> _types = new ArrayList<>();
 
 }

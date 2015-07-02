@@ -19,8 +19,9 @@
 <%@ page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
 page import="com.liferay.portlet.messageboards.BannedUserException" %><%@
 page import="com.liferay.portlet.messageboards.CategoryNameException" %><%@
+page import="com.liferay.portlet.messageboards.DiscussionMaxCommentsException" %><%@
 page import="com.liferay.portlet.messageboards.LockedThreadException" %><%@
-page import="com.liferay.portlet.messageboards.MBSettings" %><%@
+page import="com.liferay.portlet.messageboards.MBGroupServiceSettings" %><%@
 page import="com.liferay.portlet.messageboards.MailingListEmailAddressException" %><%@
 page import="com.liferay.portlet.messageboards.MailingListInServerNameException" %><%@
 page import="com.liferay.portlet.messageboards.MailingListInUserNameException" %><%@
@@ -30,7 +31,6 @@ page import="com.liferay.portlet.messageboards.MailingListOutUserNameException" 
 page import="com.liferay.portlet.messageboards.MessageBodyException" %><%@
 page import="com.liferay.portlet.messageboards.MessageSubjectException" %><%@
 page import="com.liferay.portlet.messageboards.NoSuchCategoryException" %><%@
-page import="com.liferay.portlet.messageboards.NoSuchMailingListException" %><%@
 page import="com.liferay.portlet.messageboards.NoSuchMessageException" %><%@
 page import="com.liferay.portlet.messageboards.RequiredMessageException" %><%@
 page import="com.liferay.portlet.messageboards.SplitThreadException" %><%@
@@ -73,24 +73,22 @@ Locale currentLocale = LocaleUtil.fromLanguageId(currentLanguageId);
 Locale defaultLocale = themeDisplay.getSiteDefaultLocale();
 String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
-Locale[] locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+MBGroupServiceSettings mbGroupServiceSettings = MBGroupServiceSettings.getInstance(themeDisplay.getSiteGroupId());
 
-MBSettings mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId());
+String[] priorities = mbGroupServiceSettings.getPriorities(currentLanguageId);
 
-String[] priorities = mbSettings.getPriorities(currentLanguageId);
+boolean allowAnonymousPosting = mbGroupServiceSettings.isAllowAnonymousPosting();
+boolean enableFlags = mbGroupServiceSettings.isEnableFlags();
+boolean enableRatings = mbGroupServiceSettings.isEnableRatings();
+String messageFormat = mbGroupServiceSettings.getMessageFormat();
+String recentPostsDateOffset = mbGroupServiceSettings.getRecentPostsDateOffset();
+boolean subscribeByDefault = mbGroupServiceSettings.isSubscribeByDefault();
+boolean threadAsQuestionByDefault = mbGroupServiceSettings.isThreadAsQuestionByDefault();
 
-boolean allowAnonymousPosting = mbSettings.isAllowAnonymousPosting();
-boolean enableFlags = mbSettings.isEnableFlags();
-boolean enableRatings = mbSettings.isEnableRatings();
-String messageFormat = mbSettings.getMessageFormat();
-String recentPostsDateOffset = mbSettings.getRecentPostsDateOffset();
-boolean subscribeByDefault = mbSettings.isSubscribeByDefault();
-boolean threadAsQuestionByDefault = mbSettings.isThreadAsQuestionByDefault();
-
-boolean enableRSS = mbSettings.isEnableRSS();
-int rssDelta = mbSettings.getRSSDelta();
-String rssDisplayStyle = mbSettings.getRSSDisplayStyle();
-String rssFeedType = mbSettings.getRSSFeedType();
+boolean enableRSS = mbGroupServiceSettings.isEnableRSS();
+int rssDelta = mbGroupServiceSettings.getRSSDelta();
+String rssDisplayStyle = mbGroupServiceSettings.getRSSDisplayStyle();
+String rssFeedType = mbGroupServiceSettings.getRSSFeedType();
 
 ResourceURL rssURL = liferayPortletResponse.createResourceURL();
 

@@ -77,7 +77,7 @@ public abstract class WebsiteServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the website remote service
 	 */
-	public com.liferay.portal.service.WebsiteService getWebsiteService() {
+	public WebsiteService getWebsiteService() {
 		return websiteService;
 	}
 
@@ -86,8 +86,7 @@ public abstract class WebsiteServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param websiteService the website remote service
 	 */
-	public void setWebsiteService(
-		com.liferay.portal.service.WebsiteService websiteService) {
+	public void setWebsiteService(WebsiteService websiteService) {
 		this.websiteService = websiteService;
 	}
 
@@ -183,6 +182,25 @@ public abstract class WebsiteServiceBaseImpl extends BaseServiceImpl
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
 		this.classNamePersistence = classNamePersistence;
+	}
+
+	/**
+	 * Returns the list type local service.
+	 *
+	 * @return the list type local service
+	 */
+	public com.liferay.portal.service.ListTypeLocalService getListTypeLocalService() {
+		return listTypeLocalService;
+	}
+
+	/**
+	 * Sets the list type local service.
+	 *
+	 * @param listTypeLocalService the list type local service
+	 */
+	public void setListTypeLocalService(
+		com.liferay.portal.service.ListTypeLocalService listTypeLocalService) {
+		this.listTypeLocalService = listTypeLocalService;
 	}
 
 	/**
@@ -356,8 +374,8 @@ public abstract class WebsiteServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.service.WebsiteLocalService.class)
 	protected com.liferay.portal.service.WebsiteLocalService websiteLocalService;
-	@BeanReference(type = com.liferay.portal.service.WebsiteService.class)
-	protected com.liferay.portal.service.WebsiteService websiteService;
+	@BeanReference(type = WebsiteService.class)
+	protected WebsiteService websiteService;
 	@BeanReference(type = WebsitePersistence.class)
 	protected WebsitePersistence websitePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -368,6 +386,8 @@ public abstract class WebsiteServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
+	@BeanReference(type = com.liferay.portal.service.ListTypeLocalService.class)
+	protected com.liferay.portal.service.ListTypeLocalService listTypeLocalService;
 	@BeanReference(type = com.liferay.portal.service.ListTypeService.class)
 	protected com.liferay.portal.service.ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)

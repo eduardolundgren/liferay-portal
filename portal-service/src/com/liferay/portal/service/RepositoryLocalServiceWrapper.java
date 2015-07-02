@@ -267,30 +267,14 @@ public class RepositoryLocalServiceWrapper implements RepositoryLocalService,
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _repositoryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.LocalRepository> getGroupLocalRepositoryImpl(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _repositoryLocalService.getGroupLocalRepositoryImpl(groupId);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _repositoryLocalService.getLocalRepositoryImpl(folderId,
-			fileEntryId, fileVersionId);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _repositoryLocalService.getLocalRepositoryImpl(repositoryId);
+	public java.util.List<com.liferay.portal.model.Repository> getGroupRepositories(
+		long groupId) {
+		return _repositoryLocalService.getGroupRepositories(groupId);
 	}
 
 	@Override
@@ -298,11 +282,6 @@ public class RepositoryLocalServiceWrapper implements RepositoryLocalService,
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _repositoryLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	@Override
-	public java.lang.String getRegistryName() {
-		return _repositoryLocalService.getRegistryName();
 	}
 
 	/**
@@ -408,30 +387,10 @@ public class RepositoryLocalServiceWrapper implements RepositoryLocalService,
 	}
 
 	@Override
-	public com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _repositoryLocalService.getRepositoryImpl(folderId, fileEntryId,
-			fileVersionId);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _repositoryLocalService.getRepositoryImpl(repositoryId);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _repositoryLocalService.getTypeSettingsProperties(repositoryId);
-	}
-
-	@Override
-	public void invalidate() {
-		_repositoryLocalService.invalidate();
 	}
 
 	/**
@@ -461,6 +420,14 @@ public class RepositoryLocalServiceWrapper implements RepositoryLocalService,
 		java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_repositoryLocalService.updateRepository(repositoryId, name, description);
+	}
+
+	@Override
+	public void updateRepository(long repositoryId,
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_repositoryLocalService.updateRepository(repositoryId,
+			typeSettingsProperties);
 	}
 
 	/**

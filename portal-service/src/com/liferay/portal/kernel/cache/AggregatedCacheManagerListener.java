@@ -58,20 +58,20 @@ public class AggregatedCacheManagerListener implements CacheManagerListener {
 	}
 
 	@Override
-	public void notifyCacheAdded(String name) {
+	public void notifyCacheAdded(String portalCacheName) {
 		for (CacheManagerListener cacheManagerListener :
 				_cacheManagerListeners) {
 
-			cacheManagerListener.notifyCacheAdded(name);
+			cacheManagerListener.notifyCacheAdded(portalCacheName);
 		}
 	}
 
 	@Override
-	public void notifyCacheRemoved(String name) {
+	public void notifyCacheRemoved(String portalCacheName) {
 		for (CacheManagerListener cacheManagerListener :
 				_cacheManagerListeners) {
 
-			cacheManagerListener.notifyCacheRemoved(name);
+			cacheManagerListener.notifyCacheRemoved(portalCacheName);
 		}
 	}
 
@@ -86,6 +86,6 @@ public class AggregatedCacheManagerListener implements CacheManagerListener {
 	}
 
 	private final Set<CacheManagerListener> _cacheManagerListeners =
-		new CopyOnWriteArraySet<CacheManagerListener>();
+		new CopyOnWriteArraySet<>();
 
 }

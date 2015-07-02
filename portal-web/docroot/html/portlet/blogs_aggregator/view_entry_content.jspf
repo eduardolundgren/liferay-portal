@@ -20,7 +20,7 @@
 		<%
 		PortletURL showBlogEntryURL = renderResponse.createRenderURL();
 
-		showBlogEntryURL.setParameter("struts_action", "/blogs_aggregator/view_entry");
+		showBlogEntryURL.setParameter("mvcRenderCommandName", "/blogs/view_entry");
 		showBlogEntryURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
 
 		StringBundler sb = new StringBundler(8);
@@ -90,7 +90,7 @@
 
 					<c:if test="<%= entry.isSmallImage() %>">
 						<div class="asset-small-image">
-							<img alt="" class="asset-small-image" src="<%= HtmlUtil.escape(entry.getEntryImageURL(themeDisplay)) %>" width="150" />
+							<img alt="" class="asset-small-image" src="<%= HtmlUtil.escape(entry.getSmallImageURL(themeDisplay)) %>" width="150" />
 						</div>
 					</c:if>
 

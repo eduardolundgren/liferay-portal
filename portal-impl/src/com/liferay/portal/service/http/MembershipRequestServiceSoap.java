@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.MembershipRequestServiceUtil} service utility. The
+ * {@link MembershipRequestServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -59,7 +59,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see MembershipRequestServiceHttp
  * @see com.liferay.portal.model.MembershipRequestSoap
- * @see com.liferay.portal.service.MembershipRequestServiceUtil
+ * @see MembershipRequestServiceUtil
  * @generated
  */
 @ProviderType
@@ -81,7 +81,7 @@ public class MembershipRequestServiceSoap {
 		}
 	}
 
-	public static void deleteMembershipRequests(long groupId, int statusId)
+	public static void deleteMembershipRequests(long groupId, long statusId)
 		throws RemoteException {
 		try {
 			MembershipRequestServiceUtil.deleteMembershipRequests(groupId,
@@ -109,7 +109,7 @@ public class MembershipRequestServiceSoap {
 	}
 
 	public static void updateStatus(long membershipRequestId,
-		java.lang.String reviewComments, int statusId,
+		java.lang.String reviewComments, long statusId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {

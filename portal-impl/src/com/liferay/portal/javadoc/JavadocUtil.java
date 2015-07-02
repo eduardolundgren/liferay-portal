@@ -14,9 +14,9 @@
 
 package com.liferay.portal.javadoc;
 
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.util.ClassLoaderUtil;
 
 import java.util.Arrays;
 
@@ -103,12 +103,12 @@ public class JavadocUtil {
 	};
 
 	private static final String[] _PRIMITIVE_TYPE_NAMES = {
-		"boolean", "byte", "char", "double", "float", "int", "long", "short",
+		"boolean", "byte", "char", "double", "float", "int", "long", "short"
 	};
 
 	private static final Class<?>[] _PRIMITIVE_TYPES = new Class[] {
 		boolean.class, byte.class, char.class, double.class, float.class,
-		int.class, long.class, short.class,
+		int.class, long.class, short.class
 	};
 
 }

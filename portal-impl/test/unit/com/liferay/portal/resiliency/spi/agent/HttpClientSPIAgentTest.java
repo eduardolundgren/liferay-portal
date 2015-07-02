@@ -30,12 +30,12 @@ import com.liferay.portal.kernel.resiliency.spi.SPIConfiguration;
 import com.liferay.portal.kernel.resiliency.spi.agent.AcceptorServlet;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.servlet.ReadOnlyServletResponse;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -45,8 +45,8 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.impl.PortletImpl;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.util.PropsValues;
 
@@ -176,11 +176,9 @@ public class HttpClientSPIAgentTest {
 
 			socket.close();
 
-			CaptureHandler captureHandler =
-				JDKLoggerTestUtil.configureJDKLogger(
-					HttpClientSPIAgent.class.getName(), Level.OFF);
-
-			try {
+			try (CaptureHandler captureHandler =
+					JDKLoggerTestUtil.configureJDKLogger(
+						HttpClientSPIAgent.class.getName(), Level.OFF)) {
 
 				// Clean up when input is shutdown, failed without log
 
@@ -239,9 +237,6 @@ public class HttpClientSPIAgentTest {
 				Throwable throwable = logRecord.getThrown();
 
 				Assert.assertSame(IOException.class, throwable.getClass());
-			}
-			finally {
-				captureHandler.close();
 			}
 
 			// Clean up when output is shutdown()
@@ -382,10 +377,9 @@ public class HttpClientSPIAgentTest {
 
 	@Test
 	public void testDestroy() throws Exception {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			HttpClientSPIAgent.class.getName(), Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					HttpClientSPIAgent.class.getName(), Level.OFF)) {
 
 			// Error without log
 
@@ -477,9 +471,6 @@ public class HttpClientSPIAgentTest {
 				Assert.assertTrue(logRecords.isEmpty());
 			}
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
@@ -534,9 +525,7 @@ public class HttpClientSPIAgentTest {
 		}
 	}
 
-	@AdviseWith(
-		adviceClasses = {PropsUtilAdvice.class}
-	)
+	@AdviseWith(adviceClasses = {PropsUtilAdvice.class})
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testPrepareRequest() throws Exception {
@@ -654,11 +643,9 @@ public class HttpClientSPIAgentTest {
 
 			closePeers(socket, serverSocket);
 
-			CaptureHandler captureHandler =
-				JDKLoggerTestUtil.configureJDKLogger(
-					HttpClientSPIAgent.class.getName(), Level.OFF);
-
-			try {
+			try (CaptureHandler captureHandler =
+					JDKLoggerTestUtil.configureJDKLogger(
+						HttpClientSPIAgent.class.getName(), Level.OFF)) {
 
 				// Force close, failed without log
 
@@ -705,9 +692,6 @@ public class HttpClientSPIAgentTest {
 				Throwable throwable = logRecord.getThrown();
 
 				Assert.assertSame(IOException.class, throwable.getClass());
-			}
-			finally {
-				captureHandler.close();
 			}
 
 			// socket.isConnected()
@@ -836,10 +820,9 @@ public class HttpClientSPIAgentTest {
 
 		closePeers(socket, serverSocket);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			HttpClientSPIAgent.class.getName(), Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					HttpClientSPIAgent.class.getName(), Level.OFF)) {
 
 			// Unable to send, unable to close, without log
 
@@ -914,9 +897,6 @@ public class HttpClientSPIAgentTest {
 			Assert.assertSame(IOException.class, throwable.getClass());
 
 			swapSocketImpl(socket, socketImpl);
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		closePeers(socket, serverSocket);

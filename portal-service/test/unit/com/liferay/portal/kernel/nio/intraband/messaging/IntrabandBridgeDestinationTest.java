@@ -15,10 +15,8 @@
 package com.liferay.portal.kernel.nio.intraband.messaging;
 
 import com.liferay.portal.kernel.messaging.BaseDestination;
-import com.liferay.portal.kernel.messaging.DefaultMessageBus;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
-import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.SynchronousDestination;
 import com.liferay.portal.kernel.messaging.proxy.MessagingProxy;
@@ -32,13 +30,16 @@ import com.liferay.portal.kernel.resiliency.spi.MockSPI;
 import com.liferay.portal.kernel.resiliency.spi.MockSPIProvider;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIConfiguration;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvTestRule;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.registry.BasicRegistryImpl;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 
 import java.io.IOException;
 
@@ -57,6 +58,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mockito;
+
 /**
  * @author Shuyang Zhou
  */
@@ -70,14 +73,24 @@ public class IntrabandBridgeDestinationTest {
 
 	@Before
 	public void setUp() {
-		_messageBus = new DefaultMessageBus();
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
-		MessageBusUtil.init(_messageBus, null, null);
+		Registry registry = RegistryUtil.getRegistry();
+
+		_messageBus = Mockito.mock(MessageBus.class);
+
+		registry.registerService(MessageBus.class, _messageBus);
 
 		_baseDestination = new SynchronousDestination();
 
 		_baseDestination.setName(
 			IntrabandBridgeDestinationTest.class.getName());
+
+		Mockito.when(
+			_messageBus.getDestination(_baseDestination.getName())
+		).thenReturn(
+			_baseDestination
+		);
 
 		_intrabandBridgeDestination = new IntrabandBridgeDestination(
 			_baseDestination);
@@ -119,7 +132,7 @@ public class IntrabandBridgeDestinationTest {
 		final AtomicBoolean throwRuntimeException = new AtomicBoolean();
 
 		final AtomicReference<Message> messageReference =
-			new AtomicReference<Message>();
+			new AtomicReference<>();
 
 		MessageListener messageListener = new MessageListener() {
 

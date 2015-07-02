@@ -35,13 +35,14 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.VirtualHost;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.security.exportimport.UserImporterUtil;
+import com.liferay.portal.security.ldap.LDAPSettingsUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.VirtualHostLocalServiceUtil;
-import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -209,7 +210,7 @@ public class PortalInstances {
 			_log.debug("Set company id " + companyId);
 		}
 
-		request.setAttribute(WebKeys.COMPANY_ID, new Long(companyId));
+		request.setAttribute(WebKeys.COMPANY_ID, Long.valueOf(companyId));
 
 		CompanyThreadLocal.setCompanyId(companyId);
 
@@ -293,7 +294,7 @@ public class PortalInstances {
 	}
 
 	private long[] _getCompanyIdsBySQL() throws SQLException {
-		List<Long> companyIds = new ArrayList<Long>();
+		List<Long> companyIds = new ArrayList<>();
 
 		String currentShardName = ShardUtil.setTargetSource(
 			PropsValues.SHARD_DEFAULT_NAME);
@@ -357,7 +358,7 @@ public class PortalInstances {
 			List<Company> companies = CompanyLocalServiceUtil.getCompanies(
 				false);
 
-			List<String> webIdsList = new ArrayList<String>(companies.size());
+			List<String> webIdsList = new ArrayList<>(companies.size());
 
 			for (Company company : companies) {
 				String webId = company.getWebId();
@@ -465,23 +466,15 @@ public class PortalInstances {
 				_log.error(e, e);
 			}
 
-			// Check journal content search
+			// LDAP import
 
-			if (_log.isDebugEnabled()) {
-				_log.debug("Check journal content search");
+			try {
+				if (LDAPSettingsUtil.isImportOnStartup(companyId)) {
+					UserImporterUtil.importUsers(companyId);
+				}
 			}
-
-			if (GetterUtil.getBoolean(
-					PropsUtil.get(
-						PropsKeys.JOURNAL_SYNC_CONTENT_SEARCH_ON_STARTUP))) {
-
-				try {
-					JournalContentSearchLocalServiceUtil.checkContentSearches(
-						companyId);
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
+			catch (Exception e) {
+				_log.error(e, e);
 			}
 
 			// Process application startup events
@@ -577,15 +570,16 @@ public class PortalInstances {
 		"select companyId from Company, Shard where Company.companyId = " +
 			"Shard.classPK and Shard.name = ?";
 
-	private static Log _log = LogFactoryUtil.getLog(PortalInstances.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalInstances.class);
 
-	private static PortalInstances _instance = new PortalInstances();
+	private static final PortalInstances _instance = new PortalInstances();
 
-	private Set<String> _autoLoginIgnoreHosts;
-	private Set<String> _autoLoginIgnorePaths;
+	private final Set<String> _autoLoginIgnoreHosts;
+	private final Set<String> _autoLoginIgnorePaths;
 	private long[] _companyIds;
-	private Set<String> _virtualHostsIgnoreHosts;
-	private Set<String> _virtualHostsIgnorePaths;
+	private final Set<String> _virtualHostsIgnoreHosts;
+	private final Set<String> _virtualHostsIgnorePaths;
 	private String[] _webIds;
 
 }

@@ -22,9 +22,9 @@ import com.liferay.portal.kernel.resiliency.spi.MockSPIProvider;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
 import com.liferay.portal.kernel.resiliency.spi.provider.SPIProvider;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Props;
@@ -147,7 +147,7 @@ public class SPIClassPathContextListenerTest {
 
 		// Mock lookup
 
-		final Map<String, URL> resources = new HashMap<String, URL>();
+		final Map<String, URL> resources = new HashMap<>();
 
 		final String driverClassName = "TestDriver";
 
@@ -206,10 +206,9 @@ public class SPIClassPathContextListenerTest {
 
 	@Test
 	public void testClassPathGeneration() {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			SPIClassPathContextListener.class.getName(), Level.FINE);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					SPIClassPathContextListener.class.getName(), Level.FINE)) {
 
 			// With log
 
@@ -276,9 +275,6 @@ public class SPIClassPathContextListenerTest {
 			Assert.assertEquals(
 				spiClassPath, SPIClassPathContextListener.SPI_CLASS_PATH);
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -362,10 +358,11 @@ public class SPIClassPathContextListenerTest {
 
 		// Duplicate register
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			SPIClassPathContextListener.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					SPIClassPathContextListener.class.getName(),
+					Level.SEVERE)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			spiClassPathContextListener.contextInitialized(
@@ -380,9 +377,6 @@ public class SPIClassPathContextListenerTest {
 					" is already registered in servlet context " +
 						_mockServletContext.getContextPath(),
 				logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Unregister
@@ -435,7 +429,7 @@ public class SPIClassPathContextListenerTest {
 	}
 
 	protected void deleteFile(File file) {
-		Queue<File> fileQueue = new LinkedList<File>();
+		Queue<File> fileQueue = new LinkedList<>();
 
 		fileQueue.offer(file);
 

@@ -14,6 +14,7 @@
 
 package com.liferay.invitation.web.portlet.action;
 
+import com.liferay.invitation.web.constants.InvitationPortletKeys;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -24,20 +25,27 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.portlet.RenderRequest;
+
+import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
 	immediate = true,
-	property = {
-		"javax.portlet.name=com_liferay_invitation_web_portlet_InvitationPortlet"
-	},
+	property = {"javax.portlet.name=" + InvitationPortletKeys.INVITATION},
 	service = ConfigurationAction.class
 )
 public class InvitationConfigurationAction extends DefaultConfigurationAction {
+
+	@Override
+	public String getJspPath(RenderRequest renderRequest) {
+		return "/configuration.jsp";
+	}
 
 	@Override
 	public void postProcess(
@@ -67,6 +75,15 @@ public class InvitationConfigurationAction extends DefaultConfigurationAction {
 		validateEmail(actionRequest, "emailMessage");
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.invitation.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 }

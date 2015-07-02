@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -38,7 +39,6 @@ import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -103,6 +103,15 @@ public class LicenseUtil {
 	public static Map<String, String> getClusterServerInfo(String clusterNodeId)
 		throws Exception {
 
+		ClusterNode localClusterNode =
+			ClusterExecutorUtil.getLocalClusterNode();
+
+		String localClusterNodeId = localClusterNode.getClusterNodeId();
+
+		if (clusterNodeId.equals(localClusterNodeId)) {
+			return getServerInfo();
+		}
+
 		List<ClusterNode> clusterNodes = ClusterExecutorUtil.getClusterNodes();
 
 		ClusterNode clusterNode = null;
@@ -122,10 +131,6 @@ public class LicenseUtil {
 		}
 
 		try {
-			if (clusterNode.equals(ClusterExecutorUtil.getLocalClusterNode())) {
-				return getServerInfo();
-			}
-
 			ClusterRequest clusterRequest = ClusterRequest.createUnicastRequest(
 				_getServerInfoMethodHandler, clusterNodeId);
 
@@ -136,7 +141,8 @@ public class LicenseUtil {
 				futureClusterResponses.get(20000, TimeUnit.MILLISECONDS);
 
 			ClusterNodeResponse clusterNodeResponse =
-				clusterNodeResponses.getClusterResponse(clusterNode);
+				clusterNodeResponses.getClusterResponse(
+					clusterNode.getClusterNodeId());
 
 			return (Map<String, String>)clusterNodeResponse.getResult();
 		}
@@ -157,10 +163,10 @@ public class LicenseUtil {
 
 	public static Set<String> getIpAddresses() {
 		if (_ipAddresses != null) {
-			return new HashSet<String>(_ipAddresses);
+			return new HashSet<>(_ipAddresses);
 		}
 
-		_ipAddresses = new HashSet<String>();
+		_ipAddresses = new HashSet<>();
 
 		try {
 			List<NetworkInterface> networkInterfaces = Collections.list(
@@ -188,15 +194,15 @@ public class LicenseUtil {
 			_log.error(e, e);
 		}
 
-		return new HashSet<String>(_ipAddresses);
+		return new HashSet<>(_ipAddresses);
 	}
 
 	public static Set<String> getMacAddresses() {
 		if (_macAddresses != null) {
-			return new HashSet<String>(_macAddresses);
+			return new HashSet<>(_macAddresses);
 		}
 
-		_macAddresses = new HashSet<String>();
+		_macAddresses = new HashSet<>();
 
 		try {
 			List<NetworkInterface> networkInterfaces = Collections.list(
@@ -232,7 +238,7 @@ public class LicenseUtil {
 			_log.error(e, e);
 		}
 
-		return new HashSet<String>(_macAddresses);
+		return new HashSet<>(_macAddresses);
 	}
 
 	public static byte[] getServerIdBytes() throws Exception {
@@ -253,7 +259,7 @@ public class LicenseUtil {
 	}
 
 	public static Map<String, String> getServerInfo() {
-		Map<String, String> serverInfo = new HashMap<String, String>();
+		Map<String, String> serverInfo = new HashMap<>();
 
 		serverInfo.put("hostName", PortalUtil.getComputerName());
 		serverInfo.put("ipAddresses", StringUtil.merge(getIpAddresses()));
@@ -318,7 +324,7 @@ public class LicenseUtil {
 	public static Map<String, Object> registerOrder(
 		String orderUuid, String productEntryName, int maxServers) {
 
-		Map<String, Object> attributes = new HashMap<String, Object>();
+		Map<String, Object> attributes = new HashMap<>();
 
 		if (Validator.isNull(orderUuid)) {
 			return attributes;
@@ -553,7 +559,7 @@ public class LicenseUtil {
 			return null;
 		}
 
-		Map<String, String> sortedMap = new TreeMap<String, String>(
+		Map<String, String> sortedMap = new TreeMap<>(
 			String.CASE_INSENSITIVE_ORDER);
 
 		Iterator<String> itr = productsJSONObject.keys();
@@ -622,7 +628,8 @@ public class LicenseUtil {
 			20000, TimeUnit.MILLISECONDS);
 
 		ClusterNodeResponse clusterNodeResponse =
-			clusterNodeResponses.getClusterResponse(clusterNode);
+			clusterNodeResponses.getClusterResponse(
+				clusterNode.getClusterNodeId());
 
 		Map<String, Object> attributes =
 			(Map<String, Object>)clusterNodeResponse.getResult();
@@ -646,14 +653,14 @@ public class LicenseUtil {
 	private static final String _PROXY_USER_NAME = GetterUtil.getString(
 		PropsUtil.get("license.proxy.username"));
 
-	private static Log _log = LogFactoryUtil.getLog(LicenseUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(LicenseUtil.class);
 
 	private static String _encryptedSymmetricKey;
-	private static MethodHandler _getServerInfoMethodHandler =
+	private static final MethodHandler _getServerInfoMethodHandler =
 		new MethodHandler(new MethodKey(LicenseUtil.class, "getServerInfo"));
 	private static Set<String> _ipAddresses;
 	private static Set<String> _macAddresses;
-	private static MethodKey _registerOrderMethodKey = new MethodKey(
+	private static final MethodKey _registerOrderMethodKey = new MethodKey(
 		LicenseUtil.class, "registerOrder", String.class, String.class,
 		int.class);
 	private static byte[] _serverIdBytes;

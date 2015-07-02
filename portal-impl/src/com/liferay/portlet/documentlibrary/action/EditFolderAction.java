@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.repository.LocalRepository;
+import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -35,13 +36,11 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.service.RepositoryLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.FolderNameException;
@@ -180,7 +179,7 @@ public class EditFolderAction extends PortletAction {
 		long repositoryId = ParamUtil.getLong(actionRequest, "repositoryId");
 
 		LocalRepository localRepository =
-			RepositoryLocalServiceUtil.getLocalRepositoryImpl(repositoryId);
+			RepositoryProviderUtil.getLocalRepository(repositoryId);
 
 		if (localRepository.isCapabilityProvided(
 				TemporaryFileEntriesCapability.class)) {
@@ -209,7 +208,7 @@ public class EditFolderAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "folderIds"), 0L);
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteFolderId : deleteFolderIds) {
 			if (moveToTrash) {
@@ -223,9 +222,6 @@ public class EditFolderAction extends PortletAction {
 			else {
 				DLAppServiceUtil.deleteFolder(deleteFolderId);
 			}
-
-			AssetPublisherUtil.removeRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), deleteFolderId);
 		}
 
 		if (moveToTrash && (deleteFolderIds.length > 0)) {

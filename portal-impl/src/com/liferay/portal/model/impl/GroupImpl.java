@@ -18,8 +18,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.staging.StagingConstants;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -63,6 +61,8 @@ import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.exportimport.staging.StagingConstants;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 
 import java.io.IOException;
 
@@ -118,7 +118,7 @@ public class GroupImpl extends GroupBaseImpl {
 			group = this;
 		}
 
-		List<Group> groups = new ArrayList<Group>();
+		List<Group> groups = new ArrayList<>();
 
 		while (!group.isRoot()) {
 			group = group.getParentGroup();
@@ -137,7 +137,8 @@ public class GroupImpl extends GroupBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #getChildrenWithLayouts(boolean, int, int, OrderByComparator}
+	 *             #getChildrenWithLayouts(boolean, int, int,
+	 *             OrderByComparator)}
 	 */
 	@Deprecated
 	@Override
@@ -173,14 +174,14 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public List<Group> getDescendants(boolean site) {
-		Set<Group> descendants = new LinkedHashSet<Group>();
+		Set<Group> descendants = new LinkedHashSet<>();
 
 		for (Group group : getChildren(site)) {
 			descendants.add(group);
 			descendants.addAll(group.getDescendants(site));
 		}
 
-		return new ArrayList<Group>(descendants);
+		return new ArrayList<>(descendants);
 	}
 
 	@Override
@@ -192,13 +193,21 @@ public class GroupImpl extends GroupBaseImpl {
 	public String getDescriptiveName(Locale locale) throws PortalException {
 		Group curGroup = this;
 
-		String name = getName();
+		String name = getName(locale);
 
 		if (isCompany() && !isCompanyStagingGroup()) {
 			name = LanguageUtil.get(locale, "global");
 		}
 		else if (isControlPanel()) {
 			name = LanguageUtil.get(locale, "control-panel");
+		}
+		else if (isGuest()) {
+			Company company = CompanyLocalServiceUtil.getCompany(
+				getCompanyId());
+
+			Account account = company.getAccount();
+
+			name = account.getName();
 		}
 		else if (isLayout()) {
 			Layout layout = LayoutLocalServiceUtil.getLayout(getClassPK());
@@ -247,14 +256,6 @@ public class GroupImpl extends GroupBaseImpl {
 		else if (isUserPersonalSite()) {
 			name = LanguageUtil.get(locale, "user-personal-site");
 		}
-		else if (name.equals(GroupConstants.GUEST)) {
-			Company company = CompanyLocalServiceUtil.getCompany(
-				getCompanyId());
-
-			Account account = company.getAccount();
-
-			name = account.getName();
-		}
 
 		if (curGroup.isStaged() && !curGroup.isStagedRemotely() &&
 			curGroup.isStagingGroup()) {
@@ -276,27 +277,27 @@ public class GroupImpl extends GroupBaseImpl {
 	public String getDisplayURL(
 		ThemeDisplay themeDisplay, boolean privateLayout) {
 
-		String portalURL = themeDisplay.getPortalURL();
+		if (!privateLayout && (getPublicLayoutsPageCount() > 0)) {
+			try {
+				String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
+					getPublicLayoutSet(), themeDisplay);
 
-		if ((privateLayout && (getPrivateLayoutsPageCount() > 0)) ||
-			(!privateLayout && (getPublicLayoutsPageCount() > 0))) {
-
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(portalURL);
-			sb.append(themeDisplay.getPathMain());
-			sb.append("/my_sites/view?groupId=");
-			sb.append(getGroupId());
-
-			if (privateLayout) {
-				sb.append("&privateLayout=1");
+				return PortalUtil.addPreservedParameters(
+					themeDisplay, groupFriendlyURL);
 			}
-			else {
-				sb.append("&privateLayout=0");
+			catch (PortalException pe) {
 			}
+		}
+		else if (privateLayout && (getPrivateLayoutsPageCount() > 0)) {
+			try {
+				String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
+					getPrivateLayoutSet(), themeDisplay);
 
-			return PortalUtil.addPreservedParameters(
-				themeDisplay, sb.toString());
+				return PortalUtil.addPreservedParameters(
+					themeDisplay, groupFriendlyURL);
+			}
+			catch (PortalException pe) {
+			}
 		}
 
 		return StringPool.BLANK;
@@ -816,9 +817,9 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public boolean isControlPanel() {
-		String name = getName();
+		String groupKey = getGroupKey();
 
-		if (name.equals(GroupConstants.CONTROL_PANEL)) {
+		if (groupKey.equals(GroupConstants.CONTROL_PANEL)) {
 			return true;
 		}
 		else {
@@ -828,9 +829,9 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public boolean isGuest() {
-		String name = getName();
+		String groupKey = getGroupKey();
 
-		if (name.equals(GroupConstants.GUEST)) {
+		if (groupKey.equals(GroupConstants.GUEST)) {
 			return true;
 		}
 		else {
@@ -900,7 +901,9 @@ public class GroupImpl extends GroupBaseImpl {
 			PermissionChecker permissionChecker, boolean privateSite)
 		throws PortalException {
 
-		if (!isControlPanel() && !isSite() && !isUser()) {
+		if (!isControlPanel() && !isSite() && !isUser() &&
+			!isUserPersonalPanel()) {
+
 			return false;
 		}
 
@@ -1055,6 +1058,18 @@ public class GroupImpl extends GroupBaseImpl {
 	@Override
 	public boolean isUserGroup() {
 		return hasClassName(UserGroup.class);
+	}
+
+	@Override
+	public boolean isUserPersonalPanel() {
+		String groupKey = getGroupKey();
+
+		if (groupKey.equals(GroupConstants.USER_PERSONAL_PANEL)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override

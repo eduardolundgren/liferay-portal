@@ -17,6 +17,8 @@ package com.liferay.portlet.ratings.service.impl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -28,7 +30,6 @@ import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.base.RatingsEntryLocalServiceBaseImpl;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,16 +43,27 @@ public class RatingsEntryLocalServiceImpl
 	public void deleteEntry(long userId, String className, long classPK)
 		throws PortalException {
 
-		// Entry
-
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		RatingsEntry entry = ratingsEntryPersistence.fetchByU_C_C(
 			userId, classNameId, classPK);
 
+		ratingsEntryLocalService.deleteEntry(entry, userId, className, classPK);
+	}
+
+	@Override
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
+	public void deleteEntry(
+			RatingsEntry entry, long userId, String className, long classPK)
+		throws PortalException {
+
+		// Entry
+
 		if (entry == null) {
 			return;
 		}
+
+		long classNameId = classNameLocalService.getClassNameId(className);
 
 		double oldScore = entry.getScore();
 
@@ -142,7 +154,6 @@ public class RatingsEntryLocalServiceImpl
 
 		long classNameId = classNameLocalService.getClassNameId(className);
 		double oldScore = 0;
-		Date now = new Date();
 
 		validate(score);
 
@@ -152,7 +163,6 @@ public class RatingsEntryLocalServiceImpl
 		if (entry != null) {
 			oldScore = entry.getScore();
 
-			entry.setModifiedDate(serviceContext.getModifiedDate(now));
 			entry.setScore(score);
 
 			ratingsEntryPersistence.update(entry);
@@ -180,8 +190,6 @@ public class RatingsEntryLocalServiceImpl
 			entry.setCompanyId(user.getCompanyId());
 			entry.setUserId(user.getUserId());
 			entry.setUserName(user.getFullName());
-			entry.setCreateDate(serviceContext.getCreateDate(now));
-			entry.setModifiedDate(serviceContext.getModifiedDate(now));
 			entry.setClassNameId(classNameId);
 			entry.setClassPK(classPK);
 			entry.setScore(score);

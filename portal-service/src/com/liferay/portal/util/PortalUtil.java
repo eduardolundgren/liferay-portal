@@ -68,6 +68,8 @@ import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 
@@ -328,17 +330,6 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             com.liferay.portal.kernel.language.LanguageUtil#getAvailableLocales}
-	 */
-	@Deprecated
-	public static Locale[] getAlternateLocales(HttpServletRequest request)
-		throws PortalException {
-
-		return getPortal().getAlternateLocales(request);
-	}
-
-	/**
 	 * Returns the alternate URL for the requested canonical URL in the given
 	 * locale.
 	 *
@@ -424,15 +415,10 @@ public class PortalUtil {
 	}
 
 	/**
-	 * Returns the user's ID from the HTTP authentication headers after
-	 * validating his credentials.
-	 *
-	 * @param  request the servlet request from which to retrieve the HTTP
-	 *         authentication headers
-	 * @return the user's ID if HTTP authentication headers are present and his
-	 *         credentials are valid; <code>0</code> otherwise
-	 * @throws PortalException if an authentication exception occurred
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 * 		com.liferay.portal.kernel.security.auth.http.HttpAuthManagerUtil#getBasicUserId(HttpServletRequest)}
 	 */
+	@Deprecated
 	public static long getBasicAuthUserId(HttpServletRequest request)
 		throws PortalException {
 
@@ -440,16 +426,10 @@ public class PortalUtil {
 	}
 
 	/**
-	 * Returns the user's ID from the HTTP authentication headers after
-	 * validating his credentials.
-	 *
-	 * @param  request the servlet request from which to retrieve the HTTP
-	 *         authentication headers
-	 * @param  companyId the company's ID. This parameter is not used.
-	 * @return the user's ID if HTTP authentication headers are present and his
-	 *         credentials are valid; <code>0</code> otherwise
-	 * @throws PortalException if an authentication exception occurred
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 * 		com.liferay.portal.kernel.security.auth.http.HttpAuthManagerUtil#getBasicUserId(HttpServletRequest)}
 	 */
+	@Deprecated
 	public static long getBasicAuthUserId(
 			HttpServletRequest request, long companyId)
 		throws PortalException {
@@ -711,10 +691,54 @@ public class PortalUtil {
 		return getPortal().getCurrentAndAncestorSiteGroupIds(groupId);
 	}
 
+	public static long[] getCurrentAndAncestorSiteGroupIds(
+			long groupId, boolean checkContentSharingWithChildrenEnabled)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroupIds(
+			groupId, checkContentSharingWithChildrenEnabled);
+	}
+
+	public static long[] getCurrentAndAncestorSiteGroupIds(long[] groupIds)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroupIds(groupIds);
+	}
+
+	public static long[] getCurrentAndAncestorSiteGroupIds(
+			long[] groupIds, boolean checkContentSharingWithChildrenEnabled)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroupIds(
+			groupIds, checkContentSharingWithChildrenEnabled);
+	}
+
 	public static List<Group> getCurrentAndAncestorSiteGroups(long groupId)
 		throws PortalException {
 
 		return getPortal().getCurrentAndAncestorSiteGroups(groupId);
+	}
+
+	public static List<Group> getCurrentAndAncestorSiteGroups(
+			long groupId, boolean checkContentSharingWithChildrenEnabled)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroups(
+			groupId, checkContentSharingWithChildrenEnabled);
+	}
+
+	public static List<Group> getCurrentAndAncestorSiteGroups(long[] groupIds)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroups(groupIds);
+	}
+
+	public static List<Group> getCurrentAndAncestorSiteGroups(
+			long[] groupIds, boolean checkContentSharingWithChildrenEnabled)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroups(
+			groupIds, checkContentSharingWithChildrenEnabled);
 	}
 
 	public static String getCurrentCompleteURL(HttpServletRequest request) {
@@ -861,6 +885,11 @@ public class PortalUtil {
 		return getPortal().getDefaultCompanyId();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 * 		com.liferay.portal.kernel.security.auth.http.HttpAuthManagerUtil#getDigestUserId(HttpServletRequest)}
+	 */
+	@Deprecated
 	public static long getDigestAuthUserId(HttpServletRequest request)
 		throws PortalException {
 
@@ -940,6 +969,10 @@ public class PortalUtil {
 			portlet, facebookCanvasPageURL, themeDisplay);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static Portlet getFirstMyAccountPortlet(ThemeDisplay themeDisplay) {
 		return getPortal().getFirstMyAccountPortlet(themeDisplay);
 	}
@@ -1062,6 +1095,10 @@ public class PortalUtil {
 			locale, defaultI18nPathLanguageId);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static String getJournalArticleActualURL(
 			long groupId, boolean privateLayout, String mainPath,
 			String friendlyURL, Map<String, String[]> params,
@@ -1073,6 +1110,10 @@ public class PortalUtil {
 			requestContext);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static Layout getJournalArticleLayout(
 			long groupId, boolean privateLayout, String friendlyURL)
 		throws PortalException {
@@ -1308,9 +1349,7 @@ public class PortalUtil {
 	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupId(long)}
 	 */
 	@Deprecated
-	public static long getParentGroupId(long scopeGroupId)
-		throws PortalException {
-
+	public static long getParentGroupId(long scopeGroupId) {
 		return getPortal().getParentGroupId(scopeGroupId);
 	}
 
@@ -1813,9 +1852,7 @@ public class PortalUtil {
 		return getPortal().getSiteDefaultLocale(groupId);
 	}
 
-	public static long getSiteGroupId(long scopeGroupId)
-		throws PortalException {
-
+	public static long getSiteGroupId(long scopeGroupId) {
 		return getPortal().getSiteGroupId(scopeGroupId);
 	}
 
@@ -1991,6 +2028,10 @@ public class PortalUtil {
 		return getPortal().getVirtualHostname(layoutSet);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static String getVirtualLayoutActualURL(
 			long groupId, boolean privateLayout, String mainPath,
 			String friendlyURL, Map<String, String[]> params,
@@ -2002,6 +2043,10 @@ public class PortalUtil {
 			requestContext);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static LayoutFriendlyURLComposite
 		getVirtualLayoutFriendlyURLComposite(
 			boolean privateLayout, String friendlyURL,
@@ -2034,6 +2079,15 @@ public class PortalUtil {
 
 		getPortal().invokeTaglibDiscussion(
 			portletConfig, actionRequest, actionResponse);
+	}
+
+	public static void invokeTaglibDiscussionPagination(
+			PortletConfig portletConfig, ResourceRequest resourceRequest,
+			ResourceResponse resourceResponse)
+		throws IOException, PortletException {
+
+		getPortal().invokeTaglibDiscussionPagination(
+			portletConfig, resourceRequest, resourceResponse);
 	}
 
 	/**
@@ -2366,17 +2420,19 @@ public class PortalUtil {
 	}
 
 	public static void updateImageId(
-			BaseModel<?> baseModel, boolean image, byte[] bytes,
+			BaseModel<?> baseModel, boolean hasImage, byte[] bytes,
 			String fieldName, long maxSize, int maxHeight, int maxWidth)
 		throws PortalException {
 
 		getPortal().updateImageId(
-			baseModel, image, bytes, fieldName, maxSize, maxHeight, maxWidth);
+			baseModel, hasImage, bytes, fieldName, maxSize, maxHeight,
+			maxWidth);
 	}
 
 	public static PortletMode updatePortletMode(
-		String portletId, User user, Layout layout, PortletMode portletMode,
-		HttpServletRequest request) {
+			String portletId, User user, Layout layout, PortletMode portletMode,
+			HttpServletRequest request)
+		throws PortalException {
 
 		return getPortal().updatePortletMode(
 			portletId, user, layout, portletMode, request);
@@ -2398,7 +2454,7 @@ public class PortalUtil {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #removePortalInetSocketAddressEventListener(
+	 *             #removePortalEventListener(
 	 *             PortalInetSocketAddressEventListener)}
 	 */
 	@Deprecated

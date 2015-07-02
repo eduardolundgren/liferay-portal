@@ -20,6 +20,7 @@ import com.liferay.document.library.google.docs.util.GoogleDocsMetadataHelper;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -31,7 +32,7 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngine;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public class LegacyGoogleDocsMigration {
 
@@ -79,8 +80,9 @@ public class LegacyGoogleDocsMigration {
 		_dlFileEntryType = _dlFileEntryTypeLocalService.updateDLFileEntryType(
 			_dlFileEntryType);
 
-		_dlFileEntryTypeLocalService.addDDMStructureDLFileEntryType(
-			ddmStructure.getStructureId(), _dlFileEntryType);
+		_dlFileEntryTypeLocalService.addDDMStructureLinks(
+			_dlFileEntryType.getFileEntryTypeId(),
+			SetUtil.fromArray(new long[] {ddmStructure.getStructureId()}));
 
 		upgradeDLFileEntries();
 

@@ -42,7 +42,6 @@ import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.base.ResourcePermissionLocalServiceBaseImpl;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.ResourcePermissionsThreadLocal;
 import com.liferay.util.dao.orm.CustomSQLUtil;
@@ -146,8 +145,6 @@ public class ResourcePermissionLocalServiceImpl
 		updateResourcePermission(
 			companyId, name, scope, primKey, roleId, 0, new String[] {actionId},
 			ResourcePermissionConstants.OPERATOR_ADD);
-
-		PermissionCacheUtil.clearCache();
 	}
 
 	/**
@@ -243,6 +240,10 @@ public class ResourcePermissionLocalServiceImpl
 				resourcePermission.setActionIds(resourceActionBitwiseValue);
 
 				session.save(resourcePermission);
+
+				PermissionCacheUtil.clearResourcePermissionCache(
+					resourcePermission.getName(),
+					resourcePermission.getPrimKey());
 			}
 		}
 		catch (Exception e) {
@@ -343,16 +344,15 @@ public class ResourcePermissionLocalServiceImpl
 		List<ResourcePermission> resourcePermissions = getResourcePermissions(
 			companyId, name, scope, primKey);
 
-		Map<Long, Set<String>> roleIdsToActionIds =
-			new HashMap<Long, Set<String>>(resourcePermissions.size());
+		Map<Long, Set<String>> roleIdsToActionIds = new HashMap<>(
+			resourcePermissions.size());
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
 			if (resourcePermission.getActionIds() == 0) {
 				continue;
 			}
 
-			Set<String> availableActionIds = new HashSet<String>(
-				actionIds.size());
+			Set<String> availableActionIds = new HashSet<>(actionIds.size());
 
 			for (String actionId : actionIds) {
 				if (resourcePermission.hasActionId(actionId)) {
@@ -399,8 +399,7 @@ public class ResourcePermissionLocalServiceImpl
 			return Collections.emptyList();
 		}
 
-		List<String> availableActionIds = new ArrayList<String>(
-			actionIds.size());
+		List<String> availableActionIds = new ArrayList<>(actionIds.size());
 
 		for (String actionId : actionIds) {
 			ResourceAction resourceAction =
@@ -542,6 +541,40 @@ public class ResourcePermissionLocalServiceImpl
 		long roleId, int[] scopes, int start, int end) {
 
 		return resourcePermissionFinder.findByR_S(roleId, scopes, start, end);
+	}
+
+	@Override
+	public List<Role> getRoles(
+			long companyId, String name, int scope, String primKey,
+			String actionId)
+		throws PortalException {
+
+		List<ResourcePermission> resourcePermissions =
+			resourcePermissionPersistence.findByC_N_S_P(
+				companyId, name, scope, primKey);
+
+		if (resourcePermissions.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		ResourceAction resourceAction =
+			resourceActionLocalService.getResourceAction(name, actionId);
+
+		Set<Long> rolesIds = new HashSet<>();
+
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			if (resourcePermission.hasAction(resourceAction)) {
+				rolesIds.add(resourcePermission.getRoleId());
+			}
+		}
+
+		List<Role> roles = new ArrayList<>(rolesIds.size());
+
+		for (long roleId : rolesIds) {
+			roles.add(roleLocalService.getRole(roleId));
+		}
+
+		return roles;
 	}
 
 	/**
@@ -761,8 +794,7 @@ public class ResourcePermissionLocalServiceImpl
 				PropsValues.
 					PERMISSIONS_ROLE_RESOURCE_PERMISSION_QUERY_THRESHOLD) &&
 			!dbType.equals(DB.TYPE_DERBY) &&
-			!dbType.equals(DB.TYPE_JDATASTORE) &&
-			!dbType.equals(DB.TYPE_SAP)) {
+			!dbType.equals(DB.TYPE_JDATASTORE) && !dbType.equals(DB.TYPE_SAP)) {
 
 			int count = resourcePermissionFinder.countByC_N_S_P_R_A(
 				companyId, name, scope, primKey, roleIds,
@@ -791,6 +823,11 @@ public class ResourcePermissionLocalServiceImpl
 		return false;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getRoles(long, String, int, String, String}
+	 */
+	@Deprecated
 	@Override
 	public boolean[] hasResourcePermissions(
 			long companyId, String name, int scope, String primKey,
@@ -891,10 +928,10 @@ public class ResourcePermissionLocalServiceImpl
 		if (fromRole.getType() != toRole.getType()) {
 			throw new PortalException("Role types are mismatched");
 		}
-		else if (PortalUtil.isSystemRole(toRole.getName())) {
+		else if (toRole.isSystem()) {
 			throw new PortalException("Cannot move permissions to system role");
 		}
-		else if (PortalUtil.isSystemRole(fromRole.getName())) {
+		else if (fromRole.isSystem()) {
 			throw new PortalException(
 				"Cannot move permissions from system role");
 		}
@@ -961,6 +998,8 @@ public class ResourcePermissionLocalServiceImpl
 		if (resourcePermissions.isEmpty()) {
 			roleLocalService.deleteRole(fromRoleId);
 		}
+
+		PermissionCacheUtil.clearCache();
 	}
 
 	/**
@@ -993,8 +1032,6 @@ public class ResourcePermissionLocalServiceImpl
 		updateResourcePermission(
 			companyId, name, scope, primKey, roleId, 0, new String[] {actionId},
 			ResourcePermissionConstants.OPERATOR_REMOVE);
-
-		PermissionCacheUtil.clearCache();
 	}
 
 	/**
@@ -1027,8 +1064,6 @@ public class ResourcePermissionLocalServiceImpl
 				0, new String[] {actionId},
 				ResourcePermissionConstants.OPERATOR_REMOVE);
 		}
-
-		PermissionCacheUtil.clearCache();
 	}
 
 	/**
@@ -1233,8 +1268,6 @@ public class ResourcePermissionLocalServiceImpl
 
 		resourcePermissionPersistence.update(resourcePermission);
 
-		PermissionCacheUtil.clearCache();
-
 		SearchEngineUtil.updatePermissionFields(name, primKey);
 	}
 
@@ -1243,9 +1276,12 @@ public class ResourcePermissionLocalServiceImpl
 			long ownerId, Map<Long, String[]> roleIdsToActionIds)
 		throws PortalException {
 
-		boolean flushEnabled = PermissionThreadLocal.isFlushEnabled();
+		boolean flushResourcePermissionEnabled =
+			PermissionThreadLocal.isFlushResourcePermissionEnabled(
+				name, primKey);
 
-		PermissionThreadLocal.setIndexEnabled(false);
+		PermissionThreadLocal.setFlushResourcePermissionEnabled(
+			name, primKey, false);
 
 		try {
 			long[] roleIds = ArrayUtil.toLongArray(roleIdsToActionIds.keySet());
@@ -1279,9 +1315,10 @@ public class ResourcePermissionLocalServiceImpl
 			}
 		}
 		finally {
-			PermissionThreadLocal.setIndexEnabled(flushEnabled);
+			PermissionThreadLocal.setFlushResourcePermissionEnabled(
+				name, primKey, flushResourcePermissionEnabled);
 
-			PermissionCacheUtil.clearCache();
+			PermissionCacheUtil.clearResourcePermissionCache(name, primKey);
 
 			SearchEngineUtil.updatePermissionFields(name, primKey);
 		}

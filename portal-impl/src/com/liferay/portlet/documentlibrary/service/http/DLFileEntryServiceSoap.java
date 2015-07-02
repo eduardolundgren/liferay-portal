@@ -26,7 +26,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portlet.documentlibrary.service.DLFileEntryServiceUtil} service utility. The
+ * {@link DLFileEntryServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -61,7 +61,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see DLFileEntryServiceHttp
  * @see com.liferay.portlet.documentlibrary.model.DLFileEntrySoap
- * @see com.liferay.portlet.documentlibrary.service.DLFileEntryServiceUtil
+ * @see DLFileEntryServiceUtil
  * @generated
  */
 @ProviderType
@@ -446,6 +446,20 @@ public class DLFileEntryServiceSoap {
 		}
 	}
 
+	public static com.liferay.portal.kernel.lock.Lock getFileEntryLock(
+		long fileEntryId) throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = DLFileEntryServiceUtil.getFileEntryLock(fileEntryId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static int getFoldersFileEntriesCount(long groupId,
 		Long[] folderIds, int status) throws RemoteException {
 		try {
@@ -602,6 +616,22 @@ public class DLFileEntryServiceSoap {
 					newFolderId, serviceContext);
 
 			return com.liferay.portlet.documentlibrary.model.DLFileEntrySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.kernel.lock.Lock refreshFileEntryLock(
+		java.lang.String lockUuid, long companyId, long expirationTime)
+		throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = DLFileEntryServiceUtil.refreshFileEntryLock(lockUuid,
+					companyId, expirationTime);
+
+			return returnValue;
 		}
 		catch (Exception e) {
 			_log.error(e, e);

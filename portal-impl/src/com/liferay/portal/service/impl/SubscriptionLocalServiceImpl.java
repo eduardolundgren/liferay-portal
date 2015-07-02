@@ -28,7 +28,6 @@ import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -107,7 +106,6 @@ public class SubscriptionLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long classNameId = classNameLocalService.getClassNameId(className);
-		Date now = new Date();
 
 		Subscription subscription = subscriptionPersistence.fetchByC_U_C_C(
 			user.getCompanyId(), userId, classNameId, classPK);
@@ -117,11 +115,10 @@ public class SubscriptionLocalServiceImpl
 
 			subscription = subscriptionPersistence.create(subscriptionId);
 
+			subscription.setGroupId(groupId);
 			subscription.setCompanyId(user.getCompanyId());
 			subscription.setUserId(user.getUserId());
 			subscription.setUserName(user.getFullName());
-			subscription.setCreateDate(now);
-			subscription.setModifiedDate(now);
 			subscription.setClassNameId(classNameId);
 			subscription.setClassPK(classPK);
 			subscription.setFrequency(frequency);
@@ -144,8 +141,8 @@ public class SubscriptionLocalServiceImpl
 					userId, groupId, subscription.getCreateDate(),
 					subscription.getModifiedDate(), className, classPK, null, 0,
 					null, null, false, null, null, null, null,
-					String.valueOf(groupId), null, null, null, null, 0, 0, null,
-					false);
+					String.valueOf(groupId), null, null, null, null, 0, 0,
+					null);
 			}
 
 			// Social
@@ -278,6 +275,18 @@ public class SubscriptionLocalServiceImpl
 		}
 	}
 
+	@Override
+	public void deleteSubscriptions(long userId, long groupId)
+		throws PortalException {
+
+		List<Subscription> subscriptions = subscriptionPersistence.findByG_U(
+			groupId, userId);
+
+		for (Subscription subscription : subscriptions) {
+			deleteSubscription(subscription);
+		}
+	}
+
 	/**
 	 * Deletes all the subscriptions to the entity.
 	 *
@@ -299,6 +308,16 @@ public class SubscriptionLocalServiceImpl
 		for (Subscription subscription : subscriptions) {
 			deleteSubscription(subscription);
 		}
+	}
+
+	@Override
+	public Subscription fetchSubscription(
+		long companyId, long userId, String className, long classPK) {
+
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		return subscriptionPersistence.fetchByC_U_C_C(
+			companyId, userId, classNameId, classPK);
 	}
 
 	/**

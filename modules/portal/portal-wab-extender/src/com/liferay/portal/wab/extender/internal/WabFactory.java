@@ -14,20 +14,22 @@
 
 package com.liferay.portal.wab.extender.internal;
 
-import com.liferay.portal.kernel.util.GetterUtil;
+import aQute.bnd.annotation.metatype.Configurable;
+
+import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.wab.extender.internal.configuration.WabExtenderConfiguration;
 import com.liferay.portal.wab.extender.internal.event.EventUtil;
 
 import java.util.Dictionary;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.felix.utils.extender.AbstractExtender;
 import org.apache.felix.utils.extender.Extension;
 import org.apache.felix.utils.log.Logger;
-
-import org.eclipse.equinox.http.servlet.ExtendedHttpService;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -38,36 +40,54 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+
 /**
  * @author Miguel Pastor
  * @author Raymond Augé
  */
 @Component(
-	configurationPid = "com.liferay.portal.wab.extender",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	property = {
-		"com.liferay.portal.wab.extender.stop.timeout=60000"
-	}
+	configurationPid = "com.liferay.portal.wab.extender.internal.configuration.WabExtenderConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true
 )
 public class WabFactory extends AbstractExtender {
 
 	@Activate
 	public void activate(ComponentContext componentContext) {
+		setSynchronous(true);
+
 		_bundleContext = componentContext.getBundleContext();
 		_eventUtil = new EventUtil(_bundleContext);
 		_logger = new Logger(_bundleContext);
 
+		_saxParserFactory.setNamespaceAware(false);
+		_saxParserFactory.setValidating(false);
+		_saxParserFactory.setXIncludeAware(false);
+
+		try {
+			_saxParserFactory.setFeature(_FEATURES_DISALLOW_DOCTYPE_DECL, true);
+			_saxParserFactory.setFeature(
+				_FEATURES_EXTERNAL_GENERAL_ENTITIES, false);
+			_saxParserFactory.setFeature(
+				_FEATURES_EXTERNAL_PARAMETER_ENTITIES, false);
+			_saxParserFactory.setFeature(_FEATURES_LOAD_EXTERNAL_DTD, false);
+		}
+		catch (ParserConfigurationException | SAXNotRecognizedException |
+			SAXNotSupportedException e) {
+
+			ReflectionUtil.throwException(e);
+		}
+
 		Dictionary<String, Object> properties =
 			componentContext.getProperties();
 
-		_stopTimeout = GetterUtil.getLong(
-			properties.get("com.liferay.portal.wab.extender.stop.timeout"),
-			60000);
+		_wabExtenderConfiguration = Configurable.createConfigurable(
+			WabExtenderConfiguration.class, properties);
 
 		try {
 			_webBundleDeployer = new WebBundleDeployer(
-				_bundleContext, _extendedHttpService, _saxParserFactory,
-				_eventUtil, _logger);
+				_bundleContext, _saxParserFactory, _eventUtil, _logger);
 
 			super.start(_bundleContext);
 		}
@@ -108,18 +128,9 @@ public class WabFactory extends AbstractExtender {
 		_logger.log(Logger.LOG_ERROR, message, t);
 	}
 
-	@Reference
-	protected void setExtendedHttpService(
-		ExtendedHttpService extendedHttpService) {
-
-		_extendedHttpService = extendedHttpService;
-	}
-
 	@Reference(unbind = "-")
 	protected void setSAXParserFactory(SAXParserFactory saxParserFactory) {
 		_saxParserFactory = saxParserFactory;
-
-		_saxParserFactory.setValidating(false);
 	}
 
 	@Override
@@ -127,12 +138,23 @@ public class WabFactory extends AbstractExtender {
 		_logger.log(Logger.LOG_WARNING, "[" + bundle + "] " + message, t);
 	}
 
+	private static final String _FEATURES_DISALLOW_DOCTYPE_DECL =
+		"http://apache.org/xml/features/disallow-doctype-decl";
+
+	private static final String _FEATURES_EXTERNAL_GENERAL_ENTITIES =
+		"http://xml.org/sax/features/external-general-entities";
+
+	private static final String _FEATURES_EXTERNAL_PARAMETER_ENTITIES =
+		"http://xml.org/sax/features/external-parameter-entities";
+
+	private static final String _FEATURES_LOAD_EXTERNAL_DTD =
+		"http://apache.org/xml/features/nonvalidating/load-external-dtd";
+
 	private BundleContext _bundleContext;
 	private EventUtil _eventUtil;
-	private ExtendedHttpService _extendedHttpService;
 	private Logger _logger;
 	private SAXParserFactory _saxParserFactory;
-	private long _stopTimeout;
+	private WabExtenderConfiguration _wabExtenderConfiguration;
 	private WebBundleDeployer _webBundleDeployer;
 
 	private class WABExtension implements Extension {
@@ -144,7 +166,9 @@ public class WabFactory extends AbstractExtender {
 		@Override
 		public void destroy() throws Exception {
 			try {
-				_started.await(_stopTimeout, TimeUnit.MILLISECONDS);
+				_started.await(
+					_wabExtenderConfiguration.stopTimeout(),
+					TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException ie) {
 				_logger.log(

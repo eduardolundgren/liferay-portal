@@ -22,13 +22,19 @@ String assetTagName = ParamUtil.getString(request, "tag");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/blogs/view");
+portletURL.setParameter("mvcRenderCommandName", "/blogs/view");
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL name="/blogs/edit_entry" var="restoreTrashEntriesURL">
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <liferay-portlet:renderURL varImpl="searchURL">
-	<portlet:param name="struts_action" value="/blogs/search" />
+	<portlet:param name="mvcPath" value="/html/portlet/blogs/search.jsp" />
 </liferay-portlet:renderURL>
 
 <aui:form action="<%= searchURL %>" method="get" name="fm1">
@@ -53,10 +59,6 @@ portletURL.setParameter("struts_action", "/blogs/view");
 	}
 	else {
 		int status = WorkflowConstants.STATUS_APPROVED;
-
-		if (BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ENTRY)) {
-			status = WorkflowConstants.STATUS_ANY;
-		}
 
 		total = BlogsEntryServiceUtil.getGroupEntriesCount(scopeGroupId, status);
 

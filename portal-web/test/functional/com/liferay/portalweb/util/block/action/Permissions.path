@@ -9,16 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>Permissions</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>PERMISSIONS_IFRAME</td>
 	<td>//iframe[@class='dialog-iframe-node ']</td>
 	<td></td>

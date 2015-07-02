@@ -14,20 +14,20 @@
 
 package com.liferay.portal.dao.orm.hibernate;
 
-import com.liferay.portal.cache.SingleVMPoolImpl;
-import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
-import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
+import com.liferay.portal.cache.test.TestPortalCache;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.tools.ToolDependencies;
 
 import java.io.InputStreamReader;
 
 import java.util.Arrays;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -40,17 +40,18 @@ public class SQLQueryTableNamesUtilTest {
 	public static final CodeCoverageAssertor codeCoverageAssertor =
 		CodeCoverageAssertor.INSTANCE;
 
-	@Before
-	public void setUp() {
-		SingleVMPoolImpl singleVMPoolImpl = new SingleVMPoolImpl();
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		ToolDependencies.wireCaches();
 
-		singleVMPoolImpl.setPortalCacheManager(
-			MemoryPortalCacheManager.createMemoryPortalCacheManager(
-				SQLQueryTableNamesUtilTest.class.getName()));
+		Class<SQLQueryTableNamesUtil> clazz = SQLQueryTableNamesUtil.class;
 
-		SingleVMPoolUtil singleVMPoolUtil = new SingleVMPoolUtil();
+		String className = clazz.getName();
 
-		singleVMPoolUtil.setSingleVMPool(singleVMPoolImpl);
+		Class.forName(className);
+
+		ReflectionTestUtil.setFieldValue(
+			clazz, "_portalCache", new TestPortalCache<>(className));
 	}
 
 	@Test

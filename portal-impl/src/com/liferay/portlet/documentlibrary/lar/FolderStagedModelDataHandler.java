@@ -16,19 +16,10 @@ package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataException;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -48,6 +39,12 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataException;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +62,11 @@ public class FolderStagedModelDataHandler
 	};
 
 	@Override
+	public void deleteStagedModel(Folder folder) throws PortalException {
+		DLAppLocalServiceUtil.deleteFolder(folder.getFolderId());
+	}
+
+	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
@@ -72,29 +74,31 @@ public class FolderStagedModelDataHandler
 		Folder folder = fetchStagedModelByUuidAndGroupId(uuid, groupId);
 
 		if (folder != null) {
-			DLAppLocalServiceUtil.deleteFolder(folder.getFolderId());
+			deleteStagedModel(folder);
 		}
-	}
-
-	@Override
-	public Folder fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<DLFolder> folders =
-			DLFolderLocalServiceUtil.getDLFoldersByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<DLFolder>());
-
-		if (ListUtil.isEmpty(folders)) {
-			return null;
-		}
-
-		return new LiferayFolder(folders.get(0));
 	}
 
 	@Override
 	public Folder fetchStagedModelByUuidAndGroupId(String uuid, long groupId) {
 		return FolderUtil.fetchByUUID_R(uuid, groupId);
+	}
+
+	@Override
+	public List<Folder> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		List<DLFolder> dlFolders =
+			DLFolderLocalServiceUtil.getDLFoldersByUuidAndCompanyId(
+				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new StagedModelModifiedDateComparator<DLFolder>());
+
+		List<Folder> folders = new ArrayList<>();
+
+		for (DLFolder dlFolder : dlFolders) {
+			folders.add(new LiferayFolder(dlFolder));
+		}
+
+		return folders;
 	}
 
 	@Override
@@ -105,6 +109,22 @@ public class FolderStagedModelDataHandler
 	@Override
 	public String getDisplayName(Folder folder) {
 		return folder.getName();
+	}
+
+	@Override
+	public void restoreStagedModel(
+			PortletDataContext portletDataContext, Folder stagedModel)
+		throws PortletDataException {
+
+		try {
+			doRestoreStagedModel(portletDataContext, stagedModel);
+		}
+		catch (PortletDataException pde) {
+			throw pde;
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
 	}
 
 	@Override
@@ -332,12 +352,6 @@ public class FolderStagedModelDataHandler
 			"defaultFileEntryTypeUuid", defaultFileEntryTypeUuid);
 	}
 
-	/**
-	 * @see com.liferay.portal.lar.PortletImporter#getAssetCategoryName(String,
-	 *      long, long, String, long, int)
-	 * @see com.liferay.portal.lar.PortletImporter#getAssetVocabularyName(
-	 *      String, long, String, int)
-	 */
 	protected String getFolderName(
 			String uuid, long groupId, long parentFolderId, String name,
 			int count)
@@ -367,7 +381,7 @@ public class FolderStagedModelDataHandler
 			return;
 		}
 
-		List<Long> currentFolderFileEntryTypeIds = new ArrayList<Long>();
+		List<Long> currentFolderFileEntryTypeIds = new ArrayList<>();
 
 		String defaultFileEntryTypeUuid = GetterUtil.getString(
 			folderElement.attributeValue("defaultFileEntryTypeUuid"));
@@ -448,35 +462,20 @@ public class FolderStagedModelDataHandler
 			throw pde;
 		}
 
-		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
-			DLFolder.class.getName());
+		if (folder instanceof LiferayFolder) {
+			LiferayFolder liferayFolder = (LiferayFolder)folder;
 
-		if (trashHandler != null) {
-			try {
-				if (trashHandler.isInTrash(folder.getFolderId()) ||
-					trashHandler.isInTrashContainer(folder.getFolderId())) {
+			DLFolder dlFolder = (DLFolder)liferayFolder.getModel();
 
-					throw new PortletDataException(
-						PortletDataException.STATUS_IN_TRASH);
-				}
-			}
-			catch (PortletDataException pde) {
+			if (dlFolder.isInTrash() || dlFolder.isInTrashContainer()) {
+				PortletDataException pde = new PortletDataException(
+					PortletDataException.STATUS_IN_TRASH);
+
+				pde.setStagedModel(folder);
+
 				throw pde;
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
-				}
-				else if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to check trash status for folder " +
-							folder.getFolderId());
-				}
 			}
 		}
 	}
-
-	private static Log _log = LogFactoryUtil.getLog(
-		FolderStagedModelDataHandler.class);
 
 }

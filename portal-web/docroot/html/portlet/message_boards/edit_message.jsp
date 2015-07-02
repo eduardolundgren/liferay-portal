@@ -183,6 +183,7 @@ else {
 		<liferay-ui:message key="<%= ase.getMessageKey() %>" />
 	</liferay-ui:error>
 
+	<liferay-ui:error exception="<%= CaptchaConfigurationException.class %>" message="a-captcha-error-occurred-please-contact-an-administrator" />
 	<liferay-ui:error exception="<%= CaptchaMaxChallengesException.class %>" message="maximum-number-of-captcha-attempts-exceeded" />
 	<liferay-ui:error exception="<%= CaptchaTextException.class %>" message="text-verification-failed" />
 	<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="please-enter-a-unique-document-name" />
@@ -279,7 +280,7 @@ else {
 		</c:if>
 
 		<c:if test="<%= (message == null) && themeDisplay.isSignedIn() && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBThread.class.getName(), threadId) && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBCategory.class.getName(), categoryId) %>">
-			<aui:input helpMessage="message-boards-message-subscribe-me-help" label="subscribe-me" name="subscribe" type='<%= (mbSettings.isEmailMessageAddedEnabled() || mbSettings.isEmailMessageUpdatedEnabled()) ? "checkbox" : "hidden" %>' value="<%= subscribeByDefault %>" />
+			<aui:input helpMessage="message-boards-message-subscribe-me-help" label="subscribe-me" name="subscribe" type='<%= (mbGroupServiceSettings.isEmailMessageAddedEnabled() || mbGroupServiceSettings.isEmailMessageUpdatedEnabled()) ? "checkbox" : "hidden" %>' value="<%= subscribeByDefault %>" />
 		</c:if>
 
 		<c:if test="<%= (priorities.length > 0) && MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.UPDATE_THREAD_PRIORITY) %>">
@@ -293,7 +294,7 @@ else {
 
 				<%
 				for (int i = 0; i < priorities.length; i++) {
-					String[] priority = StringUtil.split(priorities[i]);
+					String[] priority = StringUtil.split(priorities[i], StringPool.PIPE);
 
 					try {
 						String priorityName = priority[0];
@@ -519,7 +520,7 @@ else {
 
 	function <portlet:namespace />previewMessage() {
 		<c:if test="<%= ((message != null) && !message.isDraft()) %>">
-			if (!confirm('<liferay-ui:message key="in-order-to-preview-your-changes,-the-message-will-be-saved-as-a-draft-and-other-users-may-not-be-able-to-see-it" />')) {
+			if (!confirm('<liferay-ui:message key="in-order-to-preview-your-changes,-the-message-is-saved-as-a-draft-and-other-users-may-not-be-able-to-see-it" />')) {
 				return false;
 			}
 		</c:if>

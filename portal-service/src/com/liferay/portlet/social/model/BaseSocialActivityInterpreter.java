@@ -253,15 +253,15 @@ public abstract class BaseSocialActivityInterpreter
 				return HtmlUtil.escape(groupName);
 			}
 
-			String groupDisplayURL =
-				serviceContext.getPortalURL() + serviceContext.getPathMain() +
-					"/my_sites/view?groupId=" + group.getGroupId();
+			String groupDisplayURL = StringPool.BLANK;
 
 			if (group.hasPublicLayouts()) {
-				groupDisplayURL = groupDisplayURL + "&privateLayout=0";
+				groupDisplayURL = group.getDisplayURL(
+					serviceContext.getThemeDisplay(), false);
 			}
 			else if (group.hasPrivateLayouts()) {
-				groupDisplayURL = groupDisplayURL + "&privateLayout=1";
+				groupDisplayURL = group.getDisplayURL(
+					serviceContext.getThemeDisplay(), true);
 			}
 			else {
 				return HtmlUtil.escape(groupName);
@@ -297,15 +297,13 @@ public abstract class BaseSocialActivityInterpreter
 				return HtmlUtil.escape(groupName);
 			}
 
-			String groupDisplayURL =
-				themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
-					"/my_sites/view?groupId=" + group.getGroupId();
+			String groupDisplayURL = StringPool.BLANK;
 
 			if (group.hasPublicLayouts()) {
-				groupDisplayURL = groupDisplayURL + "&privateLayout=0";
+				groupDisplayURL = group.getDisplayURL(themeDisplay, false);
 			}
 			else if (group.hasPrivateLayouts()) {
-				groupDisplayURL = groupDisplayURL + "&privateLayout=1";
+				groupDisplayURL = group.getDisplayURL(themeDisplay, true);
 			}
 			else {
 				return HtmlUtil.escape(groupName);
@@ -357,18 +355,11 @@ public abstract class BaseSocialActivityInterpreter
 		String className = activity.getClassName();
 		long classPK = activity.getClassPK();
 
-		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
-			className);
+		String viewEntryInTrashURL = getViewEntryInTrashURL(
+			className, classPK, serviceContext);
 
-		if ((trashHandler != null) && trashHandler.isInTrash(classPK)) {
-			PortletURL portletURL = TrashUtil.getViewContentURL(
-				serviceContext.getRequest(), className, classPK);
-
-			if (portletURL == null) {
-				return null;
-			}
-
-			return portletURL.toString();
+		if (viewEntryInTrashURL != null) {
+			return viewEntryInTrashURL;
 		}
 
 		String path = getPath(activity, serviceContext);
@@ -515,6 +506,27 @@ public abstract class BaseSocialActivityInterpreter
 	@Deprecated
 	protected String getValue(String json, String key, String defaultValue) {
 		return getJSONValue(json, key, defaultValue);
+	}
+
+	protected String getViewEntryInTrashURL(
+			String className, long classPK, ServiceContext serviceContext)
+		throws Exception {
+
+		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
+			className);
+
+		if ((trashHandler != null) && trashHandler.isInTrash(classPK)) {
+			PortletURL portletURL = TrashUtil.getViewContentURL(
+				serviceContext.getRequest(), className, classPK);
+
+			if (portletURL == null) {
+				return null;
+			}
+
+			return portletURL.toString();
+		}
+
+		return null;
 	}
 
 	protected PortletURL getViewEntryPortletURL(

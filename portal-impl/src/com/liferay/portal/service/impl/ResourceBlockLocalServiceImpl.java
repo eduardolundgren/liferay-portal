@@ -60,6 +60,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.sql.DataSource;
@@ -216,7 +217,9 @@ public class ResourceBlockLocalServiceImpl
 		resourceBlockPermissionLocalService.deleteResourceBlockPermissions(
 			resourceBlock.getPrimaryKey());
 
-		return resourceBlockPersistence.remove(resourceBlock);
+		resourceBlockPersistence.remove(resourceBlock);
+
+		return resourceBlock;
 	}
 
 	@Override
@@ -250,7 +253,7 @@ public class ResourceBlockLocalServiceImpl
 		List<ResourceAction> resourceActions =
 			resourceActionLocalService.getResourceActions(name);
 
-		List<String> actionIds = new ArrayList<String>();
+		List<String> actionIds = new ArrayList<>();
 
 		for (ResourceAction resourceAction : resourceActions) {
 			if ((actionIdsLong & resourceAction.getBitwiseValue()) ==
@@ -354,6 +357,34 @@ public class ResourceBlockLocalServiceImpl
 	}
 
 	@Override
+	public List<Role> getRoles(String name, long primKey, String actionId)
+		throws PortalException {
+
+		long actionIdLong = getActionId(name, actionId);
+
+		ResourceBlock resourceBlock = getResourceBlock(name, primKey);
+
+		ResourceBlockPermissionsContainer resourceBlockPermissionsContainer =
+			resourceBlockPermissionLocalService.
+				getResourceBlockPermissionsContainer(
+					resourceBlock.getResourceBlockId());
+
+		Set<Long> roleIds = resourceBlockPermissionsContainer.getRoleIds();
+
+		List<Role> roles = new ArrayList<>(roleIds.size());
+
+		for (long roleId : roleIds) {
+			if (resourceBlockPermissionsContainer.hasPermission(
+					roleId, actionIdLong)) {
+
+				roles.add(roleLocalService.getRole(roleId));
+			}
+		}
+
+		return roles;
+	}
+
+	@Override
 	public boolean hasPermission(
 			String name, long primKey, String actionId,
 			ResourceBlockIdsBag resourceBlockIdsBag)
@@ -387,7 +418,8 @@ public class ResourceBlockLocalServiceImpl
 	@Override
 	@Transactional(
 		isolation = Isolation.READ_COMMITTED,
-		propagation = Propagation.REQUIRES_NEW)
+		propagation = Propagation.REQUIRES_NEW
+	)
 	public void releasePermissionedModelResourceBlock(
 		PermissionedModel permissionedModel) {
 
@@ -414,7 +446,8 @@ public class ResourceBlockLocalServiceImpl
 	@Override
 	@Transactional(
 		isolation = Isolation.READ_COMMITTED,
-		propagation = Propagation.REQUIRES_NEW)
+		propagation = Propagation.REQUIRES_NEW
+	)
 	public void releaseResourceBlock(long resourceBlockId) {
 		Session session = resourceBlockPersistence.openSession();
 
@@ -442,6 +475,11 @@ public class ResourceBlockLocalServiceImpl
 						qPos.add(resourceBlockId);
 
 						sqlQuery.executeUpdate();
+
+						PermissionCacheUtil.clearResourceBlockCache(
+							resourceBlock.getCompanyId(),
+							resourceBlock.getGroupId(),
+							resourceBlock.getName());
 					}
 				}
 
@@ -469,7 +507,8 @@ public class ResourceBlockLocalServiceImpl
 	@Override
 	@Transactional(
 		isolation = Isolation.READ_COMMITTED,
-		propagation = Propagation.REQUIRES_NEW)
+		propagation = Propagation.REQUIRES_NEW
+	)
 	public void releaseResourceBlock(ResourceBlock resourceBlock) {
 		releaseResourceBlock(resourceBlock.getResourceBlockId());
 	}
@@ -671,9 +710,12 @@ public class ResourceBlockLocalServiceImpl
 			Map<Long, String[]> roleIdsToActionIds)
 		throws PortalException {
 
-		boolean flushEnabled = PermissionThreadLocal.isFlushEnabled();
+		boolean flushResourceBlockEnabled =
+			PermissionThreadLocal.isFlushResourceBlockEnabled(
+				companyId, groupId, name);
 
-		PermissionThreadLocal.setIndexEnabled(false);
+		PermissionThreadLocal.setFlushResourceBlockEnabled(
+			companyId, groupId, name, false);
 
 		try {
 			PermissionedModel permissionedModel = getPermissionedModel(
@@ -695,9 +737,11 @@ public class ResourceBlockLocalServiceImpl
 			}
 		}
 		finally {
-			PermissionThreadLocal.setIndexEnabled(flushEnabled);
+			PermissionThreadLocal.setFlushResourceBlockEnabled(
+				companyId, groupId, name, flushResourceBlockEnabled);
 
-			PermissionCacheUtil.clearCache();
+			PermissionCacheUtil.clearResourceBlockCache(
+				companyId, groupId, name);
 		}
 	}
 
@@ -734,12 +778,7 @@ public class ResourceBlockLocalServiceImpl
 			updateCompanyScopeResourceTypePermissions(
 				companyId, name, roleId, actionIdsLong, operator);
 
-		List<ResourceBlock> resourceBlocks = resourceBlockPersistence.findByC_N(
-			companyId, name);
-
-		updatePermissions(resourceBlocks, roleId, actionIdsLong, operator);
-
-		PermissionCacheUtil.clearCache();
+		PermissionCacheUtil.clearResourceCache();
 	}
 
 	@Override
@@ -751,12 +790,7 @@ public class ResourceBlockLocalServiceImpl
 			updateGroupScopeResourceTypePermissions(
 				companyId, groupId, name, roleId, actionIdsLong, operator);
 
-		List<ResourceBlock> resourceBlocks =
-			resourceBlockPersistence.findByC_G_N(companyId, groupId, name);
-
-		updatePermissions(resourceBlocks, roleId, actionIdsLong, operator);
-
-		PermissionCacheUtil.clearCache();
+		PermissionCacheUtil.clearResourceBlockCache(companyId, groupId, name);
 	}
 
 	@Override
@@ -812,13 +846,14 @@ public class ResourceBlockLocalServiceImpl
 			companyId, groupId, name, permissionedModel, permissionsHash,
 			resourceBlockPermissionsContainer);
 
-		PermissionCacheUtil.clearCache();
+		PermissionCacheUtil.clearResourceBlockCache(companyId, groupId, name);
 	}
 
 	@Override
 	@Transactional(
 		isolation = Isolation.READ_COMMITTED,
-		propagation = Propagation.REQUIRES_NEW)
+		propagation = Propagation.REQUIRES_NEW
+	)
 	public ResourceBlock updateResourceBlockId(
 		long companyId, long groupId, String name,
 		final PermissionedModel permissionedModel, String permissionsHash,
@@ -1051,7 +1086,7 @@ public class ResourceBlockLocalServiceImpl
 	private static final String _RETAIN_RESOURCE_BLOCK =
 		ResourceBlockLocalServiceImpl.class.getName() + ".retainResourceBlock";
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ResourceBlockLocalServiceImpl.class);
 
 }
