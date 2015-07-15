@@ -14,12 +14,15 @@
 
 package com.liferay.portal.tools;
 
-import com.liferay.portal.cache.MultiVMPoolImpl;
-import com.liferay.portal.cache.SingleVMPoolImpl;
-import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
+import com.liferay.portal.cache.DummyPortalCacheManager;
+import com.liferay.portal.cache.key.SimpleCacheKeyGenerator;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
+import com.liferay.portal.kernel.cache.MultiVMPool;
+import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.PortalCacheManager;
+import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
+import com.liferay.portal.kernel.cache.SingleVMPool;
+import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.microsofttranslator.MicrosoftTranslatorFactoryUtil;
 import com.liferay.portal.kernel.util.DigesterUtil;
@@ -29,13 +32,16 @@ import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.microsofttranslator.MicrosoftTranslatorFactoryImpl;
-import com.liferay.portal.model.ModelHintsImpl;
+import com.liferay.portal.model.DefaultModelHintsImpl;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.security.auth.DefaultFullNameGenerator;
 import com.liferay.portal.security.auth.FullNameGenerator;
 import com.liferay.portal.security.permission.ResourceActionsImpl;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.service.permission.PortletPermissionImpl;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.util.DigesterImpl;
@@ -62,12 +68,18 @@ public class ToolDependencies {
 	public static void wireBasic() {
 		InitUtil.init();
 
-		RegistryUtil.setRegistry(new BasicRegistryImpl());
+		wireCaches();
 
 		Registry registry = RegistryUtil.getRegistry();
 
 		registry.registerService(
 			FullNameGenerator.class, new DefaultFullNameGenerator());
+
+		CacheKeyGeneratorUtil cacheKeyGeneratorUtil =
+			new CacheKeyGeneratorUtil();
+
+		cacheKeyGeneratorUtil.setDefaultCacheKeyGenerator(
+			new SimpleCacheKeyGenerator());
 
 		DigesterUtil digesterUtil = new DigesterUtil();
 
@@ -107,20 +119,6 @@ public class ToolDependencies {
 		microsoftTranslatorFactoryUtil.setMicrosoftTranslatorFactory(
 			new MicrosoftTranslatorFactoryImpl());
 
-		ModelHintsUtil modelHintsUtil = new ModelHintsUtil();
-
-		ModelHintsImpl modelHintsImpl = new ModelHintsImpl();
-
-		SAXReaderImpl saxReaderImpl = new SAXReaderImpl();
-
-		modelHintsImpl.setSAXReader(saxReaderImpl);
-
-		modelHintsImpl.afterPropertiesSet();
-
-		modelHintsUtil.setModelHints(modelHintsImpl);
-
-		SingleVMPoolUtil singleVMPoolUtil = new SingleVMPoolUtil();
-
 		PortletPermissionUtil portletPermissionUtil =
 			new PortletPermissionUtil();
 
@@ -128,30 +126,56 @@ public class ToolDependencies {
 
 		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
 
-		saxReaderUtil.setSAXReader(saxReaderImpl);
+		SAXReaderImpl secureSAXReader = new SAXReaderImpl();
 
-		SingleVMPoolImpl singleVMPoolImpl = new SingleVMPoolImpl();
+		secureSAXReader.setSecure(true);
 
-		singleVMPoolImpl.setPortalCacheManager(
-			MemoryPortalCacheManager.createMemoryPortalCacheManager(
-				ToolDependencies.class.getName()));
+		saxReaderUtil.setSAXReader(secureSAXReader);
 
-		singleVMPoolUtil.setSingleVMPool(singleVMPoolImpl);
+		SecureXMLFactoryProviderUtil secureXMLFactoryProviderUtil =
+			new SecureXMLFactoryProviderUtil();
+
+		secureXMLFactoryProviderUtil.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
+
+		UnsecureSAXReaderUtil unsecureSAXReaderUtil =
+			new UnsecureSAXReaderUtil();
+
+		SAXReaderImpl unsecureSAXReader = new SAXReaderImpl();
+
+		unsecureSAXReaderUtil.setSAXReader(unsecureSAXReader);
+
+		// DefaultModelHintsImpl requires SecureXMLFactoryProviderUtil
+
+		ModelHintsUtil modelHintsUtil = new ModelHintsUtil();
+
+		DefaultModelHintsImpl defaultModelHintsImpl =
+			new DefaultModelHintsImpl();
+
+		defaultModelHintsImpl.afterPropertiesSet();
+
+		modelHintsUtil.setModelHints(defaultModelHintsImpl);
+	}
+
+	public static void wireCaches() {
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		registry.registerService(
+			SingleVMPool.class,
+			new TestSingleVMPool(
+				new DummyPortalCacheManager<>(
+					PortalCacheManagerNames.SINGLE_VM)));
+		registry.registerService(
+			MultiVMPool.class,
+			new TestMultiVMPool(
+				new DummyPortalCacheManager<>(
+					PortalCacheManagerNames.MULTI_VM)));
 	}
 
 	public static void wireDeployers() {
 		wireBasic();
-
-		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
-
-		MultiVMPoolImpl multiVMPoolImpl = new MultiVMPoolImpl();
-
-		multiVMPoolImpl.setPortalCacheManager(
-			MemoryPortalCacheManager.
-				<Serializable, Serializable>createMemoryPortalCacheManager(
-					ToolDependencies.class.getName()));
-
-		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
 
 		PortalUtil portalUtil = new PortalUtil();
 
@@ -168,6 +192,102 @@ public class ToolDependencies {
 		resourceActionsImpl.afterPropertiesSet();
 
 		resourceActionsUtil.setResourceActions(resourceActionsImpl);
+	}
+
+	private static class TestMultiVMPool implements MultiVMPool {
+
+		public TestMultiVMPool(
+			PortalCacheManager<? extends Serializable, ?>
+				portalCacheManager) {
+
+			_portalCacheManager =
+				(PortalCacheManager
+					<? extends Serializable, ? extends Serializable>)
+						portalCacheManager;
+		}
+
+		@Override
+		public void clear() {
+			_portalCacheManager.clearAll();
+		}
+
+		@Override
+		public PortalCache<? extends Serializable, ? extends Serializable>
+			getPortalCache(String portalCacheName) {
+
+			return _portalCacheManager.getPortalCache(portalCacheName);
+		}
+
+		@Override
+		public PortalCache<? extends Serializable, ? extends Serializable>
+			getPortalCache(String portalCacheName, boolean blocking) {
+
+			return _portalCacheManager.getPortalCache(
+				portalCacheName, blocking);
+		}
+
+		@Override
+		public PortalCacheManager
+			<? extends Serializable, ? extends Serializable>
+			 getPortalCacheManager() {
+
+			return _portalCacheManager;
+		}
+
+		@Override
+		public void removePortalCache(String portalCacheName) {
+			_portalCacheManager.removePortalCache(portalCacheName);
+		}
+
+		private final PortalCacheManager
+			<? extends Serializable, ? extends Serializable>
+				_portalCacheManager;
+
+	}
+
+	private static class TestSingleVMPool implements SingleVMPool {
+
+		public TestSingleVMPool(
+			PortalCacheManager<? extends Serializable, ?> portalCacheManager) {
+
+			_portalCacheManager = portalCacheManager;
+		}
+
+		@Override
+		public void clear() {
+			_portalCacheManager.clearAll();
+		}
+
+		@Override
+		public PortalCache<? extends Serializable, ?> getPortalCache(
+			String portalCacheName) {
+
+			return _portalCacheManager.getPortalCache(portalCacheName);
+		}
+
+		@Override
+		public PortalCache<? extends Serializable, ?> getPortalCache(
+			String portalCacheName, boolean blocking) {
+
+			return _portalCacheManager.getPortalCache(
+				portalCacheName, blocking);
+		}
+
+		@Override
+		public PortalCacheManager<? extends Serializable, ?>
+			getPortalCacheManager() {
+
+			return _portalCacheManager;
+		}
+
+		@Override
+		public void removePortalCache(String portalCacheName) {
+			_portalCacheManager.removePortalCache(portalCacheName);
+		}
+
+		private final PortalCacheManager<? extends Serializable, ?>
+			_portalCacheManager;
+
 	}
 
 }

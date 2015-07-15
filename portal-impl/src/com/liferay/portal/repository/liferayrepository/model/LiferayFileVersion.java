@@ -15,7 +15,6 @@
 package com.liferay.portal.repository.liferayrepository.model;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -27,6 +26,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ import java.util.Map;
 public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
 	public LiferayFileVersion(DLFileVersion dlFileVersion) {
-		this(dlFileVersion, false);
+		this(dlFileVersion, dlFileVersion.isEscapedModel());
 	}
 
 	public LiferayFileVersion(
@@ -53,25 +53,7 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
 	@Override
 	public Object clone() {
-		LiferayFileVersion liferayFileVersion = new LiferayFileVersion(
-			_dlFileVersion, _escapedModel);
-
-		liferayFileVersion.setCompanyId(getCompanyId());
-		liferayFileVersion.setCreateDate(getCreateDate());
-		liferayFileVersion.setGroupId(getGroupId());
-		liferayFileVersion.setPrimaryKey(getPrimaryKey());
-		liferayFileVersion.setUserId(getUserId());
-		liferayFileVersion.setUserName(getUserName());
-
-		try {
-			liferayFileVersion.setUserUuid(getUserUuid());
-		}
-		catch (Exception e) {
-		}
-
-		liferayFileVersion.setUuid(getUuid());
-
-		return liferayFileVersion;
+		return new LiferayFileVersion(_dlFileVersion);
 	}
 
 	@Override
@@ -302,6 +284,11 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 	@Override
 	public String getVersion() {
 		return _dlFileVersion.getVersion();
+	}
+
+	@Override
+	public int hashCode() {
+		return _dlFileVersion.hashCode();
 	}
 
 	@Override

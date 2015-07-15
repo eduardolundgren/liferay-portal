@@ -33,8 +33,8 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.asset.model.BaseAssetRenderer;
-import com.liferay.portlet.asset.model.DDMFieldReader;
+import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
+import com.liferay.portlet.asset.model.DDMFormValuesReader;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
@@ -45,13 +45,13 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Julio Camarero
@@ -60,7 +60,7 @@ import javax.portlet.WindowState;
  * @author Zsolt Berentey
  */
 public class DLFileEntryAssetRenderer
-	extends BaseAssetRenderer implements TrashRenderer {
+	extends BaseJSPAssetRenderer implements TrashRenderer {
 
 	public DLFileEntryAssetRenderer(
 		FileEntry fileEntry, FileVersion fileVersion) {
@@ -89,8 +89,8 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
-	public DDMFieldReader getDDMFieldReader() {
-		return new DLFileEntryDDMFieldReader(_fileEntry, _fileVersion);
+	public DDMFormValuesReader getDDMFormValuesReader() {
+		return new DLFileEntryDDMFormValuesReader(_fileEntry, _fileVersion);
 	}
 
 	@Override
@@ -125,6 +125,19 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
+	public String getJspPath(HttpServletRequest request, String template) {
+		if (template.equals(TEMPLATE_ABSTRACT) ||
+			template.equals(TEMPLATE_FULL_CONTENT)) {
+
+			return "/html/portlet/document_library/asset/file_entry_" +
+				template + ".jsp";
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
 	public String getNewName(String oldName, String token) {
 		String extension = FileUtil.getExtension(oldName);
 
@@ -151,6 +164,11 @@ public class DLFileEntryAssetRenderer
 		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
 
 		return assetRendererFactory.getPortletId();
+	}
+
+	@Override
+	public int getStatus() {
+		return _fileVersion.getStatus();
 	}
 
 	@Override
@@ -218,7 +236,7 @@ public class DLFileEntryAssetRenderer
 			PortletKeys.DOCUMENT_LIBRARY, PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
-			"struts_action", "/document_library/edit_file_entry");
+			"mvcRenderCommandName", "/document_library/edit_file_entry");
 		portletURL.setParameter(
 			"fileEntryId", String.valueOf(_fileEntry.getFileEntryId()));
 
@@ -227,12 +245,16 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public PortletURL getURLExport(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse)
+		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createActionURL();
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
+			getControlPanelPlid(liferayPortletRequest),
+			PortletKeys.DOCUMENT_LIBRARY, PortletRequest.ACTION_PHASE);
 
-		portletURL.setParameter("struts_action", "/asset_publisher/get_file");
+		portletURL.setParameter(
+			"javax.portlet.action", "/document_library/get_file");
 		portletURL.setParameter(
 			"groupId", String.valueOf(_fileEntry.getRepositoryId()));
 		portletURL.setParameter(
@@ -265,7 +287,7 @@ public class DLFileEntryAssetRenderer
 			liferayPortletResponse, windowState);
 
 		portletURL.setParameter(
-			"struts_action", "/document_library_display/view_file_entry");
+			"mvcRenderCommandName", "/document_library/view_file_entry");
 		portletURL.setParameter(
 			"fileEntryId", String.valueOf(_fileEntry.getFileEntryId()));
 		portletURL.setWindowState(windowState);
@@ -324,6 +346,35 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
+			String template)
+		throws Exception {
+
+		request.setAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY, _fileEntry);
+
+		String version = ParamUtil.getString(request, "version");
+
+		if ((getAssetRendererType() == AssetRendererFactory.TYPE_LATEST) ||
+			Validator.isNotNull(version)) {
+
+			if ((_fileEntry != null) && Validator.isNotNull(version)) {
+				_fileVersion = _fileEntry.getFileVersion(version);
+			}
+
+			request.setAttribute(
+				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
+		}
+		else {
+			request.setAttribute(
+				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION,
+				_fileEntry.getFileVersion());
+		}
+
+		return super.include(request, response, template);
+	}
+
+	@Override
 	public boolean isConvertible() {
 		return true;
 	}
@@ -331,56 +382,6 @@ public class DLFileEntryAssetRenderer
 	@Override
 	public boolean isPrintable() {
 		return false;
-	}
-
-	@Override
-	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
-			String template)
-		throws Exception {
-
-		if (template.equals(TEMPLATE_ABSTRACT) ||
-			template.equals(TEMPLATE_FULL_CONTENT)) {
-
-			renderRequest.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY, _fileEntry);
-
-			String version = ParamUtil.getString(renderRequest, "version");
-
-			if ((getAssetRendererType() == AssetRendererFactory.TYPE_LATEST) ||
-				Validator.isNotNull(version)) {
-
-				if ((_fileEntry != null) && Validator.isNotNull(version)) {
-					_fileVersion = _fileEntry.getFileVersion(version);
-				}
-
-				renderRequest.setAttribute(
-					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
-			}
-			else {
-				renderRequest.setAttribute(
-					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION,
-					_fileEntry.getFileVersion());
-			}
-
-			return "/html/portlet/document_library/asset/file_entry_" +
-				template + ".jsp";
-		}
-		else {
-			return null;
-		}
-	}
-
-	@Override
-	public void setAddToPagePreferences(
-			PortletPreferences preferences, String portletId,
-			ThemeDisplay themeDisplay)
-		throws Exception {
-
-		preferences.setValue("showAssetTitle", Boolean.FALSE.toString());
-		preferences.setValue("showExtraInfo", Boolean.FALSE.toString());
-
-		super.setAddToPagePreferences(preferences, portletId, themeDisplay);
 	}
 
 	private final FileEntry _fileEntry;

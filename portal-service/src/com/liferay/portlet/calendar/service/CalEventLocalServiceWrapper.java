@@ -23,8 +23,10 @@ import com.liferay.portal.service.ServiceWrapper;
  *
  * @author Brian Wing Shun Chan
  * @see CalEventLocalService
+ * @deprecated As of 7.0.0, with no direct replacement
  * @generated
  */
+@Deprecated
 @ProviderType
 public class CalEventLocalServiceWrapper implements CalEventLocalService,
 	ServiceWrapper<CalEventLocalService> {
@@ -481,7 +483,7 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService,
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _calEventLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

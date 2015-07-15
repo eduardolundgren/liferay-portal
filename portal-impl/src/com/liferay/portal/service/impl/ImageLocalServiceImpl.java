@@ -133,6 +133,17 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 	}
 
 	@Override
+	public Image moveImage(long imageId, byte[] bytes) throws PortalException {
+		Image image = updateImage(counterLocalService.increment(), bytes);
+
+		if (imageId > 0) {
+			deleteImage(imageId);
+		}
+
+		return image;
+	}
+
+	@Override
 	public Image updateImage(long imageId, byte[] bytes)
 		throws PortalException {
 
@@ -235,8 +246,7 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 	}
 
 	protected void validate(String type) throws PortalException {
-		if ((type == null) ||
-			type.contains(StringPool.BACK_SLASH) ||
+		if ((type == null) || type.contains(StringPool.BACK_SLASH) ||
 			type.contains(StringPool.COLON) ||
 			type.contains(StringPool.GREATER_THAN) ||
 			type.contains(StringPool.LESS_THAN) ||
@@ -246,8 +256,7 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 			type.contains(StringPool.QUESTION) ||
 			type.contains(StringPool.QUOTE) ||
 			type.contains(StringPool.SLASH) ||
-			type.contains(StringPool.SPACE) ||
-			type.contains(StringPool.STAR)) {
+			type.contains(StringPool.SPACE) || type.contains(StringPool.STAR)) {
 
 			throw new ImageTypeException();
 		}

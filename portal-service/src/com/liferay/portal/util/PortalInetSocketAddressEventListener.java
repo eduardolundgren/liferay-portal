@@ -21,10 +21,10 @@ import java.net.InetSocketAddress;
  */
 public interface PortalInetSocketAddressEventListener {
 
-	public void portalLocalInetSockAddressConfigured(
-		InetSocketAddress localInetSocketAddress);
+	public void portalLocalInetSocketAddressConfigured(
+		InetSocketAddress localInetSocketAddress, boolean secure);
 
 	public void portalServerInetSocketAddressConfigured(
-		InetSocketAddress serverInetSocketAddress);
+		InetSocketAddress serverInetSocketAddress, boolean secure);
 
 }

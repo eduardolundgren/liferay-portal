@@ -118,11 +118,9 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			Map<Locale, String> friendlyURLMap)
 		throws PortalException {
 
-		Map<Locale, String> newFriendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> newFriendlyURLMap = new HashMap<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 			String friendlyURL = friendlyURLMap.get(locale);
 
 			if (Validator.isNotNull(friendlyURL)) {
@@ -250,10 +248,15 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			// Layout cannot become a child of a layout that is not sortable
 			// because it is linked to a layout set prototype
 
+			Layout layout = layoutPersistence.fetchByG_P_L(
+				groupId, privateLayout, layoutId);
 			Layout parentLayout = layoutPersistence.findByG_P_L(
 				groupId, privateLayout, parentLayoutId);
 
-			if (!SitesUtil.isLayoutSortable(parentLayout)) {
+			if (((layout == null) ||
+				 Validator.isNull(layout.getSourcePrototypeLayoutUuid())) &&
+				!SitesUtil.isLayoutSortable(parentLayout)) {
+
 				throw new LayoutParentLayoutIdException(
 					LayoutParentLayoutIdException.NOT_SORTABLE);
 			}
@@ -376,9 +379,7 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			}
 		}
 
-		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : availableLocales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			String languageId = StringUtil.toLowerCase(
 				LocaleUtil.toLanguageId(locale));
 
@@ -501,7 +502,9 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 		// Layout cannot become a child of a layout that is not sortable because
 		// it is linked to a layout set prototype
 
-		if (!SitesUtil.isLayoutSortable(parentLayout)) {
+		if (Validator.isNull(layout.getSourcePrototypeLayoutUuid()) &&
+			!SitesUtil.isLayoutSortable(parentLayout)) {
+
 			throw new LayoutParentLayoutIdException(
 				LayoutParentLayoutIdException.NOT_SORTABLE);
 		}

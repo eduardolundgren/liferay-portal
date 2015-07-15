@@ -35,8 +35,6 @@ import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
-import com.liferay.portlet.asset.service.persistence.AssetTagPropertyFinder;
-import com.liferay.portlet.asset.service.persistence.AssetTagPropertyPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagStatsPersistence;
 
 import javax.sql.DataSource;
@@ -85,7 +83,7 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the asset tag remote service
 	 */
-	public com.liferay.portlet.asset.service.AssetTagService getAssetTagService() {
+	public AssetTagService getAssetTagService() {
 		return assetTagService;
 	}
 
@@ -94,8 +92,7 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param assetTagService the asset tag remote service
 	 */
-	public void setAssetTagService(
-		com.liferay.portlet.asset.service.AssetTagService assetTagService) {
+	public void setAssetTagService(AssetTagService assetTagService) {
 		this.assetTagService = assetTagService;
 	}
 
@@ -454,82 +451,6 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the asset tag property local service.
-	 *
-	 * @return the asset tag property local service
-	 */
-	public com.liferay.portlet.asset.service.AssetTagPropertyLocalService getAssetTagPropertyLocalService() {
-		return assetTagPropertyLocalService;
-	}
-
-	/**
-	 * Sets the asset tag property local service.
-	 *
-	 * @param assetTagPropertyLocalService the asset tag property local service
-	 */
-	public void setAssetTagPropertyLocalService(
-		com.liferay.portlet.asset.service.AssetTagPropertyLocalService assetTagPropertyLocalService) {
-		this.assetTagPropertyLocalService = assetTagPropertyLocalService;
-	}
-
-	/**
-	 * Returns the asset tag property remote service.
-	 *
-	 * @return the asset tag property remote service
-	 */
-	public com.liferay.portlet.asset.service.AssetTagPropertyService getAssetTagPropertyService() {
-		return assetTagPropertyService;
-	}
-
-	/**
-	 * Sets the asset tag property remote service.
-	 *
-	 * @param assetTagPropertyService the asset tag property remote service
-	 */
-	public void setAssetTagPropertyService(
-		com.liferay.portlet.asset.service.AssetTagPropertyService assetTagPropertyService) {
-		this.assetTagPropertyService = assetTagPropertyService;
-	}
-
-	/**
-	 * Returns the asset tag property persistence.
-	 *
-	 * @return the asset tag property persistence
-	 */
-	public AssetTagPropertyPersistence getAssetTagPropertyPersistence() {
-		return assetTagPropertyPersistence;
-	}
-
-	/**
-	 * Sets the asset tag property persistence.
-	 *
-	 * @param assetTagPropertyPersistence the asset tag property persistence
-	 */
-	public void setAssetTagPropertyPersistence(
-		AssetTagPropertyPersistence assetTagPropertyPersistence) {
-		this.assetTagPropertyPersistence = assetTagPropertyPersistence;
-	}
-
-	/**
-	 * Returns the asset tag property finder.
-	 *
-	 * @return the asset tag property finder
-	 */
-	public AssetTagPropertyFinder getAssetTagPropertyFinder() {
-		return assetTagPropertyFinder;
-	}
-
-	/**
-	 * Sets the asset tag property finder.
-	 *
-	 * @param assetTagPropertyFinder the asset tag property finder
-	 */
-	public void setAssetTagPropertyFinder(
-		AssetTagPropertyFinder assetTagPropertyFinder) {
-		this.assetTagPropertyFinder = assetTagPropertyFinder;
-	}
-
-	/**
 	 * Returns the asset tag stats local service.
 	 *
 	 * @return the asset tag stats local service
@@ -627,8 +548,8 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portlet.asset.service.AssetTagLocalService.class)
 	protected com.liferay.portlet.asset.service.AssetTagLocalService assetTagLocalService;
-	@BeanReference(type = com.liferay.portlet.asset.service.AssetTagService.class)
-	protected com.liferay.portlet.asset.service.AssetTagService assetTagService;
+	@BeanReference(type = AssetTagService.class)
+	protected AssetTagService assetTagService;
 	@BeanReference(type = AssetTagPersistence.class)
 	protected AssetTagPersistence assetTagPersistence;
 	@BeanReference(type = AssetTagFinder.class)
@@ -667,14 +588,6 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 	protected AssetEntryPersistence assetEntryPersistence;
 	@BeanReference(type = AssetEntryFinder.class)
 	protected AssetEntryFinder assetEntryFinder;
-	@BeanReference(type = com.liferay.portlet.asset.service.AssetTagPropertyLocalService.class)
-	protected com.liferay.portlet.asset.service.AssetTagPropertyLocalService assetTagPropertyLocalService;
-	@BeanReference(type = com.liferay.portlet.asset.service.AssetTagPropertyService.class)
-	protected com.liferay.portlet.asset.service.AssetTagPropertyService assetTagPropertyService;
-	@BeanReference(type = AssetTagPropertyPersistence.class)
-	protected AssetTagPropertyPersistence assetTagPropertyPersistence;
-	@BeanReference(type = AssetTagPropertyFinder.class)
-	protected AssetTagPropertyFinder assetTagPropertyFinder;
 	@BeanReference(type = com.liferay.portlet.asset.service.AssetTagStatsLocalService.class)
 	protected com.liferay.portlet.asset.service.AssetTagStatsLocalService assetTagStatsLocalService;
 	@BeanReference(type = AssetTagStatsPersistence.class)

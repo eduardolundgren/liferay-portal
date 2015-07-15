@@ -17,7 +17,7 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
-int abstractLength = (Integer)request.getAttribute(WebKeys.ASSET_PUBLISHER_ABSTRACT_LENGTH);
+int abstractLength = GetterUtil.getInteger(request.getAttribute(WebKeys.ASSET_ENTRY_ABSTRACT_LENGTH), AssetUtil.ASSET_ENTRY_ABSTRACT_LENGTH);
 AssetRenderer assetRenderer = (AssetRenderer)request.getAttribute(WebKeys.ASSET_RENDERER);
 
 FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
@@ -36,7 +36,7 @@ if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 		<c:choose>
 			<c:when test="<%= showThumbnail && ImageProcessorUtil.hasImages(fileVersion) %>">
 				<div class="asset-thumbnail">
-					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imageThumbnail=1") %>' />
+					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imageThumbnail=1") %>' style="<%= DLUtil.getThumbnailStyle(true, 0, 128, 128) %>" />
 				</div>
 
 				<p class="asset-description">
@@ -45,7 +45,7 @@ if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 			</c:when>
 			<c:when test="<%= showThumbnail && PDFProcessorUtil.hasImages(fileVersion) %>">
 				<div class="asset-thumbnail">
-					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="document" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&documentThumbnail=1") %>' />
+					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="document" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&documentThumbnail=1") %>' style="<%= DLUtil.getThumbnailStyle(true, 0, 128, 128) %>" />
 				</div>
 
 				<p class="asset-description">
@@ -54,7 +54,7 @@ if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 			</c:when>
 			<c:when test="<%= showThumbnail && VideoProcessorUtil.hasVideo(fileVersion) %>">
 				<div class="asset-thumbnail">
-					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="video" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1") %>' />
+					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="video" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1") %>' style="<%= DLUtil.getThumbnailStyle(true, 0, 128, 128) %>" />
 				</div>
 
 				<p class="asset-description">
@@ -75,6 +75,7 @@ if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 					iconCssClass="icon-download"
 					label="<%= true %>"
 					message='<%= LanguageUtil.format(request, "download-x", taglibFileEntryTitle, false) + " (" + TextFormatter.formatStorageSize(fileVersion.getSize(), locale) + ")" %>'
+					method="get"
 					url="<%= assetRenderer.getURLDownload(themeDisplay) %>"
 				/>
 			</c:otherwise>

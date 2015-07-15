@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -37,6 +38,33 @@ import java.io.ObjectOutput;
 @ProviderType
 public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	MVCCModel {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof ListTypeCacheModel)) {
+			return false;
+		}
+
+		ListTypeCacheModel listTypeCacheModel = (ListTypeCacheModel)obj;
+
+		if ((listTypeId == listTypeCacheModel.listTypeId) &&
+				(mvccVersion == listTypeCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, listTypeId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
 	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
@@ -93,7 +121,7 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
-		listTypeId = objectInput.readInt();
+		listTypeId = objectInput.readLong();
 		name = objectInput.readUTF();
 		type = objectInput.readUTF();
 	}
@@ -102,7 +130,7 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
 		objectOutput.writeLong(mvccVersion);
-		objectOutput.writeInt(listTypeId);
+		objectOutput.writeLong(listTypeId);
 
 		if (name == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -120,7 +148,7 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	}
 
 	public long mvccVersion;
-	public int listTypeId;
+	public long listTypeId;
 	public String name;
 	public String type;
 }

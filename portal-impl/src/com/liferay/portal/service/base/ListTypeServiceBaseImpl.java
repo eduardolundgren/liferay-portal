@@ -51,11 +51,30 @@ public abstract class ListTypeServiceBaseImpl extends BaseServiceImpl
 	 */
 
 	/**
+	 * Returns the list type local service.
+	 *
+	 * @return the list type local service
+	 */
+	public com.liferay.portal.service.ListTypeLocalService getListTypeLocalService() {
+		return listTypeLocalService;
+	}
+
+	/**
+	 * Sets the list type local service.
+	 *
+	 * @param listTypeLocalService the list type local service
+	 */
+	public void setListTypeLocalService(
+		com.liferay.portal.service.ListTypeLocalService listTypeLocalService) {
+		this.listTypeLocalService = listTypeLocalService;
+	}
+
+	/**
 	 * Returns the list type remote service.
 	 *
 	 * @return the list type remote service
 	 */
-	public com.liferay.portal.service.ListTypeService getListTypeService() {
+	public ListTypeService getListTypeService() {
 		return listTypeService;
 	}
 
@@ -64,8 +83,7 @@ public abstract class ListTypeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param listTypeService the list type remote service
 	 */
-	public void setListTypeService(
-		com.liferay.portal.service.ListTypeService listTypeService) {
+	public void setListTypeService(ListTypeService listTypeService) {
 		this.listTypeService = listTypeService;
 	}
 
@@ -221,8 +239,10 @@ public abstract class ListTypeServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portal.service.ListTypeService.class)
-	protected com.liferay.portal.service.ListTypeService listTypeService;
+	@BeanReference(type = com.liferay.portal.service.ListTypeLocalService.class)
+	protected com.liferay.portal.service.ListTypeLocalService listTypeLocalService;
+	@BeanReference(type = ListTypeService.class)
+	protected ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)
 	protected ListTypePersistence listTypePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)

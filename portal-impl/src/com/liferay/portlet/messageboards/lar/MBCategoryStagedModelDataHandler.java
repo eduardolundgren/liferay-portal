@@ -16,16 +16,15 @@ package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
@@ -42,6 +41,11 @@ public class MBCategoryStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {MBCategory.class.getName()};
 
 	@Override
+	public void deleteStagedModel(MBCategory category) throws PortalException {
+		MBCategoryLocalServiceUtil.deleteCategory(category);
+	}
+
+	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
@@ -49,24 +53,8 @@ public class MBCategoryStagedModelDataHandler
 		MBCategory category = fetchStagedModelByUuidAndGroupId(uuid, groupId);
 
 		if (category != null) {
-			MBCategoryLocalServiceUtil.deleteCategory(category);
+			deleteStagedModel(category);
 		}
-	}
-
-	@Override
-	public MBCategory fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<MBCategory> categories =
-			MBCategoryLocalServiceUtil.getMBCategoriesByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<MBCategory>());
-
-		if (ListUtil.isEmpty(categories)) {
-			return null;
-		}
-
-		return categories.get(0);
 	}
 
 	@Override
@@ -75,6 +63,15 @@ public class MBCategoryStagedModelDataHandler
 
 		return MBCategoryLocalServiceUtil.fetchMBCategoryByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<MBCategory> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return MBCategoryLocalServiceUtil.getMBCategoriesByUuidAndCompanyId(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new StagedModelModifiedDateComparator<MBCategory>());
 	}
 
 	@Override

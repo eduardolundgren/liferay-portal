@@ -18,6 +18,7 @@
 
 <%
 String actionJsp = (String)request.getAttribute("liferay-ui:app-view-entry:actionJsp");
+ServletContext actionJspServletContext = (ServletContext)request.getAttribute("liferay-ui:app-view-entry:actionJspServletContext");
 String assetCategoryClassName = GetterUtil.getString(request.getAttribute("liferay-ui:app-view-entry:assetCategoryClassName"));
 long assetCategoryClassPK = GetterUtil.getLong(request.getAttribute("liferay-ui:app-view-entry:assetCategoryClassPK"));
 String assetTagClassName = GetterUtil.getString(request.getAttribute("liferay-ui:app-view-entry:assetTagClassName"));
@@ -74,7 +75,7 @@ if (showLinkTitle) {
 			}
 			%>
 
-			<liferay-util:include page="<%= actionJsp %>" />
+			<liferay-util:include page="<%= actionJsp %>" servletContext="<%= actionJspServletContext %>" />
 
 			<c:choose>
 				<c:when test="<%= Validator.isNull(url) %>">
@@ -232,15 +233,13 @@ if (showLinkTitle) {
 							</c:if>
 						</c:if>
 
-						<c:if test="<%= Validator.isNotNull(version) || ((status != WorkflowConstants.STATUS_ANY) && (status != WorkflowConstants.STATUS_APPROVED)) %>">
+						<c:if test="<%= Validator.isNotNull(version) %>">
 							<dt>
-								<liferay-ui:message key='<%= Validator.isNotNull(version) ? "version" : "status" %>' />:
+								<liferay-ui:message key="version" />:
 							</dt>
 
 							<dd>
-								<c:if test="<%= Validator.isNotNull(version) %>">
-									<%= HtmlUtil.escape(version) %>
-								</c:if>
+								<%= HtmlUtil.escape(version) %>
 							</dd>
 						</c:if>
 
@@ -357,7 +356,7 @@ if (showLinkTitle) {
 			}
 			%>
 
-			<liferay-util:include page="<%= actionJsp %>" />
+			<liferay-util:include page="<%= actionJsp %>" servletContext="<%= actionJspServletContext %>" />
 
 			<c:if test="<%= showCheckbox %>">
 				<aui:input cssClass="entry-selector overlay" id="<%= rowCheckerId %>" label="" name="<%= RowChecker.ROW_IDS + rowCheckerName %>" title='<%= LanguageUtil.format(request, "select-x", HtmlUtil.escape(shortTitle)) %>' type="checkbox" value="<%= rowCheckerId %>" />

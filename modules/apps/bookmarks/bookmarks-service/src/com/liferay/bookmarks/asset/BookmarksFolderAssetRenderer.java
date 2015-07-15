@@ -19,7 +19,7 @@ import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksEntryServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
-import com.liferay.bookmarks.service.permission.BookmarksFolderPermission;
+import com.liferay.bookmarks.service.permission.BookmarksFolderPermissionChecker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -30,7 +30,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.asset.model.BaseAssetRenderer;
+import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.Date;
@@ -39,16 +39,17 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Eudaldo Alonso
  * @author Alexander Chow
  */
 public class BookmarksFolderAssetRenderer
-	extends BaseAssetRenderer implements TrashRenderer {
+	extends BaseJSPAssetRenderer implements TrashRenderer {
 
 	public static final String TYPE = "bookmarks_folder";
 
@@ -81,7 +82,7 @@ public class BookmarksFolderAssetRenderer
 		if (BookmarksFolderServiceUtil.getFoldersAndEntriesCount(
 				_folder.getGroupId(), _folder.getFolderId()) > 0) {
 
-			return "icon-folder-close";
+			return "icon-folder-open";
 		}
 
 		return super.getIconCssClass();
@@ -105,10 +106,25 @@ public class BookmarksFolderAssetRenderer
 	}
 
 	@Override
+	public String getJspPath(HttpServletRequest request, String template) {
+		if (template.equals(TEMPLATE_FULL_CONTENT)) {
+			return "/html/portlet/bookmarks/asset/folder_" + template + ".jsp";
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
 	public String getPortletId() {
 		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
 
 		return assetRendererFactory.getPortletId();
+	}
+
+	@Override
+	public int getStatus() {
+		return _folder.getStatus();
 	}
 
 	@Override
@@ -215,7 +231,7 @@ public class BookmarksFolderAssetRenderer
 	public boolean hasEditPermission(PermissionChecker permissionChecker)
 		throws PortalException {
 
-		return BookmarksFolderPermission.contains(
+		return BookmarksFolderPermissionChecker.contains(
 			permissionChecker, _folder, ActionKeys.UPDATE);
 	}
 
@@ -223,25 +239,19 @@ public class BookmarksFolderAssetRenderer
 	public boolean hasViewPermission(PermissionChecker permissionChecker)
 		throws PortalException {
 
-		return BookmarksFolderPermission.contains(
+		return BookmarksFolderPermissionChecker.contains(
 			permissionChecker, _folder, ActionKeys.VIEW);
 	}
 
 	@Override
-	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
 			String template)
 		throws Exception {
 
-		if (template.equals(TEMPLATE_FULL_CONTENT)) {
-			renderRequest.setAttribute(
-				BookmarksWebKeys.BOOKMARKS_FOLDER, _folder);
+		request.setAttribute(BookmarksWebKeys.BOOKMARKS_FOLDER, _folder);
 
-			return "/html/portlet/bookmarks/asset/folder_" + template + ".jsp";
-		}
-		else {
-			return null;
-		}
+		return super.include(request, response, template);
 	}
 
 	private final BookmarksFolder _folder;

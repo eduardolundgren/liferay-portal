@@ -14,15 +14,24 @@
 
 package com.liferay.portal.kernel.search;
 
-import java.util.Locale;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
 
-import javax.portlet.PortletURL;
+import java.util.Locale;
 
 /**
  * @author Ryan Park
  */
 public interface IndexerPostProcessor {
 
+	public void postProcessContextBooleanFilter(
+			BooleanFilter booleanFilter, SearchContext searchContext)
+		throws Exception;
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #postProcessContextBooleanFilter(
+	 *             BooleanFilter, SearchContext)}
+	 */
+	@Deprecated
 	public void postProcessContextQuery(
 			BooleanQuery contextQuery, SearchContext searchContext)
 		throws Exception;
@@ -35,11 +44,20 @@ public interface IndexerPostProcessor {
 		throws Exception;
 
 	public void postProcessSearchQuery(
+			BooleanQuery searchQuery, BooleanFilter booleanFilter,
+			SearchContext searchContext)
+		throws Exception;
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #postProcessSearchQuery(
+	 *             BooleanQuery, BooleanFilter, SearchContext)}
+	 */
+	@Deprecated
+	public void postProcessSearchQuery(
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception;
 
 	public void postProcessSummary(
-		Summary summary, Document document, Locale locale, String snippet,
-		PortletURL portletURL);
+		Summary summary, Document document, Locale locale, String snippet);
 
 }

@@ -34,8 +34,8 @@
 				</c:if>
 
 				<span class="note-color yellow"></span>
-				<span class="note-color green"></span>
-				<span class="note-color blue"></span>
+				<span class="green note-color"></span>
+				<span class="blue note-color"></span>
 				<span class="note-color red"></span>
 			</td>
 		</tr>
@@ -59,7 +59,7 @@
 
 					quickNotePad.setStyle('backgroundColor', bgColor);
 
-					<portlet:resourceURL var="saveURL"><portlet:param name="<%= ActionRequest.ACTION_NAME %>" value="save" /></portlet:resourceURL>
+					<portlet:actionURL name="save" var="saveURL" />
 
 					A.io.request(
 						'<%= saveURL %>',

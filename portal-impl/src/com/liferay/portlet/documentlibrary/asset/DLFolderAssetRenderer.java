@@ -15,6 +15,8 @@
 package com.liferay.portlet.documentlibrary.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.RepositoryException;
@@ -27,9 +29,10 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.asset.model.BaseAssetRenderer;
+import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
@@ -42,15 +45,16 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Alexander Chow
  */
 public class DLFolderAssetRenderer
-	extends BaseAssetRenderer implements TrashRenderer {
+	extends BaseJSPAssetRenderer implements TrashRenderer {
 
 	public static final String TYPE = "folder";
 
@@ -85,11 +89,15 @@ public class DLFolderAssetRenderer
 				return "icon-drive";
 			}
 
+			if (!PropsValues.DL_FOLDER_ICON_CHECK_COUNT) {
+				return "icon-folder-open";
+			}
+
 			List<Long> subfolderIds = DLAppServiceUtil.getSubfolderIds(
 				_folder.getRepositoryId(), _folder.getFolderId(), false);
 
 			if (!subfolderIds.isEmpty()) {
-				return "icon-folder-close";
+				return "icon-folder-open";
 			}
 
 			int count = DLAppServiceUtil.getFoldersFileEntriesCount(
@@ -98,13 +106,21 @@ public class DLFolderAssetRenderer
 				WorkflowConstants.STATUS_APPROVED);
 
 			if (count > 0) {
-				return "icon-folder-close";
+				return "icon-folder-open";
 			}
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return "icon-remove";
 		}
 		catch (RepositoryException re) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(re, re);
+			}
+
 			return "icon-remove";
 		}
 
@@ -114,7 +130,8 @@ public class DLFolderAssetRenderer
 	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
 		try {
-			if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
+			if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT &&
+				DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
 					_folder.getRepositoryId(), _folder.getFolderId(),
 					WorkflowConstants.STATUS_APPROVED, true) > 0) {
 
@@ -123,9 +140,25 @@ public class DLFolderAssetRenderer
 			}
 		}
 		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(e, e);
+			}
 		}
 
 		return themeDisplay.getPathThemeImages() + "/common/folder_empty.png";
+	}
+
+	@Override
+	public String getJspPath(HttpServletRequest request, String template) {
+		if (template.equals(TEMPLATE_ABSTRACT) ||
+			template.equals(TEMPLATE_FULL_CONTENT)) {
+
+			return "/html/portlet/document_library/asset/folder_" + template +
+				".jsp";
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override
@@ -149,12 +182,16 @@ public class DLFolderAssetRenderer
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		if (!PropsValues.DL_FOLDER_ICON_CHECK_COUNT) {
+			return themeDisplay.getPathThemeImages() +
+				"/file_system/large/folder_empty_document.png";
+		}
+
 		int foldersCount = DLAppServiceUtil.getFoldersCount(
 			_folder.getRepositoryId(), _folder.getFolderId());
-		int entriesCount =
-			DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(
-				_folder.getRepositoryId(), _folder.getFolderId(),
-				WorkflowConstants.STATUS_APPROVED);
+		int entriesCount = DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(
+			_folder.getRepositoryId(), _folder.getFolderId(),
+			WorkflowConstants.STATUS_APPROVED);
 
 		if ((entriesCount > 0) || (foldersCount > 0)) {
 			return themeDisplay.getPathThemeImages() +
@@ -186,7 +223,7 @@ public class DLFolderAssetRenderer
 			PortletKeys.DOCUMENT_LIBRARY_ADMIN, PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
-			"struts_action", "/document_library/edit_folder");
+			"mvcRenderCommandName", "/document_library/edit_folder");
 		portletURL.setParameter(
 			"folderId", String.valueOf(_folder.getFolderId()));
 
@@ -205,7 +242,7 @@ public class DLFolderAssetRenderer
 			liferayPortletResponse, windowState);
 
 		portletURL.setParameter(
-			"struts_action", "/document_library_display/view");
+			"mvcRenderCommandName", "/document_library/view");
 		portletURL.setParameter(
 			"folderId", String.valueOf(_folder.getFolderId()));
 		portletURL.setWindowState(windowState);
@@ -256,6 +293,17 @@ public class DLFolderAssetRenderer
 	}
 
 	@Override
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
+			String template)
+		throws Exception {
+
+		request.setAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER, _folder);
+
+		return super.include(request, response, template);
+	}
+
+	@Override
 	public boolean isDisplayable() {
 		if (_folder.isMountPoint()) {
 			return false;
@@ -264,25 +312,8 @@ public class DLFolderAssetRenderer
 		return true;
 	}
 
-	@Override
-	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
-			String template)
-		throws Exception {
-
-		if (template.equals(TEMPLATE_ABSTRACT) ||
-			template.equals(TEMPLATE_FULL_CONTENT)) {
-
-			renderRequest.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FOLDER, _folder);
-
-			return "/html/portlet/document_library/asset/folder_" + template +
-				".jsp";
-		}
-		else {
-			return null;
-		}
-	}
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFolderAssetRenderer.class);
 
 	private final Folder _folder;
 

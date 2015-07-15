@@ -190,7 +190,10 @@ public class PropsUtil {
 		if (GetterUtil.getBoolean(
 				SystemProperties.get("company-id-properties"))) {
 
-			_configurations = new HashMap<Long, Configuration>();
+			_configurations = new HashMap<>();
+		}
+		else {
+			_configurations = null;
 		}
 	}
 
@@ -254,11 +257,7 @@ public class PropsUtil {
 	private String _getDefaultLiferayHome() {
 		String defaultLiferayHome = null;
 
-		if (ServerDetector.isGeronimo()) {
-			defaultLiferayHome =
-				SystemProperties.get("org.apache.geronimo.home.dir") + "/..";
-		}
-		else if (ServerDetector.isGlassfish()) {
+		if (ServerDetector.isGlassfish()) {
 			defaultLiferayHome =
 				SystemProperties.get("com.sun.aas.installRoot") + "/..";
 		}
@@ -345,6 +344,6 @@ public class PropsUtil {
 	private static PropsUtil _instance = new PropsUtil();
 
 	private final Configuration _configuration;
-	private Map<Long, Configuration> _configurations;
+	private final Map<Long, Configuration> _configurations;
 
 }

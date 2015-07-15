@@ -23,7 +23,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.asset.model.BaseAssetRenderer;
+import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.service.permission.MBCategoryPermission;
 
@@ -32,9 +32,10 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Julio Camarero
@@ -42,7 +43,7 @@ import javax.portlet.WindowState;
  * @author Sergio González
  * @author Jonathan Lee
  */
-public class MBCategoryAssetRenderer extends BaseAssetRenderer {
+public class MBCategoryAssetRenderer extends BaseJSPAssetRenderer {
 
 	public MBCategoryAssetRenderer(MBCategory category) {
 		_category = category;
@@ -61,6 +62,23 @@ public class MBCategoryAssetRenderer extends BaseAssetRenderer {
 	@Override
 	public long getGroupId() {
 		return _category.getGroupId();
+	}
+
+	@Override
+	public String getJspPath(HttpServletRequest request, String template) {
+		if (template.equals(TEMPLATE_ABSTRACT) ||
+			template.equals(TEMPLATE_FULL_CONTENT)) {
+
+			return "/html/portlet/message_boards/asset/" + template + ".jsp";
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public int getStatus() {
+		return _category.getStatus();
 	}
 
 	@Override
@@ -156,22 +174,14 @@ public class MBCategoryAssetRenderer extends BaseAssetRenderer {
 	}
 
 	@Override
-	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
 			String template)
 		throws Exception {
 
-		if (template.equals(TEMPLATE_ABSTRACT) ||
-			template.equals(TEMPLATE_FULL_CONTENT)) {
+		request.setAttribute(WebKeys.MESSAGE_BOARDS_CATEGORY, _category);
 
-			renderRequest.setAttribute(
-				WebKeys.MESSAGE_BOARDS_CATEGORY, _category);
-
-			return "/html/portlet/message_boards/asset/" + template + ".jsp";
-		}
-		else {
-			return null;
-		}
+		return super.include(request, response, template);
 	}
 
 	@Override

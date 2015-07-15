@@ -460,7 +460,7 @@ public class DLFolderLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -555,6 +555,16 @@ public class DLFolderLocalServiceUtil {
 		long groupId, long parentFolderId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return getService().getFolders(groupId, parentFolderId, start, end, obc);
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getFolders(groupId, parentFolderId, status,
+			includeMountfolders, start, end, obc);
 	}
 
 	public static java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
@@ -729,13 +739,13 @@ public class DLFolderLocalServiceUtil {
 		return getService().hasFolderLock(userId, folderId);
 	}
 
-	public static com.liferay.portal.model.Lock lockFolder(long userId,
+	public static com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().lockFolder(userId, folderId);
 	}
 
-	public static com.liferay.portal.model.Lock lockFolder(long userId,
+	public static com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
 		long folderId, java.lang.String owner, boolean inheritable,
 		long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {

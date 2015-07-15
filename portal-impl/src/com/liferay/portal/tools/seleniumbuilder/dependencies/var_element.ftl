@@ -8,20 +8,30 @@
 	<#assign varValue = varElement.getText()>
 </#if>
 
+<#if macroName??>
+	<#assign selenium="liferaySelenium" />
+<#else>
+	<#assign selenium="selenium" />
+</#if>
+
 <#if varElement.attributeValue("locator-key")?? && varElement.attributeValue("path")??>
 	<#assign pathRootElement = seleniumBuilderContext.getPathRootElement(varElement.attributeValue("path"))>
 
 	<#assign locatorKey = varElement.attributeValue("locator-key")>
 
 	<#assign locatorValue = seleniumBuilderContext.getPath(pathRootElement, locatorKey)>
-
-	<#if macroName??>
-		<#assign selenium="liferaySelenium" />
-	<#else>
-		<#assign selenium="selenium" />
-	</#if>
 <#elseif varElement.attributeValue("locator")??>
 	<#assign locatorValue = varElement.attributeValue("locator")>
+
+	<#if locatorValue?contains("#")>
+		<#assign x = locatorValue?last_index_of("#")>
+
+		<#assign pathRootElement = seleniumBuilderContext.getPathRootElement(locatorValue?substring(0, x))>
+
+		<#assign locatorKey = locatorValue?substring(x + 1)>
+
+		<#assign locatorValue = seleniumBuilderContext.getPath(pathRootElement, locatorKey)>
+	</#if>
 </#if>
 
 <#if (varElement.attributeValue("locator-key")?? && varElement.attributeValue("path")??) ||
@@ -93,6 +103,8 @@
 		<#assign objectName = "MathUtil">
 	<#elseif "${method}"?starts_with("StringUtil")>
 		<#assign objectName = "StringUtil">
+	<#elseif "${method}"?starts_with("TestPropsUtil")>
+		<#assign objectName = "TestPropsUtil">
 	<#else>
 		<#assign objectName = "${selenium}">
 	</#if>
@@ -104,9 +116,13 @@
 					Integer.parseInt(
 				</#if>
 
-				<#assign parameter = methodParameter?replace("\"", "")>
+				<#assign parameter = methodParameter?trim>
 
-				<#assign parameter = parameter?trim>
+				<#assign parameter = parameter?replace("\\'", "'")>
+
+				<#if "${parameter}"?starts_with("'") && "${parameter}"?ends_with("'")>
+					<#assign parameter = parameter?substring(1, (parameter?length - 1))>
+				</#if>
 
 				RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeHtml(parameter)}", ${variableContext})
 

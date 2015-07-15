@@ -53,7 +53,7 @@ public class POPServerUtil {
 		_instance._deleteListener(listener);
 	}
 
-	public static List<MessageListener> getListeners() throws Exception {
+	public static List<MessageListener> getListeners() {
 		return _instance._getListeners();
 	}
 
@@ -140,10 +140,9 @@ public class POPServerUtil {
 
 	private static final POPServerUtil _instance = new POPServerUtil();
 
-	private final List<MessageListener> _listeners =
-		new ArrayList<MessageListener>();
+	private final List<MessageListener> _listeners = new ArrayList<>();
 	private final ServiceRegistrationMap<MessageListener>
-		_serviceRegistrations = new ServiceRegistrationMap<MessageListener>();
+		_serviceRegistrations = new ServiceRegistrationMap<>();
 	private final ServiceTracker<MessageListener, MessageListenerWrapper>
 		_serviceTracker;
 

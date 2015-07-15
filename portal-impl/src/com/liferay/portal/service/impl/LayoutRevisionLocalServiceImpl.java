@@ -17,8 +17,6 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.NoSuchLayoutRevisionException;
 import com.liferay.portal.NoSuchPortletPreferencesException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.staging.MergeLayoutPrototypesThreadLocal;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -35,6 +33,8 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutRevisionLocalServiceBaseImpl;
 import com.liferay.portal.util.comparator.LayoutRevisionCreateDateComparator;
+import com.liferay.portlet.exportimport.staging.MergeLayoutPrototypesThreadLocal;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,8 +76,6 @@ public class LayoutRevisionLocalServiceImpl
 		layoutRevision.setCompanyId(user.getCompanyId());
 		layoutRevision.setUserId(user.getUserId());
 		layoutRevision.setUserName(user.getFullName());
-		layoutRevision.setCreateDate(serviceContext.getCreateDate(now));
-		layoutRevision.setModifiedDate(serviceContext.getModifiedDate(now));
 		layoutRevision.setLayoutSetBranchId(layoutSetBranchId);
 		layoutRevision.setLayoutBranchId(layoutBranchId);
 		layoutRevision.setParentLayoutRevisionId(parentLayoutRevisionId);
@@ -170,11 +168,8 @@ public class LayoutRevisionLocalServiceImpl
 			}
 		}
 
-		User user = userPersistence.findByPrimaryKey(
-			layoutRevision.getUserId());
-
 		StagingUtil.deleteRecentLayoutRevisionId(
-			user, layoutRevision.getLayoutSetBranchId(),
+			layoutRevision.getUserId(), layoutRevision.getLayoutSetBranchId(),
 			layoutRevision.getPlid());
 
 		if (layoutRevision.isPending()) {
@@ -244,6 +239,15 @@ public class LayoutRevisionLocalServiceImpl
 		catch (NoSuchLayoutRevisionException nslre) {
 			return null;
 		}
+	}
+
+	@Override
+	public LayoutRevision fetchLatestLayoutRevision(
+		long layoutSetBranchId, long plid) {
+
+		return layoutRevisionPersistence.fetchByL_P_First(
+			layoutSetBranchId, plid,
+			new LayoutRevisionCreateDateComparator(false));
 	}
 
 	@Override
@@ -414,8 +418,6 @@ public class LayoutRevisionLocalServiceImpl
 			layoutRevision.setCompanyId(oldLayoutRevision.getCompanyId());
 			layoutRevision.setUserId(user.getUserId());
 			layoutRevision.setUserName(user.getFullName());
-			layoutRevision.setCreateDate(serviceContext.getCreateDate(now));
-			layoutRevision.setModifiedDate(serviceContext.getModifiedDate(now));
 			layoutRevision.setLayoutSetBranchId(
 				oldLayoutRevision.getLayoutSetBranchId());
 			layoutRevision.setParentLayoutRevisionId(
@@ -630,8 +632,7 @@ public class LayoutRevisionLocalServiceImpl
 	protected LayoutRevision updateMajor(LayoutRevision layoutRevision)
 		throws PortalException {
 
-		List<LayoutRevision> parentLayoutRevisions =
-			new ArrayList<LayoutRevision>();
+		List<LayoutRevision> parentLayoutRevisions = new ArrayList<>();
 
 		long parentLayoutRevisionId =
 			layoutRevision.getParentLayoutRevisionId();
@@ -674,7 +675,7 @@ public class LayoutRevisionLocalServiceImpl
 	}
 
 	private static final ThreadLocal<Long> _layoutRevisionId =
-		new AutoResetThreadLocal<Long>(
+		new AutoResetThreadLocal<>(
 			LayoutRevisionLocalServiceImpl.class + "._layoutRevisionId", 0L);
 
 }

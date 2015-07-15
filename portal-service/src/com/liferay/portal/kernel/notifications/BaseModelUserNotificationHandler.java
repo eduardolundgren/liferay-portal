@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserNotificationEventLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
@@ -86,9 +87,13 @@ public abstract class BaseModelUserNotificationHandler
 			getBodyTemplate(), new String[] {"[$BODY$]", "[$TITLE$]"},
 			new String[] {
 				HtmlUtil.escape(
-					StringUtil.shorten(jsonObject.getString("entryTitle"), 70)),
+					StringUtil.shorten(getBodyContent(jsonObject), 70)),
 				getTitle(jsonObject, assetRenderer, serviceContext)
 			});
+	}
+
+	protected String getBodyContent(JSONObject jsonObject) {
+		return jsonObject.getString("entryTitle");
 	}
 
 	@Override
@@ -133,7 +138,9 @@ public abstract class BaseModelUserNotificationHandler
 		return LanguageUtil.format(
 			serviceContext.getLocale(), message,
 			new String[] {
-				HtmlUtil.escape(assetRenderer.getUserName()),
+				HtmlUtil.escape(
+					PortalUtil.getUserName(
+						jsonObject.getLong("userId"), StringPool.BLANK)),
 				StringUtil.toLowerCase(HtmlUtil.escape(typeName))
 			},
 			false);

@@ -16,12 +16,16 @@ package com.liferay.sync.engine.model;
 
 import com.j256.ormlite.field.DatabaseField;
 
+import com.liferay.sync.engine.util.JSONUtil;
+
+import java.io.IOException;
+
 /**
  * @author Shinn Lok
  */
 public abstract class BaseModel {
 
-	public static final int UI_EVENT_DEFAULT = 0;
+	public static final int UI_EVENT_NONE = 0;
 
 	public int getUiEvent() {
 		return uiEvent;
@@ -31,7 +35,17 @@ public abstract class BaseModel {
 		this.uiEvent = uiEvent;
 	}
 
-	@DatabaseField(useGetSet = true)
+	@Override
+	public String toString() {
+		try {
+			return JSONUtil.writeValueAsString(this);
+		}
+		catch (IOException ioe) {
+			return super.toString();
+		}
+	}
+
+	@DatabaseField(index = true, useGetSet = true)
 	protected int uiEvent;
 
 }

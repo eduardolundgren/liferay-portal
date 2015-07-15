@@ -14,21 +14,25 @@
 
 package com.liferay.portal.backgroundtask.messaging;
 
-import com.liferay.portal.DuplicateLockException;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageTranslator;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistryUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocalManager;
 import com.liferay.portal.kernel.backgroundtask.ClassLoaderAwareBackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.SerialBackgroundTaskExecutor;
+import com.liferay.portal.kernel.backgroundtask.ThreadLocalAwareBackgroundTaskExecutor;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.StackTraceUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -36,12 +40,17 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.ClassLoaderUtil;
 
 /**
  * @author Michael C. Han
  */
 public class BackgroundTaskMessageListener extends BaseMessageListener {
+
+	public void setBackgroundTaskThreadLocalManager(
+		BackgroundTaskThreadLocalManager backgroundTaskThreadLocalManager) {
+
+		_backgroundTaskThreadLocalManager = backgroundTaskThreadLocalManager;
+	}
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
@@ -113,11 +122,19 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			status = backgroundTaskResult.getStatus();
 			statusMessage = backgroundTaskResult.getStatusMessage();
 		}
-		catch (DuplicateLockException e) {
+		catch (DuplicateLockException dle) {
 			status = BackgroundTaskConstants.STATUS_QUEUED;
 		}
 		catch (Exception e) {
 			status = BackgroundTaskConstants.STATUS_FAILED;
+
+			if (e instanceof SystemException) {
+				Throwable cause = e.getCause();
+
+				if (cause instanceof Exception) {
+					e = (Exception)cause;
+				}
+			}
 
 			if (backgroundTaskExecutor != null) {
 				statusMessage = backgroundTaskExecutor.handleException(
@@ -178,10 +195,15 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 				backgroundTaskExecutor);
 		}
 
+		backgroundTaskExecutor = new ThreadLocalAwareBackgroundTaskExecutor(
+			backgroundTaskExecutor, _backgroundTaskThreadLocalManager);
+
 		return backgroundTaskExecutor;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BackgroundTaskMessageListener.class);
+
+	private BackgroundTaskThreadLocalManager _backgroundTaskThreadLocalManager;
 
 }

@@ -69,9 +69,8 @@ public class PortletResourceBundles {
 	}
 
 	private PortletResourceBundles() {
-		_resourceBundles =
-			new ConcurrentHashMap<String, Map<String, ResourceBundle>>(
-				new LinkedHashMap<String, Map<String, ResourceBundle>>());
+		_resourceBundles = new ConcurrentHashMap<>(
+			new LinkedHashMap<String, Map<String, ResourceBundle>>());
 	}
 
 	private ResourceBundle _getResourceBundle(
@@ -110,7 +109,7 @@ public class PortletResourceBundles {
 			servletContextName);
 
 		if (resourceBundles == null) {
-			resourceBundles = new HashMap<String, ResourceBundle>();
+			resourceBundles = new HashMap<>();
 
 			_resourceBundles.put(servletContextName, resourceBundles);
 		}
@@ -150,7 +149,11 @@ public class PortletResourceBundles {
 			ResourceBundle resourceBundle = _getResourceBundle(
 				resourceBundles, languageId);
 
-			return ResourceBundleUtil.getString(resourceBundle, key);
+			String value = ResourceBundleUtil.getString(resourceBundle, key);
+
+			if (value != null) {
+				return value;
+			}
 		}
 
 		return null;

@@ -103,13 +103,13 @@ public class ServiceTrackerCollectionTest {
 
 		InterfaceOne interfaceOneA = getInstance();
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 
 		ServiceRegistration<InterfaceOne> serviceRegistrationA =
-			_registry.registerService(InterfaceOne.class, interfaceOneA,
-			properties);
+			_registry.registerService(
+				InterfaceOne.class, interfaceOneA, properties);
 
 		Assert.assertNotNull(serviceRegistrationA);
 
@@ -156,7 +156,7 @@ public class ServiceTrackerCollectionTest {
 	public void testClassFilterProperties() throws Exception {
 		Filter filter = _registry.getFilter("(a.property=G)");
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 
@@ -224,7 +224,7 @@ public class ServiceTrackerCollectionTest {
 
 		InterfaceOne interfaceOneA = getInstance();
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 
@@ -288,7 +288,7 @@ public class ServiceTrackerCollectionTest {
 			serviceTrackerCustomizer = new MockServiceTrackerCustomizer(
 				counter);
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 
@@ -344,7 +344,7 @@ public class ServiceTrackerCollectionTest {
 
 	@Test
 	public void testClassProperties() throws Exception {
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 
@@ -448,7 +448,7 @@ public class ServiceTrackerCollectionTest {
 			serviceTrackerCustomizer = new MockServiceTrackerCustomizer(
 				counter);
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 
@@ -512,7 +512,7 @@ public class ServiceTrackerCollectionTest {
 			serviceTrackerCustomizer = new MockServiceTrackerCustomizer(
 				counter);
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("a.property", "G");
 

@@ -26,6 +26,10 @@ import com.liferay.sync.engine.service.persistence.SyncPropPersistence;
 import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
 import com.liferay.sync.engine.service.persistence.SyncUserPersistence;
 import com.liferay.sync.engine.service.persistence.SyncWatchEventPersistence;
+import com.liferay.sync.engine.upgrade.UpgradeProcess;
+import com.liferay.sync.engine.upgrade.v3_0_4.UpgradeProcess_3_0_4;
+import com.liferay.sync.engine.upgrade.v3_0_5.UpgradeProcess_3_0_5;
+import com.liferay.sync.engine.upgrade.v3_0_8.UpgradeProcess_3_0_8;
 import com.liferay.sync.engine.util.LoggerUtil;
 import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.ReleaseInfo;
@@ -35,6 +39,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Shinn Lok
@@ -63,9 +73,28 @@ public class UpgradeUtil {
 
 				Files.copy(inputStream, loggerConfigurationFilePath);
 			}
-		}
-		else if (buildNumber == ReleaseInfo.getBuildNumber()) {
+
+			SyncPropService.updateSyncProp(
+				"buildNumber", ReleaseInfo.getBuildNumber());
+
 			return;
+		}
+		else if (buildNumber >= ReleaseInfo.getBuildNumber()) {
+			return;
+		}
+
+		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
+
+		upgradeProcesses.add(new UpgradeProcess_3_0_4());
+		upgradeProcesses.add(new UpgradeProcess_3_0_5());
+		upgradeProcesses.add(new UpgradeProcess_3_0_8());
+
+		for (UpgradeProcess upgradeProcess : upgradeProcesses) {
+			if (buildNumber < upgradeProcess.getThreshold()) {
+				_logger.info("Upgrading to {}", upgradeProcess.getThreshold());
+
+				upgradeProcess.upgrade();
+			}
 		}
 
 		SyncPropService.updateSyncProp(
@@ -115,5 +144,8 @@ public class UpgradeUtil {
 			syncWatchEventPersistence.createTable();
 		}
 	}
+
+	private static final Logger _logger = LoggerFactory.getLogger(
+		UpgradeUtil.class);
 
 }

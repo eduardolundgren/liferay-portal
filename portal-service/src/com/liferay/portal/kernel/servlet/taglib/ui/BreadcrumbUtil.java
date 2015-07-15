@@ -15,6 +15,8 @@
 package com.liferay.portal.kernel.servlet.taglib.ui;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -37,7 +39,6 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,8 +71,7 @@ public class BreadcrumbUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		List<BreadcrumbEntry> breadcrumbEntries =
-			new ArrayList<BreadcrumbEntry>();
+		List<BreadcrumbEntry> breadcrumbEntries = new ArrayList<>();
 
 		boolean hasAll = ArrayUtil.contains(types, ENTRY_TYPE_ANY);
 
@@ -146,8 +146,7 @@ public class BreadcrumbUtil {
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		List<BreadcrumbEntry> breadcrumbEntries =
-			new ArrayList<BreadcrumbEntry>();
+		List<BreadcrumbEntry> breadcrumbEntries = new ArrayList<>();
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -165,8 +164,7 @@ public class BreadcrumbUtil {
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		List<BreadcrumbEntry> breadcrumbEntries =
-			new ArrayList<BreadcrumbEntry>();
+		List<BreadcrumbEntry> breadcrumbEntries = new ArrayList<>();
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -188,13 +186,15 @@ public class BreadcrumbUtil {
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-		String portletName = portletDisplay.getPortletName();
-
 		String name = WebKeys.PORTLET_BREADCRUMBS;
 
 		if (Validator.isNotNull(portletDisplay.getId()) &&
-			!portletName.equals(PortletKeys.BREADCRUMB) &&
-			!portletDisplay.isFocused()) {
+			!portletDisplay.isFocused() &&
+			!Validator.equals(
+				portletDisplay.getId(),
+				PortletProviderUtil.getPortletId(
+					BreadcrumbEntry.class.getName(),
+					PortletProvider.Action.VIEW))) {
 
 			name = name.concat(
 				StringPool.UNDERLINE.concat(portletDisplay.getId()));
@@ -228,8 +228,7 @@ public class BreadcrumbUtil {
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		List<BreadcrumbEntry> breadcrumbEntries =
-			new ArrayList<BreadcrumbEntry>();
+		List<BreadcrumbEntry> breadcrumbEntries = new ArrayList<>();
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -250,7 +249,7 @@ public class BreadcrumbUtil {
 
 		Group group = layoutSet.getGroup();
 
-		if (group.isControlPanel()) {
+		if (group.isControlPanel() || group.isUserPersonalPanel()) {
 			return;
 		}
 

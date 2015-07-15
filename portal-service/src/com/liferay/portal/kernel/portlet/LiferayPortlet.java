@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 
@@ -52,6 +54,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -88,14 +91,19 @@ public class LiferayPortlet extends GenericPortlet {
 				return;
 			}
 
-			boolean emptySessionMessages = SessionMessages.isEmpty(
+			boolean emptySessionMessages = isEmptySessionMessages(
 				actionRequest);
 
 			if (emptySessionMessages) {
 				addSuccessMessage(actionRequest, actionResponse);
 			}
 
-			if (emptySessionMessages || isAlwaysSendRedirect()) {
+			if (emptySessionMessages || isAlwaysSendRedirect() ||
+				SessionMessages.contains(
+					actionRequest,
+					PortalUtil.getPortletId(actionRequest) +
+						SessionMessages.KEY_SUFFIX_FORCE_SEND_REDIRECT)) {
+
 				sendRedirect(actionRequest, actionResponse);
 			}
 		}
@@ -400,6 +408,17 @@ public class LiferayPortlet extends GenericPortlet {
 		return method;
 	}
 
+	protected ServletContext getServletContext() {
+		LiferayPortletConfig liferayPortletConfig =
+			(LiferayPortletConfig)getPortletConfig();
+
+		Portlet portlet = liferayPortletConfig.getPortlet();
+
+		PortletApp portletApp = portlet.getPortletApp();
+
+		return portletApp.getServletContext();
+	}
+
 	@Override
 	protected String getTitle(RenderRequest renderRequest) {
 		try {
@@ -412,6 +431,36 @@ public class LiferayPortlet extends GenericPortlet {
 
 	protected boolean isAlwaysSendRedirect() {
 		return alwaysSendRedirect;
+	}
+
+	protected boolean isEmptySessionMessages(ActionRequest actionRequest) {
+		if (SessionMessages.isEmpty(actionRequest)) {
+			return true;
+		}
+
+		int sessionMessagesSize = SessionMessages.size(actionRequest);
+
+		if (SessionMessages.contains(
+				actionRequest,
+				PortalUtil.getPortletId(actionRequest) +
+					SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA)) {
+
+			sessionMessagesSize--;
+		}
+
+		if (SessionMessages.contains(
+				actionRequest,
+				PortalUtil.getPortletId(actionRequest) +
+					SessionMessages.KEY_SUFFIX_FORCE_SEND_REDIRECT)) {
+
+			sessionMessagesSize--;
+		}
+
+		if (sessionMessagesSize == 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	protected boolean isProcessActionRequest(ActionRequest actionRequest) {
@@ -512,8 +561,8 @@ public class LiferayPortlet extends GenericPortlet {
 	private static final Log _log = LogFactoryUtil.getLog(LiferayPortlet.class);
 
 	private final Map<String, Method> _actionMethods =
-		new ConcurrentHashMap<String, Method>();
+		new ConcurrentHashMap<>();
 	private final Map<String, Method> _resourceMethods =
-		new ConcurrentHashMap<String, Method>();
+		new ConcurrentHashMap<>();
 
 }

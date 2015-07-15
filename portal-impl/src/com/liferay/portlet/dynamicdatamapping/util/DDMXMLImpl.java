@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -39,7 +40,6 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.FieldConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
-import com.liferay.util.xml.XMLFormatter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -57,38 +57,6 @@ import java.util.Set;
  */
 @DoPrivileged
 public class DDMXMLImpl implements DDMXML {
-
-	@Override
-	public String formatXML(Document document) {
-		try {
-			return document.formattedString(_XML_INDENT);
-		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
-		}
-	}
-
-	@Override
-	public String formatXML(String xml) {
-
-		// This is only supposed to format your xml, however, it will also
-		// unwantingly change &#169; and other characters like it into their
-		// respective readable versions
-
-		try {
-			xml = StringUtil.replace(xml, "&#", "[$SPECIAL_CHARACTER$]");
-			xml = XMLFormatter.toString(xml, _XML_INDENT);
-			xml = StringUtil.replace(xml, "[$SPECIAL_CHARACTER$]", "&#");
-
-			return xml;
-		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
-		}
-		catch (org.dom4j.DocumentException de) {
-			throw new SystemException(de);
-		}
-	}
 
 	@Override
 	public Fields getFields(DDMStructure structure, String xml)
@@ -109,6 +77,10 @@ public class DDMXMLImpl implements DDMXML {
 			document = SAXReaderUtil.read(xml);
 		}
 		catch (DocumentException de) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(de.getMessage(), de);
+			}
+
 			return null;
 		}
 
@@ -296,7 +268,7 @@ public class DDMXMLImpl implements DDMXML {
 				_log.debug("Invalid XML content " + e.getMessage(), e);
 			}
 
-			throw new StructureDefinitionException();
+			throw new StructureDefinitionException(e);
 		}
 	}
 
@@ -390,7 +362,7 @@ public class DDMXMLImpl implements DDMXML {
 
 		List<Node> nodes = xPathSelector.selectNodes(document);
 
-		Set<String> elementNames = new HashSet<String>();
+		Set<String> elementNames = new HashSet<>();
 
 		for (Node node : nodes) {
 			Element element = (Element)node;
@@ -398,12 +370,20 @@ public class DDMXMLImpl implements DDMXML {
 			String name = StringUtil.toLowerCase(
 				element.attributeValue("name"));
 
+			if (Validator.isNull(name)) {
+				throw new StructureDefinitionException(
+					"Element must have a name attribute " +
+						element.formattedString());
+			}
+
 			if (name.startsWith(DDMStructureConstants.XSD_NAME_RESERVED)) {
-				throw new StructureDefinitionException();
+				throw new StructureDefinitionException(
+					"Element name " + name + " is reserved");
 			}
 
 			if (elementNames.contains(name)) {
-				throw new StructureDuplicateElementException();
+				throw new StructureDuplicateElementException(
+					"Element with name " + name + " already exists");
 			}
 
 			elementNames.add(name);
@@ -417,8 +397,6 @@ public class DDMXMLImpl implements DDMXML {
 	private static final String _DYNAMIC_ELEMENT = "dynamic-element";
 
 	private static final String _LOCALE = "locale";
-
-	private static final String _XML_INDENT = "  ";
 
 	private static final Log _log = LogFactoryUtil.getLog(DDMXMLImpl.class);
 

@@ -38,7 +38,7 @@ List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeServiceUtil.getFolderFileE
 		modelVar="fileEntryType"
 	>
 		<liferay-ui:search-container-column-text name="name">
-			<a class="select-file-entry-type" data-rowId="<%= fileEntryType.getFileEntryTypeId() %>" href="javascript:;"><%= HtmlUtil.escape(fileEntryType.getName(locale)) %></a>
+			<a class="select-file-entry-type" data-rowId="<%= fileEntryType.getFileEntryTypeId() %>" href="javascript:;"><%= fileEntryType.getName(locale) %></a>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
@@ -59,9 +59,9 @@ List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeServiceUtil.getFolderFileE
 			portletURL.setParameter('backURL', '<%= HtmlUtil.escape(backURL) %>');
 			portletURL.setParameter('fileEntryTypeId', link.getAttribute('data-rowId'));
 			portletURL.setParameter('folderId', '<%= folderId %>');
+			portletURL.setParameter('mvcRenderCommandName', '/document_library/edit_file_entry');
 			portletURL.setParameter('redirect', '<%= HtmlUtil.escape(redirect) %>');
 			portletURL.setParameter('repositoryId', '<%= repositoryId %>');
-			portletURL.setParameter('struts_action', '/document_library/edit_file_entry');
 
 			Liferay.Util.getOpener().location.href = portletURL.toString();
 

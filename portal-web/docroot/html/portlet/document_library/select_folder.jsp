@@ -33,7 +33,7 @@ if (folder != null) {
 	DLUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 }
 
-DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, dlPortletInstanceSettings);
+DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlRequestHelper);
 %>
 
 <aui:form method="post" name="selectFolderFm">
@@ -41,12 +41,12 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 		title="home"
 	/>
 
-	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
+	<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
 
 	<aui:button-row>
-		<c:if test="<%= dlActionsDisplayContext.isAddFolderButtonVisible() && DLFolderPermission.contains(permissionChecker, repositoryId, folderId, ActionKeys.ADD_FOLDER) %>">
+		<c:if test="<%= dlVisualizationHelper.isAddFolderButtonVisible() && DLFolderPermission.contains(permissionChecker, repositoryId, folderId, ActionKeys.ADD_FOLDER) %>">
 			<portlet:renderURL var="editFolderURL">
-				<portlet:param name="struts_action" value="/document_library/edit_folder" />
+				<portlet:param name="mvcRenderCommandName" value="/document_library/edit_folder" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
 				<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
 				<portlet:param name="parentFolderId" value="<%= String.valueOf(folderId) %>" />
@@ -70,18 +70,18 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 	<%
 	PortletURL portletURL = renderResponse.createRenderURL();
 
-	portletURL.setParameter("struts_action", "/document_library/select_folder");
+	portletURL.setParameter("mvcRenderCommandName", "/document_library/select_folder");
 	portletURL.setParameter("folderId", String.valueOf(folderId));
 	portletURL.setParameter("ignoreRootFolder", Boolean.TRUE.toString());
 	%>
 
 	<liferay-ui:search-container
 		iteratorURL="<%= portletURL %>"
-		total="<%= DLAppServiceUtil.getFoldersCount(repositoryId, folderId) %>"
+		total="<%= DLAppServiceUtil.getFoldersCount(repositoryId, folderId, dlVisualizationHelper.isMountFolderVisible()) %>"
 	>
 
 		<liferay-ui:search-container-results
-			results="<%= DLAppServiceUtil.getFolders(repositoryId, folderId, searchContainer.getStart(), searchContainer.getEnd()) %>"
+			results="<%= DLAppServiceUtil.getFolders(repositoryId, folderId, dlVisualizationHelper.isMountFolderVisible(), searchContainer.getStart(), searchContainer.getEnd()) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -91,7 +91,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 			rowVar="row"
 		>
 			<liferay-portlet:renderURL varImpl="rowURL">
-				<portlet:param name="struts_action" value="/document_library/select_folder" />
+				<portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" />
 				<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
 				<portlet:param name="ignoreRootFolder" value="<%= Boolean.TRUE.toString() %>" />
 			</liferay-portlet:renderURL>

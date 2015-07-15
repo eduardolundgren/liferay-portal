@@ -30,7 +30,7 @@ public class BookmarksSearcher extends BaseSearcher {
 		BookmarksEntry.class.getName(), BookmarksFolder.class.getName()
 	};
 
-	public static Indexer getInstance() {
+	public static Indexer<?> getInstance() {
 		return new BookmarksSearcher();
 	}
 
@@ -42,7 +42,7 @@ public class BookmarksSearcher extends BaseSearcher {
 	}
 
 	@Override
-	public String[] getClassNames() {
+	public String[] getSearchClassNames() {
 		return CLASS_NAMES;
 	}
 

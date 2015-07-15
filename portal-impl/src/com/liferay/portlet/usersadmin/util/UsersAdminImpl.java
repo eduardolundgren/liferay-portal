@@ -217,6 +217,17 @@ public class UsersAdminImpl implements UsersAdmin {
 			return filteredGroupRoles;
 		}
 
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		if (!GroupPermissionUtil.contains(
+				permissionChecker, group, ActionKeys.ASSIGN_USER_ROLES) &&
+			!OrganizationPermissionUtil.contains(
+				permissionChecker, group.getOrganizationId(),
+				ActionKeys.ASSIGN_USER_ROLES)) {
+
+			return Collections.emptyList();
+		}
+
 		itr = filteredGroupRoles.iterator();
 
 		while (itr.hasNext()) {
@@ -228,30 +239,9 @@ public class UsersAdminImpl implements UsersAdmin {
 					RoleConstants.ORGANIZATION_ADMINISTRATOR) ||
 				roleName.equals(RoleConstants.ORGANIZATION_OWNER) ||
 				roleName.equals(RoleConstants.SITE_ADMINISTRATOR) ||
-				roleName.equals(RoleConstants.SITE_OWNER)) {
-
-				itr.remove();
-			}
-		}
-
-		Group group = GroupLocalServiceUtil.getGroup(groupId);
-
-		if (GroupPermissionUtil.contains(
-				permissionChecker, group, ActionKeys.ASSIGN_USER_ROLES) ||
-			OrganizationPermissionUtil.contains(
-				permissionChecker, group.getOrganizationId(),
-				ActionKeys.ASSIGN_USER_ROLES)) {
-
-			return filteredGroupRoles;
-		}
-
-		itr = filteredGroupRoles.iterator();
-
-		while (itr.hasNext()) {
-			Role role = itr.next();
-
-			if (!RolePermissionUtil.contains(
-					permissionChecker, groupId, role.getRoleId(),
+				roleName.equals(RoleConstants.SITE_OWNER) ||
+				!RolePermissionUtil.contains(
+					permissionChecker, groupId, groupRole.getRoleId(),
 					ActionKeys.ASSIGN_MEMBERS)) {
 
 				itr.remove();
@@ -482,7 +472,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			return defaultAddresses;
 		}
 
-		List<Address> addresses = new ArrayList<Address>();
+		List<Address> addresses = new ArrayList<>();
 
 		int[] addressesIndexes = StringUtil.split(addressesIndexesString, 0);
 
@@ -515,7 +505,7 @@ public class UsersAdminImpl implements UsersAdmin {
 
 			long regionId = ParamUtil.getLong(
 				actionRequest, "addressRegionId" + addressesIndex);
-			int typeId = ParamUtil.getInteger(
+			long typeId = ParamUtil.getLong(
 				actionRequest, "addressTypeId" + addressesIndex);
 			boolean mailing = ParamUtil.getBoolean(
 				actionRequest, "addressMailing" + addressesIndex);
@@ -562,7 +552,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			return defaultEmailAddresses;
 		}
 
-		List<EmailAddress> emailAddresses = new ArrayList<EmailAddress>();
+		List<EmailAddress> emailAddresses = new ArrayList<>();
 
 		int[] emailAddressesIndexes = StringUtil.split(
 			emailAddressesIndexesString, 0);
@@ -581,7 +571,7 @@ public class UsersAdminImpl implements UsersAdmin {
 				continue;
 			}
 
-			int typeId = ParamUtil.getInteger(
+			long typeId = ParamUtil.getLong(
 				actionRequest, "emailAddressTypeId" + emailAddressesIndex);
 
 			boolean primary = false;
@@ -654,7 +644,7 @@ public class UsersAdminImpl implements UsersAdmin {
 		for (int i = 0; i < organizations.size(); i++) {
 			Organization organization = organizations.get(i);
 
-			organizationIds[i] = new Long(organization.getOrganizationId());
+			organizationIds[i] = Long.valueOf(organization.getOrganizationId());
 		}
 
 		return organizationIds;
@@ -706,8 +696,7 @@ public class UsersAdminImpl implements UsersAdmin {
 
 		List<Document> documents = hits.toList();
 
-		List<Organization> organizations = new ArrayList<Organization>(
-			documents.size());
+		List<Organization> organizations = new ArrayList<>(documents.size());
 
 		for (Document document : documents) {
 			long organizationId = GetterUtil.getLong(
@@ -719,7 +708,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			if (organization == null) {
 				organizations = null;
 
-				Indexer indexer = IndexerRegistryUtil.getIndexer(
+				Indexer<Organization> indexer = IndexerRegistryUtil.getIndexer(
 					Organization.class);
 
 				long companyId = GetterUtil.getLong(
@@ -737,7 +726,7 @@ public class UsersAdminImpl implements UsersAdmin {
 
 	@Override
 	public List<OrgLabor> getOrgLabors(ActionRequest actionRequest) {
-		List<OrgLabor> orgLabors = new ArrayList<OrgLabor>();
+		List<OrgLabor> orgLabors = new ArrayList<>();
 
 		int[] orgLaborsIndexes = StringUtil.split(
 			ParamUtil.getString(actionRequest, "orgLaborsIndexes"), 0);
@@ -746,7 +735,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			long orgLaborId = ParamUtil.getLong(
 				actionRequest, "orgLaborId" + orgLaborsIndex);
 
-			int typeId = ParamUtil.getInteger(
+			long typeId = ParamUtil.getLong(
 				actionRequest, "orgLaborTypeId" + orgLaborsIndex, -1);
 
 			if (typeId == -1) {
@@ -823,7 +812,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			return defaultPhones;
 		}
 
-		List<Phone> phones = new ArrayList<Phone>();
+		List<Phone> phones = new ArrayList<>();
 
 		int[] phonesIndexes = StringUtil.split(phonesIndexesString, 0);
 
@@ -842,7 +831,7 @@ public class UsersAdminImpl implements UsersAdmin {
 				continue;
 			}
 
-			int typeId = ParamUtil.getInteger(
+			long typeId = ParamUtil.getLong(
 				actionRequest, "phoneTypeId" + phonesIndex);
 
 			boolean primary = false;
@@ -973,10 +962,8 @@ public class UsersAdminImpl implements UsersAdmin {
 			return Collections.emptyList();
 		}
 
-		Set<UserGroupRole> userGroupRoles =
-			new HashSet<UserGroupRole>(
-				UserGroupRoleLocalServiceUtil.getUserGroupRoles(
-					user.getUserId()));
+		Set<UserGroupRole> userGroupRoles = new HashSet<>(
+			UserGroupRoleLocalServiceUtil.getUserGroupRoles(user.getUserId()));
 
 		userGroupRoles.addAll(
 			getUserGroupRoles(
@@ -987,14 +974,14 @@ public class UsersAdminImpl implements UsersAdmin {
 				portletRequest, user, "deleteGroupRolesGroupIds",
 				"deleteGroupRolesRoleIds"));
 
-		return new ArrayList<UserGroupRole>(userGroupRoles);
+		return new ArrayList<>(userGroupRoles);
 	}
 
 	@Override
 	public List<UserGroup> getUserGroups(Hits hits) throws PortalException {
 		List<Document> documents = hits.toList();
 
-		List<UserGroup> userGroups = new ArrayList<UserGroup>(documents.size());
+		List<UserGroup> userGroups = new ArrayList<>(documents.size());
 
 		for (Document document : documents) {
 			long userGroupId = GetterUtil.getLong(
@@ -1006,7 +993,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			if (userGroup == null) {
 				userGroups = null;
 
-				Indexer indexer = IndexerRegistryUtil.getIndexer(
+				Indexer<UserGroup> indexer = IndexerRegistryUtil.getIndexer(
 					UserGroup.class);
 
 				long companyId = GetterUtil.getLong(
@@ -1060,17 +1047,18 @@ public class UsersAdminImpl implements UsersAdmin {
 	public List<User> getUsers(Hits hits) throws PortalException {
 		List<Document> documents = hits.toList();
 
-		List<User> users = new ArrayList<User>(documents.size());
+		List<User> users = new ArrayList<>(documents.size());
 
 		for (Document document : documents) {
-			long userId = GetterUtil.getLong(document.get(Field.USER_ID));
+			long userId = UserIndexer.getUserId(document);
 
 			User user = UserLocalServiceUtil.fetchUser(userId);
 
 			if (user == null) {
 				users = null;
 
-				Indexer indexer = IndexerRegistryUtil.getIndexer(User.class);
+				Indexer<User> indexer = IndexerRegistryUtil.getIndexer(
+					User.class);
 
 				long companyId = GetterUtil.getLong(
 					document.get(Field.COMPANY_ID));
@@ -1101,7 +1089,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			return defaultWebsites;
 		}
 
-		List<Website> websites = new ArrayList<Website>();
+		List<Website> websites = new ArrayList<>();
 
 		int[] websitesIndexes = StringUtil.split(websitesIndexesString, 0);
 
@@ -1119,7 +1107,7 @@ public class UsersAdminImpl implements UsersAdmin {
 				continue;
 			}
 
-			int typeId = ParamUtil.getInteger(
+			long typeId = ParamUtil.getLong(
 				actionRequest, "websiteTypeId" + websitesIndex);
 
 			boolean primary = false;
@@ -1218,7 +1206,9 @@ public class UsersAdminImpl implements UsersAdmin {
 			PropsKeys.FIELD_EDITABLE_DOMAINS, new Filter(field));
 
 		for (String domainName : fieldEditableDomainNames) {
-			if (emailAddress.endsWith(domainName)) {
+			if (domainName.equals(StringPool.STAR) ||
+				emailAddress.endsWith(domainName)) {
+
 				return true;
 			}
 		}
@@ -1283,7 +1273,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			String className, long classPK, List<Address> addresses)
 		throws PortalException {
 
-		Set<Long> addressIds = new HashSet<Long>();
+		Set<Long> addressIds = new HashSet<>();
 
 		for (Address address : addresses) {
 			long addressId = address.getAddressId();
@@ -1295,7 +1285,7 @@ public class UsersAdminImpl implements UsersAdmin {
 			String zip = address.getZip();
 			long regionId = address.getRegionId();
 			long countryId = address.getCountryId();
-			int typeId = address.getTypeId();
+			long typeId = address.getTypeId();
 			boolean mailing = address.isMailing();
 			boolean primary = address.isPrimary();
 
@@ -1330,13 +1320,13 @@ public class UsersAdminImpl implements UsersAdmin {
 			String className, long classPK, List<EmailAddress> emailAddresses)
 		throws PortalException {
 
-		Set<Long> emailAddressIds = new HashSet<Long>();
+		Set<Long> emailAddressIds = new HashSet<>();
 
 		for (EmailAddress emailAddress : emailAddresses) {
 			long emailAddressId = emailAddress.getEmailAddressId();
 
 			String address = emailAddress.getAddress();
-			int typeId = emailAddress.getTypeId();
+			long typeId = emailAddress.getTypeId();
 			boolean primary = emailAddress.isPrimary();
 
 			if (emailAddressId <= 0) {
@@ -1369,12 +1359,12 @@ public class UsersAdminImpl implements UsersAdmin {
 	public void updateOrgLabors(long classPK, List<OrgLabor> orgLabors)
 		throws PortalException {
 
-		Set<Long> orgLaborsIds = new HashSet<Long>();
+		Set<Long> orgLaborsIds = new HashSet<>();
 
 		for (OrgLabor orgLabor : orgLabors) {
 			long orgLaborId = orgLabor.getOrgLaborId();
 
-			int typeId = orgLabor.getTypeId();
+			long typeId = orgLabor.getTypeId();
 			int sunOpen = orgLabor.getSunOpen();
 			int sunClose = orgLabor.getSunClose();
 			int monOpen = orgLabor.getMonOpen();
@@ -1421,14 +1411,14 @@ public class UsersAdminImpl implements UsersAdmin {
 	public void updatePhones(String className, long classPK, List<Phone> phones)
 		throws PortalException {
 
-		Set<Long> phoneIds = new HashSet<Long>();
+		Set<Long> phoneIds = new HashSet<>();
 
 		for (Phone phone : phones) {
 			long phoneId = phone.getPhoneId();
 
 			String number = phone.getNumber();
 			String extension = phone.getExtension();
-			int typeId = phone.getTypeId();
+			long typeId = phone.getTypeId();
 			boolean primary = phone.isPrimary();
 
 			if (phoneId <= 0) {
@@ -1460,13 +1450,13 @@ public class UsersAdminImpl implements UsersAdmin {
 			String className, long classPK, List<Website> websites)
 		throws PortalException {
 
-		Set<Long> websiteIds = new HashSet<Long>();
+		Set<Long> websiteIds = new HashSet<>();
 
 		for (Website website : websites) {
 			long websiteId = website.getWebsiteId();
 
 			String url = website.getUrl();
-			int typeId = website.getTypeId();
+			long typeId = website.getTypeId();
 			boolean primary = website.isPrimary();
 
 			if (websiteId <= 0) {
@@ -1519,7 +1509,7 @@ public class UsersAdminImpl implements UsersAdmin {
 		PortletRequest portletRequest, User user, String groupIdsParam,
 		String roleIdsParam) {
 
-		Set<UserGroupRole> userGroupRoles = new HashSet<UserGroupRole>();
+		Set<UserGroupRole> userGroupRoles = new HashSet<>();
 
 		long[] groupRolesGroupIds = StringUtil.split(
 			ParamUtil.getString(portletRequest, groupIdsParam), 0L);

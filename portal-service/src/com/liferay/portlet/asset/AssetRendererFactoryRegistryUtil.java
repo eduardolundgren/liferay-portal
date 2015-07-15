@@ -135,7 +135,7 @@ public class AssetRendererFactoryRegistryUtil {
 		boolean filterSelectable) {
 
 		Map<String, AssetRendererFactory> filteredAssetRendererFactories =
-			new ConcurrentHashMap<String, AssetRendererFactory>();
+			new ConcurrentHashMap<>();
 
 		for (String className : assetRendererFactories.keySet()) {
 			AssetRendererFactory assetRendererFactory =
@@ -225,21 +225,19 @@ public class AssetRendererFactoryRegistryUtil {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		AssetRendererFactoryRegistryUtil.class);
 
-	private static AssetRendererFactoryRegistryUtil _instance =
+	private static final AssetRendererFactoryRegistryUtil _instance =
 		new AssetRendererFactoryRegistryUtil();
 
-	private Map<String, AssetRendererFactory>
-		_assetRenderFactoriesMapByClassName =
-			new ConcurrentHashMap<String, AssetRendererFactory>();
-	private Map<String, AssetRendererFactory>
-		_assetRenderFactoriesMapByClassType =
-			new ConcurrentHashMap<String, AssetRendererFactory>();
-	private ServiceRegistrationMap<AssetRendererFactory> _serviceRegistrations =
-		new ServiceRegistrationMap<AssetRendererFactory>();
-	private ServiceTracker<AssetRendererFactory, AssetRendererFactory>
+	private final Map<String, AssetRendererFactory>
+		_assetRenderFactoriesMapByClassName = new ConcurrentHashMap<>();
+	private final Map<String, AssetRendererFactory>
+		_assetRenderFactoriesMapByClassType = new ConcurrentHashMap<>();
+	private final ServiceRegistrationMap<AssetRendererFactory>
+		_serviceRegistrations = new ServiceRegistrationMap<>();
+	private final ServiceTracker<AssetRendererFactory, AssetRendererFactory>
 		_serviceTracker;
 
 	private class AssetRendererFactoryServiceTrackerCustomizer

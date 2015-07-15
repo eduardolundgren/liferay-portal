@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.aop.MethodInterceptorInvocationHandler;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -136,6 +136,8 @@ public class StoreFactory {
 			return store;
 		}
 
+		DBStore dbStore = (DBStore)store;
+
 		DB db = DBFactoryUtil.getDB();
 
 		String dbType = db.getType();
@@ -155,6 +157,8 @@ public class StoreFactory {
 				classLoader, new Class<?>[] {Store.class},
 				new MethodInterceptorInvocationHandler(
 					store, methodInterceptors));
+
+			dbStore.setStoreProxy(store);
 		}
 
 		return store;

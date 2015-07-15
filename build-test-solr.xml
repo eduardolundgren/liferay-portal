@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+
+<project name="portal-test-solr" basedir="." xmlns:antelope="antlib:ise.antelope.tasks">
+	<import file="build-test.xml" />
+
+	<macrodef name="prepare-solr">
+		<sequential>
+			<copy overwrite="true" todir="${solr.dir}/server/solr/liferay/conf">
+				<fileset dir="${solr.dir}/server/solr/configsets/data_driven_schema_configs/conf">
+					<exclude name="solrconfig.xml" />
+				</fileset>
+
+				<fileset dir="modules/portal/portal-search-solr/src/META-INF/resources">
+					<include name="schema.xml" />
+					<include name="solrconfig.xml" />
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="unzip-solr">
+		<sequential>
+			<delete dir="${solr.dir}" />
+
+			<if>
+				<not>
+					<available file="${app.server.parent.dir}/${solr.zip.name}" />
+				</not>
+				<then>
+					<get
+						dest="${app.server.parent.dir}/${solr.zip.name}"
+						src="${solr.zip.url}"
+						verbose="true"
+					/>
+				</then>
+			</if>
+
+			<unzip
+				dest="${app.server.parent.dir}"
+				src="${app.server.parent.dir}/${solr.zip.name}"
+			/>
+		</sequential>
+	</macrodef>
+
+	<target name="configure-solr-osgi-bundle-properties">
+		<echo file="${liferay.home}/osgi/portal/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg">readURL=http://localhost:8983/solr/liferay
+writeURL=http://localhost:8983/solr/liferay</echo>
+	</target>
+
+	<target name="delete-elasticseach-osgi-bundle">
+		<delete file="${liferay.home}/osgi/com.liferay.portal.search.elasticsearch.jar" failonerror="false" />
+	</target>
+
+	<target name="start-solr">
+		<unzip-solr />
+
+		<prepare-solr />
+
+		<antcall target="delete-elasticseach-osgi-bundle" />
+
+		<ant dir="modules/portal/portal-search-solr" target="all" />
+
+		<antcall target="configure-solr-osgi-bundle-properties" />
+
+		<local name="solr.server.not.started" />
+
+		<if>
+			<os family="unix" />
+			<then>
+				<exec executable="/bin/bash" os="${os.unix}">
+					<arg value="-c" />
+					<arg value="${solr.dir}/bin/solr -V" />
+				</exec>
+
+				<waitfor maxwait="10" maxwaitunit="second" timeoutproperty="solr.server.not.started">
+					<http url="http://localhost:8983/solr" />
+				</waitfor>
+
+				<fail message="Solr server failed to initialize." if="solr.server.not.started" />
+
+				<exec executable="/bin/bash" os="${os.unix}">
+					<arg value="-c" />
+					<arg value="${solr.dir}/bin/solr create_core -c liferay -d ${solr.dir}/server/solr/liferay/conf" />
+				</exec>
+			</then>
+			<else>
+				<exec executable="cmd" spawn="true">
+					<arg value="/c" />
+					<arg value="${solr.dir}/bin/solr -V" />
+				</exec>
+
+				<waitfor maxwait="10" maxwaitunit="second" timeoutproperty="solr.server.not.started">
+					<http url="http://localhost:8983/solr" />
+				</waitfor>
+
+				<fail message="Solr server failed to initialize." if="solr.server.not.started" />
+
+				<exec executable="cmd" >
+					<arg value="/c" />
+					<arg value="${solr.dir}/bin/solr create_core -c liferay -d ${solr.dir}/server/solr/liferay/conf" />
+				</exec>
+			</else>
+		</if>
+	</target>
+</project>

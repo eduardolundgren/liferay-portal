@@ -191,6 +191,12 @@ public class DLFileVersionLocalServiceUtil {
 		return getService().fetchDLFileVersionByUuidAndGroupId(uuid, groupId);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileVersion fetchLatestFileVersion(
+		long fileEntryId, boolean excludeWorkingCopy) {
+		return getService()
+				   .fetchLatestFileVersion(fileEntryId, excludeWorkingCopy);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
 	}
@@ -287,7 +293,7 @@ public class DLFileVersionLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 

@@ -30,8 +30,25 @@
 	</div>
 
 	<@aui.script use="aui-carousel">
-		new A.Carousel(
+		var carousel = new A.Carousel(
 			{
+				after: {
+					responsive: function(event) {
+						event.stopImmediatePropagation();
+
+						var boundingBox = event.currentTarget.get('boundingBox');
+
+						boundingBox.all('.image-viewer-base-image-list, .image-viewer-base-image').setStyles(
+							{
+								height: 'auto',
+								maxHeight: event.height,
+								maxWidth: event.width,
+								width: 'auto'
+							}
+						);
+					}
+				},
+
 				contentBox: '#<@liferay_portlet.namespace />carousel',
 				height: 250,
 				intervalTime: 2,

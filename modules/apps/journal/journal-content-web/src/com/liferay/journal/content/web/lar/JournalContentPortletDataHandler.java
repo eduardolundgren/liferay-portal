@@ -15,11 +15,12 @@
 package com.liferay.journal.content.web.lar;
 
 import com.liferay.journal.content.web.configuration.JournalContentWebConfigurationValues;
-import com.liferay.portal.kernel.lar.DataLevel;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataHandler;
-import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.journal.content.web.constants.JournalContentPortletKeys;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.journal.service.JournalContentSearchLocalServiceUtil;
+import com.liferay.journal.service.permission.JournalPermission;
+import com.liferay.journal.web.lar.JournalPortletDataHandler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -34,11 +35,11 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
-import com.liferay.portlet.journal.lar.JournalPortletDataHandler;
-import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
-import com.liferay.portlet.journal.service.permission.JournalPermission;
+import com.liferay.portlet.exportimport.lar.DataLevel;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataHandler;
+import com.liferay.portlet.exportimport.lar.PortletDataHandlerBoolean;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import javax.portlet.PortletPreferences;
 
 import javax.servlet.ServletContext;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -72,21 +74,22 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  * @author Bruno Farache
  * @author Daniel Kocsis
- * @see    com.liferay.portal.kernel.lar.PortletDataHandler
- * @see    com.liferay.portlet.journal.lar.JournalCreationStrategy
- * @see    com.liferay.portlet.journal.lar.JournalPortletDataHandler
- */
+ * @see    com.liferay.journal.web.lar.JournalPortletDataHandler
+ * @see    com.liferay.journal.lar.JournalCreationStrategy
+ * @see    com.liferay.portlet.exportimport.lar.PortletDataHandler
+*/
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_journal_content_web_portlet_JournalContentPortlet"
+		"javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT
 	},
 	service = PortletDataHandler.class
 )
 public class JournalContentPortletDataHandler
 	extends JournalPortletDataHandler {
 
-	public JournalContentPortletDataHandler() {
+	@Activate
+	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
 		setDataPortletPreferences("articleId", "ddmTemplateKey", "groupId");
 		setExportControls(
@@ -277,10 +280,6 @@ public class JournalContentPortletDataHandler
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 		return portletPreferences;
-	}
-
-	@Reference(unbind = "-")
-	protected void setPortalUtil(PortalUtil portalUtil) {
 	}
 
 	@Reference(target = "(original.bean=*)", unbind = "-")

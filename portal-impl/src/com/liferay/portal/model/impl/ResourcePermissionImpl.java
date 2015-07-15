@@ -14,6 +14,7 @@
 
 package com.liferay.portal.model.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 
@@ -89,21 +90,41 @@ import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 public class ResourcePermissionImpl extends ResourcePermissionBaseImpl {
 
 	@Override
+	public void addResourceAction(String actionId) throws PortalException {
+		ResourceAction resourceAction =
+			ResourceActionLocalServiceUtil.getResourceAction(
+				getName(), actionId);
+
+		setActionIds(getActionIds() | resourceAction.getBitwiseValue());
+	}
+
+	@Override
+	public boolean hasAction(ResourceAction resourceAction) {
+		if ((resourceAction != null) &&
+			((getActionIds() & resourceAction.getBitwiseValue()) != 0)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean hasActionId(String actionId) {
 		ResourceAction resourceAction =
 			ResourceActionLocalServiceUtil.fetchResourceAction(
 				getName(), actionId);
 
-		if (resourceAction != null) {
-			long actionIds = getActionIds();
-			long bitwiseValue = resourceAction.getBitwiseValue();
+		return hasAction(resourceAction);
+	}
 
-			if ((actionIds & bitwiseValue) == bitwiseValue) {
-				return true;
-			}
-		}
+	@Override
+	public void removeResourceAction(String actionId) throws PortalException {
+		ResourceAction resourceAction =
+			ResourceActionLocalServiceUtil.getResourceAction(
+				getName(), actionId);
 
-		return false;
+		setActionIds(getActionIds() & (~resourceAction.getBitwiseValue()));
 	}
 
 }

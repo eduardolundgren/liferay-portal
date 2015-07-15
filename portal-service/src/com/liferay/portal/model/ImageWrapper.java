@@ -148,7 +148,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	* @return the modified date of this image
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _image.getModifiedDate();
 	}
 
@@ -243,8 +243,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_image.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -286,7 +285,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	* @param modifiedDate the modified date of this image
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_image.setModifiedDate(modifiedDate);
 	}
 
@@ -356,7 +355,7 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Image> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Image> toCacheModel() {
 		return _image.toCacheModel();
 	}
 

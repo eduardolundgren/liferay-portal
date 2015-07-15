@@ -28,11 +28,15 @@ import com.liferay.portal.model.Website;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.base.CompanyServiceBaseImpl;
+import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portlet.ratings.transformer.RatingsDataTransformerUtil;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
 import java.io.InputStream;
 
 import java.util.List;
+
+import javax.portlet.PortletPreferences;
 
 /**
  * Provides the local service for accessing, adding, checking, and updating
@@ -51,7 +55,6 @@ public class CompanyServiceImpl extends CompanyServiceBaseImpl {
 	 * @param  webId the company's web domain
 	 * @param  virtualHost the company's virtual host name
 	 * @param  mx the company's mail domain
-	 * @param  shardName the company's shard
 	 * @param  system whether the company is the very first company (i.e., the
 	 * @param  maxUsers the max number of company users (optionally
 	 *         <code>0</code>)
@@ -64,18 +67,18 @@ public class CompanyServiceImpl extends CompanyServiceBaseImpl {
 	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
 	@Override
 	public Company addCompany(
-			String webId, String virtualHost, String mx, String shardName,
-			boolean system, int maxUsers, boolean active)
+			String webId, String virtualHost, String mx, boolean system,
+			int maxUsers, boolean active)
 		throws PortalException {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (!permissionChecker.isOmniadmin()) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
 		}
 
 		return companyLocalService.addCompany(
-			webId, virtualHost, mx, shardName, system, maxUsers, active);
+			webId, virtualHost, mx, system, maxUsers, active);
 	}
 
 	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
@@ -84,7 +87,7 @@ public class CompanyServiceImpl extends CompanyServiceBaseImpl {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (!permissionChecker.isOmniadmin()) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
 		}
 
 		return companyLocalService.deleteCompany(companyId);
@@ -224,7 +227,7 @@ public class CompanyServiceImpl extends CompanyServiceBaseImpl {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (!permissionChecker.isOmniadmin()) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
 		}
 
 		return companyLocalService.updateCompany(
@@ -328,6 +331,9 @@ public class CompanyServiceImpl extends CompanyServiceBaseImpl {
 			List<Website> websites, UnicodeProperties properties)
 		throws PortalException {
 
+		PortletPreferences oldCompanyPortletPreferences =
+			PrefsPropsUtil.getPreferences(companyId);
+
 		Company company = updateCompany(
 			companyId, virtualHost, mx, homeURL, logo, logoBytes, name,
 			legalName, legalId, legalType, sicCode, tickerSymbol, industry,
@@ -336,6 +342,9 @@ public class CompanyServiceImpl extends CompanyServiceBaseImpl {
 		updateDisplay(company.getCompanyId(), languageId, timeZoneId);
 
 		updatePreferences(company.getCompanyId(), properties);
+
+		RatingsDataTransformerUtil.transformCompanyRatingsData(
+			companyId, oldCompanyPortletPreferences, properties);
 
 		UsersAdminUtil.updateAddresses(
 			Account.class.getName(), company.getAccountId(), addresses);

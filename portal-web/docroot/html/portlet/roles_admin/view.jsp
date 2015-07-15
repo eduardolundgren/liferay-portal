@@ -19,7 +19,7 @@
 <%
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/roles_admin/view");
+portletURL.setParameter("mvcPath", "/html/portlet/roles_admin/view.jsp");
 
 pageContext.setAttribute("portletURL", portletURL);
 
@@ -38,11 +38,11 @@ String portletURLString = portletURL.toString();
 			<aui:nav cssClass="navbar-nav">
 				<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_ROLE) %>">
 					<portlet:renderURL var="viewRolesURL">
-						<portlet:param name="struts_action" value="/roles_admin/view" />
+						<portlet:param name="mvcPath" value="/html/portlet/roles_admin/view.jsp" />
 					</portlet:renderURL>
 
 					<liferay-portlet:renderURL varImpl="addRoleURL">
-						<portlet:param name="struts_action" value="/roles_admin/edit_role" />
+						<portlet:param name="mvcPath" value="/html/portlet/roles_admin/edit_role.jsp" />
 						<portlet:param name="redirect" value="<%= viewRolesURL %>" />
 					</liferay-portlet:renderURL>
 
@@ -81,11 +81,11 @@ String portletURLString = portletURL.toString();
 			<%
 			RoleSearchTerms searchTerms = (RoleSearchTerms)searchContainer.getSearchTerms();
 
-			total = RoleLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getTypesObj());
+			total = RoleServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getTypesObj(), new LinkedHashMap<String, Object>());
 
 			searchContainer.setTotal(total);
 
-			results = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getTypesObj(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			results = RoleServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getTypesObj(), new LinkedHashMap<String, Object>(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 
 			searchContainer.setResults(results);
 
@@ -108,7 +108,7 @@ String portletURLString = portletURL.toString();
 			if (RolePermissionUtil.contains(permissionChecker, role.getRoleId(), ActionKeys.UPDATE)) {
 				rowURL = renderResponse.createRenderURL();
 
-				rowURL.setParameter("struts_action", "/roles_admin/edit_role");
+				rowURL.setParameter("mvcPath", "/html/portlet/roles_admin/edit_role.jsp");
 				rowURL.setParameter("redirect", searchContainer.getIteratorURL().toString());
 				rowURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 			}

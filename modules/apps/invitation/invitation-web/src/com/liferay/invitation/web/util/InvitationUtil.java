@@ -36,6 +36,8 @@ import javax.portlet.PortletRequest;
  */
 public class InvitationUtil {
 
+	public static final String MESSAGE_POP_PORTLET_PREFIX = "invitation";
+
 	public static Map<String, String> getEmailDefinitionTerms(
 			PortletRequest portletRequest)
 		throws PortalException {
@@ -43,8 +45,7 @@ public class InvitationUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$FROM_ADDRESS$]",

@@ -146,6 +146,10 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 					Group group = groupPersistence.fetchByPrimaryKey(
 						trashEntry.getGroupId());
 
+					if (group == null) {
+						return;
+					}
+
 					Date date = getMaxAge(group);
 
 					if (createDate.before(date) ||
@@ -164,6 +168,15 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 			BaseActionableDynamicQuery.REQUIRES_NEW_TRANSACTION_ATTRIBUTE);
 
 		actionableDynamicQuery.performActions();
+	}
+
+	@Override
+	public void deleteEntries(long groupId) {
+		List<TrashEntry> entries = getEntries(groupId);
+
+		for (TrashEntry entry : entries) {
+			deleteEntry(entry);
+		}
 	}
 
 	/**
@@ -341,8 +354,8 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 		int end, Sort sort) {
 
 		try {
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				TrashEntry.class);
+			Indexer<TrashEntry> indexer =
+				IndexerRegistryUtil.nullSafeGetIndexer(TrashEntry.class);
 
 			SearchContext searchContext = buildSearchContext(
 				companyId, groupId, userId, keywords, start, end, sort);
@@ -360,8 +373,8 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 		int end, Sort sort) {
 
 		try {
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				TrashEntry.class);
+			Indexer<TrashEntry> indexer =
+				IndexerRegistryUtil.nullSafeGetIndexer(TrashEntry.class);
 
 			SearchContext searchContext = buildSearchContext(
 				companyId, groupId, userId, keywords, start, end, sort);
@@ -370,8 +383,7 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 
 			List<TrashEntry> trashEntries = TrashUtil.getEntries(hits);
 
-			return new BaseModelSearchResult<TrashEntry>(
-				trashEntries, hits.getLength());
+			return new BaseModelSearchResult<>(trashEntries, hits.getLength());
 		}
 		catch (Exception e) {
 			throw new SystemException(e);

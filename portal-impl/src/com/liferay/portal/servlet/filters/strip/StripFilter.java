@@ -63,12 +63,15 @@ import javax.servlet.http.HttpServletResponse;
 public class StripFilter extends BasePortalFilter {
 
 	public static final String SKIP_FILTER =
-		StripFilter.class.getName() + "SKIP_FILTER";
+		StripFilter.class.getName() + "#SKIP_FILTER";
 
 	public StripFilter() {
 		if (PropsValues.MINIFIER_INLINE_CONTENT_CACHE_SIZE > 0) {
-			_minifierCache = new ConcurrentLFUCache<String, String>(
+			_minifierCache = new ConcurrentLFUCache<>(
 				PropsValues.MINIFIER_INLINE_CONTENT_CACHE_SIZE);
+		}
+		else {
+			_minifierCache = null;
 		}
 	}
 
@@ -748,13 +751,13 @@ public class StripFilter extends BasePortalFilter {
 
 	private static final String _STRIP = "strip";
 
-	private static Log _log = LogFactoryUtil.getLog(StripFilter.class);
+	private static final Log _log = LogFactoryUtil.getLog(StripFilter.class);
 
-	private static Pattern _javaScriptPattern = Pattern.compile(
+	private static final Pattern _javaScriptPattern = Pattern.compile(
 		"[Jj][aA][vV][aA][sS][cC][rR][iI][pP][tT]");
 
-	private Set<String> _ignorePaths = new HashSet<String>();
-	private ConcurrentLFUCache<String, String> _minifierCache;
+	private final Set<String> _ignorePaths = new HashSet<>();
+	private final ConcurrentLFUCache<String, String> _minifierCache;
 	private ServletContext _servletContext;
 
 }

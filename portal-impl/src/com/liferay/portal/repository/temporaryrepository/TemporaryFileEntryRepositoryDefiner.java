@@ -25,15 +25,20 @@ import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
 import com.liferay.portal.repository.capabilities.LiferayBulkOperationCapability;
 import com.liferay.portal.repository.capabilities.MinimalWorkflowCapability;
 import com.liferay.portal.repository.capabilities.TemporaryFileEntriesCapabilityImpl;
+import com.liferay.portal.repository.capabilities.util.DLFileEntryServiceAdapter;
+import com.liferay.portal.repository.capabilities.util.DLFolderServiceAdapter;
 
 /**
  * @author Iván Zaera
  */
 public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 
+	public static final String CLASS_NAME =
+		TemporaryFileEntryRepository.class.getName();
+
 	@Override
 	public String getClassName() {
-		return TemporaryFileEntryRepository.class.getName();
+		return CLASS_NAME;
 	}
 
 	@Override
@@ -42,20 +47,26 @@ public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 	}
 
 	@Override
-	public void registerCapabilities(CapabilityRegistry capabilityRegistry) {
-		DocumentRepository documentRepository =
-			capabilityRegistry.getDocumentRepository();
+	public void registerCapabilities(
+		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
+
+		DocumentRepository documentRepository = capabilityRegistry.getTarget();
+
+		DLFileEntryServiceAdapter dlFileEntryServiceAdapter =
+			DLFileEntryServiceAdapter.create(documentRepository);
 
 		capabilityRegistry.addExportedCapability(
 			BulkOperationCapability.class,
 			new LiferayBulkOperationCapability(
-				documentRepository.getRepositoryId()));
+				documentRepository, dlFileEntryServiceAdapter,
+				DLFolderServiceAdapter.create(documentRepository)));
 		capabilityRegistry.addExportedCapability(
 			TemporaryFileEntriesCapability.class,
 			new TemporaryFileEntriesCapabilityImpl(documentRepository));
 
 		capabilityRegistry.addSupportedCapability(
-			WorkflowCapability.class, new MinimalWorkflowCapability());
+			WorkflowCapability.class,
+			new MinimalWorkflowCapability(dlFileEntryServiceAdapter));
 	}
 
 	@Override

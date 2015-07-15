@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public class FreeMarkerRenderer {
 

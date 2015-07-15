@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -50,16 +49,6 @@ import javax.portlet.PortletURL;
  */
 @ProviderType
 public abstract class BaseDDMDisplay implements DDMDisplay {
-
-	@Override
-	public String getAddStructureActionId() {
-		return ActionKeys.ADD_STRUCTURE;
-	}
-
-	@Override
-	public String getAddTemplateActionId() {
-		return ActionKeys.ADD_TEMPLATE;
-	}
 
 	@Override
 	public String getAvailableFields() {
@@ -138,20 +127,6 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 	}
 
 	@Override
-	public String getResourceName(long classNameId) {
-		if (classNameId > 0) {
-			TemplateHandler templateHandler =
-				TemplateHandlerRegistryUtil.getTemplateHandler(classNameId);
-
-			if (templateHandler != null) {
-				return templateHandler.getResourceName();
-			}
-		}
-
-		return getResourceName();
-	}
-
-	@Override
 	public String getStorageType() {
 		return StringPool.BLANK;
 	}
@@ -184,7 +159,7 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			return new long[] {classPK};
 		}
 
-		List<Long> classPKs = new ArrayList<Long>();
+		List<Long> classPKs = new ArrayList<>();
 
 		classPKs.add(0L);
 
@@ -253,7 +228,7 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			getControlPanelPlid(liferayPortletRequest),
 			PortletKeys.DYNAMIC_DATA_MAPPING, PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter("struts_action", "/dynamic_data_mapping/view");
+		portletURL.setParameter("mvcPath", "/view.jsp");
 
 		return portletURL.toString();
 	}
@@ -334,19 +309,17 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			getControlPanelPlid(liferayPortletRequest),
 			PortletKeys.DYNAMIC_DATA_MAPPING, PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter(
-			"struts_action", "/dynamic_data_mapping/view_template");
+		portletURL.setParameter("mvcPath", "/view_template.jsp");
 		portletURL.setParameter("classNameId", String.valueOf(classNameId));
 		portletURL.setParameter("classPK", String.valueOf(classPK));
 
 		return portletURL.toString();
 	}
 
-	private static final Set<String> _templateLanguageTypes =
-		SetUtil.fromArray(
-			new String[] {
-				TemplateConstants.LANG_TYPE_FTL, TemplateConstants.LANG_TYPE_VM
-			});
+	private static final Set<String> _templateLanguageTypes = SetUtil.fromArray(
+		new String[] {
+			TemplateConstants.LANG_TYPE_FTL, TemplateConstants.LANG_TYPE_VM
+		});
 	private static final Set<String> _viewTemplateExcludedColumnNames =
 		SetUtil.fromArray(new String[] {"structure"});
 

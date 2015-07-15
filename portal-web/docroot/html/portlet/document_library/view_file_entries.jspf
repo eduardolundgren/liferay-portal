@@ -15,7 +15,7 @@
 --%>
 
 <liferay-portlet:renderURL varImpl="deleteURL">
-	<portlet:param name="struts_action" value="/document_library_display/edit_file_entry" />
+	<portlet:param name="mvcRenderCommandName" value="/document_library_display/edit_file_entry" />
 </liferay-portlet:renderURL>
 
 <aui:form action="<%= deleteURL.toString() %>" method="get" name="fm">
@@ -30,7 +30,7 @@
 
 	boolean showDeleteButton = permissionChecker.hasPermission(scopeGroupId, DLFileEntryConstants.getClassName(), scopeGroupId, ActionKeys.DELETE);
 
-	if (dlActionsDisplayContext.isShowActions() && showDeleteButton) {
+	if (dlPortletInstanceSettingsHelper.isShowActions() && showDeleteButton) {
 		entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
 	}
 	%>
@@ -48,10 +48,11 @@
 
 			<%
 			if (useAssetEntryQuery) {
-				long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcut.class.getName())};
+				long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcutConstants.getClassName())};
 
 				AssetEntryQuery assetEntryQuery = new AssetEntryQuery(classNameIds, searchContainer);
 
+				assetEntryQuery.setEnablePermissions(true);
 				assetEntryQuery.setExcludeZeroViewCount(false);
 
 				total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
@@ -97,7 +98,7 @@
 			%>
 
 				<liferay-portlet:renderURL varImpl="rowURL">
-					<portlet:param name="struts_action" value="/document_library_display/view" />
+					<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 					<portlet:param name="redirect" value="<%= redirect %>" />
 					<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
 				</liferay-portlet:renderURL>
@@ -113,12 +114,12 @@
 					PortletURL tempRowURL = renderResponse.createRenderURL();
 
 					if (fileShortcut == null) {
-						tempRowURL.setParameter("struts_action", "/document_library_display/view_file_entry");
+						tempRowURL.setParameter("mvcRenderCommandName", "/document_library/view_file_entry");
 						tempRowURL.setParameter("redirect", currentURL);
 						tempRowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
 					}
 					else {
-						tempRowURL.setParameter("struts_action", "/document_library_display/view_file_entry");
+						tempRowURL.setParameter("mvcRenderCommandName", "/document_library/view_file_entry");
 						tempRowURL.setParameter("redirect", currentURL);
 						tempRowURL.setParameter("fileEntryId", String.valueOf(fileShortcut.getToFileEntryId()));
 					}
@@ -135,7 +136,7 @@
 
 		</liferay-ui:search-container-row>
 
-		<c:if test="<%= (total > 0) && dlActionsDisplayContext.isShowActions() && showDeleteButton %>">
+		<c:if test="<%= (total > 0) && dlPortletInstanceSettingsHelper.isShowActions() && showDeleteButton %>">
 			<aui:button onClick='<%= renderResponse.getNamespace() + "deleteEntries();" %>' value='<%= ((repositoryId == scopeGroupId) && TrashUtil.isTrashEnabled(scopeGroupId)) ? "move-to-the-recycle-bin" : "delete" %>' />
 
 			<div class="separator"><!-- --></div>
@@ -155,7 +156,7 @@
 			form.fm('fileEntryIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds', '<portlet:namespace />rowIdsFileEntry'));
 			form.fm('fileShortcutIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds', '<portlet:namespace />rowIdsDLFileShortcut'));
 
-			submitForm(form, '<portlet:actionURL><portlet:param name="struts_action" value="/document_library/edit_entry" /></portlet:actionURL>');
+			submitForm(form, '<portlet:actionURL name="/document_library/edit_entry" />');
 		}
 	}
 </aui:script>

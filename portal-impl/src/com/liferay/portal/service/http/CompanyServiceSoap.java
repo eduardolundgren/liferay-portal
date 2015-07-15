@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.CompanyServiceUtil} service utility. The
+ * {@link CompanyServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -59,7 +59,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see CompanyServiceHttp
  * @see com.liferay.portal.model.CompanySoap
- * @see com.liferay.portal.service.CompanyServiceUtil
+ * @see CompanyServiceUtil
  * @generated
  */
 @ProviderType
@@ -70,7 +70,6 @@ public class CompanyServiceSoap {
 	* @param webId the company's web domain
 	* @param virtualHost the company's virtual host name
 	* @param mx the company's mail domain
-	* @param shardName the company's shard
 	* @param system whether the company is the very first company (i.e., the
 	* @param maxUsers the max number of company users (optionally
 	<code>0</code>)
@@ -82,11 +81,11 @@ public class CompanyServiceSoap {
 	*/
 	public static com.liferay.portal.model.CompanySoap addCompany(
 		java.lang.String webId, java.lang.String virtualHost,
-		java.lang.String mx, java.lang.String shardName, boolean system,
-		int maxUsers, boolean active) throws RemoteException {
+		java.lang.String mx, boolean system, int maxUsers, boolean active)
+		throws RemoteException {
 		try {
 			com.liferay.portal.model.Company returnValue = CompanyServiceUtil.addCompany(webId,
-					virtualHost, mx, shardName, system, maxUsers, active);
+					virtualHost, mx, system, maxUsers, active);
 
 			return com.liferay.portal.model.CompanySoap.toSoapModel(returnValue);
 		}

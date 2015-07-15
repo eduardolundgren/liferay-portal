@@ -15,12 +15,12 @@
 package com.liferay.portlet.documentlibrary.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.portlet.exportimport.staging.permission.StagingPermissionUtil;
 
 /**
  * @author Alexander Chow
@@ -33,7 +33,9 @@ public class DLFileEntryTypePermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, fileEntryType, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, DLFileEntryType.class.getName(),
+				fileEntryType.getFileEntryTypeId(), actionId);
 		}
 	}
 
@@ -43,7 +45,9 @@ public class DLFileEntryTypePermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, fileEntryTypeId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, DLFileEntryType.class.getName(),
+				fileEntryTypeId, actionId);
 		}
 	}
 

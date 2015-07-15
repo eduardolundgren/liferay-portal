@@ -15,10 +15,16 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.NoSuchUserException;
-import com.liferay.portal.ReservedUserEmailAddressException;
+import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
@@ -27,18 +33,12 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.MailServiceTestUtil;
-import com.liferay.portal.util.test.OrganizationTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
 
 import javax.portlet.PortletPreferences;
 
@@ -66,7 +66,7 @@ public class UserServiceTest {
 			new AggregateTestRule(
 				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
 
-		@Test(expected = ReservedUserEmailAddressException.class)
+		@Test(expected = UserEmailAddressException.MustNotUseCompanyMx.class)
 		public void shouldNotAddUser() throws Exception {
 			boolean companySecurityStrangersWithMx =
 				PropsValues.COMPANY_SECURITY_STRANGERS_WITH_MX;
@@ -91,7 +91,7 @@ public class UserServiceTest {
 			}
 		}
 
-		@Test(expected = ReservedUserEmailAddressException.class)
+		@Test(expected = UserEmailAddressException.MustNotUseCompanyMx.class)
 		public void shouldNotUpdateEmailAddress() throws Exception {
 			boolean companySecurityStrangersWithMx =
 				PropsValues.COMPANY_SECURITY_STRANGERS_WITH_MX;
@@ -124,7 +124,7 @@ public class UserServiceTest {
 			}
 		}
 
-		@Test(expected = ReservedUserEmailAddressException.class)
+		@Test(expected = UserEmailAddressException.MustNotUseCompanyMx.class)
 		public void shouldNotUpdateUser() throws Exception {
 			boolean companySecurityStrangersWithMx =
 				PropsValues.COMPANY_SECURITY_STRANGERS_WITH_MX;

@@ -49,10 +49,22 @@ import java.util.List;
 public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 
 	@Override
+	public AssetEntry fetchEntry(long entryId) throws PortalException {
+		AssetEntry entry = assetEntryLocalService.fetchEntry(entryId);
+
+		if (entry != null) {
+			AssetEntryPermission.check(
+				getPermissionChecker(), entry, ActionKeys.VIEW);
+		}
+
+		return entry;
+	}
+
+	@Override
 	public List<AssetEntry> getCompanyEntries(
 		long companyId, int start, int end) {
 
-		List<AssetEntry> entries = new ArrayList<AssetEntry>();
+		List<AssetEntry> entries = new ArrayList<>();
 
 		List<AssetEntry> companyEntries =
 			assetEntryLocalService.getCompanyEntries(companyId, start, end);
@@ -88,7 +100,7 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 			entryQuery);
 
 		if (hasEntryQueryResults(entryQuery, filteredEntryQuery)) {
-			return new ArrayList<AssetEntry>();
+			return new ArrayList<>();
 		}
 
 		Object[] results = filterEntryQuery(filteredEntryQuery, false);
@@ -131,6 +143,33 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 			getGuestOrUserId(), className, classPK);
 	}
 
+	@Override
+	public AssetEntry updateEntry(
+			long groupId, Date createDate, Date modifiedDate, String className,
+			long classPK, String classUuid, long classTypeId,
+			long[] categoryIds, String[] tagNames, boolean visible,
+			Date startDate, Date endDate, Date expirationDate, String mimeType,
+			String title, String description, String summary, String url,
+			String layoutUuid, int height, int width, Integer priority)
+		throws PortalException {
+
+		AssetEntryPermission.check(
+			getPermissionChecker(), className, classPK, ActionKeys.UPDATE);
+
+		return assetEntryLocalService.updateEntry(
+			getUserId(), groupId, createDate, modifiedDate, className, classPK,
+			classUuid, classTypeId, categoryIds, tagNames, visible, startDate,
+			endDate, expirationDate, mimeType, title, description, summary, url,
+			layoutUuid, height, width, priority);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, Date,
+	 *             Date, String, long, String, long, long[], String[], boolean,
+	 *             Date, Date, Date, String, String, String, String, String,
+	 *             String, int, int, Integer)}
+	 */
+	@Deprecated
 	@Override
 	public AssetEntry updateEntry(
 			long groupId, Date createDate, Date modifiedDate, String className,
@@ -275,7 +314,7 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 		if (entryQuery.isEnablePermissions()) {
 			PermissionChecker permissionChecker = getPermissionChecker();
 
-			filteredEntries = new ArrayList<AssetEntry>();
+			filteredEntries = new ArrayList<>();
 
 			for (AssetEntry entry : entries) {
 				String className = entry.getClassName();

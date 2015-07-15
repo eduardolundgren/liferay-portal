@@ -14,17 +14,24 @@
 
 package com.liferay.portal.verify;
 
+import com.liferay.portal.LayoutFriendlyURLException;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Gergely Mathe
  * @author Kenneth Chang
  */
 public class VerifyLayout extends VerifyProcess {
@@ -40,8 +47,43 @@ public class VerifyLayout extends VerifyProcess {
 	protected void doVerify() throws Exception {
 		deleteOrphanedLayouts();
 		verifyFriendlyURL();
+		verifyLayoutIdFriendlyURL();
 		verifyLayoutPrototypeLinkEnabled();
 		verifyUuid();
+	}
+
+	protected List<Layout> getInvalidLayoutIdFriendlyURLLayouts()
+		throws Exception {
+
+		final List<Layout> layouts = new ArrayList<>();
+
+		ActionableDynamicQuery actionableDynamicQuery =
+			LayoutLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object) {
+					Layout layout = (Layout)object;
+
+					String friendlyURL = layout.getFriendlyURL();
+
+					friendlyURL = friendlyURL.substring(1);
+
+					if (Validator.isNumber(friendlyURL) &&
+						!friendlyURL.equals(
+							String.valueOf(layout.getLayoutId()))) {
+
+						layouts.add(layout);
+					}
+				}
+
+			});
+
+		actionableDynamicQuery.performActions();
+
+		return layouts;
 	}
 
 	protected void verifyFriendlyURL() throws Exception {
@@ -63,6 +105,89 @@ public class VerifyLayout extends VerifyProcess {
 		}
 	}
 
+	protected void verifyLayoutIdFriendlyURL() throws Exception {
+		while (true) {
+			List<Layout> layouts = getInvalidLayoutIdFriendlyURLLayouts();
+
+			if (layouts.isEmpty()) {
+				break;
+			}
+
+			for (Layout layout : layouts) {
+				if (verifyLayoutIdFriendlyURL(layout)) {
+					continue;
+				}
+			}
+		}
+	}
+
+	protected boolean verifyLayoutIdFriendlyURL(Layout layout)
+		throws Exception {
+
+		String oldFriendlyURL = layout.getFriendlyURL();
+		String newFriendlyURL = StringPool.SLASH + layout.getLayoutId();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Updating layout " + layout.getPlid() + " from friendly URL " +
+					oldFriendlyURL + " to friendly URL " + newFriendlyURL);
+		}
+
+		List<LayoutFriendlyURL> layoutFriendlyURLs =
+			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
+				layout.getPlid());
+
+		for (LayoutFriendlyURL layoutFriendlyURL : layoutFriendlyURLs) {
+			if (!oldFriendlyURL.equals(layoutFriendlyURL.getFriendlyURL())) {
+				return true;
+			}
+
+			try {
+				LayoutLocalServiceUtil.updateFriendlyURL(
+					layout.getUserId(), layout.getPlid(), newFriendlyURL,
+					layoutFriendlyURL.getLanguageId());
+			}
+			catch (LayoutFriendlyURLException lfurle) {
+				int type = lfurle.getType();
+
+				if (type == LayoutFriendlyURLException.DUPLICATE) {
+					return true;
+				}
+				else {
+					throw lfurle;
+				}
+			}
+		}
+
+		try {
+			Layout duplicateLayout =
+				LayoutLocalServiceUtil.fetchLayoutByFriendlyURL(
+					layout.getGroupId(), layout.isPrivateLayout(),
+					newFriendlyURL);
+
+			if (duplicateLayout != null) {
+				throw new LayoutFriendlyURLException(
+					LayoutFriendlyURLException.DUPLICATE);
+			}
+
+			layout.setFriendlyURL(newFriendlyURL);
+
+			LayoutLocalServiceUtil.updateLayout(layout);
+		}
+		catch (LayoutFriendlyURLException lfurle) {
+			int type = lfurle.getType();
+
+			if (type == LayoutFriendlyURLException.DUPLICATE) {
+				return true;
+			}
+			else {
+				throw lfurle;
+			}
+		}
+
+		return false;
+	}
+
 	protected void verifyLayoutPrototypeLinkEnabled() throws Exception {
 		runSQL(
 			"update Layout set layoutPrototypeLinkEnabled = [$FALSE$] where " +
@@ -72,7 +197,6 @@ public class VerifyLayout extends VerifyProcess {
 
 	protected void verifyUuid() throws Exception {
 		verifyUuid("AssetEntry");
-		verifyUuid("JournalArticle");
 
 		runSQL(
 			"update Layout set uuid_ = sourcePrototypeLayoutUuid where " +
@@ -98,5 +222,7 @@ public class VerifyLayout extends VerifyProcess {
 
 		runSQL(sb.toString());
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(VerifyLayout.class);
 
 }

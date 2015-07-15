@@ -16,14 +16,13 @@ package com.liferay.portal.wab.extender.internal;
 
 import com.liferay.portal.wab.extender.internal.event.EventUtil;
 
+import java.util.Dictionary;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.felix.utils.log.Logger;
-
-import org.eclipse.equinox.http.servlet.ExtendedHttpService;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -35,14 +34,13 @@ import org.osgi.framework.BundleContext;
 public class WebBundleDeployer {
 
 	public WebBundleDeployer(
-			BundleContext bundleContext,
-			ExtendedHttpService extendedHttpService,
+			BundleContext bundleContext, Dictionary<String, Object> properties,
 			SAXParserFactory saxParserFactory, EventUtil eventUtil,
 			Logger logger)
 		throws Exception {
 
 		_bundleContext = bundleContext;
-		_extendedHttpService = extendedHttpService;
+		_properties = properties;
 		_saxParserFactory = saxParserFactory;
 		_eventUtil = eventUtil;
 		_logger = logger;
@@ -73,8 +71,7 @@ public class WebBundleDeployer {
 
 		try {
 			WabBundleProcessor newWabBundleProcessor = new WabBundleProcessor(
-				bundle, contextPath, _extendedHttpService, _saxParserFactory,
-				_logger);
+				bundle, contextPath, _properties, _saxParserFactory, _logger);
 
 			WabBundleProcessor oldWabBundleProcessor =
 				_wabBundleProcessors.putIfAbsent(bundle, newWabBundleProcessor);
@@ -137,11 +134,10 @@ public class WebBundleDeployer {
 
 	private final BundleContext _bundleContext;
 	private final EventUtil _eventUtil;
-	private final ExtendedHttpService _extendedHttpService;
 	private final Logger _logger;
+	private final Dictionary<String, Object> _properties;
 	private final SAXParserFactory _saxParserFactory;
 	private final ConcurrentMap<Bundle, WabBundleProcessor>
-		_wabBundleProcessors =
-			new ConcurrentHashMap<Bundle, WabBundleProcessor>();
+		_wabBundleProcessors = new ConcurrentHashMap<>();
 
 }

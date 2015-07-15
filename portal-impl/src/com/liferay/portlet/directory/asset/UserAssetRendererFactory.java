@@ -15,8 +15,7 @@
 package com.liferay.portlet.directory.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -27,11 +26,12 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 
-import javax.portlet.PortletURL;
-
 /**
  * @author Michael C. Han
  */
+@OSGiBeanProperties(
+	property = {"search.asset.type=com.liferay.portal.model.User"}
+)
 public class UserAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "user";
@@ -78,14 +78,6 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory {
 	@Override
 	public String getType() {
 		return TYPE;
-	}
-
-	@Override
-	public PortletURL getURLAdd(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
-
-		return null;
 	}
 
 	@Override

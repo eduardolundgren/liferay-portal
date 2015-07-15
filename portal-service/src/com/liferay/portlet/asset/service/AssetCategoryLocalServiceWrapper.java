@@ -74,23 +74,23 @@ public class AssetCategoryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portlet.asset.model.AssetCategory addCategory(
-		long userId, long parentCategoryId,
+		long userId, long groupId, long parentCategoryId,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		long vocabularyId, java.lang.String[] categoryProperties,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _assetCategoryLocalService.addCategory(userId, parentCategoryId,
-			titleMap, descriptionMap, vocabularyId, categoryProperties,
-			serviceContext);
+		return _assetCategoryLocalService.addCategory(userId, groupId,
+			parentCategoryId, titleMap, descriptionMap, vocabularyId,
+			categoryProperties, serviceContext);
 	}
 
 	@Override
 	public com.liferay.portlet.asset.model.AssetCategory addCategory(
-		long userId, java.lang.String title, long vocabularyId,
+		long userId, long groupId, java.lang.String title, long vocabularyId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _assetCategoryLocalService.addCategory(userId, title,
+		return _assetCategoryLocalService.addCategory(userId, groupId, title,
 			vocabularyId, serviceContext);
 	}
 
@@ -503,6 +503,13 @@ public class AssetCategoryLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories(
+		com.liferay.portal.kernel.search.Hits hits)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetCategoryLocalService.getCategories(hits);
+	}
+
+	@Override
 	public com.liferay.portlet.asset.model.AssetCategory getCategory(
 		long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -564,7 +571,7 @@ public class AssetCategoryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _assetCategoryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

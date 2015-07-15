@@ -35,6 +35,8 @@ public interface TemplateHandler {
 	 */
 	public String getClassName();
 
+	public Map<String, Object> getCustomContextObjects();
+
 	/**
 	 * Returns the elements containing the information of the portlet display
 	 * templates to be installed by default.
@@ -46,6 +48,13 @@ public interface TemplateHandler {
 	 *         template elements
 	 */
 	public List<Element> getDefaultTemplateElements() throws Exception;
+
+	/**
+	 * Returns the key of the template handler's default template.
+	 *
+	 * @return the key of the template handler's default template
+	 */
+	public String getDefaultTemplateKey();
 
 	/**
 	 * Returns the template handler's name.
@@ -69,9 +78,9 @@ public interface TemplateHandler {
 	 *
 	 * @param  language the template's scripting language. Acceptable values for
 	 *         the FreeMarker, Velocity, or XSL languages are {@link
-	 *         TemplateConstants.LANG_TYPE_FTL}, {@link
-	 *         TemplateConstants.LANG_TYPE_VM}, or {@link
-	 *         TemplateConstants.LANG_TYPE_XSL}, respectively.
+	 *         TemplateConstants#LANG_TYPE_FTL}, {@link
+	 *         TemplateConstants#LANG_TYPE_VM}, or {@link
+	 *         TemplateConstants#LANG_TYPE_XSL}, respectively.
 	 * @return the restricted variables that are excluded from the template's
 	 *         context
 	 */
@@ -83,9 +92,9 @@ public interface TemplateHandler {
 	 *
 	 * @param  language the template's scripting language. Acceptable values for
 	 *         the FreeMarker, Velocity, or XSL languages are {@link
-	 *         TemplateConstants.LANG_TYPE_FTL}, {@link
-	 *         TemplateConstants.LANG_TYPE_VM}, or {@link
-	 *         TemplateConstants.LANG_TYPE_XSL}, respectively.
+	 *         TemplateConstants#LANG_TYPE_FTL}, {@link
+	 *         TemplateConstants#LANG_TYPE_VM}, or {@link
+	 *         TemplateConstants#LANG_TYPE_XSL}, respectively.
 	 * @return initial template content for helping the user create a new
 	 *         template
 	 */
@@ -96,9 +105,9 @@ public interface TemplateHandler {
 	 *
 	 * @param  language the template's scripting language. Acceptable values for
 	 *         the FreeMarker, Velocity, or XSL languages are {@link
-	 *         TemplateConstants.LANG_TYPE_FTL}, {@link
-	 *         TemplateConstants.LANG_TYPE_VM}, or {@link
-	 *         TemplateConstants.LANG_TYPE_XSL}, respectively.
+	 *         TemplateConstants#LANG_TYPE_FTL}, {@link
+	 *         TemplateConstants#LANG_TYPE_VM}, or {@link
+	 *         TemplateConstants#LANG_TYPE_XSL}, respectively.
 	 * @return the path to the template's help content
 	 */
 	public String getTemplatesHelpPath(String language);
@@ -128,9 +137,9 @@ public interface TemplateHandler {
 	 *         primary key of the structure associated to the template.
 	 * @param  language the template's scripting language. Acceptable values for
 	 *         the FreeMarker, Velocity, or XSL languages are {@link
-	 *         TemplateConstants.LANG_TYPE_FTL}, {@link
-	 *         TemplateConstants.LANG_TYPE_VM}, or {@link
-	 *         TemplateConstants.LANG_TYPE_XSL}, respectively.
+	 *         TemplateConstants#LANG_TYPE_FTL}, {@link
+	 *         TemplateConstants#LANG_TYPE_VM}, or {@link
+	 *         TemplateConstants#LANG_TYPE_XSL}, respectively.
 	 * @param  locale the locale of the variable groups to get
 	 * @return the template's map of script variable groups for which hints are
 	 *         displayed in the template editor palette
@@ -140,5 +149,7 @@ public interface TemplateHandler {
 	public Map<String, TemplateVariableGroup> getTemplateVariableGroups(
 			long classPK, String language, Locale locale)
 		throws Exception;
+
+	public boolean isDisplayTemplateHandler();
 
 }

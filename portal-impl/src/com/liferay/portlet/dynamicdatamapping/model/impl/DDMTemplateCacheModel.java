@@ -16,6 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DDMTemplateCacheModel)) {
+			return false;
+		}
+
+		DDMTemplateCacheModel ddmTemplateCacheModel = (DDMTemplateCacheModel)obj;
+
+		if (templateId == ddmTemplateCacheModel.templateId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, templateId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(45);
+		StringBundler sb = new StringBundler(51);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -55,6 +80,10 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 		sb.append(userId);
 		sb.append(", userName=");
 		sb.append(userName);
+		sb.append(", versionUserId=");
+		sb.append(versionUserId);
+		sb.append(", versionUserName=");
+		sb.append(versionUserName);
 		sb.append(", createDate=");
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
@@ -63,6 +92,8 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 		sb.append(classNameId);
 		sb.append(", classPK=");
 		sb.append(classPK);
+		sb.append(", resourceClassNameId=");
+		sb.append(resourceClassNameId);
 		sb.append(", templateKey=");
 		sb.append(templateKey);
 		sb.append(", version=");
@@ -115,6 +146,15 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 			ddmTemplateImpl.setUserName(userName);
 		}
 
+		ddmTemplateImpl.setVersionUserId(versionUserId);
+
+		if (versionUserName == null) {
+			ddmTemplateImpl.setVersionUserName(StringPool.BLANK);
+		}
+		else {
+			ddmTemplateImpl.setVersionUserName(versionUserName);
+		}
+
 		if (createDate == Long.MIN_VALUE) {
 			ddmTemplateImpl.setCreateDate(null);
 		}
@@ -131,6 +171,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 
 		ddmTemplateImpl.setClassNameId(classNameId);
 		ddmTemplateImpl.setClassPK(classPK);
+		ddmTemplateImpl.setResourceClassNameId(resourceClassNameId);
 
 		if (templateKey == null) {
 			ddmTemplateImpl.setTemplateKey(StringPool.BLANK);
@@ -212,10 +253,13 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 		companyId = objectInput.readLong();
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
+		versionUserId = objectInput.readLong();
+		versionUserName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
+		resourceClassNameId = objectInput.readLong();
 		templateKey = objectInput.readUTF();
 		version = objectInput.readUTF();
 		name = objectInput.readUTF();
@@ -252,10 +296,20 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 			objectOutput.writeUTF(userName);
 		}
 
+		objectOutput.writeLong(versionUserId);
+
+		if (versionUserName == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(versionUserName);
+		}
+
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 		objectOutput.writeLong(classNameId);
 		objectOutput.writeLong(classPK);
+		objectOutput.writeLong(resourceClassNameId);
 
 		if (templateKey == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -331,10 +385,13 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	public long companyId;
 	public long userId;
 	public String userName;
+	public long versionUserId;
+	public String versionUserName;
 	public long createDate;
 	public long modifiedDate;
 	public long classNameId;
 	public long classPK;
+	public long resourceClassNameId;
 	public String templateKey;
 	public String version;
 	public String name;

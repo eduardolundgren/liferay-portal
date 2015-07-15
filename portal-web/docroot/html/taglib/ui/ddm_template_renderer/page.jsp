@@ -14,14 +14,14 @@
  */
 --%>
 
-<%@ include file="/html/taglib/init.jsp" %>
+<%@ include file="/html/taglib/ui/ddm_template_renderer/init.jsp" %>
 
 <%
-Map<String,Object> contextObjects = ((Map<String,Object>)request.getAttribute("liferay-ui:ddm-template-renderer:contextObjects"));
+Map<String, Object> contextObjects = ((Map<String, Object>)request.getAttribute("liferay-ui:ddm-template-renderer:contextObjects"));
 List<?> entries = (List<?>)request.getAttribute("liferay-ui:ddm-template-renderer:entries");
-long portletDisplayDDMTemplateId = GetterUtil.getLong((String)request.getAttribute("liferay-ui:ddm-template-renderer:portletDisplayDDMTemplateId"));
+DDMTemplate portletDisplayDDMTemplate = (DDMTemplate)request.getAttribute("liferay-ui:ddm-template-renderer:portletDisplayDDMTemplate");
 %>
 
-<c:if test="<%= portletDisplayDDMTemplateId > 0 %>">
-	<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, portletDisplayDDMTemplateId, entries, contextObjects) %>
+<c:if test="<%= portletDisplayDDMTemplate != null %>">
+	<%= PortletDisplayTemplateManagerUtil.renderDDMTemplate(request, response, portletDisplayDDMTemplate.getTemplateId(), entries, contextObjects) %>
 </c:if>

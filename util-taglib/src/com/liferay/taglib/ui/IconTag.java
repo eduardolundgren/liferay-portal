@@ -144,6 +144,10 @@ public class IconTag extends IncludeTag {
 		_useDialog = useDialog;
 	}
 
+	public void setView(String view) {
+		_view = view;
+	}
+
 	@Override
 	protected void cleanUp() {
 		_alt = null;
@@ -167,16 +171,17 @@ public class IconTag extends IncludeTag {
 		_toolTip = false;
 		_url = null;
 		_useDialog = false;
+		_view = null;
 	}
 
 	protected Map<String, Object> getData() {
 		Map<String, Object> data = null;
 
 		if (_data != null) {
-			data = new HashMap<String, Object>(_data);
+			data = new HashMap<>(_data);
 		}
 		else {
-			data = new HashMap<String, Object>(1);
+			data = new HashMap<>(1);
 		}
 
 		if (_useDialog && Validator.isNull(data.get("title"))) {
@@ -423,7 +428,11 @@ public class IconTag extends IncludeTag {
 
 	@Override
 	protected String getPage() {
-		return _PAGE;
+		if (Validator.isNotNull(_view)) {
+			return "/html/taglib/ui/icon/" + _view + "/page.jsp";
+		}
+
+		return "/html/taglib/ui/icon/page.jsp";
 	}
 
 	protected String getProcessedMessage() {
@@ -432,13 +441,8 @@ public class IconTag extends IncludeTag {
 		}
 
 		return StringUtil.replace(
-			_image,
-			new String[] {
-				StringPool.UNDERLINE, _AUI_PATH
-			},
-			new String[] {
-				StringPool.DASH, StringPool.BLANK
-			});
+			_image, new String[] {StringPool.UNDERLINE, _AUI_PATH},
+			new String[] {StringPool.DASH, StringPool.BLANK});
 	}
 
 	protected String getProcessedUrl() {
@@ -593,13 +597,12 @@ public class IconTag extends IncludeTag {
 		request.setAttribute("liferay-ui:icon:url", getProcessedUrl());
 		request.setAttribute(
 			"liferay-ui:icon:useDialog", String.valueOf(_useDialog));
+		request.setAttribute("liferay-ui:icon:view", _view);
 	}
 
 	private static final String _AUI_PATH = "../aui/";
 
 	private static final boolean _CLEAN_UP_SET_ATTRIBUTES = true;
-
-	private static final String _PAGE = "/html/taglib/ui/icon/page.jsp";
 
 	private String _alt;
 	private String _ariaRole;
@@ -622,5 +625,6 @@ public class IconTag extends IncludeTag {
 	private boolean _toolTip;
 	private String _url;
 	private boolean _useDialog = false;
+	private String _view;
 
 }

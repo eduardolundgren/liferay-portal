@@ -160,7 +160,7 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 
 		installExt(servletContext, hotDeployEvent.getContextClassLoader());
 
-		FileAvailabilityUtil.reset();
+		FileAvailabilityUtil.clearAvailabilities();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(

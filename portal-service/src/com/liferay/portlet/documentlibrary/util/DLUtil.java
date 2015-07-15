@@ -17,6 +17,7 @@ package com.liferay.portlet.documentlibrary.util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Hits;
@@ -46,20 +47,20 @@ import javax.servlet.http.HttpServletRequest;
 public class DLUtil {
 
 	public static void addPortletBreadcrumbEntries(
-			DLFileShortcut dlFileShortcut, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(
-			dlFileShortcut, request, renderResponse);
-	}
-
-	public static void addPortletBreadcrumbEntries(
 			FileEntry fileEntry, HttpServletRequest request,
 			RenderResponse renderResponse)
 		throws Exception {
 
 		getDL().addPortletBreadcrumbEntries(fileEntry, request, renderResponse);
+	}
+
+	public static void addPortletBreadcrumbEntries(
+			FileShortcut fileShortcut, HttpServletRequest request,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		getDL().addPortletBreadcrumbEntries(
+			fileShortcut, request, renderResponse);
 	}
 
 	public static void addPortletBreadcrumbEntries(
@@ -181,10 +182,6 @@ public class DLUtil {
 
 		return getDL().getEmailFromDefinitionTerms(
 			request, emailFromAddress, emailFromName);
-	}
-
-	public static List<Object> getEntries(Hits hits) {
-		return getDL().getEntries(hits);
 	}
 
 	public static List<FileEntry> getFileEntries(Hits hits) {
@@ -327,14 +324,18 @@ public class DLUtil {
 		return getDL().getThumbnailSrc(fileEntry, themeDisplay);
 	}
 
-	public static String getThumbnailStyle() throws Exception {
+	public static String getThumbnailStyle() {
 		return getDL().getThumbnailStyle();
 	}
 
-	public static String getThumbnailStyle(boolean max, int margin)
-		throws Exception {
-
+	public static String getThumbnailStyle(boolean max, int margin) {
 		return getDL().getThumbnailStyle(max, margin);
+	}
+
+	public static String getThumbnailStyle(
+		boolean max, int margin, int height, int width) {
+
+		return getDL().getThumbnailStyle(max, margin, height, width);
 	}
 
 	public static String getTitleWithExtension(FileEntry fileEntry) {

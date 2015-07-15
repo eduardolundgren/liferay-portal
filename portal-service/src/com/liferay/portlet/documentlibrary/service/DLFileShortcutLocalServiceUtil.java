@@ -53,12 +53,13 @@ public class DLFileShortcutLocalServiceUtil {
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
-		long userId, long groupId, long folderId, long toFileEntryId,
+		long userId, long groupId, long repositoryId, long folderId,
+		long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .addFileShortcut(userId, groupId, folderId, toFileEntryId,
-			serviceContext);
+				   .addFileShortcut(userId, groupId, repositoryId, folderId,
+			toFileEntryId, serviceContext);
 	}
 
 	public static void addFileShortcutResources(
@@ -366,7 +367,7 @@ public class DLFileShortcutLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -382,6 +383,11 @@ public class DLFileShortcutLocalServiceUtil {
 		return getService()
 				   .getFileShortcuts(groupId, folderId, active, status, start,
 			end);
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileShortcut> getFileShortcuts(
+		long toFileEntryId) {
+		return getService().getFileShortcuts(toFileEntryId);
 	}
 
 	public static int getFileShortcutsCount(long groupId, long folderId,
@@ -435,12 +441,13 @@ public class DLFileShortcutLocalServiceUtil {
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
-		long userId, long fileShortcutId, long folderId, long toFileEntryId,
+		long userId, long fileShortcutId, long repositoryId, long folderId,
+		long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .updateFileShortcut(userId, fileShortcutId, folderId,
-			toFileEntryId, serviceContext);
+				   .updateFileShortcut(userId, fileShortcutId, repositoryId,
+			folderId, toFileEntryId, serviceContext);
 	}
 
 	public static void updateFileShortcuts(long oldToFileEntryId,

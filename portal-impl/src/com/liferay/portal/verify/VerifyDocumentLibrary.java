@@ -40,6 +40,7 @@ import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -56,11 +57,12 @@ import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
-import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
+import com.liferay.portlet.documentlibrary.util.comparator.DLFileVersionVersionComparator;
 import com.liferay.portlet.documentlibrary.webdav.DLWebDAVStorageImpl;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageAdapter;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageAdapterRegistryUtil;
+import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
 
 import java.io.InputStream;
 
@@ -156,13 +158,9 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 			return;
 		}
 
-		Date now = new Date();
-
 		dlFileEntryType = DLFileEntryTypeLocalServiceUtil.createDLFileEntryType(
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
 
-		dlFileEntryType.setCreateDate(now);
-		dlFileEntryType.setModifiedDate(now);
 		dlFileEntryType.setFileEntryTypeKey(
 			StringUtil.toUpperCase(
 				DLFileEntryTypeConstants.NAME_BASIC_DOCUMENT));
@@ -407,9 +405,6 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 			return;
 		}
 
-		FileVersionVersionComparator comparator =
-			new FileVersionVersionComparator();
-
 		List<DLFileVersion> dlFileVersions = dlFileEntry.getFileVersions(
 			WorkflowConstants.STATUS_APPROVED);
 
@@ -426,7 +421,7 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 
 		dlFileVersions = ListUtil.copy(dlFileVersions);
 
-		Collections.sort(dlFileVersions, comparator);
+		Collections.sort(dlFileVersions, new DLFileVersionVersionComparator());
 
 		DLFileVersion dlFileVersion = dlFileVersions.get(0);
 
@@ -473,11 +468,13 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 			dlFileEntryMetadata);
 
 		StorageAdapter storageAdapter =
-			StorageAdapterRegistryUtil.getStorageAdapter("xml");
+			StorageAdapterRegistryUtil.getStorageAdapter(
+				StorageType.JSON.toString());
 
 		storageAdapter.deleteByClass(dlFileEntryMetadata.getDDMStorageId());
 
-		DDMStructureLinkLocalServiceUtil.deleteClassStructureLink(
+		DDMStructureLinkLocalServiceUtil.deleteStructureLinks(
+			PortalUtil.getClassNameId(DLFileEntryMetadata.class),
 			dlFileEntryMetadata.getFileEntryMetadataId());
 	}
 
@@ -675,7 +672,7 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		VerifyDocumentLibrary.class);
 
 }

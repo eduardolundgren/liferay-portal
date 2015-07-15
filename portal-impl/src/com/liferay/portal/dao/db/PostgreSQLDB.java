@@ -55,7 +55,7 @@ public class PostgreSQLDB extends BaseDB {
 
 	@Override
 	public List<Index> getIndexes(Connection con) throws SQLException {
-		List<Index> indexes = new ArrayList<Index>();
+		List<Index> indexes = new ArrayList<>();
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -159,7 +159,8 @@ public class PostgreSQLDB extends BaseDB {
 
 					line = StringUtil.replace(
 						"alter table @table@ rename @old-column@ to " +
-							"@new-column@;", REWORD_TEMPLATE, template);
+							"@new-column@;",
+						REWORD_TEMPLATE, template);
 				}
 				else if (line.startsWith(ALTER_COLUMN_TYPE)) {
 					String[] template = buildColumnTypeTokens(line);

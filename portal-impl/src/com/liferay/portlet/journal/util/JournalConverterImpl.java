@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.journal.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -45,7 +46,7 @@ import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMFieldsCounter;
 import com.liferay.portlet.dynamicdatamapping.util.DDMImpl;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
+import com.liferay.util.xml.XMLUtil;
 
 import java.io.Serializable;
 
@@ -55,6 +56,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Marcellus Tavares
@@ -63,7 +66,7 @@ import java.util.Set;
 public class JournalConverterImpl implements JournalConverter {
 
 	public JournalConverterImpl() {
-		_ddmDataTypes = new HashMap<String, String>();
+		_ddmDataTypes = new HashMap<>();
 
 		_ddmDataTypes.put("boolean", "boolean");
 		_ddmDataTypes.put("document_library", "document-library");
@@ -75,13 +78,13 @@ public class JournalConverterImpl implements JournalConverter {
 		_ddmDataTypes.put("text_area", "html");
 		_ddmDataTypes.put("text_box", "string");
 
-		_ddmMetadataAttributes = new HashMap<String, String>();
+		_ddmMetadataAttributes = new HashMap<>();
 
 		_ddmMetadataAttributes.put("instructions", "tip");
 		_ddmMetadataAttributes.put("label", "label");
 		_ddmMetadataAttributes.put("predefinedValue", "predefinedValue");
 
-		_ddmTypesToJournalTypes = new HashMap<String, String>();
+		_ddmTypesToJournalTypes = new HashMap<>();
 
 		_ddmTypesToJournalTypes.put("checkbox", "boolean");
 		_ddmTypesToJournalTypes.put("ddm-documentlibrary", "document_library");
@@ -93,7 +96,7 @@ public class JournalConverterImpl implements JournalConverter {
 		_ddmTypesToJournalTypes.put("text", "text");
 		_ddmTypesToJournalTypes.put("textarea", "text_box");
 
-		_journalTypesToDDMTypes = new HashMap<String, String>();
+		_journalTypesToDDMTypes = new HashMap<>();
 
 		_journalTypesToDDMTypes.put("boolean", "checkbox");
 		_journalTypesToDDMTypes.put("document_library", "ddm-documentlibrary");
@@ -143,7 +146,7 @@ public class JournalConverterImpl implements JournalConverter {
 			}
 		}
 
-		return DDMXMLUtil.formatXML(document.asXML());
+		return XMLUtil.formatXML(document.asXML());
 	}
 
 	@Override
@@ -207,7 +210,7 @@ public class JournalConverterImpl implements JournalConverter {
 				dynamicElementElement, defaultLocale.toString());
 		}
 
-		return DDMXMLUtil.formatXML(document);
+		return XMLUtil.formatXML(document);
 	}
 
 	@Override
@@ -229,7 +232,7 @@ public class JournalConverterImpl implements JournalConverter {
 				dynamicElementElement, defaultLanguageId);
 		}
 
-		return DDMXMLUtil.formatXML(document);
+		return XMLUtil.formatXML(document);
 	}
 
 	protected void addDDMFields(
@@ -351,27 +354,20 @@ public class JournalConverterImpl implements JournalConverter {
 
 	protected Serializable getDocumentLibraryValue(String url) {
 		try {
-			int x = url.indexOf("/documents/");
+			FileEntry fileEntry = null;
 
-			if (x == -1) {
+			if (url.contains("/c/document_library/get_file?") ||
+				url.contains("/image/image_gallery?")) {
+
+				fileEntry = getFileEntryByOldDocumentLibraryURL(url);
+			}
+			else if (url.contains("/documents/")) {
+				fileEntry = getFileEntryByDocumentLibraryURL(url);
+			}
+
+			if (fileEntry == null) {
 				return StringPool.BLANK;
 			}
-
-			int y = url.indexOf(StringPool.QUESTION);
-
-			if (y == -1) {
-				y = url.length();
-			}
-
-			url = url.substring(x, y);
-
-			String[] parts = StringUtil.split(url, CharPool.SLASH);
-
-			long groupId = GetterUtil.getLong(parts[2]);
-
-			FileEntry fileEntry =
-				DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
-					parts[5], groupId);
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -471,6 +467,8 @@ public class JournalConverterImpl implements JournalConverter {
 			jsonObject.put("data", dynamicContentElement.getText());
 			jsonObject.put(
 				"name", dynamicContentElement.attributeValue("name"));
+			jsonObject.put(
+				"title", dynamicContentElement.attributeValue("title"));
 
 			serializable = jsonObject.toString();
 		}
@@ -522,6 +520,42 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 
 		return serializable;
+	}
+
+	protected FileEntry getFileEntryByDocumentLibraryURL(String url)
+		throws PortalException {
+
+		int x = url.indexOf("/documents/");
+
+		int y = url.indexOf(StringPool.QUESTION);
+
+		if (y == -1) {
+			y = url.length();
+		}
+
+		url = url.substring(x, y);
+
+		String[] parts = StringUtil.split(url, CharPool.SLASH);
+
+		long groupId = GetterUtil.getLong(parts[2]);
+
+		return DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+			parts[5], groupId);
+	}
+
+	protected FileEntry getFileEntryByOldDocumentLibraryURL(String url)
+		throws PortalException {
+
+		Matcher matcher = _oldDocumentLibraryURLPattern.matcher(url);
+
+		if (!matcher.find()) {
+			return null;
+		}
+
+		long groupId = GetterUtil.getLong(matcher.group(2));
+
+		return DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+			matcher.group(1), groupId);
 	}
 
 	protected void getJournalMetadataElement(Element metadataElement) {
@@ -606,6 +640,8 @@ public class JournalConverterImpl implements JournalConverter {
 		String fieldType = ddmStructure.getFieldType(fieldName);
 		String indexType = ddmStructure.getFieldProperty(
 			fieldName, "indexType");
+		boolean multiple = GetterUtil.getBoolean(
+			ddmStructure.getFieldProperty(fieldName, "multiple"));
 
 		String type = _ddmTypesToJournalTypes.get(fieldType);
 
@@ -646,7 +682,8 @@ public class JournalConverterImpl implements JournalConverter {
 				String valueString = String.valueOf(fieldValue);
 
 				updateDynamicContentValue(
-					dynamicContentElement, fieldType, valueString.trim());
+					dynamicContentElement, fieldType, multiple,
+					valueString.trim());
 			}
 		}
 
@@ -749,7 +786,8 @@ public class JournalConverterImpl implements JournalConverter {
 	}
 
 	protected void updateDynamicContentValue(
-			Element dynamicContentElement, String fieldType, String fieldValue)
+			Element dynamicContentElement, String fieldType, boolean multiple,
+			String fieldValue)
 		throws Exception {
 
 		if (DDMImpl.TYPE_CHECKBOX.equals(fieldType)) {
@@ -769,6 +807,8 @@ public class JournalConverterImpl implements JournalConverter {
 				"alt", jsonObject.getString("alt"));
 			dynamicContentElement.addAttribute(
 				"name", jsonObject.getString("name"));
+			dynamicContentElement.addAttribute(
+				"title", jsonObject.getString("title"));
 			dynamicContentElement.addCDATA(fieldValue);
 		}
 		else if (DDMImpl.TYPE_DDM_LINK_TO_PAGE.equals(fieldType) &&
@@ -817,8 +857,8 @@ public class JournalConverterImpl implements JournalConverter {
 
 			JSONArray jsonArray = JSONFactoryUtil.createJSONArray(fieldValue);
 
-			if (jsonArray.length() > 1) {
-				for (int i = 0; i <jsonArray.length(); i++) {
+			if (multiple) {
+				for (int i = 0; i < jsonArray.length(); i++) {
 					Element optionElement = dynamicContentElement.addElement(
 						"option");
 
@@ -993,11 +1033,14 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JournalConverterImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalConverterImpl.class);
 
-	private Map<String, String> _ddmDataTypes;
-	private Map<String, String> _ddmMetadataAttributes;
-	private Map<String, String> _ddmTypesToJournalTypes;
-	private Map<String, String> _journalTypesToDDMTypes;
+	private final Map<String, String> _ddmDataTypes;
+	private final Map<String, String> _ddmMetadataAttributes;
+	private final Map<String, String> _ddmTypesToJournalTypes;
+	private final Map<String, String> _journalTypesToDDMTypes;
+	private final Pattern _oldDocumentLibraryURLPattern = Pattern.compile(
+		"uuid=([^&]+)&groupId=([^&]+)");
 
 }

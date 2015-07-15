@@ -18,24 +18,32 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.web.proxy.web.constants.WebProxyPortletKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
 	immediate = true,
-	property = {
-		"javax.portlet.name=com_liferay_web_proxy_web_portlet_WebProxyPortlet"
-	},
+	property = {"javax.portlet.name=" + WebProxyPortletKeys.WEB_PROXY},
 	service = ConfigurationAction.class
 )
 public class WebProxyConfigurationAction extends DefaultConfigurationAction {
+
+	@Override
+	public String getJspPath(HttpServletRequest request) {
+		return "/configuration.jsp";
+	}
 
 	@Override
 	public void processAction(
@@ -56,6 +64,15 @@ public class WebProxyConfigurationAction extends DefaultConfigurationAction {
 		setPreference(actionRequest, "initUrl", initUrl);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.web.proxy.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 }

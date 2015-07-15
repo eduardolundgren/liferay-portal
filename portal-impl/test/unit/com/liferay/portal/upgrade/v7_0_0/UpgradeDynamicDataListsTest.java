@@ -19,11 +19,18 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.util.LocalizationImpl;
 import com.liferay.portal.xml.SAXReaderImpl;
 
@@ -32,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,11 +50,13 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcellus Tavares
  */
+@PowerMockIgnore("javax.xml.stream.*")
 @RunWith(PowerMockRunner.class)
 public class UpgradeDynamicDataListsTest extends PowerMockito {
 
@@ -54,12 +64,14 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 	public void setUp() {
 		setUpLanguageUtil();
 		setUpLocalizationUtil();
+		setUpPropsUtil();
 		setUpSAXReaderUtil();
+		setUpSecureXMLFactoryProviderUtil();
 	}
 
 	@Test
-	public void testToXMLWihoutLocalizedData() throws Exception {
-		Map<String, String> expandoValuesMap = new HashMap<String, String>();
+	public void testToXMLWithoutLocalizedData() throws Exception {
+		Map<String, String> expandoValuesMap = new HashMap<>();
 
 		expandoValuesMap.put(
 			"Text", createLocalizationXML(new String[] {"Joe Bloggs"}));
@@ -95,7 +107,7 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 
 	@Test
 	public void testToXMLWithRepeatableAndLocalizedData() throws Exception {
-		Map<String, String> expandoValuesMap = new HashMap<String, String>();
+		Map<String, String> expandoValuesMap = new HashMap<>();
 
 		expandoValuesMap.put(
 			"Text",
@@ -143,7 +155,7 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 		List<String> data = localizedDataMap.get(languageId);
 
 		if (data == null) {
-			data = new ArrayList<String>();
+			data = new ArrayList<>();
 
 			localizedDataMap.put(languageId, data);
 		}
@@ -197,8 +209,7 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 	protected Map<String, List<String>> getLocalizedDataMap(
 		Element dynamicElementElement) {
 
-		Map<String, List<String>> localizedDataMap =
-			new HashMap<String, List<String>>();
+		Map<String, List<String>> localizedDataMap = new HashMap<>();
 
 		for (Element dynamicContentElement : dynamicElementElement.elements()) {
 			String languageId = dynamicContentElement.attributeValue(
@@ -212,11 +223,14 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 	}
 
 	protected void setUpLanguageUtil() {
-		whenLanguageGetLanguageId(LocaleUtil.US, "en_US");
 		whenLanguageGetLanguageId(LocaleUtil.BRAZIL, "pt_BR");
+		whenLanguageGetLanguageId(LocaleUtil.US, "en_US");
 
 		whenLanguageGetAvailableLocalesThen(
-			new Locale[] {LocaleUtil.BRAZIL, LocaleUtil.US});
+			SetUtil.fromArray(new Locale[] {LocaleUtil.BRAZIL, LocaleUtil.US}));
+
+		whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
+		whenLanguageIsAvailableLocale(LocaleUtil.US);
 
 		LanguageUtil languageUtil = new LanguageUtil();
 
@@ -229,10 +243,41 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 		localizationUtil.setLocalization(new LocalizationImpl());
 	}
 
+	protected void setUpPropsUtil() {
+		Props props = mock(Props.class);
+
+		when(
+			props.get(PropsKeys.XML_SECURITY_ENABLED)
+		).thenReturn(
+			Boolean.TRUE.toString()
+		);
+
+		PropsUtil.setProps(props);
+	}
+
 	protected void setUpSAXReaderUtil() {
 		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
 
-		saxReaderUtil.setSAXReader(new SAXReaderImpl());
+		SAXReaderImpl secureSAXReader = new SAXReaderImpl();
+
+		secureSAXReader.setSecure(true);
+
+		saxReaderUtil.setSAXReader(secureSAXReader);
+
+		UnsecureSAXReaderUtil unsecureSAXReaderUtil =
+			new UnsecureSAXReaderUtil();
+
+		SAXReaderImpl unsecureSAXReader = new SAXReaderImpl();
+
+		unsecureSAXReaderUtil.setSAXReader(unsecureSAXReader);
+	}
+
+	protected void setUpSecureXMLFactoryProviderUtil() {
+		SecureXMLFactoryProviderUtil secureXMLFactoryProviderUtil =
+			new SecureXMLFactoryProviderUtil();
+
+		secureXMLFactoryProviderUtil.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
 	}
 
 	protected Map<String, Map<String, List<String>>> toDataMap(
@@ -240,8 +285,7 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 
 		Element rootElement = document.getRootElement();
 
-		Map<String, Map<String, List<String>>> dataMap =
-			new HashMap<String, Map<String, List<String>>>();
+		Map<String, Map<String, List<String>>> dataMap = new HashMap<>();
 
 		for (Element dynamicElementElement :
 				rootElement.elements("dynamic-element")) {
@@ -258,7 +302,7 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 	}
 
 	protected void whenLanguageGetAvailableLocalesThen(
-		Locale[] availableLocales) {
+		Set<Locale> availableLocales) {
 
 		when(
 			_language.getAvailableLocales()
@@ -271,7 +315,15 @@ public class UpgradeDynamicDataListsTest extends PowerMockito {
 		when(
 			_language.getLanguageId(Matchers.eq(locale))
 		).thenReturn(
-				languageId
+			languageId
+		);
+	}
+
+	protected void whenLanguageIsAvailableLocale(Locale locale) {
+		when(
+			_language.isAvailableLocale(Matchers.eq(locale))
+		).thenReturn(
+			true
 		);
 	}
 

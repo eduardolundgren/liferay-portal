@@ -59,7 +59,7 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 	public com.liferay.portal.model.MembershipRequest addMembershipRequest(
 		long userId, long groupId, java.lang.String comments,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Creates a new membership request with the primary key. Does not add the membership request to the database.
@@ -89,12 +89,11 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
-		long membershipRequestId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long membershipRequestId) throws PortalException;
 
 	public void deleteMembershipRequests(long groupId);
 
-	public void deleteMembershipRequests(long groupId, int statusId);
+	public void deleteMembershipRequests(long groupId, long statusId);
 
 	public void deleteMembershipRequestsByUserId(long userId);
 
@@ -104,7 +103,7 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -194,8 +193,7 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.MembershipRequest getMembershipRequest(
-		long membershipRequestId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long membershipRequestId) throws PortalException;
 
 	/**
 	* Returns a range of all the membership requests.
@@ -214,7 +212,7 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.MembershipRequest> getMembershipRequests(
-		long userId, long groupId, int statusId);
+		long userId, long groupId, long statusId);
 
 	/**
 	* Returns the number of membership requests.
@@ -227,11 +225,10 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasMembershipRequest(long userId, long groupId, int statusId);
+	public boolean hasMembershipRequest(long userId, long groupId, long statusId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.MembershipRequest> search(
@@ -258,7 +255,7 @@ public interface MembershipRequestLocalService extends BaseLocalService,
 		com.liferay.portal.model.MembershipRequest membershipRequest);
 
 	public void updateStatus(long replierUserId, long membershipRequestId,
-		java.lang.String replyComments, int statusId, boolean addUserToGroup,
+		java.lang.String replyComments, long statusId, boolean addUserToGroup,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 }

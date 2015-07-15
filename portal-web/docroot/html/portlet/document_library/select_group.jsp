@@ -28,16 +28,13 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 	<%
 	PortletURL portletURL = renderResponse.createRenderURL();
 
-	portletURL.setParameter("struts_action", "/document_library/select_group");
+	portletURL.setParameter("mvcPath", "/html/portlet/document_library/select_group.jsp");
 	%>
 
 	<liferay-ui:search-container
 		searchContainer="<%= new GroupSearch(renderRequest, portletURL) %>"
 	>
-		<liferay-ui:search-form
-			page="/html/portlet/users_admin/group_search.jsp"
-			searchContainer="<%= searchContainer %>"
-		/>
+		<liferay-ui:group-search-form />
 
 		<div class="separator"><!-- --></div>
 

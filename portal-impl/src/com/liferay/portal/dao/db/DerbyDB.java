@@ -43,7 +43,7 @@ public class DerbyDB extends BaseDB {
 		template = reword(template );
 		//template = _removeLongInserts(derby);
 		template = removeNull(template);
-		template = StringUtil.replace(template , "\\'", "''");
+		template = StringUtil.replace(template, "\\'", "''");
 
 		return template;
 	}
@@ -156,8 +156,8 @@ public class DerbyDB extends BaseDB {
 
 	private static final boolean _SUPPORTS_ALTER_COLUMN_TYPE = false;
 
-	private static Log _log = LogFactoryUtil.getLog(DerbyDB.class);
+	private static final Log _log = LogFactoryUtil.getLog(DerbyDB.class);
 
-	private static DerbyDB _instance = new DerbyDB();
+	private static final DerbyDB _instance = new DerbyDB();
 
 }

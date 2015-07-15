@@ -18,20 +18,22 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.scripting.BaseScriptingExecutor;
 import com.liferay.portal.kernel.scripting.ExecutionException;
+import com.liferay.portal.kernel.scripting.ScriptingContainer;
 import com.liferay.portal.kernel.scripting.ScriptingException;
-import com.liferay.portal.kernel.util.AggregateClassLoader;
+import com.liferay.portal.kernel.scripting.ScriptingExecutor;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import java.lang.reflect.Field;
 
@@ -44,13 +46,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadFactory;
 
+import javax.servlet.ServletContext;
+
 import jodd.io.ZipUtil;
 
 import org.jruby.Ruby;
 import org.jruby.RubyInstanceConfig;
 import org.jruby.RubyInstanceConfig.CompileMode;
 import org.jruby.embed.LocalContextScope;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.embed.internal.LocalContextProvider;
 import org.jruby.exceptions.RaiseException;
 
@@ -62,19 +65,53 @@ public class RubyExecutor extends BaseScriptingExecutor {
 
 	public static final String LANGUAGE = "ruby";
 
-	public RubyExecutor() {
-		try {
-			initRubyGems();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
+	public static void initRubyGems(ServletContext servletContext) {
+		File rubyGemsJarFile = new File(
+			servletContext.getRealPath("/WEB-INF/lib/ruby-gems.jar"));
+
+		if (!rubyGemsJarFile.exists()) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(rubyGemsJarFile + " does not exist");
+			}
+
+			return;
 		}
 
-		_scriptingContainer = new ScriptingContainer(
-			LocalContextScope.THREADSAFE);
+		String tmpDir = SystemProperties.get(SystemProperties.TMP_DIR);
+
+		File rubyDir = new File(tmpDir + "/liferay/ruby");
+
+		if (!rubyDir.exists() ||
+			(rubyDir.lastModified() < rubyGemsJarFile.lastModified())) {
+
+			FileUtil.deltree(rubyDir);
+
+			try {
+				FileUtil.mkdirs(rubyDir);
+
+				ZipUtil.unzip(rubyGemsJarFile, rubyDir);
+
+				rubyDir.setLastModified(rubyGemsJarFile.lastModified());
+			}
+			catch (IOException ioe) {
+				_log.error(
+					"Unable to unzip " + rubyGemsJarFile + " to " + rubyDir,
+					ioe);
+			}
+		}
+	}
+
+	public RubyExecutor() {
+		initScriptingExecutorClassLoader();
+
+		org.jruby.embed.ScriptingContainer scriptingContainer =
+			new org.jruby.embed.ScriptingContainer(
+				LocalContextScope.THREADSAFE);
+
+		_scriptingContainer = new RubyScriptingContainer(scriptingContainer);
 
 		LocalContextProvider localContextProvider =
-			_scriptingContainer.getProvider();
+			scriptingContainer.getProvider();
 
 		RubyInstanceConfig rubyInstanceConfig =
 			localContextProvider.getRubyInstanceConfig();
@@ -96,7 +133,7 @@ public class RubyExecutor extends BaseScriptingExecutor {
 
 		_basePath = PropsValues.LIFERAY_LIB_PORTAL_DIR;
 
-		_loadPaths = new ArrayList<String>(
+		_loadPaths = new ArrayList<>(
 			PropsValues.SCRIPTING_JRUBY_LOAD_PATHS.length);
 
 		for (String gemLibPath : PropsValues.SCRIPTING_JRUBY_LOAD_PATHS) {
@@ -105,7 +142,11 @@ public class RubyExecutor extends BaseScriptingExecutor {
 
 		rubyInstanceConfig.setLoadPaths(_loadPaths);
 
-		_scriptingContainer.setCurrentDirectory(_basePath);
+		scriptingContainer.setCurrentDirectory(_basePath);
+	}
+
+	public void destroy() {
+		_scriptingContainer.destroy();
 	}
 
 	@Override
@@ -136,8 +177,18 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		return LANGUAGE;
 	}
 
-	public ScriptingContainer getScriptingContainer() {
+	@Override
+	public ScriptingContainer<?> getScriptingContainer() {
 		return _scriptingContainer;
+	}
+
+	@Override
+	public ScriptingExecutor newInstance(boolean executeInSeparateThread) {
+		RubyExecutor rubyExecutor = new RubyExecutor();
+
+		rubyExecutor.setExecuteInSeparateThread(executeInSeparateThread);
+
+		return rubyExecutor;
 	}
 
 	public void setExecuteInSeparateThread(boolean executeInSeparateThread) {
@@ -155,9 +206,12 @@ public class RubyExecutor extends BaseScriptingExecutor {
 				"Constrained execution not supported for Ruby");
 		}
 
+		org.jruby.embed.ScriptingContainer scriptingContainer =
+			_scriptingContainer.getWrappedScriptingContainer();
+
 		try {
 			LocalContextProvider localContextProvider =
-				_scriptingContainer.getProvider();
+				scriptingContainer.getProvider();
 
 			RubyInstanceConfig rubyInstanceConfig =
 				localContextProvider.getRubyInstanceConfig();
@@ -165,11 +219,8 @@ public class RubyExecutor extends BaseScriptingExecutor {
 			rubyInstanceConfig.setCurrentDirectory(_basePath);
 
 			if (ArrayUtil.isNotEmpty(classLoaders)) {
-				ClassLoader aggregateClassLoader =
-					AggregateClassLoader.getAggregateClassLoader(
-						ClassLoaderUtil.getPortalClassLoader(), classLoaders);
-
-				rubyInstanceConfig.setLoader(aggregateClassLoader);
+				rubyInstanceConfig.setLoader(
+					getAggregateClassLoader(classLoaders));
 			}
 
 			rubyInstanceConfig.setLoadPaths(_loadPaths);
@@ -182,11 +233,11 @@ public class RubyExecutor extends BaseScriptingExecutor {
 					inputName = StringPool.DOLLAR + inputName;
 				}
 
-				_scriptingContainer.put(inputName, inputObject);
+				scriptingContainer.put(inputName, inputObject);
 			}
 
 			if (scriptFile != null) {
-				_scriptingContainer.runScriptlet(
+				scriptingContainer.runScriptlet(
 					new FileInputStream(scriptFile), scriptFile.toString());
 			}
 			else {
@@ -197,11 +248,11 @@ public class RubyExecutor extends BaseScriptingExecutor {
 				return null;
 			}
 
-			Map<String, Object> outputObjects = new HashMap<String, Object>();
+			Map<String, Object> outputObjects = new HashMap<>();
 
 			for (String outputName : outputNames) {
 				outputObjects.put(
-					outputName, _scriptingContainer.get(outputName));
+					outputName, scriptingContainer.get(outputName));
 			}
 
 			return outputObjects;
@@ -239,8 +290,8 @@ public class RubyExecutor extends BaseScriptingExecutor {
 			allowedClasses, inputObjects, outputNames, scriptFile, script,
 			classLoaders);
 
-		FutureTask<Map<String, Object>> futureTask =
-			new FutureTask<Map<String, Object>>(evalCallable);
+		FutureTask<Map<String, Object>> futureTask = new FutureTask<>(
+			evalCallable);
 
 		Thread oneTimeExecutorThread = _threadFactory.newThread(futureTask);
 
@@ -259,35 +310,6 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		}
 	}
 
-	protected void initRubyGems() throws Exception {
-		File rubyGemsJarFile = new File(
-			PropsValues.LIFERAY_LIB_PORTAL_DIR, "ruby-gems.jar");
-
-		if (!rubyGemsJarFile.exists()) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(rubyGemsJarFile + " does not exist");
-			}
-
-			return;
-		}
-
-		String tmpDir = SystemProperties.get(SystemProperties.TMP_DIR);
-
-		File rubyDir = new File(tmpDir + "/liferay/ruby");
-
-		if (!rubyDir.exists() ||
-			(rubyDir.lastModified() < rubyGemsJarFile.lastModified())) {
-
-			FileUtil.deltree(rubyDir);
-
-			rubyDir.mkdirs();
-
-			ZipUtil.unzip(rubyGemsJarFile, rubyDir);
-
-			rubyDir.setLastModified(rubyGemsJarFile.lastModified());
-		}
-	}
-
 	private static final String _COMPILE_MODE_FORCE = "force";
 
 	private static final String _COMPILE_MODE_JIT = "jit";
@@ -295,10 +317,9 @@ public class RubyExecutor extends BaseScriptingExecutor {
 	private static final Log _log = LogFactoryUtil.getLog(RubyExecutor.class);
 
 	private static final Field _globalRuntimeField;
-	private static final ThreadFactory _threadFactory =
-		new NamedThreadFactory(
-			RubyExecutor.class.getName(), Thread.NORM_PRIORITY,
-			RubyExecutor.class.getClassLoader());
+	private static final ThreadFactory _threadFactory = new NamedThreadFactory(
+		RubyExecutor.class.getName(), Thread.NORM_PRIORITY,
+		RubyExecutor.class.getClassLoader());
 
 	static {
 		try {
@@ -313,7 +334,8 @@ public class RubyExecutor extends BaseScriptingExecutor {
 	private final String _basePath;
 	private boolean _executeInSeparateThread = true;
 	private final List<String> _loadPaths;
-	private final ScriptingContainer _scriptingContainer;
+	private final ScriptingContainer<org.jruby.embed.ScriptingContainer>
+		_scriptingContainer;
 
 	private class EvalCallable implements Callable<Map<String, Object>> {
 

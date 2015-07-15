@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
-import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelNameComparator;
+import com.liferay.portlet.documentlibrary.util.comparator.FolderNameComparator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +43,7 @@ public class FolderAtomCollectionAdapter
 
 	@Override
 	public List<String> getEntryAuthors(Folder folder) {
-		List<String> authors = new ArrayList<String>();
+		List<String> authors = new ArrayList<>();
 
 		authors.add(folder.getUserName());
 
@@ -118,7 +118,7 @@ public class FolderAtomCollectionAdapter
 			AtomRequestContext atomRequestContext)
 		throws Exception {
 
-		long repositoryId;
+		long repositoryId = 0L;
 
 		long parentFolderId = atomRequestContext.getLongParameter(
 			"parentFolderId");
@@ -141,8 +141,7 @@ public class FolderAtomCollectionAdapter
 
 		return DLAppServiceUtil.getFolders(
 			repositoryId, parentFolderId, atomPager.getStart(),
-			atomPager.getEnd() + 1,
-			new RepositoryModelNameComparator<Folder>());
+			atomPager.getEnd() + 1, new FolderNameComparator());
 	}
 
 	@Override
@@ -151,7 +150,7 @@ public class FolderAtomCollectionAdapter
 			AtomRequestContext atomRequestContext)
 		throws Exception {
 
-		long repositoryId;
+		long repositoryId = 0L;
 
 		long parentFolderId = atomRequestContext.getLongParameter(
 			"parentFolderId");

@@ -16,6 +16,7 @@ package com.liferay.portlet.usersadmin.action;
 
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.portlet.DynamicActionRequest;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ProgressTracker;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -73,6 +75,17 @@ public class ExportUsersAction extends PortletAction {
 		throws Exception {
 
 		try {
+			String keywords = ParamUtil.getString(actionRequest, "keywords");
+
+			if (Validator.isNotNull(keywords)) {
+				DynamicActionRequest dynamicActionRequest =
+					new DynamicActionRequest(actionRequest);
+
+				dynamicActionRequest.setParameter("keywords", StringPool.BLANK);
+
+				actionRequest = dynamicActionRequest;
+			}
+
 			String csv = getUsersCSV(actionRequest, actionResponse);
 
 			String fileName = "users.csv";
@@ -158,13 +171,12 @@ public class ExportUsersAction extends PortletAction {
 		UserSearchTerms searchTerms =
 			(UserSearchTerms)userSearch.getSearchTerms();
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		long organizationId = searchTerms.getOrganizationId();
 
 		if (organizationId > 0) {
-			params.put("usersOrgs", new Long(organizationId));
+			params.put("usersOrgs", Long.valueOf(organizationId));
 		}
 		else if (!exportAllUsers) {
 			User user = themeDisplay.getUser();
@@ -180,13 +192,13 @@ public class ExportUsersAction extends PortletAction {
 		long roleId = searchTerms.getRoleId();
 
 		if (roleId > 0) {
-			params.put("usersRoles", new Long(roleId));
+			params.put("usersRoles", Long.valueOf(roleId));
 		}
 
 		long userGroupId = searchTerms.getUserGroupId();
 
 		if (userGroupId > 0) {
-			params.put("usersUserGroups", new Long(userGroupId));
+			params.put("usersUserGroups", Long.valueOf(userGroupId));
 		}
 
 		if (PropsValues.USERS_INDEXER_ENABLED &&

@@ -14,22 +14,32 @@
 
 package com.liferay.portlet.sitesadmin.lar;
 
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.adapter.StagedGroup;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Daniel Kocsis
  */
+@OSGiBeanProperties
 public class StagedGroupStagedModelDataHandler
 	extends BaseStagedModelDataHandler<StagedGroup> {
 
 	public static final String[] CLASS_NAMES = {StagedGroup.class.getName()};
+
+	@Override
+	public void deleteStagedModel(StagedGroup stagedGroup) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public void deleteStagedModel(
@@ -39,10 +49,10 @@ public class StagedGroupStagedModelDataHandler
 	}
 
 	@Override
-	public StagedGroup fetchStagedModelByUuidAndCompanyId(
+	public List<StagedGroup> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -105,18 +115,12 @@ public class StagedGroupStagedModelDataHandler
 
 	@Override
 	protected void doExportStagedModel(
-			PortletDataContext portletDataContext, StagedGroup stagedGroup)
-		throws Exception {
-
-		return;
+		PortletDataContext portletDataContext, StagedGroup stagedGroup) {
 	}
 
 	@Override
 	protected void doImportStagedModel(
-			PortletDataContext portletDataContext, StagedGroup stagedGroup)
-		throws Exception {
-
-		return;
+		PortletDataContext portletDataContext, StagedGroup stagedGroup) {
 	}
 
 	protected Group fetchExistingGroup(

@@ -17,6 +17,9 @@ package com.liferay.portal.kernel.cluster;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,16 +42,6 @@ public class ClusterExecutorUtil {
 		clusterExecutor.addClusterEventListener(clusterEventListener);
 	}
 
-	public static void destroy() {
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return;
-		}
-
-		clusterExecutor.destroy();
-	}
-
 	public static FutureClusterResponses execute(
 		ClusterRequest clusterRequest) {
 
@@ -61,41 +54,21 @@ public class ClusterExecutorUtil {
 		return clusterExecutor.execute(clusterRequest);
 	}
 
-	public static FutureClusterResponses execute(
-		ClusterRequest clusterRequest,
-		ClusterResponseCallback clusterResponseCallback) {
-
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return null;
-		}
-
-		return clusterExecutor.execute(clusterRequest, clusterResponseCallback);
-	}
-
 	public static ClusterExecutor getClusterExecutor() {
 		PortalRuntimePermission.checkGetBeanProperty(ClusterExecutorUtil.class);
 
-		if ((_clusterExecutor == null) || !_clusterExecutor.isEnabled()) {
+		ClusterExecutor clusterExecutor =
+			_instance._serviceTracker.getService();
+
+		if ((clusterExecutor == null) || !clusterExecutor.isEnabled()) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("ClusterExecutorUtil has not been initialized");
+				_log.warn("ClusterExecutorUtil was not initialized");
 			}
 
 			return null;
 		}
 
-		return _clusterExecutor;
-	}
-
-	public static List<Address> getClusterNodeAddresses() {
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return Collections.emptyList();
-		}
-
-		return clusterExecutor.getClusterNodeAddresses();
+		return clusterExecutor;
 	}
 
 	public static List<ClusterNode> getClusterNodes() {
@@ -116,36 +89,6 @@ public class ClusterExecutorUtil {
 		}
 
 		return clusterExecutor.getLocalClusterNode();
-	}
-
-	public static Address getLocalClusterNodeAddress() {
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return null;
-		}
-
-		return clusterExecutor.getLocalClusterNodeAddress();
-	}
-
-	public static void initialize() {
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return;
-		}
-
-		clusterExecutor.initialize();
-	}
-
-	public static boolean isClusterNodeAlive(Address address) {
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return false;
-		}
-
-		return clusterExecutor.isClusterNodeAlive(address);
 	}
 
 	public static boolean isClusterNodeAlive(String clusterNodeId) {
@@ -180,15 +123,21 @@ public class ClusterExecutorUtil {
 		clusterExecutor.removeClusterEventListener(clusterEventListener);
 	}
 
-	public void setClusterExecutor(ClusterExecutor clusterExecutor) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
+	private ClusterExecutorUtil() {
+		Registry registry = RegistryUtil.getRegistry();
 
-		_clusterExecutor = clusterExecutor;
+		_serviceTracker = registry.trackServices(ClusterExecutor.class);
+
+		_serviceTracker.open();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ClusterExecutorUtil.class);
 
-	private static ClusterExecutor _clusterExecutor;
+	private static final ClusterExecutorUtil _instance =
+		new ClusterExecutorUtil();
+
+	private final ServiceTracker<ClusterExecutor, ClusterExecutor>
+		_serviceTracker;
 
 }

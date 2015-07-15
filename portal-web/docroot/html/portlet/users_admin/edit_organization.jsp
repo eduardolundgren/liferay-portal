@@ -21,24 +21,12 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
-Organization organization = (Organization)request.getAttribute(WebKeys.ORGANIZATION);
+long organizationId = ParamUtil.getLong(request, "organizationId");
 
-long organizationId = BeanParamUtil.getLong(organization, request, "organizationId");
+Organization organization = OrganizationServiceUtil.fetchOrganization(organizationId);
 
 long parentOrganizationId = ParamUtil.getLong(request, "parentOrganizationSearchContainerPrimaryKeys", (organization != null) ? organization.getParentOrganizationId() : OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
 String type = BeanParamUtil.getString(organization, request, "type");
-
-String[] mainSections = PropsValues.ORGANIZATIONS_FORM_ADD_MAIN;
-String[] identificationSections = PropsValues.ORGANIZATIONS_FORM_ADD_IDENTIFICATION;
-String[] miscellaneousSections = PropsValues.ORGANIZATIONS_FORM_ADD_MISCELLANEOUS;
-
-if (organization != null) {
-	mainSections = PropsUtil.getArray(PropsKeys.ORGANIZATIONS_FORM_UPDATE_MAIN, new Filter(organization.getType()));
-	identificationSections = PropsUtil.getArray(PropsKeys.ORGANIZATIONS_FORM_UPDATE_IDENTIFICATION, new Filter(organization.getType()));
-	miscellaneousSections = PropsUtil.getArray(PropsKeys.ORGANIZATIONS_FORM_UPDATE_MISCELLANEOUS, new Filter(organization.getType()));
-}
-
-String[][] categorySections = {mainSections, identificationSections, miscellaneousSections};
 
 if (organization != null) {
 	UsersAdminUtil.addPortletBreadcrumbEntries(organization, request, renderResponse);
@@ -125,19 +113,14 @@ else {
 
 	<liferay-ui:form-navigator
 		backURL="<%= backURL %>"
-		categoryNames="<%= _CATEGORY_NAMES %>"
-		categorySections="<%= categorySections %>"
+		formModelBean="<%= organization %>"
 		htmlTop="<%= htmlTop %>"
-		jspPath="/html/portlet/users_admin/organization/"
+		id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_ORGANIZATIONS %>"
 	/>
 </aui:form>
 
 <aui:script>
 	function <portlet:namespace />createURL(href, value, onclick) {
 		return '<a href="' + href + '"' + (onclick ? ' onclick="' + onclick + '" ' : '') + '>' + value + '</a>';
-	};
+	}
 </aui:script>
-
-<%!
-private static final String[] _CATEGORY_NAMES = {"organization-information", "identification", "miscellaneous"};
-%>

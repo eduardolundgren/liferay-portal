@@ -77,7 +77,7 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the phone remote service
 	 */
-	public com.liferay.portal.service.PhoneService getPhoneService() {
+	public PhoneService getPhoneService() {
 		return phoneService;
 	}
 
@@ -86,8 +86,7 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param phoneService the phone remote service
 	 */
-	public void setPhoneService(
-		com.liferay.portal.service.PhoneService phoneService) {
+	public void setPhoneService(PhoneService phoneService) {
 		this.phoneService = phoneService;
 	}
 
@@ -183,6 +182,25 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
 		this.classNamePersistence = classNamePersistence;
+	}
+
+	/**
+	 * Returns the list type local service.
+	 *
+	 * @return the list type local service
+	 */
+	public com.liferay.portal.service.ListTypeLocalService getListTypeLocalService() {
+		return listTypeLocalService;
+	}
+
+	/**
+	 * Sets the list type local service.
+	 *
+	 * @param listTypeLocalService the list type local service
+	 */
+	public void setListTypeLocalService(
+		com.liferay.portal.service.ListTypeLocalService listTypeLocalService) {
+		this.listTypeLocalService = listTypeLocalService;
 	}
 
 	/**
@@ -356,8 +374,8 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.service.PhoneLocalService.class)
 	protected com.liferay.portal.service.PhoneLocalService phoneLocalService;
-	@BeanReference(type = com.liferay.portal.service.PhoneService.class)
-	protected com.liferay.portal.service.PhoneService phoneService;
+	@BeanReference(type = PhoneService.class)
+	protected PhoneService phoneService;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -368,6 +386,8 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
+	@BeanReference(type = com.liferay.portal.service.ListTypeLocalService.class)
+	protected com.liferay.portal.service.ListTypeLocalService listTypeLocalService;
 	@BeanReference(type = com.liferay.portal.service.ListTypeService.class)
 	protected com.liferay.portal.service.ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)

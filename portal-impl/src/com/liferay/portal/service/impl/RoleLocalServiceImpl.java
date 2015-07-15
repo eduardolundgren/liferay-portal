@@ -16,18 +16,16 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.DuplicateRoleException;
 import com.liferay.portal.NoSuchRoleException;
-import com.liferay.portal.NoSuchShardException;
 import com.liferay.portal.RequiredRoleException;
 import com.liferay.portal.RoleNameException;
 import com.liferay.portal.kernel.cache.Lifecycle;
 import com.liferay.portal.kernel.cache.ThreadLocalCachable;
 import com.liferay.portal.kernel.cache.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
-import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -51,7 +49,6 @@ import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.ResourceTypePermission;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.Shard;
 import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
@@ -64,13 +61,13 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -197,8 +194,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			classPK = roleId;
 		}
 
-		Date now = new Date();
-
 		validate(0, user.getCompanyId(), classNameId, name);
 
 		Role role = rolePersistence.create(roleId);
@@ -210,16 +205,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		role.setCompanyId(user.getCompanyId());
 		role.setUserId(user.getUserId());
 		role.setUserName(user.getFullName());
-
-		if (serviceContext != null) {
-			role.setCreateDate(serviceContext.getCreateDate(now));
-			role.setModifiedDate(serviceContext.getModifiedDate(now));
-		}
-		else {
-			role.setCreateDate(now);
-			role.setModifiedDate(now);
-		}
-
 		role.setClassNameId(classNameId);
 		role.setClassPK(classPK);
 		role.setName(name);
@@ -239,10 +224,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 				role.getRoleId(), false, false, false);
 
 			if (!ExportImportThreadLocal.isImportInProcess()) {
-				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-					User.class);
-
-				indexer.reindex(userId);
+				reindex(userId);
 			}
 		}
 
@@ -265,11 +247,9 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		userPersistence.addRoles(userId, roleIds);
 
-		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(User.class);
+		reindex(userId);
 
-		indexer.reindex(userId);
-
-		PermissionCacheUtil.clearCache();
+		PermissionCacheUtil.clearCache(userId);
 	}
 
 	/**
@@ -283,25 +263,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	public void checkSystemRoles() throws PortalException {
 		List<Company> companies = companyLocalService.getCompanies();
 
-		String currentShardName = ShardUtil.getCurrentShardName();
-
 		for (Company company : companies) {
-			String shardName = null;
-
-			try {
-				shardName = company.getShardName();
-			}
-			catch (NoSuchShardException nsse) {
-				Shard shard = shardLocalService.addShard(
-					Company.class.getName(), company.getCompanyId(),
-					PropsValues.SHARD_DEFAULT_NAME);
-
-				shardName = shard.getName();
-			}
-
-			if (!ShardUtil.isEnabled() || shardName.equals(currentShardName)) {
-				checkSystemRoles(company.getCompanyId());
-			}
+			checkSystemRoles(company.getCompanyId());
 		}
 	}
 
@@ -351,7 +314,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
 						".description";
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
 
@@ -371,7 +334,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
 						".description";
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
 
@@ -390,7 +353,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
 						".description";
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
 
@@ -444,11 +407,10 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public Role deleteRole(Role role) throws PortalException {
-		if (PortalUtil.isSystemRole(role.getName()) &&
-			!CompanyThreadLocal.isDeleteInProcess()) {
-
+		if (role.isSystem() && !CompanyThreadLocal.isDeleteInProcess()) {
 			throw new RequiredRoleException();
 		}
 
@@ -590,9 +552,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			role = getRole(
 				group.getCompanyId(), RoleConstants.ORGANIZATION_USER);
 		}
-		else if (group.isUser() || group.isUserGroup()) {
-			role = getRole(group.getCompanyId(), RoleConstants.POWER_USER);
-		}
 		else {
 			role = getRole(group.getCompanyId(), RoleConstants.USER);
 		}
@@ -604,7 +563,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	public List<Role> getGroupRelatedRoles(long groupId)
 		throws PortalException {
 
-		List<Role> roles = new ArrayList<Role>();
+		List<Role> roles = new ArrayList<>();
 
 		Group group = groupLocalService.getGroup(groupId);
 
@@ -618,7 +577,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			types = RoleConstants.TYPES_ORGANIZATION_AND_REGULAR;
 		}
 		else if (group.isLayout() || group.isLayoutSetPrototype() ||
-				 group.isSite()) {
+				 group.isSite() || group.isUser()) {
 
 			types = RoleConstants.TYPES_REGULAR_AND_SITE;
 		}
@@ -751,7 +710,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 */
 	@Override
 	public List<Role> getRoles(long[] roleIds) throws PortalException {
-		List<Role> roles = new ArrayList<Role>(roleIds.length);
+		List<Role> roles = new ArrayList<>(roleIds.length);
 
 		for (long roleId : roleIds) {
 			Role role = getRole(roleId);
@@ -1020,27 +979,37 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 				return true;
 			}
 
-			ThreadLocalCache<Integer> threadLocalCache =
+			ThreadLocalCache<Boolean> threadLocalCache =
 				ThreadLocalCacheManager.getThreadLocalCache(
 					Lifecycle.REQUEST, RoleLocalServiceImpl.class.getName());
 
 			String key = String.valueOf(role.getRoleId()).concat(
 				String.valueOf(userId));
 
-			Integer value = threadLocalCache.get(key);
+			Boolean value = threadLocalCache.get(key);
+
+			if (value != null) {
+				return value;
+			}
+
+			value = PermissionCacheUtil.getUserRole(userId, role);
 
 			if (value == null) {
-				value = roleFinder.countByR_U(role.getRoleId(), userId);
+				int count = roleFinder.countByR_U(role.getRoleId(), userId);
 
-				threadLocalCache.put(key, value);
+				if (count > 0) {
+					value = true;
+				}
+				else {
+					value = false;
+				}
+
+				PermissionCacheUtil.putUserRole(userId, role, value);
 			}
 
-			if (value > 0) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			threadLocalCache.put(key, value);
+
+			return value;
 		}
 		else {
 			return userPersistence.containsRole(userId, role.getRoleId());
@@ -1350,11 +1319,9 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		userPersistence.setRoles(userId, roleIds);
 
-		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(User.class);
+		reindex(userId);
 
-		indexer.reindex(userId);
-
-		PermissionCacheUtil.clearCache();
+		PermissionCacheUtil.clearCache(userId);
 	}
 
 	/**
@@ -1374,11 +1341,9 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		userPersistence.removeRoles(userId, roleIds);
 
-		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(User.class);
+		reindex(userId);
 
-		indexer.reindex(userId);
-
-		PermissionCacheUtil.clearCache();
+		PermissionCacheUtil.clearCache(userId);
 	}
 
 	/**
@@ -1409,12 +1374,11 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		validate(roleId, role.getCompanyId(), role.getClassNameId(), name);
 
-		if (PortalUtil.isSystemRole(role.getName())) {
+		if (role.isSystem()) {
 			name = role.getName();
 			subtype = null;
 		}
 
-		role.setModifiedDate(new Date());
 		role.setName(name);
 		role.setTitleMap(titleMap);
 		role.setDescriptionMap(descriptionMap);
@@ -1466,7 +1430,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	protected String[] getDefaultControlPanelPortlets() {
 		return new String[] {
 			PortletKeys.MY_ACCOUNT, PortletKeys.MY_PAGES,
-			PortletKeys.MY_WORKFLOW_INSTANCES, PortletKeys.MY_WORKFLOW_TASKS
+			PortletKeys.MY_WORKFLOW_INSTANCE, PortletKeys.MY_WORKFLOW_TASK
 		};
 	}
 
@@ -1488,7 +1452,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		Set<Long> roleIds = SetUtil.fromArray(excludedRoleIds);
 
-		Map<Team, Role> teamRoleMap = new LinkedHashMap<Team, Role>();
+		Map<Team, Role> teamRoleMap = new LinkedHashMap<>();
 
 		for (Team team : teams) {
 			Role role = getTeamRole(team.getCompanyId(), team.getTeamId());
@@ -1525,10 +1489,17 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 			setRolePermissions(
 				role, portletId,
-				new String[] {
-					ActionKeys.ACCESS_IN_CONTROL_PANEL
-				});
+				new String[] {ActionKeys.ACCESS_IN_CONTROL_PANEL});
 		}
+	}
+
+	protected void reindex(long userId) throws SearchException {
+		Indexer<User> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			User.class);
+
+		User user = userLocalService.fetchUser(userId);
+
+		indexer.reindex(user);
 	}
 
 	protected void setRolePermissions(
@@ -1578,7 +1549,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		}
 	}
 
-	private final Map<String, Role> _systemRolesMap =
-		new HashMap<String, Role>();
+	private final Map<String, Role> _systemRolesMap = new HashMap<>();
 
 }

@@ -17,7 +17,9 @@
 <%@ include file="/html/portlet/users_admin/init.jsp" %>
 
 <%
-Organization organization = (Organization)request.getAttribute(WebKeys.ORGANIZATION);
+long organizationId = ParamUtil.getLong(request, "organizationId");
+
+Organization organization = OrganizationServiceUtil.fetchOrganization(organizationId);
 
 List<LayoutSetPrototype> layoutSetPrototypes = LayoutSetPrototypeServiceUtil.search(company.getCompanyId(), Boolean.TRUE, null);
 
@@ -88,6 +90,25 @@ if (organization != null) {
 				</c:otherwise>
 			</c:choose>
 
+			<c:if test="<%= site %>">
+
+				<%
+				LiferayPortletURL editOrganizationSiteURL = (LiferayPortletURL)PortletProviderUtil.getPortletURL(request, Group.class.getName(), PortletProvider.Action.EDIT);
+
+				editOrganizationSiteURL.setDoAsGroupId(organizationGroup.getGroupId());
+				editOrganizationSiteURL.setParameter("viewOrganizationsRedirect", currentURL);
+				%>
+
+				<aui:field-wrapper>
+					<liferay-ui:icon
+						iconCssClass="icon-cog"
+						label="<%= true %>"
+						message="manage-site"
+						url="<%= editOrganizationSiteURL.toString() %>"
+					/>
+				</aui:field-wrapper>
+			</c:if>
+
 			<%
 			boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(permissionChecker, ActionKeys.UNLINK_LAYOUT_SET_PROTOTYPE);
 			%>
@@ -131,38 +152,36 @@ if (organization != null) {
 						<aui:field-wrapper label="public-pages">
 							<c:choose>
 								<c:when test="<%= organization != null %>">
-									<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="publicPagesURL">
-										<portlet:param name="struts_action" value="/my_sites/view" />
-										<portlet:param name="groupId" value="<%= String.valueOf(organization.getGroup().getGroupId()) %>" />
-										<portlet:param name="privateLayout" value="<%= Boolean.FALSE.toString() %>" />
-									</liferay-portlet:actionURL>
+									<aui:field-wrapper>
+										<c:choose>
+											<c:when test="<%= organization.getPublicLayoutsPageCount() > 0 %>">
+												<liferay-ui:icon
+													iconCssClass="icon-search"
+													label="<%= true %>"
+													message="open-public-pages"
+													method="get"
+													target="_blank"
+													url="<%= organizationGroup.getDisplayURL(themeDisplay, false) %>"
+												/>
+											</c:when>
+											<c:otherwise>
+												<liferay-ui:message key="this-organization-does-not-have-any-public-pages" />
+											</c:otherwise>
+										</c:choose>
+									</aui:field-wrapper>
 
-									<c:choose>
-										<c:when test="<%= organization.getPublicLayoutsPageCount() > 0 %>">
-											<liferay-ui:icon
-												iconCssClass="icon-search"
-												label="<%= true %>"
-												message="open-public-pages"
-												method="get"
-												target="_blank"
-												url="<%= publicPagesURL.toString() %>"
-											/>
-										</c:when>
-										<c:otherwise>
-											<liferay-ui:message key="this-organization-does-not-have-any-public-pages" />
-										</c:otherwise>
-									</c:choose>
+									<aui:field-wrapper>
+										<c:choose>
+											<c:when test="<%= (publicLayoutSetPrototype != null) && !organizationGroup.isStaged() && hasUnlinkLayoutSetPrototypePermission %>">
+												<aui:input label='<%= LanguageUtil.format(request, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(publicLayoutSetPrototype.getName(locale)), false) %>' name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
+											</c:when>
+											<c:when test="<%= publicLayoutSetPrototype != null %>">
+												<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(publicLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" translateArguments="<%= false %>" />
 
-									<c:choose>
-										<c:when test="<%= (publicLayoutSetPrototype != null) && !organizationGroup.isStaged() && hasUnlinkLayoutSetPrototypePermission %>">
-											<aui:input label='<%= LanguageUtil.format(request, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(publicLayoutSetPrototype.getName(locale)), false) %>' name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
-										</c:when>
-										<c:when test="<%= publicLayoutSetPrototype != null %>">
-											<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(publicLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" translateArguments="<%= false %>" />
-
-											<aui:input name="publicLayoutSetPrototypeLinkEnabled" type="hidden" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
-										</c:when>
-									</c:choose>
+												<aui:input name="publicLayoutSetPrototypeLinkEnabled" type="hidden" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
+											</c:when>
+										</c:choose>
+									</aui:field-wrapper>
 								</c:when>
 							</c:choose>
 						</aui:field-wrapper>
@@ -207,38 +226,36 @@ if (organization != null) {
 						<aui:field-wrapper label="private-pages">
 							<c:choose>
 								<c:when test="<%= organization != null %>">
-									<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="privatePagesURL">
-										<portlet:param name="struts_action" value="/my_sites/view" />
-										<portlet:param name="groupId" value="<%= String.valueOf(organization.getGroup().getGroupId()) %>" />
-										<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
-									</liferay-portlet:actionURL>
+									<aui:field-wrapper>
+										<c:choose>
+											<c:when test="<%= organization.getPrivateLayoutsPageCount() > 0 %>">
+												<liferay-ui:icon
+													iconCssClass="icon-search"
+													label="<%= true %>"
+													message="open-private-pages"
+													method="get"
+													target="_blank"
+													url="<%= organizationGroup.getDisplayURL(themeDisplay, true) %>"
+												/>
+											</c:when>
+											<c:otherwise>
+												<liferay-ui:message key="this-organization-does-not-have-any-private-pages" />
+											</c:otherwise>
+										</c:choose>
+									</aui:field-wrapper>
 
-									<c:choose>
-										<c:when test="<%= organization.getPrivateLayoutsPageCount() > 0 %>">
-											<liferay-ui:icon
-												iconCssClass="icon-search"
-												label="<%= true %>"
-												message="open-private-pages"
-												method="get"
-												target="_blank"
-												url="<%= privatePagesURL.toString() %>"
-											/>
-										</c:when>
-										<c:otherwise>
-											<liferay-ui:message key="this-organization-does-not-have-any-private-pages" />
-										</c:otherwise>
-									</c:choose>
+									<aui:field-wrapper>
+										<c:choose>
+											<c:when test="<%= (privateLayoutSetPrototype != null) && !organizationGroup.isStaged() && hasUnlinkLayoutSetPrototypePermission %>">
+												<aui:input label='<%= LanguageUtil.format(request, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(privateLayoutSetPrototype.getName(locale)), false) %>' name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
+											</c:when>
+											<c:when test="<%= privateLayoutSetPrototype != null %>">
+												<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(privateLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" translateArguments="<%= false %>" />
 
-									<c:choose>
-										<c:when test="<%= (privateLayoutSetPrototype != null) && !organizationGroup.isStaged() && hasUnlinkLayoutSetPrototypePermission %>">
-											<aui:input label='<%= LanguageUtil.format(request, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(privateLayoutSetPrototype.getName(locale)), false) %>' name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
-										</c:when>
-										<c:when test="<%= privateLayoutSetPrototype != null %>">
-											<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(privateLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" translateArguments="<%= false %>" />
-
-											<aui:input name="privateLayoutSetPrototypeLinkEnabled" type="hidden" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
-										</c:when>
-									</c:choose>
+												<aui:input name="privateLayoutSetPrototypeLinkEnabled" type="hidden" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
+											</c:when>
+										</c:choose>
+									</aui:field-wrapper>
 								</c:when>
 							</c:choose>
 						</aui:field-wrapper>
@@ -253,16 +270,18 @@ if (organization != null) {
 		}
 		%>
 
-		<aui:script>
-			function <portlet:namespace />isVisible(currentValue, value) {
-				return currentValue != '';
-			}
+		<c:if test="<%= !site %>">
+			<aui:script>
+				function <portlet:namespace />isVisible(currentValue, value) {
+					return currentValue != '';
+				}
 
-			Liferay.Util.toggleBoxes('<portlet:namespace />site','<portlet:namespace />siteTemplates');
+				Liferay.Util.toggleBoxes('<portlet:namespace />site', '<portlet:namespace />siteTemplates');
 
-			Liferay.Util.toggleSelectBox('<portlet:namespace />publicLayoutSetPrototypeId', <portlet:namespace />isVisible, '<portlet:namespace />publicLayoutSetPrototypeIdOptions');
-			Liferay.Util.toggleSelectBox('<portlet:namespace />privateLayoutSetPrototypeId', <portlet:namespace />isVisible, '<portlet:namespace />privateLayoutSetPrototypeIdOptions');
-		</aui:script>
+				Liferay.Util.toggleSelectBox('<portlet:namespace />publicLayoutSetPrototypeId', <portlet:namespace />isVisible, '<portlet:namespace />publicLayoutSetPrototypeIdOptions');
+				Liferay.Util.toggleSelectBox('<portlet:namespace />privateLayoutSetPrototypeId', <portlet:namespace />isVisible, '<portlet:namespace />privateLayoutSetPrototypeIdOptions');
+			</aui:script>
+		</c:if>
 	</c:when>
 	<c:otherwise>
 		<aui:input name="site" type="hidden" value="<%= site %>" />

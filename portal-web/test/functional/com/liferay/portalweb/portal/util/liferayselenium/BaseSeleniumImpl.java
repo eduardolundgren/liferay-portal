@@ -35,21 +35,32 @@ public abstract class BaseSeleniumImpl
 	public BaseSeleniumImpl(String projectDirName, Selenium selenium) {
 		super(selenium);
 
-		_projectDirName = projectDirName;
+		String dependenciesDirName =
+			"portal-web//test//functional//com//liferay//portalweb//" +
+				"dependencies//";
+
+		String outputDirName = TestPropsValues.OUTPUT_DIR_NAME;
+
+		String sikuliImagesDirName = dependenciesDirName + "sikuli//linux//";
 
 		if (OSDetector.isWindows()) {
-			_dependenciesDirName = StringUtil.replace(
-				_dependenciesDirName, "//", "\\");
+			dependenciesDirName = StringUtil.replace(
+				dependenciesDirName, "//", "\\");
 
-			_outputDirName = StringUtil.replace(_outputDirName, "//", "\\");
+			outputDirName = StringUtil.replace(outputDirName, "//", "\\");
 
-			_projectDirName = StringUtil.replace(_projectDirName, "//", "\\");
+			projectDirName = StringUtil.replace(projectDirName, "//", "\\");
 
-			_sikuliImagesDirName = StringUtil.replace(
-				_sikuliImagesDirName, "//", "\\");
-			_sikuliImagesDirName = StringUtil.replace(
-				_sikuliImagesDirName, "linux", "windows");
+			sikuliImagesDirName = StringUtil.replace(
+				sikuliImagesDirName, "//", "\\");
+			sikuliImagesDirName = StringUtil.replace(
+				sikuliImagesDirName, "linux", "windows");
 		}
+
+		_dependenciesDirName = dependenciesDirName;
+		_outputDirName = outputDirName;
+		_projectDirName = projectDirName;
+		_sikuliImagesDirName = sikuliImagesDirName;
 
 		initCommandProcessor();
 
@@ -200,6 +211,11 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
+	public void assertPartialConfirmation(String pattern) throws Exception {
+		LiferaySeleniumHelper.assertPartialConfirmation(this, pattern);
+	}
+
+	@Override
 	public void assertPartialText(String locator, String pattern)
 		throws Exception {
 
@@ -316,13 +332,13 @@ public abstract class BaseSeleniumImpl
 	@Override
 	public String getFirstNumber(String locator) {
 		return _commandProcessor.getString(
-			"getFirstNumber", new String[] {locator,});
+			"getFirstNumber", new String[] {locator});
 	}
 
 	@Override
 	public String getFirstNumberIncrement(String locator) {
 		return _commandProcessor.getString(
-			"getFirstNumberIncrement", new String[] {locator,});
+			"getFirstNumberIncrement", new String[] {locator});
 	}
 
 	@Override
@@ -421,7 +437,7 @@ public abstract class BaseSeleniumImpl
 		value = RuntimeVariables.replace(value);
 
 		return _commandProcessor.getBoolean(
-			"isPartialText", new String[] {locator, value,});
+			"isPartialText", new String[] {locator, value});
 	}
 
 	@Override
@@ -720,13 +736,13 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
-	public void tap(String locator) {
-		throw new UnsupportedOperationException();
+	public void typeAceEditor(String locator, String value) {
+		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
 	}
 
 	@Override
-	public void typeAceEditor(String locator, String value) {
-		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
+	public void typeCKEditor(String locator, String value) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -925,13 +941,11 @@ public abstract class BaseSeleniumImpl
 
 	private String _clipBoard = "";
 	private CommandProcessor _commandProcessor;
-	private String _dependenciesDirName =
-		"portal-web//test//functional//com//liferay//portalweb//dependencies//";
-	private String _outputDirName = TestPropsValues.OUTPUT_DIR_NAME;
+	private final String _dependenciesDirName;
+	private final String _outputDirName;
 	private String _primaryTestSuiteName;
-	private String _projectDirName;
-	private String _sikuliImagesDirName =
-		_dependenciesDirName + "sikuli//linux//";
+	private final String _projectDirName;
+	private final String _sikuliImagesDirName;
 	private String _timeout = "90000";
 
 }

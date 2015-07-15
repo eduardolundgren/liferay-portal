@@ -15,11 +15,6 @@
 package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
@@ -27,6 +22,11 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
+import com.liferay.portlet.messageboards.NoSuchDiscussionException;
 import com.liferay.portlet.messageboards.model.MBDiscussion;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBThread;
@@ -45,6 +45,11 @@ public class MBDiscussionStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {MBDiscussion.class.getName()};
 
 	@Override
+	public void deleteStagedModel(MBDiscussion discussion) {
+		MBDiscussionLocalServiceUtil.deleteMBDiscussion(discussion);
+	}
+
+	@Override
 	public void deleteStagedModel(
 		String uuid, long groupId, String className, String extraData) {
 
@@ -52,24 +57,8 @@ public class MBDiscussionStagedModelDataHandler
 			uuid, groupId);
 
 		if (discussion != null) {
-			MBDiscussionLocalServiceUtil.deleteMBDiscussion(discussion);
+			deleteStagedModel(discussion);
 		}
-	}
-
-	@Override
-	public MBDiscussion fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<MBDiscussion> discussions =
-			MBDiscussionLocalServiceUtil.getMBDiscussionsByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<MBDiscussion>());
-
-		if (ListUtil.isEmpty(discussions)) {
-			return null;
-		}
-
-		return discussions.get(0);
 	}
 
 	@Override
@@ -78,6 +67,15 @@ public class MBDiscussionStagedModelDataHandler
 
 		return MBDiscussionLocalServiceUtil.fetchMBDiscussionByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<MBDiscussion> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return MBDiscussionLocalServiceUtil.getMBDiscussionsByUuidAndCompanyId(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new StagedModelModifiedDateComparator<MBDiscussion>());
 	}
 
 	@Override
@@ -130,20 +128,23 @@ public class MBDiscussionStagedModelDataHandler
 			MBDiscussionLocalServiceUtil.fetchDiscussion(
 				discussion.getClassName(), newClassPK);
 
-		if ((existingDiscussion == null) &&
-			className.equals(Layout.class.getName()) &&
-			PropsValues.LAYOUT_COMMENTS_ENABLED) {
+		if (existingDiscussion == null) {
+			if (className.equals(Layout.class.getName()) &&
+				PropsValues.LAYOUT_COMMENTS_ENABLED) {
 
-			MBMessage rootMessage =
-				MBMessageLocalServiceUtil.addDiscussionMessage(
-					userId, discussion.getUserName(),
-					portletDataContext.getScopeGroupId(),
-					Layout.class.getName(), newClassPK,
-					WorkflowConstants.ACTION_PUBLISH);
+				MBMessage rootMessage =
+					MBMessageLocalServiceUtil.addDiscussionMessage(
+						userId, discussion.getUserName(),
+						portletDataContext.getScopeGroupId(), className,
+						newClassPK, WorkflowConstants.ACTION_PUBLISH);
 
-			existingDiscussion =
-				MBDiscussionLocalServiceUtil.getThreadDiscussion(
-					rootMessage.getThreadId());
+				existingDiscussion =
+					MBDiscussionLocalServiceUtil.getThreadDiscussion(
+						rootMessage.getThreadId());
+			}
+			else {
+				throw new NoSuchDiscussionException();
+			}
 		}
 
 		Map<Long, Long> discussionIds =

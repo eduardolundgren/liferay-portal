@@ -96,7 +96,7 @@ public class LayoutTypeControllerTracker {
 			_defaultLayoutTypeControllers.entrySet();
 
 		for (Entry<String, LayoutTypeController> entry : entries) {
-			Map<String, Object> properties = new HashMap<String, Object>();
+			Map<String, Object> properties = new HashMap<>();
 
 			properties.put("layout.type", entry.getKey());
 
@@ -106,20 +106,18 @@ public class LayoutTypeControllerTracker {
 	}
 
 	private static final String[] _LAYOUT_TYPES = new String[] {
-		LayoutConstants.TYPE_CONTROL_PANEL, LayoutConstants.TYPE_EMBEDDED,
-		LayoutConstants.TYPE_LINK_TO_LAYOUT, LayoutConstants.TYPE_PANEL,
-		LayoutConstants.TYPE_PORTLET, LayoutConstants.TYPE_URL
+		LayoutConstants.TYPE_EMBEDDED, LayoutConstants.TYPE_LINK_TO_LAYOUT,
+		LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
+		LayoutConstants.TYPE_URL
 	};
 
 	private static final LayoutTypeControllerTracker _instance =
 		new LayoutTypeControllerTracker();
 
 	private final Map<String, LayoutTypeController>
-		_defaultLayoutTypeControllers =
-			new ConcurrentHashMap<String, LayoutTypeController>();
+		_defaultLayoutTypeControllers = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, LayoutTypeController>
-		_layoutTypeControllers =
-			new ConcurrentHashMap<String, LayoutTypeController>();
+		_layoutTypeControllers = new ConcurrentHashMap<>();
 	private final ServiceTracker <LayoutTypeController, LayoutTypeController>
 		_serviceTracker;
 

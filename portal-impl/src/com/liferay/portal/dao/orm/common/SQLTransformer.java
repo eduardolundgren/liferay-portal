@@ -56,7 +56,7 @@ public class SQLTransformer {
 
 	private void _reloadSQLTransformer() {
 		if (_transformedSqls == null) {
-			_transformedSqls = new ConcurrentHashMap<String, String>();
+			_transformedSqls = new ConcurrentHashMap<>();
 		}
 		else {
 			_transformedSqls.clear();
@@ -187,6 +187,16 @@ public class SQLTransformer {
 			new String[] {_db.getTemplateFalse(), _db.getTemplateTrue()});
 	}
 
+	private String _replaceCastClobText(String sql) {
+		Matcher matcher = _castClobTextPattern.matcher(sql);
+
+		if (_vendorOracle) {
+			return matcher.replaceAll("DBMS_LOB.SUBSTR($1, 1, 4000)");
+		}
+
+		return _replaceCastText(matcher);
+	}
+
 	private String _replaceCastLong(String sql) {
 		Matcher matcher = _castLongPattern.matcher(sql);
 
@@ -201,9 +211,7 @@ public class SQLTransformer {
 		}
 	}
 
-	private String _replaceCastText(String sql) {
-		Matcher matcher = _castTextPattern.matcher(sql);
-
+	private String _replaceCastText(Matcher matcher) {
 		if (_vendorDB2 || _vendorDerby) {
 			return matcher.replaceAll("CAST($1 AS CHAR(254))");
 		}
@@ -225,6 +233,10 @@ public class SQLTransformer {
 		else {
 			return matcher.replaceAll("$1");
 		}
+	}
+
+	private String _replaceCastText(String sql) {
+		return _replaceCastText(_castTextPattern.matcher(sql));
 	}
 
 	private String _replaceCrossJoin(String sql) {
@@ -295,6 +307,7 @@ public class SQLTransformer {
 
 		newSQL = _replaceBitwiseCheck(newSQL);
 		newSQL = _replaceBoolean(newSQL);
+		newSQL = _replaceCastClobText(newSQL);
 		newSQL = _replaceCastLong(newSQL);
 		newSQL = _replaceCastText(newSQL);
 		newSQL = _replaceCrossJoin(newSQL);
@@ -419,27 +432,29 @@ public class SQLTransformer {
 
 	private static final String _LOWER_OPEN = "lower(";
 
-	private static Log _log = LogFactoryUtil.getLog(SQLTransformer.class);
+	private static final Log _log = LogFactoryUtil.getLog(SQLTransformer.class);
 
-	private static SQLTransformer _instance = new SQLTransformer();
+	private static final SQLTransformer _instance = new SQLTransformer();
 
-	private static Pattern _bitwiseCheckPattern = Pattern.compile(
+	private static final Pattern _bitwiseCheckPattern = Pattern.compile(
 		"BITAND\\((.+?),(.+?)\\)");
-	private static Pattern _castLongPattern = Pattern.compile(
+	private static final Pattern _castClobTextPattern = Pattern.compile(
+		"CAST_CLOB_TEXT\\((.+?)\\)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern _castLongPattern = Pattern.compile(
 		"CAST_LONG\\((.+?)\\)", Pattern.CASE_INSENSITIVE);
-	private static Pattern _castTextPattern = Pattern.compile(
+	private static final Pattern _castTextPattern = Pattern.compile(
 		"CAST_TEXT\\((.+?)\\)", Pattern.CASE_INSENSITIVE);
-	private static Pattern _integerDivisionPattern = Pattern.compile(
+	private static final Pattern _integerDivisionPattern = Pattern.compile(
 		"INTEGER_DIV\\((.+?),(.+?)\\)", Pattern.CASE_INSENSITIVE);
-	private static Pattern _jpqlCountPattern = Pattern.compile(
+	private static final Pattern _jpqlCountPattern = Pattern.compile(
 		"SELECT COUNT\\((\\S+)\\) FROM (\\S+) (\\S+)");
-	private static Pattern _likePattern = Pattern.compile(
+	private static final Pattern _likePattern = Pattern.compile(
 		"LIKE \\?", Pattern.CASE_INSENSITIVE);
-	private static Pattern _modPattern = Pattern.compile(
+	private static final Pattern _modPattern = Pattern.compile(
 		"MOD\\((.+?),(.+?)\\)", Pattern.CASE_INSENSITIVE);
-	private static Pattern _negativeComparisonPattern = Pattern.compile(
+	private static final Pattern _negativeComparisonPattern = Pattern.compile(
 		"(!?=)( -([0-9]+)?)", Pattern.CASE_INSENSITIVE);
-	private static Pattern _unionAllPattern = Pattern.compile(
+	private static final Pattern _unionAllPattern = Pattern.compile(
 		"SELECT \\* FROM(.*)TEMP_TABLE(.*)", Pattern.CASE_INSENSITIVE);
 
 	private DB _db;

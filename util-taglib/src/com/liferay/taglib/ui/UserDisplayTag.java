@@ -53,6 +53,27 @@ public class UserDisplayTag extends TagSupport {
 				(HttpServletRequest)pageContext.getRequest();
 
 			request.setAttribute(
+				"liferay-ui:user-display:author", String.valueOf(_author));
+			request.setAttribute(
+				"liferay-ui:user-display:displayStyle",
+				String.valueOf(_displayStyle));
+
+			if (Validator.isNull(_imageCssClass)) {
+				_imageCssClass = "img-circle";
+			}
+
+			request.setAttribute(
+				"liferay-ui:user-display:imageCssClass", _imageCssClass);
+
+			request.setAttribute(
+				"liferay-ui:user-display:showLink", String.valueOf(_showLink));
+			request.setAttribute(
+				"liferay-ui:user-display:showUserDetails",
+				String.valueOf(_showUserDetails));
+			request.setAttribute(
+				"liferay-ui:user-display:showUserName",
+				String.valueOf(_showUserName));
+			request.setAttribute(
 				"liferay-ui:user-display:user-id", String.valueOf(_userId));
 			request.setAttribute(
 				"liferay-ui:user-display:user-name", _userName);
@@ -74,23 +95,6 @@ public class UserDisplayTag extends TagSupport {
 				pageContext.removeAttribute("userDisplay");
 			}
 
-			request.setAttribute(
-				"liferay-ui:user-display:displayStyle",
-				String.valueOf(_displayStyle));
-
-			if (Validator.isNull(_imageCssClass)) {
-				_imageCssClass = "img-circle";
-			}
-
-			request.setAttribute(
-				"liferay-ui:user-display:imageCssClass", _imageCssClass);
-
-			request.setAttribute(
-				"liferay-ui:user-display:showUserDetails",
-				String.valueOf(_showUserDetails));
-			request.setAttribute(
-				"liferay-ui:user-display:showUserName",
-				String.valueOf(_showUserName));
 			request.setAttribute("liferay-ui:user-display:url", _url);
 
 			PortalIncludeUtil.include(pageContext, getStartPage());
@@ -107,6 +111,10 @@ public class UserDisplayTag extends TagSupport {
 		}
 	}
 
+	public void setAuthor(boolean author) {
+		_author = author;
+	}
+
 	public void setDisplayStyle(Object displayStyle) {
 		_displayStyle = GetterUtil.getInteger(displayStyle);
 	}
@@ -117,6 +125,10 @@ public class UserDisplayTag extends TagSupport {
 
 	public void setImageCssClass(String imageCssClass) {
 		_imageCssClass = imageCssClass;
+	}
+
+	public void setShowLink(boolean showLink) {
+		_showLink = showLink;
 	}
 
 	public void setShowUserDetails(boolean showUserDetails) {
@@ -143,38 +155,45 @@ public class UserDisplayTag extends TagSupport {
 		_userName = userName;
 	}
 
+	public void setView(String view) {
+		_view = view;
+	}
+
 	protected String getEndPage() {
-		if (Validator.isNull(_endPage)) {
-			return _END_PAGE;
-		}
-		else {
+		if (Validator.isNotNull(_endPage)) {
 			return _endPage;
 		}
+
+		if (Validator.isNotNull(_view)) {
+			return "/html/taglib/ui/user_display/" + _view + "/end.jsp";
+		}
+
+		return "/html/taglib/ui/user_display/end.jsp";
 	}
 
 	protected String getStartPage() {
-		if (Validator.isNull(_startPage)) {
-			return _START_PAGE;
-		}
-		else {
+		if (Validator.isNotNull(_startPage)) {
 			return _startPage;
 		}
+
+		if (Validator.isNotNull(_view)) {
+			return "/html/taglib/ui/user_display/" + _view + "/start.jsp";
+		}
+
+		return "/html/taglib/ui/user_display/start.jsp";
 	}
 
-	private static final String _END_PAGE =
-		"/html/taglib/ui/user_display/end.jsp";
-
-	private static final String _START_PAGE =
-		"/html/taglib/ui/user_display/start.jsp";
-
+	private boolean _author;
 	private int _displayStyle = 1;
 	private String _endPage;
 	private String _imageCssClass;
+	private boolean _showLink = true;
 	private boolean _showUserDetails = true;
 	private boolean _showUserName = true;
 	private String _startPage;
 	private String _url;
 	private long _userId;
 	private String _userName;
+	private String _view;
 
 }

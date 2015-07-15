@@ -14,6 +14,7 @@
 
 package com.liferay.currency.converter.web.portlet.validator;
 
+import com.liferay.currency.converter.web.constants.CurrencyConverterPortletKeys;
 import com.liferay.currency.converter.web.model.CurrencyConverter;
 import com.liferay.currency.converter.web.util.CurrencyConverterUtil;
 
@@ -32,7 +33,7 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_currency_converter_web_portlet_CurrencyConverterPortlet"
+		"javax.portlet.name=" + CurrencyConverterPortletKeys.CURRENCY_CONVERTER
 	}
 )
 public class CurrencyConverterPreferencesValidator
@@ -42,7 +43,7 @@ public class CurrencyConverterPreferencesValidator
 	public void validate(PortletPreferences portletPreferences)
 		throws ValidatorException {
 
-		List<String> badSymbols = new ArrayList<String>();
+		List<String> badSymbols = new ArrayList<>();
 
 		String[] symbols = portletPreferences.getValues(
 			"symbols", new String[0]);

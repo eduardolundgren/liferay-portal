@@ -1,13 +1,16 @@
-@import "compass";
+@import "bourbon";
 
 .portlet-document-library-display {
+	.entry-metadata .entry-title, .entry-thumbnail {
+		font-size: 1.15em;
+	}
+
 	.entry-metadata {
 		.entry-title {
 			display: block;
 
 			@include ellipsis;
 
-			font-size: 1.15em;
 			font-weight: bold;
 		}
 
@@ -56,12 +59,5 @@
 
 	.taglib-workflow-status {
 		margin-bottom: 5px;
-	}
-}
-
-.ie6 .portlet-document-library-display {
-	img.entry-thumbnail {
-		height: expression(this.height > 128 ? '128px' : this.height);
-		width: expression(this.width > 128 ? '128px' : this.width);
 	}
 }

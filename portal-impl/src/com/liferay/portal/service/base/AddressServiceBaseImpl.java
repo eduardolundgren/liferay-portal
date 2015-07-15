@@ -78,7 +78,7 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the address remote service
 	 */
-	public com.liferay.portal.service.AddressService getAddressService() {
+	public AddressService getAddressService() {
 		return addressService;
 	}
 
@@ -87,8 +87,7 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param addressService the address remote service
 	 */
-	public void setAddressService(
-		com.liferay.portal.service.AddressService addressService) {
+	public void setAddressService(AddressService addressService) {
 		this.addressService = addressService;
 	}
 
@@ -221,6 +220,25 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setCountryPersistence(CountryPersistence countryPersistence) {
 		this.countryPersistence = countryPersistence;
+	}
+
+	/**
+	 * Returns the list type local service.
+	 *
+	 * @return the list type local service
+	 */
+	public com.liferay.portal.service.ListTypeLocalService getListTypeLocalService() {
+		return listTypeLocalService;
+	}
+
+	/**
+	 * Sets the list type local service.
+	 *
+	 * @param listTypeLocalService the list type local service
+	 */
+	public void setListTypeLocalService(
+		com.liferay.portal.service.ListTypeLocalService listTypeLocalService) {
+		this.listTypeLocalService = listTypeLocalService;
 	}
 
 	/**
@@ -394,8 +412,8 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.service.AddressLocalService.class)
 	protected com.liferay.portal.service.AddressLocalService addressLocalService;
-	@BeanReference(type = com.liferay.portal.service.AddressService.class)
-	protected com.liferay.portal.service.AddressService addressService;
+	@BeanReference(type = AddressService.class)
+	protected AddressService addressService;
 	@BeanReference(type = AddressPersistence.class)
 	protected AddressPersistence addressPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -410,6 +428,8 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.service.CountryService countryService;
 	@BeanReference(type = CountryPersistence.class)
 	protected CountryPersistence countryPersistence;
+	@BeanReference(type = com.liferay.portal.service.ListTypeLocalService.class)
+	protected com.liferay.portal.service.ListTypeLocalService listTypeLocalService;
 	@BeanReference(type = com.liferay.portal.service.ListTypeService.class)
 	protected com.liferay.portal.service.ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)

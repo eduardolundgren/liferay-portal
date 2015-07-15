@@ -32,6 +32,7 @@
 		<column name="allowPingbacks" type="boolean" />
 		<column name="allowTrackbacks" type="boolean" />
 		<column name="trackbacks" type="String" />
+		<column name="coverImageCaption" type="String" />
 		<column name="coverImageFileEntryId" type="long" />
 		<column name="coverImageURL" type="String" />
 		<column name="smallImage" type="boolean" />
@@ -168,7 +169,6 @@
 		<reference package-path="com.liferay.portlet.blogs" entity="BlogsStatsUser" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoRow" />
 		<reference package-path="com.liferay.portlet.ratings" entity="RatingsStats" />
-		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
 		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<entity name="BlogsStatsUser" local-service="true" remote-service="false">

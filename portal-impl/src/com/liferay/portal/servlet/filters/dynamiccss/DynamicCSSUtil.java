@@ -17,9 +17,7 @@ package com.liferay.portal.servlet.filters.dynamiccss;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -27,17 +25,19 @@ import com.liferay.portal.kernel.util.SessionParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.URLUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.Theme;
-import com.liferay.portal.scripting.ruby.RubyExecutor;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.tools.SassToCssBuilder;
-import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.tools.CSSBuilderUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.sass.compiler.SassCompiler;
+import com.liferay.sass.compiler.jni.internal.JniSassCompiler;
+import com.liferay.sass.compiler.ruby.internal.RubySassCompiler;
 
 import java.io.File;
 
@@ -53,36 +53,30 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.time.StopWatch;
 
-import org.jruby.RubyArray;
-import org.jruby.RubyException;
-import org.jruby.embed.ScriptingContainer;
-import org.jruby.exceptions.RaiseException;
-import org.jruby.runtime.builtin.IRubyObject;
-
 /**
  * @author Raymond Augé
  * @author Sergio Sánchez
+ * @author David Truong
  */
 public class DynamicCSSUtil {
 
-	public static void init() {
+	public static void init(ServletContext servletContext) {
 		try {
 			if (_initialized) {
 				return;
 			}
 
-			RubyExecutor rubyExecutor = new RubyExecutor();
+			try {
+				_sassCompiler = new JniSassCompiler();
+			}
+			catch (Throwable t) {
+				File sassTempDir = _getSassTempDir(servletContext);
 
-			_scriptingContainer = rubyExecutor.getScriptingContainer();
-
-			String rubyScript = StringUtil.read(
-				ClassLoaderUtil.getPortalClassLoader(),
-				"com/liferay/portal/servlet/filters/dynamiccss" +
-					"/dependencies/main.rb");
-
-			_scriptObject = _scriptingContainer.runScriptlet(rubyScript);
-
-			RTLCSSUtil.init();
+				_sassCompiler = new RubySassCompiler(
+					PropsValues.SCRIPTING_JRUBY_COMPILE_MODE,
+					PropsValues.SCRIPTING_JRUBY_COMPILE_THRESHOLD,
+					sassTempDir.getCanonicalPath());
+			}
 
 			_initialized = true;
 		}
@@ -139,35 +133,27 @@ public class DynamicCSSUtil {
 
 		boolean themeCssFastLoad = _isThemeCssFastLoad(request, themeDisplay);
 
-		URLConnection cacheResourceURLConnection = null;
-
 		URL cacheResourceURL = _getCacheResourceURL(
 			servletContext, request, resourcePath);
 
 		if (cacheResourceURL != null) {
-			cacheResourceURLConnection = cacheResourceURL.openConnection();
-
 			if (!themeCssFastLoad) {
 				URL resourceURL = servletContext.getResource(resourcePath);
 
 				if (resourceURL != null) {
-					URLConnection resourceURLConnection =
-						resourceURL.openConnection();
+					if (URLUtil.getLastModifiedTime(cacheResourceURL) <
+							URLUtil.getLastModifiedTime(resourceURL)) {
 
-					if (cacheResourceURLConnection.getLastModified() <
-							resourceURLConnection.getLastModified()) {
-
-						cacheResourceURLConnection = null;
+						cacheResourceURL = null;
 					}
 				}
 			}
 		}
 
 		if ((themeCssFastLoad || !content.contains(_CSS_IMPORT_BEGIN)) &&
-			(cacheResourceURLConnection != null)) {
+			(cacheResourceURL != null)) {
 
-			parsedContent = StringUtil.read(
-				cacheResourceURLConnection.getInputStream());
+			parsedContent = StringUtil.read(cacheResourceURL.openStream());
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
@@ -176,7 +162,7 @@ public class DynamicCSSUtil {
 			}
 		}
 		else {
-			content = SassToCssBuilder.parseStaticTokens(content);
+			content = CSSBuilderUtil.parseStaticTokens(content);
 
 			String queryString = request.getQueryString();
 
@@ -189,8 +175,7 @@ public class DynamicCSSUtil {
 			}
 			else {
 				parsedContent = _parseSass(
-					servletContext, request, themeDisplay, theme, resourcePath,
-					content);
+					servletContext, request, themeDisplay, theme, content);
 			}
 
 			if (PortalUtil.isRightToLeft(request) &&
@@ -213,7 +198,7 @@ public class DynamicCSSUtil {
 
 					String parsedRtlCustomContent = _parseSass(
 						servletContext, request, themeDisplay, theme,
-						resourcePath, rtlCustomContent);
+						rtlCustomContent);
 
 					parsedContent += parsedRtlCustomContent;
 				}
@@ -230,16 +215,38 @@ public class DynamicCSSUtil {
 			return content;
 		}
 
+		parsedContent = replaceToken(
+			servletContext, request, themeDisplay, theme, parsedContent);
+
+		return parsedContent;
+	}
+
+	public static String replaceToken(
+			ServletContext servletContext, HttpServletRequest request,
+			String content)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Theme theme = _getTheme(request);
+
+		if (theme == null) {
+			return content;
+		}
+
+		return replaceToken(
+			servletContext, request, themeDisplay, theme, content);
+	}
+
+	public static String replaceToken(
+			ServletContext servletContext, HttpServletRequest request,
+			ThemeDisplay themeDisplay, Theme theme, String parsedContent)
+		throws Exception {
+
 		String portalContextPath = PortalUtil.getPathContext();
 
-		String baseURL = portalContextPath;
-
-		String contextPath = ContextPathUtil.getContextPath(servletContext);
-
-		if (!contextPath.equals(portalContextPath)) {
-			baseURL = StringPool.SLASH.concat(
-				GetterUtil.getString(servletContext.getServletContextName()));
-		}
+		String baseURL = servletContext.getContextPath();
 
 		if (baseURL.endsWith(StringPool.SLASH)) {
 			baseURL = baseURL.substring(0, baseURL.length() - 1);
@@ -247,9 +254,7 @@ public class DynamicCSSUtil {
 
 		parsedContent = StringUtil.replace(
 			parsedContent,
-			new String[] {
-				"@base_url@", "@portal_ctx@", "@theme_image_path@"
-			},
+			new String[] {"@base_url@", "@portal_ctx@", "@theme_image_path@"},
 			new String[] {
 				baseURL, portalContextPath,
 				_getThemeImagesPath(request, themeDisplay, theme)
@@ -337,7 +342,7 @@ public class DynamicCSSUtil {
 		}
 
 		return servletContext.getResource(
-			SassToCssBuilder.getCacheFileName(resourcePath, suffix));
+			CSSBuilderUtil.getCacheFileName(resourcePath, suffix));
 	}
 
 	private static String _getCssThemePath(
@@ -366,7 +371,7 @@ public class DynamicCSSUtil {
 		throws Exception {
 
 		return servletContext.getResource(
-			SassToCssBuilder.getRtlCustomFileName(resourcePath));
+			CSSBuilderUtil.getRtlCustomFileName(resourcePath));
 	}
 
 	private static File _getSassTempDir(ServletContext servletContext) {
@@ -530,8 +535,7 @@ public class DynamicCSSUtil {
 
 	private static String _parseSass(
 			ServletContext servletContext, HttpServletRequest request,
-			ThemeDisplay themeDisplay, Theme theme, String resourcePath,
-			String content)
+			ThemeDisplay themeDisplay, Theme theme, String content)
 		throws Exception {
 
 		String portalWebDir = PortalUtil.getPortalWebDir();
@@ -555,40 +559,13 @@ public class DynamicCSSUtil {
 			}
 		}
 
-		File sassTempDir = _getSassTempDir(servletContext);
-
-		Object[] arguments = new Object[] {
-			content, commonSassPath, resourcePath, cssThemePath,
-			sassTempDir.getCanonicalPath(), _log.isDebugEnabled()
-		};
-
 		try {
-			content = _scriptingContainer.callMethod(
-				_scriptObject, "process", arguments, String.class);
+			content = _sassCompiler.compileString(
+				content, commonSassPath + File.pathSeparator + cssThemePath,
+				"");
 		}
 		catch (Exception e) {
-			if (e instanceof RaiseException) {
-				RaiseException raiseException = (RaiseException)e;
-
-				RubyException rubyException = raiseException.getException();
-
-				_log.error(
-					String.valueOf(rubyException.message.toJava(String.class)));
-
-				IRubyObject iRubyObject = rubyException.getBacktrace();
-
-				RubyArray rubyArray = (RubyArray)iRubyObject.toJava(
-					RubyArray.class);
-
-				for (int i = 0; i < rubyArray.size(); i++) {
-					Object object = rubyArray.get(i);
-
-					_log.error(String.valueOf(object));
-				}
-			}
-			else {
-				_log.error(e, e);
-			}
+			_log.error(e, e);
 		}
 
 		return content;
@@ -605,14 +582,13 @@ public class DynamicCSSUtil {
 	private static final String _SASS_DIR_KEY =
 		DynamicCSSUtil.class.getName() + "#sass";
 
-	private static Log _log = LogFactoryUtil.getLog(DynamicCSSUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(DynamicCSSUtil.class);
 
 	private static boolean _initialized;
-	private static Pattern _pluginThemePattern = Pattern.compile(
+	private static final Pattern _pluginThemePattern = Pattern.compile(
 		"\\/([^\\/]+)-theme\\/", Pattern.CASE_INSENSITIVE);
-	private static Pattern _portalThemePattern = Pattern.compile(
+	private static final Pattern _portalThemePattern = Pattern.compile(
 		"themes\\/([^\\/]+)\\/css", Pattern.CASE_INSENSITIVE);
-	private static ScriptingContainer _scriptingContainer;
-	private static Object _scriptObject;
+	private static SassCompiler _sassCompiler;
 
 }

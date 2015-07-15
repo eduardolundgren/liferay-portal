@@ -71,36 +71,10 @@ public class RepositoryServiceUtil {
 		return getService().getBeanIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .getLocalRepositoryImpl(folderId, fileEntryId, fileVersionId);
-	}
-
-	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getLocalRepositoryImpl(repositoryId);
-	}
-
 	public static com.liferay.portal.model.Repository getRepository(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRepository(repositoryId);
-	}
-
-	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .getRepositoryImpl(folderId, fileEntryId, fileVersionId);
-	}
-
-	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepositoryImpl(repositoryId);
 	}
 
 	public static java.lang.String[] getSupportedConfigurations(
@@ -108,6 +82,16 @@ public class RepositoryServiceUtil {
 		return getService().getSupportedConfigurations(classNameId);
 	}
 
+	public static java.lang.String[] getSupportedParameters(
+		java.lang.String className, java.lang.String configuration) {
+		return getService().getSupportedParameters(className, configuration);
+	}
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link
+	#getSupportedParameters(String, String)}
+	*/
+	@Deprecated
 	public static java.lang.String[] getSupportedParameters(long classNameId,
 		java.lang.String configuration) {
 		return getService().getSupportedParameters(classNameId, configuration);

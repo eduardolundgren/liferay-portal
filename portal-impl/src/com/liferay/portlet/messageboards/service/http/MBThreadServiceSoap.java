@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portlet.messageboards.service.MBThreadServiceUtil} service utility. The
+ * {@link MBThreadServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -60,7 +60,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see MBThreadServiceHttp
  * @see com.liferay.portlet.messageboards.model.MBThreadSoap
- * @see com.liferay.portlet.messageboards.service.MBThreadServiceUtil
+ * @see MBThreadServiceUtil
  * @generated
  */
 @ProviderType
@@ -227,6 +227,20 @@ public class MBThreadServiceSoap {
 		try {
 			int returnValue = MBThreadServiceUtil.getThreadsCount(groupId,
 					categoryId, status);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.kernel.lock.Lock lockThread(long threadId)
+		throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = MBThreadServiceUtil.lockThread(threadId);
 
 			return returnValue;
 		}

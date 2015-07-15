@@ -22,11 +22,11 @@ import com.liferay.portal.fabric.repository.MockRepository;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import io.netty.channel.Channel;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -63,8 +63,7 @@ public class NettyChannelAttributesTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testConcurrentGetAsyncBroker() {
-		AsyncBroker<Long, Serializable> asyncBroker =
-			new AsyncBroker<Long, Serializable>();
+		AsyncBroker<Long, Serializable> asyncBroker = new AsyncBroker<>();
 
 		AttributeAdvice.setConcurrentValue(asyncBroker);
 
@@ -96,7 +95,7 @@ public class NettyChannelAttributesTest {
 			new ConcurrentHashMap<Long, FabricWorker<?>>());
 
 		DefaultNoticeableFuture<Serializable> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Serializable>();
+			new DefaultNoticeableFuture<>();
 
 		FabricWorker<Serializable> fabricWorker =
 			new LocalFabricWorker<Serializable>(
@@ -137,7 +136,7 @@ public class NettyChannelAttributesTest {
 			NettyChannelAttributes.getFabricWorker(_embeddedChannel, 0));
 
 		DefaultNoticeableFuture<Serializable> defaultNoticeableFuture1 =
-			new DefaultNoticeableFuture<Serializable>();
+			new DefaultNoticeableFuture<>();
 
 		FabricWorker<Serializable> fabricWorker1 =
 			new LocalFabricWorker<Serializable>(
@@ -157,7 +156,7 @@ public class NettyChannelAttributesTest {
 			NettyChannelAttributes.getFabricWorker(_embeddedChannel, 0));
 
 		DefaultNoticeableFuture<Serializable> defaultNoticeableFuture2 =
-			new DefaultNoticeableFuture<Serializable>();
+			new DefaultNoticeableFuture<>();
 
 		FabricWorker<Serializable> fabricWorker2 =
 			new LocalFabricWorker<Serializable>(
@@ -209,7 +208,8 @@ public class NettyChannelAttributesTest {
 
 		@Around(
 			"execution(public Object io.netty.util.Attribute.setIfAbsent(" +
-				"Object))")
+				"Object))"
+		)
 		public Object setIfAbsent(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 

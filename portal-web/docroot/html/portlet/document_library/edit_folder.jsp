@@ -62,9 +62,7 @@ if (workflowEnabled) {
 	/>
 </liferay-util:buffer>
 
-<portlet:actionURL var="editFolderURL">
-	<portlet:param name="struts_action" value="/document_library/edit_folder" />
-</portlet:actionURL>
+<portlet:actionURL name="/document_library/edit_folder" var="editFolderURL" />
 
 <aui:form action="<%= editFolderURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "savePage();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value='<%= rootFolder ? "updateWorkflowDefinitions" : ((folder == null) ? Constants.ADD : Constants.UPDATE) %>' />
@@ -303,7 +301,7 @@ if (workflowEnabled) {
 </liferay-util:buffer>
 
 <aui:script>
-	var documentTypesChanged = false;
+	var <portlet:namespace />documentTypesChanged = false;
 
 	function <portlet:namespace />openFileEntryTypeSelector() {
 		Liferay.Util.selectEntity(
@@ -316,7 +314,7 @@ if (workflowEnabled) {
 				eventName: '<portlet:namespace />selectFileEntryType',
 				id: '<portlet:namespace />fileEntryTypeSelector',
 				title: '<%= UnicodeLanguageUtil.get(request, "document-types") %>',
-				uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/document_library/select_restricted_file_entry_type" /><portlet:param name="includeBasicFileEntryType" value="<%= Boolean.TRUE.toString() %>" /></portlet:renderURL>'
+				uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/html/portlet/document_library/select_restricted_file_entry_type.jsp" /><portlet:param name="includeBasicFileEntryType" value="<%= Boolean.TRUE.toString() %>" /></portlet:renderURL>'
 			},
 			function(event) {
 				<portlet:namespace />selectFileEntryType(event.fileentrytypeid, event.fileentrytypename);
@@ -329,7 +327,7 @@ if (workflowEnabled) {
 
 		var submit = true;
 
-		if (documentTypesChanged) {
+		if (<portlet:namespace />documentTypesChanged) {
 			if (!confirm(message)) {
 				submit = false;
 			}
@@ -360,7 +358,7 @@ if (workflowEnabled) {
 
 					workflowDefinitions = workflowDefinitions.replace(/LIFERAY_WORKFLOW_DEFINITION_FILE_ENTRY_TYPE/g, 'workflowDefinition' + fileEntryTypeId);
 
-					documentTypesChanged = true;
+					<portlet:namespace />documentTypesChanged = true;
 
 					searchContainer.addRow([fileEntryTypeName, workflowDefinitions, fileEntryTypeLink], fileEntryTypeId);
 				</c:when>
@@ -388,7 +386,10 @@ if (workflowEnabled) {
 
 	Liferay.Util.toggleRadio('<portlet:namespace />restrictionTypeInherit', '', ['<portlet:namespace />restrictionTypeDefinedDiv', '<portlet:namespace />restrictionTypeWorkflowDiv']);
 	Liferay.Util.toggleRadio('<portlet:namespace />restrictionTypeDefined', '<portlet:namespace />restrictionTypeDefinedDiv', '<portlet:namespace />restrictionTypeWorkflowDiv');
-	Liferay.Util.toggleRadio('<portlet:namespace />restrictionTypeWorkflow', '<portlet:namespace />restrictionTypeWorkflowDiv', '<portlet:namespace />restrictionTypeDefinedDiv');
+
+	<c:if test="<%= !rootFolder %>">
+		Liferay.Util.toggleRadio('<portlet:namespace />restrictionTypeWorkflow', '<portlet:namespace />restrictionTypeWorkflowDiv', '<portlet:namespace />restrictionTypeDefinedDiv');
+	</c:if>
 </aui:script>
 
 <aui:script use="liferay-search-container">
@@ -407,7 +408,7 @@ if (workflowEnabled) {
 
 			A.one('#<portlet:namespace />defaultFileEntryTypeId-' + link.getAttribute('data-rowId')).remove();
 
-			documentTypesChanged = true;
+			<portlet:namespace />documentTypesChanged = true;
 
 			var select = A.one('#<%= liferayPortletResponse.getNamespace() + "workflowDefinition" + DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL %>');
 

@@ -21,10 +21,9 @@ import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 import com.liferay.portal.kernel.servlet.TrackedServletRequest;
-import com.liferay.portal.kernel.servlet.taglib.DynamicIncludeUtil;
-import com.liferay.portal.kernel.servlet.taglib.TagKeyFactory;
-import com.liferay.portal.kernel.servlet.taglib.TagKeyFactoryRegistry;
-import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.servlet.taglib.TagDynamicIdFactory;
+import com.liferay.portal.kernel.servlet.taglib.TagDynamicIdFactoryRegistry;
+import com.liferay.portal.kernel.servlet.taglib.TagDynamicIncludeUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -39,12 +38,16 @@ import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.Theme;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.CustomJspRegistryUtil;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.taglib.FileAvailabilityUtil;
 import com.liferay.taglib.servlet.JspWriterHttpServletResponse;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
+import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -61,15 +64,7 @@ public class IncludeTag extends AttributesTagSupport {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			String page = null;
-
-			if (_useCustomPage) {
-				page = getCustomPage(servletContext, request);
-			}
-
-			if (Validator.isNull(page)) {
-				page = getPage();
-			}
+			String page = getPage();
 
 			if (Validator.isNull(page)) {
 				page = getEndPage();
@@ -248,7 +243,12 @@ public class IncludeTag extends AttributesTagSupport {
 	}
 
 	protected String getCustomPage(
-		ServletContext servletContext, HttpServletRequest request) {
+		ServletContext servletContext, HttpServletRequest request,
+		String page) {
+
+		if (Validator.isNull(page)) {
+			return null;
+		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -273,16 +273,6 @@ public class IncludeTag extends AttributesTagSupport {
 			"customJspServletContextName");
 
 		if (Validator.isNull(customJspServletContextName)) {
-			return null;
-		}
-
-		String page = getPage();
-
-		if (Validator.isNull(page)) {
-			page = getEndPage();
-		}
-
-		if (Validator.isNull(page)) {
 			return null;
 		}
 
@@ -315,54 +305,68 @@ public class IncludeTag extends AttributesTagSupport {
 	protected void include(String page, boolean doStartTag) throws Exception {
 		JspWriterHttpServletResponse jspWriterHttpServletResponse = null;
 
-		String tagKey = null;
-
 		Class<?> clazz = getClass();
 
 		String tagClassName = clazz.getName();
 
-		String dynamicIncludePrefixKey = tagClassName + "#";
+		String tagDynamicId = null;
+
+		String tagPointPrefix = null;
 
 		if (doStartTag) {
-			dynamicIncludePrefixKey += "doStartTag#";
+			tagPointPrefix = "doStartTag#";
 		}
 		else {
-			dynamicIncludePrefixKey += "doEndTag#";
+			tagPointPrefix = "doEndTag#";
 		}
 
-		TagKeyFactory tagKeyResolver = TagKeyFactoryRegistry.getTagKeyFactory(
-			tagClassName);
+		TagDynamicIdFactory tagDynamicIdFactory =
+			TagDynamicIdFactoryRegistry.getTagDynamicIdFactory(tagClassName);
 
-		if (tagKeyResolver != null) {
+		if (tagDynamicIdFactory != null) {
 			jspWriterHttpServletResponse = new JspWriterHttpServletResponse(
 				pageContext);
 
-			tagKey = tagKeyResolver.getKey(
+			tagDynamicId = tagDynamicIdFactory.getTagDynamicId(
 				request, jspWriterHttpServletResponse, this);
 
-			DynamicIncludeUtil.include(
-				request, jspWriterHttpServletResponse,
-				dynamicIncludePrefixKey + "before#" + tagKey, doStartTag);
+			TagDynamicIncludeUtil.include(
+				request, jspWriterHttpServletResponse, tagClassName,
+				tagDynamicId, tagPointPrefix + "before", doStartTag);
 		}
 
-		RequestDispatcher requestDispatcher =
-			DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
-				servletContext, page);
+		if (_useCustomPage) {
+			String customPage = getCustomPage(servletContext, request, page);
+
+			if (Validator.isNotNull(customPage)) {
+				page = customPage;
+			}
+		}
 
 		request.setAttribute(
 			WebKeys.SERVLET_CONTEXT_INCLUDE_FILTER_STRICT, _strict);
 
 		HttpServletResponse response = new PipingServletResponse(pageContext);
 
-		requestDispatcher.include(request, response);
+		includePage(page, response);
 
 		request.removeAttribute(WebKeys.SERVLET_CONTEXT_INCLUDE_FILTER_STRICT);
 
-		if (tagKeyResolver != null) {
-			DynamicIncludeUtil.include(
-				request, jspWriterHttpServletResponse,
-				dynamicIncludePrefixKey + "after#" + tagKey, doStartTag);
+		if (tagDynamicIdFactory != null) {
+			TagDynamicIncludeUtil.include(
+				request, jspWriterHttpServletResponse, tagClassName,
+				tagDynamicId, tagPointPrefix + "after", doStartTag);
 		}
+	}
+
+	protected void includePage(String page, HttpServletResponse response)
+		throws IOException, ServletException {
+
+		RequestDispatcher requestDispatcher =
+			DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+				servletContext, page);
+
+		requestDispatcher.include(request, response);
 	}
 
 	protected boolean isCleanUpSetAttributes() {

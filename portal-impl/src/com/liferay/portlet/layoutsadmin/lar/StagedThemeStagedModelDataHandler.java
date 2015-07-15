@@ -14,23 +14,31 @@
 
 package com.liferay.portlet.layoutsadmin.lar;
 
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Theme;
+import com.liferay.portal.model.adapter.StagedTheme;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Mate Thurzo
  */
+@OSGiBeanProperties
 public class StagedThemeStagedModelDataHandler
 	extends BaseStagedModelDataHandler<StagedTheme> {
 
 	public static final String[] CLASS_NAMES = {StagedTheme.class.getName()};
+
+	@Override
+	public void deleteStagedModel(StagedTheme stagedTheme) {
+	}
 
 	@Override
 	public void deleteStagedModel(
@@ -38,10 +46,10 @@ public class StagedThemeStagedModelDataHandler
 	}
 
 	@Override
-	public StagedTheme fetchStagedModelByUuidAndCompanyId(
+	public List<StagedTheme> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override

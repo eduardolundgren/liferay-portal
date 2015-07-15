@@ -17,18 +17,15 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.social.SocialActivityManagerUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.model.ClassName;
 import com.liferay.portal.model.Subscription;
 import com.liferay.portal.model.SubscriptionConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.base.SubscriptionLocalServiceBaseImpl;
 import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -107,7 +104,6 @@ public class SubscriptionLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long classNameId = classNameLocalService.getClassNameId(className);
-		Date now = new Date();
 
 		Subscription subscription = subscriptionPersistence.fetchByC_U_C_C(
 			user.getCompanyId(), userId, classNameId, classPK);
@@ -117,11 +113,10 @@ public class SubscriptionLocalServiceImpl
 
 			subscription = subscriptionPersistence.create(subscriptionId);
 
+			subscription.setGroupId(groupId);
 			subscription.setCompanyId(user.getCompanyId());
 			subscription.setUserId(user.getUserId());
 			subscription.setUserName(user.getFullName());
-			subscription.setCreateDate(now);
-			subscription.setModifiedDate(now);
 			subscription.setClassNameId(classNameId);
 			subscription.setClassPK(classPK);
 			subscription.setFrequency(frequency);
@@ -144,8 +139,8 @@ public class SubscriptionLocalServiceImpl
 					userId, groupId, subscription.getCreateDate(),
 					subscription.getModifiedDate(), className, classPK, null, 0,
 					null, null, false, null, null, null, null,
-					String.valueOf(groupId), null, null, null, null, 0, 0, null,
-					false);
+					String.valueOf(groupId), null, null, null, null, 0, 0,
+					null);
 			}
 
 			// Social
@@ -154,25 +149,9 @@ public class SubscriptionLocalServiceImpl
 
 			extraDataJSONObject.put("title", assetEntry.getTitle());
 
-			if (className.equals(MBThread.class.getName())) {
-				MBThread mbThread = mbThreadLocalService.getMBThread(classPK);
-
-				extraDataJSONObject.put("threadId", classPK);
-
-				socialActivityLocalService.addActivity(
-					userId, groupId, MBMessage.class.getName(),
-					mbThread.getRootMessageId(),
-					SocialActivityConstants.TYPE_SUBSCRIBE,
-					extraDataJSONObject.toString(), 0);
-			}
-			else {
-				if (classPK != groupId) {
-					socialActivityLocalService.addActivity(
-						userId, groupId, className, classPK,
-						SocialActivityConstants.TYPE_SUBSCRIBE,
-						extraDataJSONObject.toString(), 0);
-				}
-			}
+			SocialActivityManagerUtil.addActivity(
+				userId, assetEntry, SocialActivityConstants.TYPE_SUBSCRIBE,
+				extraDataJSONObject.toString(), 0);
 		}
 
 		return subscription;
@@ -243,18 +222,12 @@ public class SubscriptionLocalServiceImpl
 			subscription.getClassNameId(), subscription.getClassPK());
 
 		if (assetEntry != null) {
-			ClassName className = classNameLocalService.getClassName(
-				subscription.getClassNameId());
-
-			String subscriptionClassName = className.getValue();
-
 			JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
 			extraDataJSONObject.put("title", assetEntry.getTitle());
 
-			socialActivityLocalService.addActivity(
-				subscription.getUserId(), assetEntry.getGroupId(),
-				subscriptionClassName, subscription.getClassPK(),
+			SocialActivityManagerUtil.addActivity(
+				subscription.getUserId(), subscription,
 				SocialActivityConstants.TYPE_UNSUBSCRIBE,
 				extraDataJSONObject.toString(), 0);
 		}
@@ -272,6 +245,18 @@ public class SubscriptionLocalServiceImpl
 	public void deleteSubscriptions(long userId) throws PortalException {
 		List<Subscription> subscriptions = subscriptionPersistence.findByUserId(
 			userId);
+
+		for (Subscription subscription : subscriptions) {
+			deleteSubscription(subscription);
+		}
+	}
+
+	@Override
+	public void deleteSubscriptions(long userId, long groupId)
+		throws PortalException {
+
+		List<Subscription> subscriptions = subscriptionPersistence.findByG_U(
+			groupId, userId);
 
 		for (Subscription subscription : subscriptions) {
 			deleteSubscription(subscription);
@@ -299,6 +284,16 @@ public class SubscriptionLocalServiceImpl
 		for (Subscription subscription : subscriptions) {
 			deleteSubscription(subscription);
 		}
+	}
+
+	@Override
+	public Subscription fetchSubscription(
+		long companyId, long userId, String className, long classPK) {
+
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		return subscriptionPersistence.fetchByC_U_C_C(
+			companyId, userId, classNameId, classPK);
 	}
 
 	/**

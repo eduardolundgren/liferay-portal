@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.ListTypeServiceUtil} service utility. The
+ * {@link ListTypeServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -59,13 +59,13 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see ListTypeServiceHttp
  * @see com.liferay.portal.model.ListTypeSoap
- * @see com.liferay.portal.service.ListTypeServiceUtil
+ * @see ListTypeServiceUtil
  * @generated
  */
 @ProviderType
 public class ListTypeServiceSoap {
 	public static com.liferay.portal.model.ListTypeSoap getListType(
-		int listTypeId) throws RemoteException {
+		long listTypeId) throws RemoteException {
 		try {
 			com.liferay.portal.model.ListType returnValue = ListTypeServiceUtil.getListType(listTypeId);
 
@@ -92,7 +92,7 @@ public class ListTypeServiceSoap {
 		}
 	}
 
-	public static void validate(int listTypeId, long classNameId,
+	public static void validate(long listTypeId, long classNameId,
 		java.lang.String type) throws RemoteException {
 		try {
 			ListTypeServiceUtil.validate(listTypeId, classNameId, type);
@@ -104,7 +104,7 @@ public class ListTypeServiceSoap {
 		}
 	}
 
-	public static void validate(int listTypeId, java.lang.String type)
+	public static void validate(long listTypeId, java.lang.String type)
 		throws RemoteException {
 		try {
 			ListTypeServiceUtil.validate(listTypeId, type);

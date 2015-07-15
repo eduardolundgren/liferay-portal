@@ -14,18 +14,19 @@
 
 package com.liferay.portlet.blogs.subscriptions;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailTestRule;
-import com.liferay.portal.util.subscriptions.BaseSubscriptionRootContainerModelTestCase;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
+import com.liferay.portlet.subscriptions.test.BaseSubscriptionRootContainerModelTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -44,7 +45,8 @@ public class BlogsSubscriptionRootContainerModelTest
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE, SynchronousMailTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+			SynchronousMailTestRule.INSTANCE);
 
 	@Ignore
 	@Override
@@ -71,8 +73,19 @@ public class BlogsSubscriptionRootContainerModelTest
 	}
 
 	@Override
-	protected long addBaseModel(long containerModelId) throws Exception {
-		BlogsEntry entry = BlogsTestUtil.addEntry(group, true);
+	protected long addBaseModel(long userId, long containerModelId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), userId);
+
+		BlogsTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.ADD);
+
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
+			userId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), serviceContext);
 
 		return entry.getEntryId();
 	}
@@ -86,16 +99,19 @@ public class BlogsSubscriptionRootContainerModelTest
 	}
 
 	@Override
-	protected void updateBaseModel(long baseModelId) throws Exception {
-		BlogsEntry entry = BlogsEntryLocalServiceUtil.getEntry(baseModelId);
-
+	protected void updateBaseModel(long userId, long baseModelId) throws Exception {
 		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(group.getGroupId());
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), userId);
+
+		BlogsTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.UPDATE);
 
 		serviceContext.setAttribute("sendEmailEntryUpdated", true);
 
-		BlogsTestUtil.updateEntry(
-			entry, RandomTestUtil.randomString(), true, serviceContext);
+		BlogsEntryLocalServiceUtil.updateEntry(
+			userId, baseModelId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 }

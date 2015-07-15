@@ -15,15 +15,16 @@
 package com.liferay.portal.kernel.repository;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.service.ServiceContext;
 
 import java.io.File;
@@ -127,10 +128,6 @@ public interface Repository extends DocumentRepository {
 		throws PortalException;
 
 	public List<FileEntry> getFileEntries(
-			long folderId, int start, int end, OrderByComparator<FileEntry> obc)
-		throws PortalException;
-
-	public List<FileEntry> getFileEntries(
 			long folderId, long fileEntryTypeId, int start, int end,
 			OrderByComparator<FileEntry> obc)
 		throws PortalException;
@@ -140,18 +137,9 @@ public interface Repository extends DocumentRepository {
 			OrderByComparator<FileEntry> obc)
 		throws PortalException;
 
-	public List<Object> getFileEntriesAndFileShortcuts(
-			long folderId, int status, int start, int end)
-		throws PortalException;
-
-	public int getFileEntriesAndFileShortcutsCount(long folderId, int status)
-		throws PortalException;
-
 	public int getFileEntriesAndFileShortcutsCount(
 			long folderId, int status, String[] mimeTypes)
 		throws PortalException;
-
-	public int getFileEntriesCount(long folderId) throws PortalException;
 
 	public int getFileEntriesCount(long folderId, long fileEntryTypeId)
 		throws PortalException;
@@ -159,22 +147,12 @@ public interface Repository extends DocumentRepository {
 	public int getFileEntriesCount(long folderId, String[] mimeTypes)
 		throws PortalException;
 
-	public List<Folder> getFolders(
-			long parentFolderId, boolean includeMountFolders, int start,
-			int end, OrderByComparator<Folder> obc)
-		throws PortalException;
-
-	public List<Folder> getFolders(
-			long parentFolderId, int status, boolean includeMountFolders,
-			int start, int end, OrderByComparator<Folder> obc)
-		throws PortalException;
-
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, boolean includeMountFolders, int start,
 			int end, OrderByComparator<?> obc)
 		throws PortalException;
 
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, String[] mimetypes,
 			boolean includeMountFolders, int start, int end,
 			OrderByComparator<?> obc)
@@ -187,13 +165,6 @@ public interface Repository extends DocumentRepository {
 	public int getFoldersAndFileEntriesAndFileShortcutsCount(
 			long folderId, int status, String[] mimetypes,
 			boolean includeMountFolders)
-		throws PortalException;
-
-	public int getFoldersCount(long parentFolderId, boolean includeMountfolders)
-		throws PortalException;
-
-	public int getFoldersCount(
-			long parentFolderId, int status, boolean includeMountfolders)
 		throws PortalException;
 
 	public int getFoldersFileEntriesCount(List<Long> folderIds, int status)
@@ -222,22 +193,6 @@ public interface Repository extends DocumentRepository {
 		throws PortalException;
 
 	public List<Long> getSubfolderIds(long folderId, boolean recurse)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	public Lock lockFileEntry(long fileEntryId) throws PortalException;
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
-	 *             String, long, ServiceContext)}
-	 */
-	@Deprecated
-	public Lock lockFileEntry(
-			long fileEntryId, String owner, long expirationTime)
 		throws PortalException;
 
 	public Lock lockFolder(long folderId) throws PortalException;

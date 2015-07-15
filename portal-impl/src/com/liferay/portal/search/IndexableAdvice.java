@@ -62,35 +62,35 @@ public class IndexableAdvice
 			return;
 		}
 
-		Object[] arguments = methodInvocation.getArguments();
+		Indexer<Object> indexer = IndexerRegistryUtil.getIndexer(
+			returnType.getName());
 
-		ServiceContext serviceContext = null;
+		if (indexer == null) {
+			serviceBeanAopCacheManager.removeMethodInterceptor(
+				methodInvocation, this);
+
+			return;
+		}
+
+		Object[] arguments = methodInvocation.getArguments();
 
 		for (int i = arguments.length - 1; i >= 0; i--) {
 			if (arguments[i] instanceof ServiceContext) {
-				serviceContext = (ServiceContext)arguments[i];
+				ServiceContext serviceContext = (ServiceContext)arguments[i];
 
-				break;
+				if (serviceContext.isIndexingEnabled()) {
+					break;
+				}
+
+				return;
 			}
 		}
 
-		Indexer indexer = null;
-
-		if ((serviceContext == null) || serviceContext.isIndexingEnabled()) {
-			indexer = IndexerRegistryUtil.getIndexer(returnType.getName());
-		}
-
-		if (indexer != null) {
-			if (indexable.type() == IndexableType.DELETE) {
-				indexer.delete(result);
-			}
-			else {
-				indexer.reindex(result);
-			}
+		if (indexable.type() == IndexableType.DELETE) {
+			indexer.delete(result);
 		}
 		else {
-			serviceBeanAopCacheManager.removeMethodInterceptor(
-				methodInvocation, this);
+			indexer.reindex(result);
 		}
 	}
 
@@ -99,9 +99,10 @@ public class IndexableAdvice
 		return _nullIndexable;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(IndexableAdvice.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		IndexableAdvice.class);
 
-	private static Indexable _nullIndexable = new Indexable() {
+	private static final Indexable _nullIndexable = new Indexable() {
 
 		@Override
 		public Class<? extends Annotation> annotationType() {

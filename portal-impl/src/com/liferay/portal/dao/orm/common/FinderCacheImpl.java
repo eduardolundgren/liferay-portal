@@ -14,13 +14,13 @@
 
 package com.liferay.portal.dao.orm.common;
 
-import com.liferay.portal.kernel.cache.CacheManagerListener;
 import com.liferay.portal.kernel.cache.CacheRegistryItem;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
+import com.liferay.portal.kernel.cache.PortalCacheManagerListener;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -30,6 +30,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.dependency.ServiceDependencyListener;
+import com.liferay.registry.dependency.ServiceDependencyManager;
 
 import java.io.Serializable;
 
@@ -50,12 +54,42 @@ import org.apache.commons.collections.map.LRUMap;
  */
 @DoPrivileged
 public class FinderCacheImpl
-	implements CacheManagerListener, CacheRegistryItem, FinderCache {
+	implements PortalCacheManagerListener, CacheRegistryItem, FinderCache {
 
 	public static final String CACHE_NAME = FinderCache.class.getName();
 
 	public void afterPropertiesSet() {
 		CacheRegistryUtil.register(this);
+
+		ServiceDependencyManager serviceDependencyManager =
+			new ServiceDependencyManager();
+
+		serviceDependencyManager.addServiceDependencyListener(
+			new ServiceDependencyListener() {
+
+				@Override
+				public void dependenciesFulfilled() {
+					Registry registry = RegistryUtil.getRegistry();
+
+					_multiVMPool = registry.getService(MultiVMPool.class);
+
+					PortalCacheManager
+						<? extends Serializable, ? extends Serializable>
+							portalCacheManager =
+								_multiVMPool.getPortalCacheManager();
+
+					portalCacheManager.registerPortalCacheManagerListener(
+						FinderCacheImpl.this);
+				}
+
+				@Override
+				public void destroy() {
+				}
+
+			}
+		);
+
+		serviceDependencyManager.registerDependencies(MultiVMPool.class);
 	}
 
 	@Override
@@ -154,12 +188,12 @@ public class FinderCacheImpl
 	}
 
 	@Override
-	public void notifyCacheAdded(String name) {
+	public void notifyPortalCacheAdded(String portalCacheName) {
 	}
 
 	@Override
-	public void notifyCacheRemoved(String name) {
-		_portalCaches.remove(name);
+	public void notifyPortalCacheRemoved(String portalCacheName) {
+		_portalCaches.remove(portalCacheName);
 	}
 
 	@Override
@@ -173,8 +207,7 @@ public class FinderCacheImpl
 
 		if (!PropsValues.VALUE_OBJECT_FINDER_CACHE_ENABLED ||
 			!finderPath.isFinderCacheEnabled() ||
-			!CacheRegistryUtil.isActive() ||
-			(result == null)) {
+			!CacheRegistryUtil.isActive() || (result == null)) {
 
 			return;
 		}
@@ -209,7 +242,7 @@ public class FinderCacheImpl
 
 		String groupKey = _GROUP_KEY_PREFIX.concat(className);
 
-		_multiVMPool.removeCache(groupKey);
+		_multiVMPool.removePortalCache(groupKey);
 	}
 
 	@Override
@@ -237,15 +270,6 @@ public class FinderCacheImpl
 		portalCache.remove(cacheKey);
 	}
 
-	public void setMultiVMPool(MultiVMPool multiVMPool) {
-		_multiVMPool = multiVMPool;
-
-		PortalCacheManager<? extends Serializable, ? extends Serializable>
-			portalCacheManager = _multiVMPool.getCacheManager();
-
-		portalCacheManager.registerCacheManagerListener(this);
-	}
-
 	private PortalCache<Serializable, Serializable> _getPortalCache(
 		String className, boolean createIfAbsent) {
 
@@ -256,8 +280,10 @@ public class FinderCacheImpl
 			String groupKey = _GROUP_KEY_PREFIX.concat(className);
 
 			portalCache =
-				(PortalCache<Serializable, Serializable>)_multiVMPool.getCache(
-					groupKey, PropsValues.VALUE_OBJECT_FINDER_BLOCKING_CACHE);
+				(PortalCache<Serializable, Serializable>)
+					_multiVMPool.getPortalCache(
+						groupKey,
+						PropsValues.VALUE_OBJECT_ENTITY_BLOCKING_CACHE);
 
 			PortalCache<Serializable, Serializable> previousPortalCache =
 				_portalCaches.putIfAbsent(className, portalCache);
@@ -282,8 +308,7 @@ public class FinderCacheImpl
 				return (Serializable)Collections.emptyList();
 			}
 
-			Set<Serializable> primaryKeysSet = new HashSet<Serializable>(
-				primaryKeys);
+			Set<Serializable> primaryKeysSet = new HashSet<>(primaryKeys);
 
 			Map<Serializable, ? extends BaseModel<?>> map =
 				basePersistenceImpl.fetchByPrimaryKeys(primaryKeysSet);
@@ -292,8 +317,7 @@ public class FinderCacheImpl
 				return null;
 			}
 
-			List<Serializable> list = new ArrayList<Serializable>(
-				primaryKeys.size());
+			List<Serializable> list = new ArrayList<>(primaryKeys.size());
 
 			for (Serializable curPrimaryKey : primaryKeys) {
 				list.add(map.get(curPrimaryKey));
@@ -325,8 +349,7 @@ public class FinderCacheImpl
 				return (Serializable)Collections.emptyList();
 			}
 
-			ArrayList<Serializable> cachedList = new ArrayList<Serializable>(
-				list.size());
+			ArrayList<Serializable> cachedList = new ArrayList<>(list.size());
 
 			for (Serializable curResult : list) {
 				Serializable primaryKey = _resultToPrimaryKey(curResult);
@@ -351,7 +374,7 @@ public class FinderCacheImpl
 		if (PropsValues.VALUE_OBJECT_FINDER_THREAD_LOCAL_CACHE_MAX_SIZE > 0) {
 			_LOCAL_CACHE_AVAILABLE = true;
 
-			_localCache = new AutoResetThreadLocal<LRUMap>(
+			_localCache = new AutoResetThreadLocal<>(
 				FinderCacheImpl.class + "._localCache",
 				new LRUMap(
 					PropsValues.
@@ -366,8 +389,6 @@ public class FinderCacheImpl
 
 	private MultiVMPool _multiVMPool;
 	private final ConcurrentMap<String, PortalCache<Serializable, Serializable>>
-		_portalCaches =
-			new ConcurrentHashMap
-				<String, PortalCache<Serializable, Serializable>>();
+		_portalCaches = new ConcurrentHashMap<>();
 
 }

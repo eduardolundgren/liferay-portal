@@ -16,7 +16,7 @@
 
 <%
 boolean customizableLayout = !(group.isLayoutPrototype() || group.isLayoutSetPrototype() || group.isStagingGroup() || group.isUserGroup()) && layoutTypePortlet.isCustomizable() && LayoutPermissionUtil.containsWithoutViewableGroup(permissionChecker, layout, false, ActionKeys.CUSTOMIZE);
-boolean linkedLayout = (!SitesUtil.isLayoutUpdateable(layout) || (layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup())) && LayoutPermissionUtil.containsWithoutViewableGroup(themeDisplay.getPermissionChecker(), layout, false, ActionKeys.UPDATE);
+boolean linkedLayout = ((!SitesUtil.isLayoutUpdateable(layout) && SitesUtil.isUserGroupLayout(layout)) || (layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup())) && LayoutPermissionUtil.containsWithoutViewableGroup(themeDisplay.getPermissionChecker(), layout, false, ActionKeys.UPDATE);
 boolean modifiedLayout = (layoutSet != null) && layoutSet.isLayoutSetPrototypeLinkActive() && SitesUtil.isLayoutModifiedSinceLastMerge(layout) && hasLayoutUpdatePermission;
 %>
 
@@ -39,11 +39,11 @@ boolean modifiedLayout = (layoutSet != null) && layoutSet.isLayoutSetPrototypeLi
 					</div>
 
 					<div class="page-customization-bar-form">
-						<liferay-portlet:actionURL portletName="<%= PortletKeys.LAYOUTS_ADMIN %>" var="resetPrototypeURL">
-							<portlet:param name="struts_action" value="/layouts_admin/edit_layouts" />
-						</liferay-portlet:actionURL>
+						<portlet:actionURL var="resetPrototypeURL">
+							<portlet:param name="struts_action" value="/dockbar/edit_layouts" />
+						</portlet:actionURL>
 
-						<aui:form action="<%= resetPrototypeURL %>" cssClass="reset-prototype" name="resetFm" portletNamespace="<%= PortalUtil.getPortletNamespace(PortletKeys.LAYOUTS_ADMIN) %>">
+						<aui:form action="<%= resetPrototypeURL %>" cssClass="reset-prototype" name="resetFm">
 							<aui:input name="<%= Constants.CMD %>" type="hidden" value="reset_prototype" />
 							<aui:input name="redirect" type="hidden" value="<%= PortalUtil.getLayoutURL(themeDisplay) %>" />
 							<aui:input name="groupId" type="hidden" value="<%= String.valueOf(themeDisplay.getSiteGroupId()) %>" />
@@ -61,7 +61,7 @@ boolean modifiedLayout = (layoutSet != null) && layoutSet.isLayoutSetPrototypeLi
 							<c:when test="<%= layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup() %>">
 								<liferay-ui:message key="this-page-is-linked-to-a-page-template" />
 							</c:when>
-							<c:when test="<%= layout instanceof VirtualLayout %>">
+							<c:when test="<%= SitesUtil.isUserGroupLayout(layout) %>">
 								<liferay-ui:message key="this-page-belongs-to-a-user-group" />
 							</c:when>
 							<c:otherwise>
@@ -114,8 +114,8 @@ boolean modifiedLayout = (layoutSet != null) && layoutSet.isLayoutSetPrototypeLi
 						<liferay-ui:icon id="toggleCustomizedView" label="<%= true %>" message="<%= taglibMessage %>" url="javascript:;" />
 
 						<c:if test="<%= layoutTypePortlet.isCustomizedView() %>">
-							<liferay-portlet:actionURL portletName="<%= PortletKeys.LAYOUTS_ADMIN %>" var="resetCustomizationViewURL">
-								<portlet:param name="struts_action" value="/layouts_admin/edit_layouts" />
+							<liferay-portlet:actionURL var="resetCustomizationViewURL">
+								<portlet:param name="struts_action" value="/dockbar/edit_layouts" />
 								<portlet:param name="groupId" value="<%= String.valueOf(themeDisplay.getSiteGroupId()) %>" />
 								<portlet:param name="<%= Constants.CMD %>" value="reset_customized_view" />
 							</liferay-portlet:actionURL>

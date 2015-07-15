@@ -14,7 +14,6 @@
 
 package com.liferay.taglib.staging;
 
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -23,6 +22,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,9 +63,15 @@ public class DefineObjectsTag extends IncludeTag {
 
 		Layout layout = themeDisplay.getLayout();
 
+		String privateLayoutString = request.getParameter("privateLayout");
+
+		if (Validator.isNull(privateLayoutString)) {
+			privateLayoutString = String.valueOf(
+				request.getAttribute(WebKeys.PRIVATE_LAYOUT));
+		}
+
 		boolean privateLayout = GetterUtil.getBoolean(
-			ParamUtil.getBoolean(
-				request, "privateLayout", layout.isPrivateLayout()));
+			privateLayoutString, layout.isPrivateLayout());
 
 		pageContext.setAttribute("privateLayout", privateLayout);
 

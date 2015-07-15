@@ -14,6 +14,7 @@
 
 package com.liferay.portal.security.auth;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.Validator;
@@ -31,6 +32,10 @@ import javax.servlet.http.HttpSession;
  */
 public class SessionAuthToken implements AuthToken {
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public void check(HttpServletRequest request) throws PrincipalException {
 		checkCSRFToken(
@@ -76,11 +81,16 @@ public class SessionAuthToken implements AuthToken {
 
 		String csrfToken = ParamUtil.getString(request, "p_auth");
 
+		if (Validator.isNull(csrfToken)) {
+			csrfToken = GetterUtil.getString(request.getHeader("X-CSRF-Token"));
+		}
+
 		String sessionToken = getSessionAuthenticationToken(
 			request, _CSRF, false);
 
 		if (!csrfToken.equals(sessionToken)) {
-			throw new PrincipalException("Invalid authentication token");
+			throw new PrincipalException.MustBeAuthenticated(
+				PortalUtil.getUserId(request));
 		}
 	}
 
@@ -130,7 +140,10 @@ public class SessionAuthToken implements AuthToken {
 	protected String getSessionAuthenticationToken(
 		HttpServletRequest request, String key, boolean createToken) {
 
-		HttpSession session = request.getSession();
+		HttpServletRequest originalRequest =
+			PortalUtil.getOriginalServletRequest(request);
+
+		HttpSession session = originalRequest.getSession();
 
 		String tokenKey = WebKeys.AUTHENTICATION_TOKEN.concat(key);
 

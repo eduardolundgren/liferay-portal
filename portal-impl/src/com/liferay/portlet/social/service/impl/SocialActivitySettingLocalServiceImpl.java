@@ -96,8 +96,7 @@ public class SocialActivitySettingLocalServiceImpl
 	public List<SocialActivityDefinition> getActivityDefinitions(
 		long groupId, String className) {
 
-		List<SocialActivityDefinition> activityDefinitions =
-			new ArrayList<SocialActivityDefinition>();
+		List<SocialActivityDefinition> activityDefinitions = new ArrayList<>();
 
 		List<SocialActivityDefinition> defaultActivityDefinitions =
 			SocialConfigurationUtil.getActivityDefinitions(className);
@@ -417,7 +416,7 @@ public class SocialActivitySettingLocalServiceImpl
 		SocialActivitySettingLocalServiceImpl.class);
 
 	private static final PortalCache<String, SocialActivityDefinition>
-		_activityDefinitions = MultiVMPoolUtil.getCache(
+		_activityDefinitions = MultiVMPoolUtil.getPortalCache(
 			SocialActivitySettingLocalServiceImpl.class.getName());
 
 }

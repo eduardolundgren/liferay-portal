@@ -14,10 +14,11 @@
 
 package com.liferay.portlet.documentlibrary.webdav;
 
-import com.liferay.portal.DuplicateLockException;
-import com.liferay.portal.InvalidLockException;
-import com.liferay.portal.NoSuchLockException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.DuplicateLockException;
+import com.liferay.portal.kernel.lock.InvalidLockException;
+import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.lock.NoSuchLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -39,7 +41,6 @@ import com.liferay.portal.kernel.webdav.Status;
 import com.liferay.portal.kernel.webdav.WebDAVException;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -100,6 +101,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				parentFolderId = getParentFolderId(companyId, destinationArray);
 			}
 			catch (NoSuchFolderException nsfe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsfe, nsfe);
+				}
+
 				return HttpServletResponse.SC_CONFLICT;
 			}
 
@@ -139,9 +144,17 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return status;
 		}
 		catch (DuplicateFolderNameException dfne) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfne, dfne);
+			}
+
 			return HttpServletResponse.SC_PRECONDITION_FAILED;
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (Exception e) {
@@ -169,6 +182,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				parentFolderId = getParentFolderId(companyId, destinationArray);
 			}
 			catch (NoSuchFolderException nsfe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsfe, nsfe);
+				}
+
 				return HttpServletResponse.SC_CONFLICT;
 			}
 
@@ -208,15 +225,31 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return status;
 		}
 		catch (DuplicateFileException dfe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfe, dfe);
+			}
+
 			return HttpServletResponse.SC_PRECONDITION_FAILED;
 		}
 		catch (DuplicateFolderNameException dfne) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfne, dfne);
+			}
+
 			return HttpServletResponse.SC_PRECONDITION_FAILED;
 		}
 		catch (LockException le) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(le, le);
+			}
+
 			return WebDAVUtil.SC_LOCKED;
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (Exception e) {
@@ -283,6 +316,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return HttpServletResponse.SC_NO_CONTENT;
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (Exception e) {
@@ -320,6 +357,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				return toResource(webDAVRequest, folder, false);
 			}
 			catch (NoSuchFolderException nsfe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsfe, nsfe);
+				}
+
 				try {
 					String titleWithExtension = name;
 
@@ -330,6 +371,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					return toResource(webDAVRequest, fileEntry, false);
 				}
 				catch (NoSuchFileEntryException nsfee) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(nsfee, nsfee);
+					}
+
 					return null;
 				}
 			}
@@ -351,7 +396,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			List<Resource> fileEntries = getFileEntries(
 				webDAVRequest, folderId);
 
-			List<Resource> resources = new ArrayList<Resource>(
+			List<Resource> resources = new ArrayList<>(
 				folders.size() + fileEntries.size());
 
 			resources.addAll(folders);
@@ -496,15 +541,31 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return new Status(location, HttpServletResponse.SC_CREATED);
 		}
 		catch (DuplicateFolderNameException dfne) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfne, dfne);
+			}
+
 			return new Status(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		}
 		catch (DuplicateFileException dfe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfe, dfe);
+			}
+
 			return new Status(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		}
 		catch (NoSuchFolderException nsfe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfe, nsfe);
+			}
+
 			return new Status(HttpServletResponse.SC_CONFLICT);
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return new Status(HttpServletResponse.SC_FORBIDDEN);
 		}
 		catch (Exception e) {
@@ -560,9 +621,17 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return status;
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (DuplicateFolderNameException dfne) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfne, dfne);
+			}
+
 			return HttpServletResponse.SC_PRECONDITION_FAILED;
 		}
 		catch (Exception e) {
@@ -639,6 +708,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					return status;
 				}
 				catch (NoSuchFileEntryException nsfee) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(nsfee, nsfee);
+					}
 				}
 			}
 
@@ -656,15 +728,31 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return status;
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (DuplicateFileException dfe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfe, dfe);
+			}
+
 			return HttpServletResponse.SC_PRECONDITION_FAILED;
 		}
 		catch (DuplicateFolderNameException dfne) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(dfne, dfne);
+			}
+
 			return HttpServletResponse.SC_PRECONDITION_FAILED;
 		}
 		catch (LockException le) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(le, le);
+			}
+
 			return WebDAVUtil.SC_LOCKED;
 		}
 		catch (Exception e) {
@@ -730,6 +818,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					changeLog, false, file, serviceContext);
 			}
 			catch (NoSuchFileEntryException nsfee) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsfee, nsfee);
+				}
+
 				serviceContext.setCommand(Constants.ADD_WEBDAV);
 
 				DLAppServiceUtil.addFileEntry(
@@ -745,12 +837,24 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return HttpServletResponse.SC_CREATED;
 		}
 		catch (FileSizeException fse) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(fse, fse);
+			}
+
 			return HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
 		}
 		catch (NoSuchFolderException nsfe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfe, nsfe);
+			}
+
 			return HttpServletResponse.SC_CONFLICT;
 		}
 		catch (PrincipalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (PortalException pe) {
@@ -864,6 +968,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			return true;
 		}
 		catch (NoSuchFolderException nsfe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfe, nsfe);
+			}
+
 			try {
 				FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
 					groupId, parentFolderId, name);
@@ -880,6 +988,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				return true;
 			}
 			catch (NoSuchFileEntryException nsfee) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsfee, nsfee);
+				}
 			}
 		}
 
@@ -906,7 +1017,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			WebDAVRequest webDAVRequest, long parentFolderId)
 		throws Exception {
 
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Resource> resources = new ArrayList<>();
 
 		List<FileEntry> fileEntries = DLAppServiceUtil.getFileEntries(
 			webDAVRequest.getGroupId(), parentFolderId);
@@ -945,7 +1056,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		}
 
 		for (int i = 2; i < x; i++) {
-			String name = pathArray[i];
+			String name = HttpUtil.decodeURL(pathArray[i]);
 
 			Folder folder = DLAppServiceUtil.getFolder(groupId, folderId, name);
 
@@ -961,7 +1072,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			WebDAVRequest webDAVRequest, long parentFolderId)
 		throws Exception {
 
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Resource> resources = new ArrayList<>();
 
 		long groupId = webDAVRequest.getGroupId();
 
@@ -1002,6 +1113,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					lockUuid);
 			}
 			catch (NoSuchLockException nsle) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsle, nsle);
+				}
+
 				return false;
 			}
 		}
@@ -1076,6 +1191,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		return resource;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLWebDAVStorageImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLWebDAVStorageImpl.class);
 
 }

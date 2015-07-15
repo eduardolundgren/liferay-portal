@@ -17,6 +17,7 @@ package com.liferay.portal.security.lang;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ServiceLoader;
+import com.liferay.portal.module.framework.ModuleFrameworkAdapterHelper;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.List;
@@ -117,7 +118,9 @@ public class SecurityManagerUtil {
 	private static void loadPortalSecurityManager() {
 		try {
 			List<PortalSecurityManager> portalSecurityManagers =
-				ServiceLoader.load(PortalSecurityManager.class);
+				ServiceLoader.load(
+					ModuleFrameworkAdapterHelper.getClassLoader(),
+					PortalSecurityManager.class);
 
 			if (portalSecurityManagers.isEmpty()) {
 				return;
@@ -141,10 +144,7 @@ public class SecurityManagerUtil {
 		DEFAULT, LIFERAY;
 
 		public static PortalSecurityManagerStrategy parse(String value) {
-			if (PropsValues.TCK_URL) {
-				return DEFAULT;
-			}
-			else if (value.equals("liferay")) {
+			if (value.equals("liferay")) {
 				return LIFERAY;
 			}
 

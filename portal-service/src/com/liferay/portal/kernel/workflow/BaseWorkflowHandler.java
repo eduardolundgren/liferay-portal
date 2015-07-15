@@ -41,10 +41,11 @@ import java.util.Map;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Bruno Farache
@@ -173,13 +174,13 @@ public abstract class BaseWorkflowHandler<T> implements WorkflowHandler<T> {
 
 		try {
 			LiferayPortletURL liferayPortletURL = PortletURLFactoryUtil.create(
-				serviceContext.getRequest(), PortletKeys.MY_WORKFLOW_TASKS,
+				serviceContext.getRequest(), PortletKeys.MY_WORKFLOW_TASK,
 				PortalUtil.getControlPanelPlid(serviceContext.getCompanyId()),
 				PortletRequest.RENDER_PHASE);
 
 			liferayPortletURL.setControlPanelCategory("my");
 			liferayPortletURL.setParameter(
-				"struts_action", "/my_workflow_tasks/edit_workflow_task");
+				"mvcPath", "/edit_workflow_task.jsp");
 			liferayPortletURL.setParameter(
 				"workflowTaskId", String.valueOf(workflowTaskId));
 			liferayPortletURL.setWindowState(WindowState.MAXIMIZED);
@@ -251,6 +252,27 @@ public abstract class BaseWorkflowHandler<T> implements WorkflowHandler<T> {
 	}
 
 	@Override
+	public boolean include(
+		long classPK, HttpServletRequest request, HttpServletResponse response,
+		String template) {
+
+		try {
+			AssetRenderer assetRenderer = getAssetRenderer(classPK);
+
+			if (assetRenderer != null) {
+				return assetRenderer.include(request, response, template);
+			}
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isAssetTypeSearchable() {
 		return _ASSET_TYPE_SEARCHABLE;
 	}
@@ -263,28 +285,6 @@ public abstract class BaseWorkflowHandler<T> implements WorkflowHandler<T> {
 	@Override
 	public boolean isVisible() {
 		return _VISIBLE;
-	}
-
-	@Override
-	public String render(
-		long classPK, RenderRequest renderRequest,
-		RenderResponse renderResponse, String template) {
-
-		try {
-			AssetRenderer assetRenderer = getAssetRenderer(classPK);
-
-			if (assetRenderer != null) {
-				return assetRenderer.render(
-					renderRequest, renderResponse, template);
-			}
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
-			}
-		}
-
-		return null;
 	}
 
 	@Override

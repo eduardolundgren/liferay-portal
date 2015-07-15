@@ -12,6 +12,8 @@
 		<path location="${project.dir.native}" />
 	</pathconvert>
 
+	<property name="sdk.dir" value="${project.dir}/tools/sdk" />
+
 	<property name="test.properties" value="com/liferay/portal/tools/dependencies/portal-tools.properties" />
 
 	<property environment="env" />
@@ -74,6 +76,12 @@
 	<taskdef classpathref="lib.classpath" resource="tasks.properties" />
 
 	<taskdef classname="com.liferay.ant.bnd.BaselineJarTask" classpathref="lib.classpath" name="baseline-jar" />
+	<taskdef classname="com.liferay.ant.bnd.ReleaseToRepoTask" classpathref="lib.classpath" name="release-to-repo" />
+
+	<taskdef classname="com.liferay.ant.build.logger.LiferayBuildLoggerInstallerTask" classpath="${project.dir}/lib/development/com.liferay.ant.build.logger.jar" name="liferay-build-logger-installer" />
+
+	<liferay-build-logger-installer />
+
 	<taskdef classname="com.tonicsystems.jarjar.JarJarTask" classpath="${project.dir}/lib/development/jarjar.jar" name="jarjar" />
 	<taskdef classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${project.dir}/lib/development/xmltask.jar" name="xmltask" />
 
@@ -367,82 +375,44 @@
 		</then>
 	</if>
 
-	<whichresource resource="/org/eclipse/jdt/core/JDTCompilerAdapter.class" property="ecj.compiler" />
 	<whichresource resource="/com/google/errorprone/ErrorProneAntCompilerAdapter.class" property="google.errorprone.compiler" />
 
 	<if>
+
 		<and>
-			<equals arg1="${javac.compiler}" arg2="org.eclipse.jdt.core.JDTCompilerAdapter" />
+			<equals arg1="${javac.compiler}" arg2="com.google.errorprone.ErrorProneAntCompilerAdapter" />
 			<not>
-				<isset property="ecj.compiler" />
+				<isset property="google.errorprone.compiler" />
 			</not>
 		</and>
 		<then>
 			<trycatch>
 				<try>
-					<copy file="${project.dir}/lib/development/ecj.jar" todir="${ant.home}/lib" />
+					<copy file="${project.dir}/lib/development/error-prone-ant.jar" todir="${ant.home}/lib" />
 				</try>
 				<catch>
 					<fail>
 .
 
-Please manually copy ${project.dir}/lib/development/ecj.jar to ${ant.home}/lib
-to install ECJ. Then rerun your task.
+Please manually copy ${project.dir}/lib/development/error-prone-ant.jar to
+${ant.home}/lib to install Error-Prone. Then rerun your task.
 					</fail>
 				</catch>
 			</trycatch>
 
 			<if>
-				<available file="${ant.home}/lib/ecj.jar" />
+				<available file="${ant.home}/lib/error-prone-ant.jar" />
 				<then>
 					<fail>
-.
-
-Task cannot continue because ECJ is not installed.
-
-ECJ was automatically installed. Please rerun your task.
-					</fail>
-				</then>
-			</if>
-		</then>
-		<else>
-			<if>
-				<and>
-					<equals arg1="${javac.compiler}" arg2="com.google.errorprone.ErrorProneAntCompilerAdapter" />
-					<not>
-						<isset property="google.errorprone.compiler" />
-					</not>
-				</and>
-				<then>
-					<trycatch>
-						<try>
-							<copy file="${project.dir}/lib/development/error-prone-ant.jar" todir="${ant.home}/lib" />
-						</try>
-						<catch>
-							<fail>
-.
-
-Please manually copy ${project.dir}/lib/development/error-prone-ant.jar to
-${ant.home}/lib to install Error-Prone. Then rerun your task.
-							</fail>
-						</catch>
-					</trycatch>
-
-					<if>
-						<available file="${ant.home}/lib/error-prone-ant.jar" />
-						<then>
-							<fail>
 .
 
 Task cannot continue because Error-Prone is not installed.
 
 Error-Prone was automatically installed. Please rerun your task.
-							</fail>
-						</then>
-					</if>
+					</fail>
 				</then>
 			</if>
-		</else>
+		</then>
 	</if>
 
 	<if>
@@ -462,16 +432,14 @@ Please set the environment variable ANT_OPTS to the recommended value of
 	<if>
 		<and>
 			<not>
-				<isset property="jdk.6.home" />
+				<isset property="jdk.7.home" />
 			</not>
 			<equals arg1="${java.specification.version}" arg2="1.6" />
 		</and>
 		<then>
-			<property name="jdk.6.home" value="${env.JAVA_HOME}" />
+			<property name="jdk.7.home" value="${env.JAVA_HOME}" />
 		</then>
 	</if>
-
-	<property name="junit.cobertura.agent" value="-javaagent:${project.dir}/${junit.cobertura.agent.jar}=${junit.cobertura.includes};${junit.cobertura.excludes}" />
 
 	<if>
 		<not>
@@ -482,31 +450,13 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</then>
 	</if>
 
-	<macrodef name="ant-execute">
-		<attribute default="build.xml" name="ant.build.file" />
-		<attribute name="ant.dir" />
-		<attribute name="ant.target" />
-
-		<sequential>
-			<if>
-				<os family="unix" />
-				<then>
-					<ant antfile="@{ant.build.file}" dir="@{ant.dir}" target="@{ant.target}" inheritAll="false" />
-				</then>
-				<else>
-					<exec dir="@{ant.dir}" executable="${ant.home}/bin/ant.bat" failonerror="true">
-						<arg line="-f @{ant.build.file} @{ant.target}" />
-					</exec>
-				</else>
-			</if>
-		</sequential>
-	</macrodef>
+	<property name="whip.agent" value="-javaagent:${project.dir}/${junit.whip.jar}=${junit.whip.includes};${junit.whip.excludes}" />
 
 	<macrodef name="app-server-properties-reset">
 		<sequential>
 			<delete file="app.server.${user.name}.properties" />
 
-			<delete file="${project.dir}/tools/sdk/build.${user.name}.properties" />
+			<delete file="${sdk.dir}/build.${user.name}.properties" />
 		</sequential>
 	</macrodef>
 
@@ -516,32 +466,7 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		<sequential>
 			<echo file="app.server.${user.name}.properties">@{properties.content}</echo>
 
-			<echo file="${project.dir}/tools/sdk/build.${user.name}.properties">@{properties.content}</echo>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="baseline-jar-macro">
-		<attribute name="bndRootFile" />
-		<attribute name="file" />
-		<attribute name="outputPath" />
-		<attribute name="rootProjectDir" />
-		<attribute name="sourcePath" />
-
-		<sequential>
-			<manifest-helper />
-
-			<bndexpand propertyfile="@{bndRootFile}" />
-
-			<baseline-jar
-				bndRootFile="@{bndRootFile}"
-				file="@{file}"
-				outputPath="@{outputPath}"
-				sourcePath="@{sourcePath}"
-			>
-				<classpath>
-					<pathelement location="@{sourcePath}/classes" />
-				</classpath>
-			</baseline-jar>
+			<echo file="${sdk.dir}/build.${user.name}.properties">@{properties.content}</echo>
 		</sequential>
 	</macrodef>
 
@@ -700,7 +625,7 @@ Please set the environment variable ANT_OPTS to the recommended value of
 
 					<copy todir="test-classes/@{test.type}" preservelastmodified="true">
 						<fileset dir="test" includes="*.properties,META-INF/*.dtd,META-INF/*.xml" />
-						<fileset dir="test/@{test.type}" includes="**/*.policy,**/*.properties,**/dependencies/**,META-INF/*.xml,WEB-INF/*.xml" />
+						<fileset dir="test/@{test.type}" includes="**/*.bnd,**/*.png,**/*.policy,**/*.properties,**/dependencies/**,META-INF/*.xml,WEB-INF/*.xml" />
 					</copy>
 
 					<javac
@@ -737,6 +662,27 @@ Please set the environment variable ANT_OPTS to the recommended value of
 			</if>
 
 			<delete dir="${java.io.tmpdir}/osgi" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="deploy-properties">
+		<sequential>
+			<if>
+				<and>
+					<equals arg1="${app.server.bundled}" arg2="true" />
+					<equals arg1="${app.server.type}" arg2="glassfish" />
+				</and>
+				<then>
+					<war destfile="${app.server.glassfish.portal.war.dir}" update="true">
+						<classes dir="${project.dir}/portal-impl/src" includes="portal-*.properties,system-*.properties" />
+					</war>
+				</then>
+				<else>
+					<copy todir="${app.server.classes.portal.dir}" overwrite="true">
+						<fileset dir="${project.dir}/portal-impl/src" includes="portal-*.properties,system-*.properties" />
+					</copy>
+				</else>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -802,8 +748,9 @@ Please set the environment variable ANT_OPTS to the recommended value of
 											</exec>
 										</then>
 										<else>
-											<exec dir="@{dir}" executable="${command.executable}" output="${command.output}">
-												<arg line="${command.arg.line}" />
+											<exec dir="@{dir}" executable="/bin/bash" output="${command.output}">
+												<arg value="-c" />
+												<arg value="${command.executable} ${command.arg.line}" />
 											</exec>
 										</else>
 									</if>
@@ -845,8 +792,9 @@ Please set the environment variable ANT_OPTS to the recommended value of
 												</exec>
 											</then>
 											<else>
-												<exec append="true" dir="@{dir}" executable="${command.executable}" output="${command.output}">
-													<arg line="${command.arg.line}" />
+												<exec append="true" dir="@{dir}" executable="/bin/bash" output="${command.output}">
+													<arg value="-c" />
+													<arg value="${command.executable} ${command.arg.line}" />
 												</exec>
 											</else>
 										</if>
@@ -871,8 +819,9 @@ Please set the environment variable ANT_OPTS to the recommended value of
 											</exec>
 										</then>
 										<else>
-											<exec dir="@{dir}" executable="${command.executable}">
-												<arg line="${command.arg.line}" />
+											<exec dir="@{dir}" executable="/bin/bash">
+												<arg value="-c" />
+												<arg value="${command.executable} ${command.arg.line}" />
 											</exec>
 										</else>
 									</if>
@@ -890,6 +839,32 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</sequential>
 	</macrodef>
 
+	<macrodef name="gradle-execute">
+		<attribute default="${basedir}" name="dir" />
+		<attribute default="true" name="failonerror" />
+		<attribute name="task" />
+		<element implicit="true" name="args" optional="true" />
+
+		<sequential>
+			<if>
+				<os family="unix" />
+				<then>
+					<property name="gradlew.suffix" value="" />
+
+					<chmod file="${sdk.dir}/tools/gradle/gradlew${gradlew.suffix}" perm="a+x" />
+				</then>
+				<else>
+					<property name="gradlew.suffix" value=".bat" />
+				</else>
+			</if>
+
+			<exec dir="@{dir}" executable="${sdk.dir}/tools/gradle/gradlew${gradlew.suffix}" failonerror="@{failonerror}">
+				<args />
+				<arg value="@{task}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="junit-cmd">
 		<attribute name="forkmode" />
 		<attribute name="test.type" />
@@ -897,22 +872,47 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		<element name="test.classes" />
 
 		<sequential>
+			<local name="junit.java.gc" />
+
+			<if>
+				<equals arg1="@{test.type}" arg2="unit" />
+				<then>
+					<if>
+						<equals arg1="${junit.java.unit.gc.logging}" arg2="on" />
+						<then>
+							<property name="junit.java.gc" value="${junit.java.unit.gc} -verbose:gc -XX:+PrintGCCause -XX:+PrintGCDetails" />
+						</then>
+						<else>
+							<property name="junit.java.gc" value="${junit.java.unit.gc}" />
+						</else>
+					</if>
+				</then>
+				<else>
+					<local name="project.dir.name" />
+
+					<basename property="project.dir.name" file="${project.dir}" />
+
+					<property name="junit.java.gc" value="${junit.java.integration.gc} -verbose:gc -Xloggc:/tmp/${project.dir.name}-@{test.type}-gc.log -XX:+PrintGCCause -XX:+PrintGCDetails" />
+				</else>
+			</if>
+
 			<junit dir="${project.dir}" fork="on" forkmode="@{forkmode}" haltonfailure="${junit.halt.on.failure}" jvm="${junit.jvm}" outputtoformatters="false" printsummary="on" showoutput="true">
 				<sysproperty key="junit.aspectj.dump" file="woven-classes" />
-				<sysproperty key="junit.cobertura.agent" value="${junit.cobertura.agent}" />
 				<sysproperty key="junit.code.coverage" value="${junit.code.coverage}" />
-				<sysproperty key="junit.code.coverage.dump" value="${junit.code.coverage.dump}" />
 				<sysproperty key="junit.debug" value="${junit.debug}" />
-				<sysproperty key="net.sourceforge.cobertura.datafile" file="test-coverage/@{test.type}/cobertura.ser" />
+				<sysproperty key="whip.agent" value="${whip.agent}" />
+				<sysproperty key="whip.datafile" file="test-coverage/@{test.type}/whip.dat" />
+				<sysproperty key="whip.instrument.dump" value="${whip.instrument.dump}" />
 				<jvmarg line="${junit.debug.jpda}" />
-				<jvmarg line="${junit.cobertura.agent}" />
-				<jvmarg value="-Xmx${junit.java.mx}" />
+				<jvmarg line="${junit.java.gc}" />
+				<jvmarg line="${whip.agent}" />
 				<jvmarg value="-Xss2m" />
-				<jvmarg value="-XX:MaxPermSize=${junit.java.maxpermsize}" />
 				<jvmarg value="-Dexternal-properties=${test.properties}" />
 				<jvmarg value="-Dfile.encoding=UTF-8" />
 				<jvmarg value="-Dfixed.issues=${fixed.issues}" />
 				<jvmarg value="-Djava.net.preferIPv4Stack=true" />
+				<jvmarg value="-Dliferay.log.dir=${liferay.home}/logs" />
+				<jvmarg value="-Dliferay.mode=test" />
 				<misc />
 				<jvmarg value="-Duser.timezone=GMT" />
 				<classpath location="test-coverage" />
@@ -921,6 +921,34 @@ Please set the environment variable ANT_OPTS to the recommended value of
 				<formatter type="xml" />
 				<test.classes />
 			</junit>
+
+			<if>
+				<and>
+					<equals arg1="@{test.type}" arg2="integration" />
+					<isset property="database.type" />
+				</and>
+				<then>
+					<for param="test.results.file">
+						<path>
+							<fileset dir="test-results/@{test.type}">
+								<include name="TEST-*.xml" />
+								<exclude name="TEST-*-*.xml" />
+							</fileset>
+						</path>
+						<sequential>
+							<local name="test.results.file.class.name" />
+
+							<basename file="@{test.results.file}" property="test.results.file.class.name" suffix=".xml" />
+
+							<xmltask dest="test-results/@{test.type}/TEST-${test.results.file.class.name}-${database.type}.xml" source="@{test.results.file}">
+								<replace path="/testsuite/@name" withText="${test.results.file.class.name}-${database.type}" />
+							</xmltask>
+
+							<delete file="@{test.results.file}" />
+						</sequential>
+					</for>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -937,8 +965,8 @@ Please set the environment variable ANT_OPTS to the recommended value of
 					/>
 				</try>
 				<catch>
-					<ant antfile="${project.dir}/portal-service/build.xml" target="compile" inheritAll="false" />
-					<ant antfile="${project.dir}/util-java/build.xml" target="compile" inheritAll="false" />
+					<ant dir="../portal-service" target="compile" inheritAll="false" />
+					<ant dir="../util-java" target="compile" inheritAll="false" />
 
 					<taskdef
 						classname="com.liferay.util.ant.ManifestHelperTask"
@@ -956,37 +984,15 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</sequential>
 	</macrodef>
 
-	<macrodef name="release-to-repo-macro">
-		<attribute name="bndRootFile" />
-		<attribute name="file" />
-
+	<macrodef name="print-current-time">
 		<sequential>
-			<trycatch>
-				<try>
-					<taskdef
-						classname="com.liferay.util.ant.bnd.ReleaseToRepoTask"
-						classpathref="project.classpath"
-						name="release-to-repo"
-					/>
-				</try>
-				<catch>
-					<ant antfile="${project.dir}/portal-service/build.xml" target="compile" inheritAll="false" />
-					<ant antfile="${project.dir}/util-java/build.xml" target="compile" inheritAll="false" />
+			<local name="current.time" />
 
-					<taskdef
-						classname="com.liferay.util.ant.bnd.ReleaseToRepoTask"
-						classpathref="project.classpath"
-						name="release-to-repo"
-					/>
-				</catch>
-			</trycatch>
+			<tstamp>
+				<format property="current.time" pattern="MMMM d, yyyy 'at' hh:mm aa" />
+			</tstamp>
 
-			<bndexpand propertyfile="@{bndRootFile}" />
-
-			<release-to-repo
-				bndRootFile="@{bndRootFile}"
-				file="@{file}"
-			/>
+			<echo message="${current.time}" />
 		</sequential>
 	</macrodef>
 
@@ -1040,96 +1046,31 @@ Please set the environment variable ANT_OPTS to the recommended value of
 	<macrodef name="set-test-type">
 		<sequential>
 			<if>
-				<not>
-					<isset property="test.type" />
-				</not>
-				<then>
-					<if>
-						<available file="test/functional" type="dir" />
-						<then>
-							<resourcecount property="test.functional.count">
-								<fileset dir="test/functional" includes="**/${test.class}.java" />
-							</resourcecount>
-						</then>
-					</if>
-
-					<if>
-						<available file="test/functional-generated" type="dir" />
-						<then>
-							<resourcecount property="test.functional-generated.count">
-								<fileset dir="test/functional-generated" includes="**/${test.class}.java" />
-							</resourcecount>
-						</then>
-					</if>
-
-					<if>
-						<available file="test/integration" type="dir" />
-						<then>
-							<resourcecount property="test.integration.count">
-								<fileset dir="test/integration" includes="**/${test.class}.java" />
-							</resourcecount>
-						</then>
-					</if>
-
-					<if>
-						<available file="test/unit" type="dir" />
-						<then>
-							<resourcecount property="test.unit.count">
-								<fileset dir="test/unit" includes="**/${test.class}.java" />
-							</resourcecount>
-						</then>
-					</if>
-				</then>
-				<else>
-					<resourcecount property="test.${test.type}.count">
-						<fileset dir="test/${test.type}" includes="**/${test.class}.java" />
-					</resourcecount>
-				</else>
-			</if>
-
-			<if>
-				<and>
-					<isset property="test.functional.count" />
-					<not>
-						<equals arg1="${test.functional.count}" arg2="0" />
-					</not>
-				</and>
+				<resourcecount count="0" when="gt">
+					<multirootfileset basedirs="test/functional,test/functional-generated" erroronmissingdir="false" includes="**/${test.class}.java" />
+				</resourcecount>
 				<then>
 					<var name="test.type" value="functional" />
 				</then>
 				<elseif>
-					<and>
-						<isset property="test.functional-generated.count" />
-						<not>
-							<equals arg1="${test.functional-generated.count}" arg2="0" />
-						</not>
-					</and>
-					<then>
-						<var name="test.type" value="functional" />
-					</then>
-				</elseif>
-				<elseif>
-					<and>
-						<isset property="test.integration.count" />
-						<not>
-							<equals arg1="${test.integration.count}" arg2="0" />
-						</not>
-					</and>
+					<resourcecount count="0" when="gt">
+						<fileset dir="test/integration" erroronmissingdir="false" includes="**/${test.class}.java" />
+					</resourcecount>
 					<then>
 						<var name="test.type" value="integration" />
 					</then>
 				</elseif>
 				<elseif>
-					<and>
-						<isset property="test.unit.count" />
-						<not>
-							<equals arg1="${test.unit.count}" arg2="0" />
-						</not>
-					</and>
+					<resourcecount count="0" when="gt">
+						<fileset dir="test/unit" erroronmissingdir="false" includes="**/${test.class}.java" />
+					</resourcecount>
 					<then>
 						<var name="test.type" value="unit" />
 					</then>
 				</elseif>
+				<else>
+					<fail>Test class ${test.class} cannot be found.</fail>
+				</else>
 			</if>
 		</sequential>
 	</macrodef>
@@ -1138,8 +1079,8 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		<attribute name="test.type" />
 
 		<sequential>
-			<ivy:resolve log="download-only">
-				<dependency name="arquillian-junit-container" org="org.jboss.arquillian.junit" rev="1.1.2.Final" />
+			<ivy:resolve log="${ivy.log.level}">
+				<dependency name="arquillian-junit-container" org="org.jboss.arquillian.junit" rev="1.1.8.Final" />
 				<dependency name="com.liferay.arquillian.extension" org="com.liferay" rev="1.0.0-SNAPSHOT" />
 				<exclude org="junit" />
 			</ivy:resolve>
@@ -1296,13 +1237,22 @@ rerun your task.
 			<if>
 				<available file="test/${current.test.dir}" type="dir" />
 				<then>
+					<if>
+						<equals arg1="@{test.type}" arg2="integration" />
+						<then>
+							<delete dir="${liferay.home}/data" />
+							<delete dir="${liferay.home}/osgi/state" />
+						</then>
+					</if>
+
 					<junit-cmd
 						forkmode="@{junit.forkmode}"
 						test.type="@{test.type}"
 					>
 						<misc>
 							<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
-							<jvmarg value="-Dliferay.mode=test" />
+							<jvmarg value="-Dtest.class.group.index=${test.class.group.index}" />
+							<jvmarg value="-Dtest.class.groups=${TEST_CLASS_GROUPS}" />
 						</misc>
 						<test.classes>
 							<batchtest todir="test-results/@{test.type}">
@@ -1312,9 +1262,9 @@ rerun your task.
 									<exclude name="**/DLAppServiceSoapTest.class" />
 									<exclude name="**/UserServiceHttpTest.class" />
 									<exclude name="**/UserServiceSoapTest.class" />
+									<exclude name="**/pacl/test/*Test.class" />
 									<exclude name="${test.excludes}" />
 									<filename regex="${junit.test.excludes}" negate="true" />
-									<filename regex=".*/pacl/test/[\w]+Test.class" negate="true" />
 								</fileset>
 							</batchtest>
 						</test.classes>
@@ -1352,12 +1302,21 @@ rerun your task.
 		</if>
 	</target>
 
+	<target name="deploy-properties">
+		<deploy-properties />
+	</target>
+
 	<target name="format-javadoc">
 		<echo>Run "ant compile compile-test" before using format-javadoc to generate @Override tags.</echo>
 
+		<path id="javadoc.formatter.classpath">
+			<fileset dir="${sdk.dir}/dependencies/com.liferay.javadoc.formatter/lib" includes="*.jar" />
+			<path refid="project.classpath" />
+		</path>
+
 		<java
-			classname="com.liferay.portal.tools.JavadocFormatter"
-			classpathref="project.classpath"
+			classname="com.liferay.javadoc.formatter.JavadocFormatter"
+			classpathref="javadoc.formatter.classpath"
 			fork="true"
 			newenvironment="true"
 		>
@@ -1370,16 +1329,20 @@ rerun your task.
 		</java>
 	</target>
 
-	<target name="print-current-time">
-		<tstamp>
-			<format property="current.time" pattern="MMMM d, yyyy 'at' hh:mm aa" />
-		</tstamp>
-
-		<echo message="${current.time}" />
-	</target>
-
 	<target name="print-properties">
 		<echoproperties />
+	</target>
+
+	<target name="run-cpd">
+		<ant antfile="build-common.xml" dir="${sdk.dir}" inheritRefs="true" target="run-cpd">
+			<property name="cpd.basedir" value="${basedir}" />
+		</ant>
+	</target>
+
+	<target name="run-pmd">
+		<ant antfile="build-common.xml" dir="${sdk.dir}" inheritRefs="true" target="run-pmd">
+			<property name="pmd.basedir" value="${basedir}" />
+		</ant>
 	</target>
 
 	<target name="setproxy" if="setproxy.proxy.host">
@@ -1453,9 +1416,21 @@ rerun your task.
 			</sequential>
 		</for>
 
-		<taskdef resource="org/sonar/ant/antlib.xml" uri="antlib:org.sonar.ant">
-			<classpath path="lib/development/sonar-ant-task.jar" />
-		</taskdef>
+		<ivy:resolve log="${ivy.log.level}">
+			<dependency conf="default" name="sonar-ant-task" org="org.codehaus.sonar-plugins" rev="2.1" />
+		</ivy:resolve>
+
+		<ivy:cachepath
+			conf="default"
+			inline="true"
+			module="sonar-ant-task"
+			log="quiet"
+			organisation="org.codehaus.sonar-plugins"
+			pathid="sonar.ant.task.classpath"
+			revision="2.1"
+		/>
+
+		<taskdef classpathref="sonar.ant.task.classpath" resource="org/sonar/ant/antlib.xml" uri="antlib:org.sonar.ant" />
 
 		<sonar:sonar />
 
@@ -1482,14 +1457,6 @@ rerun your task.
 			<then>
 				<fail>Use "ant test-class -Dtest.class=StringUtilTest".</fail>
 			</then>
-			<elseif>
-				<not>
-					<isset property="test.type" />
-				</not>
-				<then>
-					<fail>Test class ${test.class} cannot be found.</fail>
-				</then>
-			</elseif>
 		</if>
 
 		<compile-test
@@ -1521,25 +1488,45 @@ rerun your task.
 
 		<propertycopy from="TEST_CLASS_GROUP_${test.class.group.index}" name="test.classes" />
 
-		<test-cmd
-			junit.forkmode="once"
-			test.includes="${test.classes}"
-			test.type="integration"
-		/>
+		<if>
+			<or>
+				<not>
+					<isset property="test.type" />
+				</not>
+				<equals arg1="${test.type}" arg2="unit" />
+			</or>
+			<then>
+				<test-cmd
+					junit.forkmode="perTest"
+					test.includes="${test.classes}"
+					test.type="unit"
+				/>
 
-		<report-test-coverage
-			test.type="integration"
-		/>
+				<report-test-coverage
+					test.type="unit"
+				/>
+			</then>
+		</if>
 
-		<test-cmd
-			junit.forkmode="perTest"
-			test.includes="${test.classes}"
-			test.type="unit"
-		/>
+		<if>
+			<or>
+				<not>
+					<isset property="test.type" />
+				</not>
+				<equals arg1="${test.type}" arg2="integration" />
+			</or>
+			<then>
+				<test-cmd
+					junit.forkmode="once"
+					test.includes="${test.classes}"
+					test.type="integration"
+				/>
 
-		<report-test-coverage
-			test.type="unit"
-		/>
+				<report-test-coverage
+					test.type="integration"
+				/>
+			</then>
+		</if>
 	</target>
 
 	<target name="test-integration" depends="compile">
@@ -1571,14 +1558,6 @@ rerun your task.
 			<then>
 				<fail>Use "ant test-method -Dtest.class=StringUtilTest -Dtest.methods=testAppendParentheticalSuffixInteger".</fail>
 			</then>
-			<elseif>
-				<not>
-					<isset property="test.type" />
-				</not>
-				<then>
-					<fail>Test class ${test.class} cannot be found.</fail>
-				</then>
-			</elseif>
 		</if>
 
 		<compile-test

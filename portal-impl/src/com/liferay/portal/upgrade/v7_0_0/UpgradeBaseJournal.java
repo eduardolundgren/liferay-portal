@@ -15,16 +15,12 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
-import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcePermission;
@@ -118,12 +114,7 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String currentShardName = null;
-
 		try {
-			currentShardName = ShardUtil.setTargetSource(
-				PropsUtil.get(PropsKeys.SHARD_DEFAULT_NAME));
-
 			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
@@ -134,7 +125,7 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 
 			rs = ps.executeQuery();
 
-			bitwiseValues = new HashMap<String, Long>();
+			bitwiseValues = new HashMap<>();
 
 			while (rs.next()) {
 				String actionId = rs.getString("actionId");
@@ -148,10 +139,6 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 			return bitwiseValues;
 		}
 		finally {
-			if (Validator.isNotNull(currentShardName)) {
-				ShardUtil.setTargetSource(currentShardName);
-			}
-
 			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
@@ -254,11 +241,9 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 			long groupId, String key, String defaultLanguageId)
 		throws Exception {
 
-		Map<Locale, String> localizationMap = new HashMap<Locale, String>();
+		Map<Locale, String> localizationMap = new HashMap<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 			localizationMap.put(locale, LanguageUtil.get(locale, key));
 		}
 
@@ -266,10 +251,11 @@ public abstract class UpgradeBaseJournal extends UpgradeDynamicDataMapping {
 			localizationMap, StringPool.BLANK, key, defaultLanguageId);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(UpgradeBaseJournal.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		UpgradeBaseJournal.class);
 
-	private Map<String, Map<String, Long>> _bitwiseValues =
-		new HashMap<String, Map<String, Long>>();
-	private Map<String, Long> _roleIds = new HashMap<String, Long>();
+	private final Map<String, Map<String, Long>> _bitwiseValues =
+		new HashMap<>();
+	private final Map<String, Long> _roleIds = new HashMap<>();
 
 }

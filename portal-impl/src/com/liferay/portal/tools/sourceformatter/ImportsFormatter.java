@@ -30,12 +30,12 @@ public abstract class ImportsFormatter {
 
 	public String format(String imports) throws IOException {
 		if (imports.contains("/*") || imports.contains("*/") ||
-			imports.contains("//")) {
+			imports.contains("\n//")) {
 
 			return imports + "\n";
 		}
 
-		Set<ImportPackage> importPackages = new TreeSet<ImportPackage>();
+		Set<ImportPackage> importPackages = new TreeSet<>();
 
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
 			new UnsyncStringReader(imports));

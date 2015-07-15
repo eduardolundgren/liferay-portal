@@ -19,6 +19,9 @@
 <%
 String browseBy = ParamUtil.getString(request, "browseBy");
 
+String curEntry = ParamUtil.getString(request, "curEntry");
+String deltaEntry = ParamUtil.getString(request, "deltaEntry");
+
 Folder folder = (Folder)request.getAttribute("view.jsp-folder");
 
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
@@ -74,10 +77,12 @@ else if ((folderId != rootFolderId) || expandFolder) {
 
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/document_library/view");
+portletURL.setParameter("mvcRenderCommandName", "/document_library/view");
+portletURL.setParameter("curEntry", curEntry);
+portletURL.setParameter("deltaEntry", deltaEntry);
 portletURL.setParameter("folderId", String.valueOf(folderId));
 
-SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
+SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "curFolder", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
 searchContainer.setTotal(total);
 
@@ -110,7 +115,7 @@ else {
 			<c:choose>
 				<c:when test='<%= (((folderId == rootFolderId) && !expandFolder) || ((folder != null) && (folder.isRoot() && !folder.isDefaultRepository() && !expandFolder))) && !browseBy.equals("file-entry-type") %>'>
 					<portlet:renderURL var="viewDocumentsHomeURL">
-						<portlet:param name="struts_action" value="/document_library/view" />
+						<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
 					</portlet:renderURL>
 
@@ -139,7 +144,7 @@ else {
 					</aui:nav-item>
 
 					<portlet:renderURL var="viewRecentDocumentsURL">
-						<portlet:param name="struts_action" value="/document_library/view" />
+						<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 						<portlet:param name="navigation" value="recent" />
 						<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
 					</portlet:renderURL>
@@ -155,7 +160,7 @@ else {
 
 					<c:if test="<%= themeDisplay.isSignedIn() %>">
 						<portlet:renderURL var="viewMyDocumentsURL">
-							<portlet:param name="struts_action" value="/document_library/view" />
+							<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 							<portlet:param name="navigation" value="mine" />
 							<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
 						</portlet:renderURL>
@@ -172,7 +177,7 @@ else {
 
 					<c:if test="<%= DLFileEntryTypeServiceUtil.getFileEntryTypesCount(groupIds) > 0 %>">
 						<portlet:renderURL var="viewBasicFileEntryTypeURL">
-							<portlet:param name="struts_action" value="/document_library/view" />
+							<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 							<portlet:param name="browseBy" value="file-entry-type" />
 							<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
 						</portlet:renderURL>
@@ -200,7 +205,7 @@ else {
 					%>
 
 							<portlet:renderURL var="viewURL">
-								<portlet:param name="struts_action" value="/document_library/view" />
+								<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 								<portlet:param name="folderId" value="<%= String.valueOf(mountFolder.getFolderId()) %>" />
 							</portlet:renderURL>
 
@@ -260,7 +265,7 @@ else {
 				</c:when>
 				<c:when test='<%= browseBy.equals("file-entry-type") %>'>
 					<portlet:renderURL var="viewUpURL">
-						<portlet:param name="struts_action" value="/document_library/view" />
+						<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 						<portlet:param name="structureId" value="<%= String.valueOf(0) %>" />
 					</portlet:renderURL>
 
@@ -275,7 +280,7 @@ else {
 					<c:if test="<%= total > 0 %>">
 						<c:if test="<%= searchContainer.getStart() == 0 %>">
 							<portlet:renderURL var="viewBasicFileEntryTypeURL">
-								<portlet:param name="struts_action" value="/document_library/view" />
+								<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 								<portlet:param name="browseBy" value="file-entry-type" />
 								<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
 								<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(0) %>" />
@@ -301,7 +306,7 @@ else {
 						%>
 
 							<portlet:renderURL var="viewFileEntryTypeURL">
-								<portlet:param name="struts_action" value="/document_library/view" />
+								<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 								<portlet:param name="browseBy" value="file-entry-type" />
 								<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
 								<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(fileEntryType.getFileEntryTypeId()) %>" />
@@ -324,7 +329,7 @@ else {
 				</c:when>
 				<c:otherwise>
 					<portlet:renderURL var="viewURL">
-						<portlet:param name="struts_action" value="/document_library/view" />
+						<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(parentFolderId) %>" />
 					</portlet:renderURL>
 
@@ -344,17 +349,23 @@ else {
 						request.setAttribute("view_entries.jsp-folderId", String.valueOf(curFolder.getFolderId()));
 						request.setAttribute("view_entries.jsp-folderSelected", String.valueOf(folderId == curFolder.getFolderId()));
 						request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
+
+						String iconCssClass = "icon-folder-close";
+
+						if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0)) {
+							iconCssClass = "icon-folder-open";
+						}
 					%>
 
 						<portlet:renderURL var="viewURL">
-							<portlet:param name="struts_action" value="/document_library/view" />
+							<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
 							<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item
 							cssClass="folder list-group-item navigation-entry"
 							href="<%= viewURL %>"
-							iconCssClass='<%= (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0) ? "icon-folder-open" : "icon-folder-close" %>'
+							iconCssClass="<%= iconCssClass %>"
 							label="<%= curFolder.getName() %>"
 							localizeLabel="<%= false %>"
 							selected="<%= (curFolder.getFolderId() == folderId) %>"

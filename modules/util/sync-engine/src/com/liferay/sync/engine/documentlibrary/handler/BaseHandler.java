@@ -39,6 +39,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
@@ -56,6 +57,11 @@ public class BaseHandler implements Handler<Void> {
 	}
 
 	@Override
+	public String getException(String response) {
+		return null;
+	}
+
+	@Override
 	public void handleException(Exception e) {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			getSyncAccountId());
@@ -66,7 +72,51 @@ public class BaseHandler implements Handler<Void> {
 			_logger.debug("Handling exception {}", e.toString());
 		}
 
-		if (e instanceof FileNotFoundException) {
+		if (e instanceof HttpResponseException) {
+			HttpResponseException hre = (HttpResponseException)e;
+
+			int statusCode = hre.getStatusCode();
+
+			if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+				if (syncAccount.getUiEvent() ==
+						SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION) {
+
+					if (_logger.isDebugEnabled()) {
+						_logger.debug(
+							"Aborting reauthentication attempts. Retry limit " +
+								"reached.");
+					}
+
+					syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
+
+					SyncAccountService.update(syncAccount);
+				}
+				else {
+					syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
+					syncAccount.setUiEvent(
+						SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
+
+					SyncAccountService.update(syncAccount);
+
+					retryServerConnection(
+						SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
+				}
+
+				return;
+			}
+		}
+
+		if ((e instanceof ClientProtocolException) ||
+			(e instanceof ConnectTimeoutException) ||
+			(e instanceof HttpHostConnectException) ||
+			(e instanceof NoHttpResponseException) ||
+			(e instanceof SocketException) ||
+			(e instanceof SocketTimeoutException) ||
+			(e instanceof UnknownHostException)) {
+
+			retryServerConnection(SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
+		}
+		else if (e instanceof FileNotFoundException) {
 			SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
 			String message = e.getMessage();
@@ -83,38 +133,17 @@ public class BaseHandler implements Handler<Void> {
 				executorService.execute(_event);
 			}
 			else if (syncFile.getVersion() == null) {
-				SyncFileService.deleteSyncFile(syncFile);
-			}
-		}
-		else if ((e instanceof ConnectTimeoutException) ||
-				 (e instanceof HttpHostConnectException) ||
-				 (e instanceof NoHttpResponseException) ||
-				 (e instanceof SocketException) ||
-				 (e instanceof SocketTimeoutException) ||
-				 (e instanceof UnknownHostException)) {
-
-			retryServerConnection(SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
-		}
-		else if (e instanceof HttpResponseException) {
-			HttpResponseException hre = (HttpResponseException)e;
-
-			int statusCode = hre.getStatusCode();
-
-			if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
-				syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
-				syncAccount.setUiEvent(
-					SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
-
-				SyncAccountService.update(syncAccount);
-			}
-			else {
-				retryServerConnection(
-					SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
+				SyncFileService.deleteSyncFile(syncFile, false);
 			}
 		}
 		else {
 			_logger.error(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public boolean handlePortalException(String exception) throws Exception {
+		return false;
 	}
 
 	@Override
@@ -130,7 +159,7 @@ public class BaseHandler implements Handler<Void> {
 			}
 
 			if (_logger.isTraceEnabled()) {
-				Class<?> clazz = this.getClass();
+				Class<?> clazz = getClass();
 
 				SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
@@ -150,12 +179,25 @@ public class BaseHandler implements Handler<Void> {
 		catch (Exception e) {
 			handleException(e);
 		}
+		finally {
+			processFinally();
+		}
 
 		return null;
 	}
 
+	@Override
+	public void processResponse(String response) throws Exception {
+	}
+
 	protected void doHandleResponse(HttpResponse httpResponse)
 		throws Exception {
+	}
+
+	protected SyncFile getLocalSyncFile() {
+		SyncFile localSyncFile = (SyncFile)getParameterValue("syncFile");
+
+		return SyncFileService.fetchSyncFile(localSyncFile.getSyncFileId());
 	}
 
 	protected Map<String, Object> getParameters() {
@@ -174,7 +216,7 @@ public class BaseHandler implements Handler<Void> {
 		SyncSite syncSite = (SyncSite)getParameterValue("syncSite");
 
 		if (syncSite == null) {
-			SyncFile syncFile = (SyncFile) getParameterValue("syncFile");
+			SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
 			syncSite = SyncSiteService.fetchSyncSite(
 				syncFile.getRepositoryId(), getSyncAccountId());
@@ -195,6 +237,9 @@ public class BaseHandler implements Handler<Void> {
 		}
 	}
 
+	protected void processFinally() {
+	}
+
 	protected void retryServerConnection(int uiEvent) {
 		if (!(_event instanceof GetSyncContextEvent) &&
 			ConnectionRetryUtil.retryInProgress(getSyncAccountId())) {
@@ -205,21 +250,24 @@ public class BaseHandler implements Handler<Void> {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			getSyncAccountId());
 
-		syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
-		syncAccount.setUiEvent(uiEvent);
+		int retryCount = ConnectionRetryUtil.getRetryCount(getSyncAccountId());
 
-		SyncAccountService.update(syncAccount);
+		if (retryCount > 0) {
+			syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
+			syncAccount.setUiEvent(uiEvent);
+
+			SyncAccountService.update(syncAccount);
+
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(
+					"Attempting to reconnect to {}. Retry #{}.",
+					syncAccount.getUrl(), retryCount);
+			}
+		}
 
 		ServerEventUtil.retryServerConnection(
 			getSyncAccountId(),
 			ConnectionRetryUtil.incrementRetryDelay(getSyncAccountId()));
-
-		if (_logger.isDebugEnabled()) {
-			_logger.debug(
-				"Attempting to reconnect to {}. Retry #{}.",
-				syncAccount.getUrl(),
-				ConnectionRetryUtil.getRetryCount(getSyncAccountId()));
-		}
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

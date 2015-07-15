@@ -25,7 +25,7 @@ if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isContentRe
 	latestFileVersion = fileEntry.getLatestFileVersion();
 }
 
-DLFileShortcut fileShortcut = (DLFileShortcut)request.getAttribute("view_entries.jsp-fileShortcut");
+FileShortcut fileShortcut = (FileShortcut)request.getAttribute("view_entries.jsp-fileShortcut");
 
 PortletURL tempRowURL = (PortletURL)request.getAttribute("view_entries.jsp-tempRowURL");
 
@@ -33,7 +33,7 @@ String rowCheckerName = FileEntry.class.getSimpleName();
 long rowCheckerId = fileEntry.getFileEntryId();
 
 if (fileShortcut != null) {
-	rowCheckerName = DLFileShortcut.class.getSimpleName();
+	rowCheckerName = FileShortcut.class.getSimpleName();
 	rowCheckerId = fileShortcut.getFileShortcutId();
 }
 %>
@@ -48,9 +48,9 @@ if (fileShortcut != null) {
 	shortcut="<%= fileShortcut != null %>"
 	showCheckbox="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE) %>"
 	status="<%= latestFileVersion.getStatus() %>"
-	thumbnailDivStyle="<%= DLUtil.getThumbnailStyle(false, 9) %>"
+	thumbnailDivStyle="<%= DLUtil.getThumbnailStyle(false, 9, 128, 128) %>"
 	thumbnailSrc="<%= DLUtil.getThumbnailSrc(fileEntry, latestFileVersion, themeDisplay) %>"
-	thumbnailStyle="<%= DLUtil.getThumbnailStyle() %>"
+	thumbnailStyle="<%= DLUtil.getThumbnailStyle(true, 0, 128, 128) %>"
 	title="<%= latestFileVersion.getTitle() %>"
 	url="<%= tempRowURL.toString() %>"
 />

@@ -22,9 +22,9 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
+import com.liferay.portlet.blogs.util.BlogsConstants;
 
 import java.io.InputStream;
 
@@ -49,7 +49,7 @@ public class BlogsEntryAttachmentFileEntryHelper {
 			blogsEntryAttachmentFileEntryReferences = new ArrayList<>();
 
 		for (FileEntry tempFileEntry : tempFileEntries) {
-			FileEntry blogsAttachmentEntryFileEntry =
+			FileEntry blogsEntryAttachmentFileEntry =
 				addBlogsEntryAttachmentFileEntry(
 					groupId, userId, blogsEntryId, tempFileEntry.getTitle(),
 					tempFileEntry.getMimeType(),
@@ -58,7 +58,7 @@ public class BlogsEntryAttachmentFileEntryHelper {
 			blogsEntryAttachmentFileEntryReferences.add(
 				new BlogsEntryAttachmentFileEntryReference(
 					tempFileEntry.getFileEntryId(),
-					blogsAttachmentEntryFileEntry));
+					blogsEntryAttachmentFileEntry));
 		}
 
 		return blogsEntryAttachmentFileEntryReferences;
@@ -95,19 +95,22 @@ public class BlogsEntryAttachmentFileEntryHelper {
 				blogsEntryAttachmentFileEntryReference :
 					blogsEntryAttachmentFileEntryReferences) {
 
-			StringBundler sb = new StringBundler(5);
+			StringBundler sb = new StringBundler(8);
 
-			sb.append("<img.*");
+			sb.append("<\\s*?img");
+			sb.append(_ATTRIBUTE_LIST_REGEXP);
 			sb.append(EditorConstants.ATTRIBUTE_DATA_IMAGE_ID);
-			sb.append("=\\s?\"");
+			sb.append("\\s*?=\\s*?\"");
 			sb.append(
 				blogsEntryAttachmentFileEntryReference.
 					getTempBlogsEntryAttachmentFileEntryId());
-			sb.append("\".*src=\\s?\"(.*)\".*/>");
+			sb.append("\"");
+			sb.append(_ATTRIBUTE_LIST_REGEXP);
+			sb.append("/>");
 
 			content = content.replaceAll(
 				sb.toString(),
-				getBlogsEntryAttachmentFileEntryLink(
+				getBlogsEntryAttachmentFileEntryImgTag(
 					blogsEntryAttachmentFileEntryReference.
 						getBlogsEntryAttachmentFileEntry()));
 		}
@@ -125,17 +128,20 @@ public class BlogsEntryAttachmentFileEntryHelper {
 
 		return PortletFileRepositoryUtil.addPortletFileEntry(
 			groupId, userId, BlogsEntry.class.getName(), blogsEntryId,
-			PortletKeys.BLOGS, folder.getFolderId(), is, fileName, mimeType,
-			true);
+			BlogsConstants.SERVICE_NAME, folder.getFolderId(), is, fileName,
+			mimeType, true);
 	}
 
-	protected String getBlogsEntryAttachmentFileEntryLink(
-		FileEntry blogsEntryAttachmentEntryFileEntry) {
+	protected String getBlogsEntryAttachmentFileEntryImgTag(
+		FileEntry blogsEntryAttachmentFileEntry) {
 
 		String fileEntryURL = PortletFileRepositoryUtil.getPortletFileEntryURL(
-			null, blogsEntryAttachmentEntryFileEntry, StringPool.BLANK);
+			null, blogsEntryAttachmentFileEntry, StringPool.BLANK);
 
 		return "<img src=\"" + fileEntryURL + "\" />";
 	}
+
+	private static final String _ATTRIBUTE_LIST_REGEXP =
+		"(\\s*?\\w+\\s*?=\\s*?\"[^\"]*\")*?\\s*?";
 
 }

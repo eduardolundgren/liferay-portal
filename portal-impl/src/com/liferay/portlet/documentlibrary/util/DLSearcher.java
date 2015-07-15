@@ -30,7 +30,7 @@ public class DLSearcher extends BaseSearcher {
 		DLFileEntry.class.getName(), DLFolder.class.getName()
 	};
 
-	public static Indexer getInstance() {
+	public static Indexer<?> getInstance() {
 		return new DLSearcher();
 	}
 
@@ -44,7 +44,7 @@ public class DLSearcher extends BaseSearcher {
 	}
 
 	@Override
-	public String[] getClassNames() {
+	public String[] getSearchClassNames() {
 		return CLASS_NAMES;
 	}
 

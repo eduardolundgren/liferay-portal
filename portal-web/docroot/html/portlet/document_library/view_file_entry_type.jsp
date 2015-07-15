@@ -19,14 +19,14 @@
 <%
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/document_library/view_file_entry_type");
+portletURL.setParameter("mvcPath", "/html/portlet/document_library/view_file_entry_type.jsp");
 %>
 
 <liferay-util:include page="/html/portlet/document_library/file_entry_type_toolbar.jsp">
 	<liferay-util:param name="includeBasicFileEntryType" value="<%= Boolean.FALSE.toString() %>" />
 </liferay-util:include>
 
-<liferay-ui:error exception="<%= RequiredStructureException.class %>" message="cannot-delete-a-document-type-that-is-presently-used-by-one-or-more-documents" />
+<liferay-ui:error exception="<%= RequiredFileEntryTypeException.class %>" message="cannot-delete-a-document-type-that-is-presently-used-by-one-or-more-documents" />
 
 <div class="separator"></div>
 

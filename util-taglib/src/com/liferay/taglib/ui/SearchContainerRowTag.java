@@ -152,7 +152,7 @@ public class SearchContainerRowTag<R>
 
 	public List<String> getHeaderNames() {
 		if (_headerNames == null) {
-			_headerNames = new ArrayList<String>();
+			_headerNames = new ArrayList<>();
 		}
 
 		return _headerNames;
@@ -172,7 +172,7 @@ public class SearchContainerRowTag<R>
 
 	public Map<String, String> getOrderableHeaders() {
 		if (_orderableHeaders == null) {
-			_orderableHeaders = new LinkedHashMap<String, String>();
+			_orderableHeaders = new LinkedHashMap<>();
 		}
 
 		return _orderableHeaders;
@@ -311,7 +311,8 @@ public class SearchContainerRowTag<R>
 		pageContext.setAttribute(_rowVar, _resultRow);
 	}
 
-	private static Pattern _friendlyURLPattern = Pattern.compile("[^a-z0-9_-]");
+	private static final Pattern _friendlyURLPattern = Pattern.compile(
+		"[^a-z0-9_-]");
 
 	private boolean _bold;
 	private String _className;

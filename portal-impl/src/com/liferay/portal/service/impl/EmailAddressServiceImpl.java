@@ -37,7 +37,7 @@ public class EmailAddressServiceImpl extends EmailAddressServiceBaseImpl {
 	@Deprecated
 	@Override
 	public EmailAddress addEmailAddress(
-			String className, long classPK, String address, int typeId,
+			String className, long classPK, String address, long typeId,
 			boolean primary)
 		throws PortalException {
 
@@ -50,7 +50,7 @@ public class EmailAddressServiceImpl extends EmailAddressServiceBaseImpl {
 
 	@Override
 	public EmailAddress addEmailAddress(
-			String className, long classPK, String address, int typeId,
+			String className, long classPK, String address, long typeId,
 			boolean primary, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -72,6 +72,31 @@ public class EmailAddressServiceImpl extends EmailAddressServiceBaseImpl {
 			emailAddress.getClassPK(), ActionKeys.UPDATE);
 
 		emailAddressLocalService.deleteEmailAddress(emailAddress);
+	}
+
+	/**
+	 * Returns the email address with the primary key.
+	 *
+	 * @param  emailAddressId the primary key of the email address
+	 * @return the email address with the primary key, or <code>null</code> if
+	 *         an email address with the primary key could not be found or if
+	 *         the user did not have permission to view the email address
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public EmailAddress fetchEmailAddress(long emailAddressId)
+		throws PortalException {
+
+		EmailAddress emailAddress = emailAddressPersistence.fetchByPrimaryKey(
+			emailAddressId);
+
+		if (emailAddress != null) {
+			CommonPermissionUtil.check(
+				getPermissionChecker(), emailAddress.getClassNameId(),
+				emailAddress.getClassPK(), ActionKeys.VIEW);
+		}
+
+		return emailAddress;
 	}
 
 	@Override
@@ -103,7 +128,7 @@ public class EmailAddressServiceImpl extends EmailAddressServiceBaseImpl {
 
 	@Override
 	public EmailAddress updateEmailAddress(
-			long emailAddressId, String address, int typeId, boolean primary)
+			long emailAddressId, String address, long typeId, boolean primary)
 		throws PortalException {
 
 		EmailAddress emailAddress = emailAddressPersistence.findByPrimaryKey(

@@ -399,7 +399,7 @@ public class MBCategoryLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -591,10 +591,25 @@ public class MBCategoryLocalServiceUtil {
 		return getService().updateMBCategory(mbCategory);
 	}
 
+	public static com.liferay.portlet.messageboards.model.MBCategory updateMessageCount(
+		long categoryId) {
+		return getService().updateMessageCount(categoryId);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBCategory updateStatistics(
+		long categoryId) {
+		return getService().updateStatistics(categoryId);
+	}
+
 	public static com.liferay.portlet.messageboards.model.MBCategory updateStatus(
 		long userId, long categoryId, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().updateStatus(userId, categoryId, status);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBCategory updateThreadCount(
+		long categoryId) {
+		return getService().updateThreadCount(categoryId);
 	}
 
 	public static MBCategoryLocalService getService() {

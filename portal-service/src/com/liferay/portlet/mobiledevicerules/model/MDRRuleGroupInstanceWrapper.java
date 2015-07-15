@@ -16,9 +16,10 @@ package com.liferay.portlet.mobiledevicerules.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -208,7 +209,7 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	* @return the create date of this m d r rule group instance
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _mdrRuleGroupInstance.getCreateDate();
 	}
 
@@ -233,7 +234,7 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	* @return the modified date of this m d r rule group instance
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _mdrRuleGroupInstance.getModifiedDate();
 	}
 
@@ -399,7 +400,7 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	* @param createDate the create date of this m d r rule group instance
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_mdrRuleGroupInstance.setCreateDate(createDate);
 	}
 
@@ -437,7 +438,7 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	* @param modifiedDate the modified date of this m d r rule group instance
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_mdrRuleGroupInstance.setModifiedDate(modifiedDate);
 	}
 

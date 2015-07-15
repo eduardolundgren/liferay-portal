@@ -16,9 +16,10 @@ package com.liferay.bookmarks.asset;
 
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.model.BookmarksEntry;
+import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.BookmarksEntryLocalServiceUtil;
-import com.liferay.bookmarks.service.permission.BookmarksEntryPermission;
-import com.liferay.bookmarks.service.permission.BookmarksPermission;
+import com.liferay.bookmarks.service.permission.BookmarksEntryPermissionChecker;
+import com.liferay.bookmarks.service.permission.BookmarksResourcePermissionChecker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -27,13 +28,18 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetRenderer;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
+
+import javax.servlet.ServletContext;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Julio Camarero
@@ -41,13 +47,23 @@ import javax.portlet.WindowStateException;
  * @author Raymond Augé
  * @author Sergio González
  */
+@Component(
+	immediate = true,
+	property = {
+		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS,
+		"search.asset.type=com.liferay.bookmarks.model.BookmarksEntry"
+	},
+	service = AssetRendererFactory.class
+)
 public class BookmarksEntryAssetRendererFactory
 	extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "bookmark";
 
 	public BookmarksEntryAssetRendererFactory() {
+		setClassName(BookmarksEntry.class.getName());
 		setLinkable(true);
+		setPortletId(BookmarksPortletKeys.BOOKMARKS);
 	}
 
 	@Override
@@ -60,6 +76,7 @@ public class BookmarksEntryAssetRendererFactory
 			new BookmarksEntryAssetRenderer(entry);
 
 		bookmarksEntryAssetRenderer.setAssetRendererType(type);
+		bookmarksEntryAssetRenderer.setServletContext(_servletContext);
 
 		return bookmarksEntryAssetRenderer;
 	}
@@ -82,7 +99,7 @@ public class BookmarksEntryAssetRendererFactory
 	@Override
 	public PortletURL getURLAdd(
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
+		LiferayPortletResponse liferayPortletResponse, long classTypeId) {
 
 		PortletURL portletURL = liferayPortletResponse.createRenderURL(
 			BookmarksPortletKeys.BOOKMARKS);
@@ -90,9 +107,7 @@ public class BookmarksEntryAssetRendererFactory
 		portletURL.setParameter("struts_action", "/bookmarks/edit_entry");
 		portletURL.setParameter(
 			"folderId",
-			String.valueOf(
-				AssetPublisherUtil.getRecentFolderId(
-					liferayPortletRequest, getClassName())));
+			String.valueOf(BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID));
 
 		return portletURL;
 	}
@@ -120,7 +135,7 @@ public class BookmarksEntryAssetRendererFactory
 			PermissionChecker permissionChecker, long groupId, long classTypeId)
 		throws Exception {
 
-		return BookmarksPermission.contains(
+		return BookmarksResourcePermissionChecker.contains(
 			permissionChecker, groupId, ActionKeys.ADD_ENTRY);
 	}
 
@@ -129,13 +144,23 @@ public class BookmarksEntryAssetRendererFactory
 			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws Exception {
 
-		return BookmarksEntryPermission.contains(
+		return BookmarksEntryPermissionChecker.contains(
 			permissionChecker, classPK, actionId);
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.bookmarks.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
 	}
 
 	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/ratings/star_hover.png";
 	}
+
+	private ServletContext _servletContext;
 
 }

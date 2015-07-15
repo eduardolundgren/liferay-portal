@@ -93,15 +93,14 @@ public class LayoutPrototypeLocalServiceImpl
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			LayoutPrototype.class.getName(),
 			layoutPrototype.getLayoutPrototypeId(),
-			GroupConstants.DEFAULT_LIVE_GROUP_ID,
-			layoutPrototype.getName(LocaleUtil.getDefault()), null, 0, true,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, friendlyURL, false,
-			true, null);
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, layoutPrototype.getNameMap(),
+			null, 0, true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
+			friendlyURL, false, true, null);
 
 		if (GetterUtil.getBoolean(
 				serviceContext.getAttribute("addDefaultLayout"), true)) {
 
-			Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+			Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 			friendlyURLMap.put(LocaleUtil.getSiteDefault(), "/layout");
 
@@ -143,7 +142,7 @@ public class LayoutPrototypeLocalServiceImpl
 			String description, boolean active, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), description);
 
@@ -154,7 +153,8 @@ public class LayoutPrototypeLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public LayoutPrototype deleteLayoutPrototype(
 			LayoutPrototype layoutPrototype)
 		throws PortalException {
@@ -321,7 +321,7 @@ public class LayoutPrototypeLocalServiceImpl
 			String description, boolean active, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), description);
 

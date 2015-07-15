@@ -18,15 +18,16 @@ import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.nio.intraband.Datagram;
 import com.liferay.portal.kernel.nio.intraband.test.MockIntraband;
 import com.liferay.portal.kernel.nio.intraband.test.MockRegistrationReference;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtilAdvice;
 import com.liferay.portal.kernel.util.ThreadUtil;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import java.io.IOException;
 
@@ -151,8 +152,12 @@ public class MailboxUtilTest {
 
 		overdueMailQueue.offer(createReceiptStub());
 
-		reaperThread.join(1000);
+		reaperThread.join(10 * Time.MINUTE);
 
+		Assert.assertFalse(
+			"Reaper thread " + reaperThread +
+				" failed to join back after waiting for 10 mins",
+			reaperThread.isAlive());
 		Assert.assertSame(
 			reaperThread, RecorderUncaughtExceptionHandler._thread);
 
@@ -261,7 +266,8 @@ public class MailboxUtilTest {
 
 		@Around(
 			"execution(public long com.liferay.portal.kernel.nio.intraband." +
-				"mailbox.MailboxUtil$ReceiptStub.getReceipt())")
+				"mailbox.MailboxUtil$ReceiptStub.getReceipt())"
+		)
 		public Object getReceipt(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -284,7 +290,11 @@ public class MailboxUtilTest {
 
 		Constructor<?> constructor = clazz.getConstructor(long.class);
 
-		return constructor.newInstance(0);
+		Object object = constructor.newInstance(0);
+
+		Assert.assertEquals(0, object.hashCode());
+
+		return object;
 	}
 
 	private static class RecorderUncaughtExceptionHandler

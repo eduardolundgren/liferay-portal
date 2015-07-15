@@ -23,12 +23,6 @@ import java.io.Serializable;
  */
 public class Sort implements Serializable {
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public static final int AUTO_TYPE = 2;
-
 	public static final int CUSTOM_TYPE = 9;
 
 	public static final int DOC_TYPE = 1;
@@ -36,6 +30,8 @@ public class Sort implements Serializable {
 	public static final int DOUBLE_TYPE = 7;
 
 	public static final int FLOAT_TYPE = 5;
+
+	public static final int GEO_DISTANCE_TYPE = 10;
 
 	public static final int INT_TYPE = 4;
 

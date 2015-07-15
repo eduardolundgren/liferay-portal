@@ -16,22 +16,23 @@ package com.liferay.portlet.softwarecatalog.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.softwarecatalog.model.SCProductEntry;
 import com.liferay.portlet.softwarecatalog.model.SCProductVersion;
 import com.liferay.portlet.softwarecatalog.service.SCProductEntryLocalServiceUtil;
@@ -40,7 +41,6 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 /**
  * @author Jorge Ferrer
@@ -49,11 +49,10 @@ import javax.portlet.PortletURL;
  * @author Bruno Farache
  * @author Raymond Augé
  */
-public class SCIndexer extends BaseIndexer {
+@OSGiBeanProperties
+public class SCIndexer extends BaseIndexer<SCProductEntry> {
 
-	public static final String[] CLASS_NAMES = {SCProductEntry.class.getName()};
-
-	public static final String PORTLET_ID = PortletKeys.SOFTWARE_CATALOG;
+	public static final String CLASS_NAME = SCProductEntry.class.getName();
 
 	public SCIndexer() {
 		setDefaultSelectedFieldNames(
@@ -63,68 +62,62 @@ public class SCIndexer extends BaseIndexer {
 	}
 
 	@Override
-	public String[] getClassNames() {
-		return CLASS_NAMES;
+	public String getClassName() {
+		return CLASS_NAME;
 	}
 
 	@Override
-	public String getPortletId() {
-		return PORTLET_ID;
-	}
-
-	@Override
-	protected void doDelete(Object obj) throws Exception {
-		SCProductEntry productEntry = (SCProductEntry)obj;
-
+	protected void doDelete(SCProductEntry scProductEntry) throws Exception {
 		deleteDocument(
-			productEntry.getCompanyId(), productEntry.getProductEntryId());
+			scProductEntry.getCompanyId(), scProductEntry.getProductEntryId());
 	}
 
 	@Override
-	protected Document doGetDocument(Object obj) throws Exception {
-		SCProductEntry productEntry = (SCProductEntry)obj;
+	protected Document doGetDocument(SCProductEntry scProductEntry)
+		throws Exception {
 
-		Document document = getBaseModelDocument(PORTLET_ID, productEntry);
+		Document document = getBaseModelDocument(CLASS_NAME, scProductEntry);
 
 		StringBundler sb = new StringBundler(15);
 
 		String longDescription = HtmlUtil.extractText(
-			productEntry.getLongDescription());
+			scProductEntry.getLongDescription());
 
 		sb.append(longDescription);
 
 		sb.append(StringPool.SPACE);
-		sb.append(productEntry.getPageURL());
+		sb.append(scProductEntry.getPageURL());
 		sb.append(StringPool.SPACE);
-		sb.append(productEntry.getRepoArtifactId());
+		sb.append(scProductEntry.getRepoArtifactId());
 		sb.append(StringPool.SPACE);
-		sb.append(productEntry.getRepoGroupId());
+		sb.append(scProductEntry.getRepoGroupId());
 		sb.append(StringPool.SPACE);
 
 		String shortDescription = HtmlUtil.extractText(
-			productEntry.getShortDescription());
+			scProductEntry.getShortDescription());
 
 		sb.append(shortDescription);
 
 		sb.append(StringPool.SPACE);
-		sb.append(productEntry.getType());
+		sb.append(scProductEntry.getType());
 		sb.append(StringPool.SPACE);
-		sb.append(productEntry.getUserId());
+		sb.append(scProductEntry.getUserId());
 		sb.append(StringPool.SPACE);
 
 		String userName = PortalUtil.getUserName(
-			productEntry.getUserId(), productEntry.getUserName());
+			scProductEntry.getUserId(), scProductEntry.getUserName());
 
 		sb.append(userName);
 
 		document.addText(Field.CONTENT, sb.toString());
 
-		document.addText(Field.TITLE, productEntry.getName());
-		document.addKeyword(Field.TYPE, productEntry.getType());
+		document.addText(Field.TITLE, scProductEntry.getName());
+		document.addKeyword(Field.TYPE, scProductEntry.getType());
 
 		String version = StringPool.BLANK;
 
-		SCProductVersion latestProductVersion = productEntry.getLatestVersion();
+		SCProductVersion latestProductVersion =
+			scProductEntry.getLatestVersion();
 
 		if (latestProductVersion != null) {
 			version = latestProductVersion.getVersion();
@@ -133,9 +126,10 @@ public class SCIndexer extends BaseIndexer {
 		document.addKeyword(Field.VERSION, version);
 
 		document.addText("longDescription", longDescription);
-		document.addText("pageURL", productEntry.getPageURL());
-		document.addKeyword("repoArtifactId", productEntry.getRepoArtifactId());
-		document.addKeyword("repoGroupId", productEntry.getRepoGroupId());
+		document.addText("pageURL", scProductEntry.getPageURL());
+		document.addKeyword(
+			"repoArtifactId", scProductEntry.getRepoArtifactId());
+		document.addKeyword("repoGroupId", scProductEntry.getRepoGroupId());
 		document.addText("shortDescription", shortDescription);
 
 		return document;
@@ -143,31 +137,22 @@ public class SCIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet, PortletURL portletURL,
+		Document document, Locale locale, String snippet,
 		PortletRequest portletRequest, PortletResponse portletResponse) {
-
-		String productEntryId = document.get(Field.ENTRY_CLASS_PK);
-
-		portletURL.setParameter(
-			"struts_action", "/software_catalog/view_product_entry");
-		portletURL.setParameter("productEntryId", productEntryId);
 
 		Summary summary = createSummary(document, Field.TITLE, Field.CONTENT);
 
 		summary.setMaxContentLength(200);
-		summary.setPortletURL(portletURL);
 
 		return summary;
 	}
 
 	@Override
-	protected void doReindex(Object obj) throws Exception {
-		SCProductEntry productEntry = (SCProductEntry)obj;
-
-		Document document = getDocument(productEntry);
+	protected void doReindex(SCProductEntry scProductEntry) throws Exception {
+		Document document = getDocument(scProductEntry);
 
 		SearchEngineUtil.updateDocument(
-			getSearchEngineId(), productEntry.getCompanyId(), document,
+			getSearchEngineId(), scProductEntry.getCompanyId(), document,
 			isCommitImmediately());
 	}
 
@@ -187,24 +172,24 @@ public class SCIndexer extends BaseIndexer {
 	}
 
 	@Override
-	protected String getPortletId(SearchContext searchContext) {
-		return PORTLET_ID;
-	}
-
-	@Override
 	protected void postProcessFullQuery(
 			BooleanQuery fullQuery, SearchContext searchContext)
 		throws Exception {
 
+		BooleanFilter booleanFilter = fullQuery.getPreBooleanFilter();
+
+		if (booleanFilter == null) {
+			booleanFilter = new BooleanFilter();
+		}
+
 		String type = (String)searchContext.getAttribute("type");
 
 		if (Validator.isNotNull(type)) {
-			BooleanQuery searchQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			booleanFilter.addRequiredTerm("type", type);
+		}
 
-			searchQuery.addRequiredTerm("type", type);
-
-			fullQuery.add(searchQuery, BooleanClauseOccur.MUST);
+		if (booleanFilter.hasClauses()) {
+			fullQuery.setPreBooleanFilter(booleanFilter);
 		}
 	}
 
@@ -219,14 +204,22 @@ public class SCIndexer extends BaseIndexer {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
+				public void performAction(Object object) {
 					SCProductEntry productEntry = (SCProductEntry)object;
 
-					Document document = getDocument(productEntry);
+					try {
+						Document document = getDocument(productEntry);
 
-					actionableDynamicQuery.addDocument(document);
+						actionableDynamicQuery.addDocument(document);
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to software catalog product entry " +
+									productEntry.getProductEntryId(),
+								pe);
+						}
+					}
 				}
 
 			});
@@ -234,5 +227,7 @@ public class SCIndexer extends BaseIndexer {
 
 		actionableDynamicQuery.performActions();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(SCIndexer.class);
 
 }

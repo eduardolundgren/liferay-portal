@@ -17,6 +17,8 @@ package com.liferay.taglib.ui.context;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -32,8 +34,6 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
@@ -169,8 +169,7 @@ public class InputAssetLinksDisplayContext {
 	}
 
 	public List<Map<String, Object>> getSelectorEntries() throws Exception {
-		List<Map<String, Object>> selectorEntries =
-			new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> selectorEntries = new ArrayList<>();
 
 		for (AssetRendererFactory assetRendererFactory :
 				getAssetRendererFactories()) {
@@ -180,8 +179,7 @@ public class InputAssetLinksDisplayContext {
 					_getSelectorEntries(assetRendererFactory));
 			}
 			else {
-				Map<String, Object> selectorEntry =
-					new HashMap<String, Object>();
+				Map<String, Object> selectorEntry = new HashMap<>();
 
 				selectorEntry.put(
 					"data", _geSelectorEntryData(assetRendererFactory));
@@ -203,7 +201,7 @@ public class InputAssetLinksDisplayContext {
 	}
 
 	private List<AssetLink> _createAssetLinks() throws PortalException {
-		List<AssetLink> assetLinks = new ArrayList<AssetLink>();
+		List<AssetLink> assetLinks = new ArrayList<>();
 
 		String assetLinksSearchContainerPrimaryKeys = ParamUtil.getString(
 			_request, "assetLinksSearchContainerPrimaryKeys");
@@ -263,7 +261,7 @@ public class InputAssetLinksDisplayContext {
 			AssetRendererFactory assetRendererFactory)
 		throws Exception {
 
-		Map<String, Object> selectorEntryData = new HashMap<String, Object>();
+		Map<String, Object> selectorEntryData = new HashMap<>();
 
 		selectorEntryData.put(
 			"href",
@@ -306,14 +304,9 @@ public class InputAssetLinksDisplayContext {
 			AssetRendererFactory assetRendererFactory)
 		throws Exception {
 
-		long controlPanelPlid = PortalUtil.getControlPanelPlid(
-			_themeDisplay.getCompanyId());
-
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			_request, PortletKeys.ASSET_BROWSER, controlPanelPlid,
-			PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter("struts_action", "/asset_browser/view");
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			_request, assetRendererFactory.getClassName(),
+			PortletProvider.Action.BROWSE);
 
 		long groupId = _getAssetBrowserGroupId(assetRendererFactory);
 
@@ -348,20 +341,18 @@ public class InputAssetLinksDisplayContext {
 		ClassTypeReader classTypeReader =
 			assetRendererFactory.getClassTypeReader();
 
-		List<ClassType> classTypes =
-			classTypeReader.getAvailableClassTypes(
-				PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId),
-				_themeDisplay.getLocale());
+		List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId),
+			_themeDisplay.getLocale());
 
 		if (classTypes.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		List<Map<String, Object>> selectorEntries =
-			new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> selectorEntries = new ArrayList<>();
 
 		for (ClassType classType : classTypes) {
-			Map<String, Object> selectorEntry = new HashMap<String, Object>();
+			Map<String, Object> selectorEntry = new HashMap<>();
 
 			selectorEntry.put(
 				"data",
@@ -386,7 +377,7 @@ public class InputAssetLinksDisplayContext {
 			AssetRendererFactory assetRendererFactory, ClassType classType)
 		throws Exception {
 
-		Map<String, Object> selectorEntryData = new HashMap<String, Object>();
+		Map<String, Object> selectorEntryData = new HashMap<>();
 
 		PortletURL portletURL = _getAssetBrowserPortletURL(
 			assetRendererFactory);
@@ -491,15 +482,15 @@ public class InputAssetLinksDisplayContext {
 		return _stagedReferrerPortlet;
 	}
 
-	private long _assetEntryId;
+	private final long _assetEntryId;
 	private List<AssetLink> _assetLinks;
 	private String _eventName;
-	private PageContext _pageContext;
-	private PortletRequest _portletRequest;
+	private final PageContext _pageContext;
+	private final PortletRequest _portletRequest;
 	private String _randomNamespace;
-	private HttpServletRequest _request;
+	private final HttpServletRequest _request;
 	private Boolean _stagedLocally;
 	private Boolean _stagedReferrerPortlet;
-	private ThemeDisplay _themeDisplay;
+	private final ThemeDisplay _themeDisplay;
 
 }

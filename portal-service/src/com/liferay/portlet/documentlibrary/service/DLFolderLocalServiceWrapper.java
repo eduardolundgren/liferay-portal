@@ -511,7 +511,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _dlFolderLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -613,6 +613,16 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return _dlFolderLocalService.getFolders(groupId, parentFolderId, start,
 			end, obc);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlFolderLocalService.getFolders(groupId, parentFolderId,
+			status, includeMountfolders, start, end, obc);
 	}
 
 	@Override
@@ -810,14 +820,16 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	}
 
 	@Override
-	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId)
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
+		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFolderLocalService.lockFolder(userId, folderId);
 	}
 
 	@Override
-	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId,
-		java.lang.String owner, boolean inheritable, long expirationTime)
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
+		long folderId, java.lang.String owner, boolean inheritable,
+		long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFolderLocalService.lockFolder(userId, folderId, owner,
 			inheritable, expirationTime);

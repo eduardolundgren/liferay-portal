@@ -1,0 +1,178 @@
+<definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="Site and Page Templates" />
+
+	<set-up>
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<execute macro="Site#tearDownCP" />
+
+		<execute macro="SiteTemplates#tearDownCP" />
+	</tear-down>
+
+	<command name="AddSiteTemplate" priority="5">
+		<var name="siteTemplateActive" value="Yes" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#addCP">
+			<var name="siteTemplateActive" value="Yes" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addSiteTemplateCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+	</command>
+
+	<command name="DeleteSiteTemplate" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#addCP">
+			<var name="siteTemplateActive" value="Yes" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#deleteCP">
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewDefaultCP">
+			<var name="pageTemplateName" value="${pageTemplateName}" />
+		</execute>
+	</command>
+
+	<command name="EditSiteTemplateStatus" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#addCP">
+			<var name="siteTemplateActive" value="Yes" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addSiteTemplateCP">
+			<var name="siteName" value="Site Name" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#editTemplateStatusCP">
+			<var name="siteTemplateActiveEdit" value="No" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewTemplateStatusCP">
+			<var name="siteTemplateActiveEdit" value="No" />
+			<var name="siteTemplateName" value="Site Template Name" />
+		</execute>
+	</command>
+
+	<command name="LocalizeDefaultSiteTemplates" priority="4">
+		<var name="pageTemplateName" value="Page Template Name" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewDefaultCP" />
+
+		<execute macro="MyAccount#configureDisplaySettingsLanguage">
+			<var name="languageName" value="español (España)" />
+			<var name="myAccount" value="My Account" />
+			<var name="saveButton" value="Save" />
+			<var name="successMessage" value="Su petición ha terminado con éxito." />
+		</execute>
+
+		<execute macro="Page#gotoCPLocalized">
+			<var name="localizedAdmin" value="Administración" />
+			<var name="localizedControlPanel" value="Panel de control" />\
+			<var name="localizedPortletName" value="Plantillas de sitio web" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewDefaultDataLocalizedCP">
+			<var name="communitySiteDescriptionTranslation" value="Sitio con foros y Wiki" />
+			<var name="communitySiteTranslation" value="Sitio de la comunidad" />
+			<var name="intranetSiteDescriptionTranslation" value="Sitio con noticias y documentos" />
+			<var name="intranetSiteTranslation" value="Sitio de la intranet" />
+		</execute>
+
+		<execute macro="Page#openURL">
+			<var name="siteName" value="Liferay" />
+		</execute>
+
+		<execute macro="MyAccount#configureDisplaySettingsLanguage">
+			<var name="languageName" value="English (United States)" />
+			<var name="myAccount" value="Mi cuenta" />
+			<var name="saveButton" value="Guardar" />
+			<var name="successMessage" value="Your request completed successfully." />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Site Templates" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewDefaultCP" />
+	</command>
+
+	<command name="ResetPageChanges" priority="4">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addCommunityCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#openURL">
+			<var name="siteName" value="Site Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Portlet#dragAndDropPortletToColumnPG">
+			<var name="columnNumberFrom" value="2" />
+			<var name="columnNumberTo" value="1" />
+			<var name="portletName" value="User Statistics" />
+		</execute>
+
+		<execute macro="SiteTemplates#resetPageChanges">
+			<var name="columnNumberTo" value="1" />
+			<var name="portletName" value="User Statistics" />
+		</execute>
+
+		<execute macro="SiteTemplates#viewResetPageChanges">
+			<var name="columnNumberFrom" value="2" />
+			<var name="portletName" value="User Statistics" />
+		</execute>
+	</command>
+</definition>

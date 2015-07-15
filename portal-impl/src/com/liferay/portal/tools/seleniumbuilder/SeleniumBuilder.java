@@ -38,7 +38,14 @@ public class SeleniumBuilder {
 	public static void main(String[] args) throws Exception {
 		ToolDependencies.wireBasic();
 
-		new SeleniumBuilder(args);
+		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
+
+		try {
+			new SeleniumBuilder(args);
+		}
+		catch (Exception e) {
+			ArgumentsUtil.processMainException(arguments, e);
+		}
 	}
 
 	/**
@@ -284,8 +291,7 @@ public class SeleniumBuilder {
 	 * @throws Exception if an exception occurred
 	 */
 	private void _writeTestCaseMethodNamesFile() throws Exception {
-		Map<String, Set<String>> testCaseMethodNameMap =
-			new TreeMap<String, Set<String>>();
+		Map<String, Set<String>> testCaseMethodNameMap = new TreeMap<>();
 
 		Set<String> testCaseNames = _seleniumBuilderContext.getTestCaseNames();
 
@@ -299,7 +305,7 @@ public class SeleniumBuilder {
 
 			String componentName = rootElement.attributeValue("component-name");
 
-			Set<String> compontentTestCaseMethodNames = new TreeSet<String>();
+			Set<String> compontentTestCaseMethodNames = new TreeSet<>();
 
 			if (testCaseMethodNameMap.containsKey(componentName)) {
 				compontentTestCaseMethodNames = testCaseMethodNameMap.get(
@@ -358,7 +364,7 @@ public class SeleniumBuilder {
 					}
 
 					Set<String> knownIssuesTestCaseMethodNames =
-						new TreeSet<String>();
+						new TreeSet<>();
 
 					if (testCaseMethodNameMap.containsKey(
 							knownIssuesComponent)) {
@@ -453,7 +459,7 @@ public class SeleniumBuilder {
 	 * @throws Exception if an exception occurred
 	 */
 	private void _writeTestCasePropertiesFile() throws Exception {
-		Set<String> testCaseProperties = new TreeSet<String>();
+		Set<String> testCaseProperties = new TreeSet<>();
 
 		Set<String> testCaseNames = _seleniumBuilderContext.getTestCaseNames();
 
@@ -508,6 +514,18 @@ public class SeleniumBuilder {
 			List<Element> commandElements =
 				_seleniumBuilderFileUtil.getAllChildElements(
 					rootElement, "command");
+
+			String extendsTestCaseName = rootElement.attributeValue("extends");
+
+			if (extendsTestCaseName != null) {
+				Element extendsRootElement =
+					_seleniumBuilderContext.getTestCaseRootElement(
+						extendsTestCaseName);
+
+				commandElements.addAll(
+					_seleniumBuilderFileUtil.getAllChildElements(
+						extendsRootElement, "command"));
+			}
 
 			for (Element commandElement : commandElements) {
 				List<Element> commandPropertyElements =
@@ -574,7 +592,7 @@ public class SeleniumBuilder {
 			false);
 	}
 
-	private SeleniumBuilderContext _seleniumBuilderContext;
-	private SeleniumBuilderFileUtil _seleniumBuilderFileUtil;
+	private final SeleniumBuilderContext _seleniumBuilderContext;
+	private final SeleniumBuilderFileUtil _seleniumBuilderFileUtil;
 
 }

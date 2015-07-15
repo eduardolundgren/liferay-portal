@@ -37,7 +37,9 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, organizationId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Organization.class.getName(), organizationId,
+				actionId);
 		}
 	}
 
@@ -48,7 +50,9 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, organization, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Organization.class.getName(),
+				organization.getOrganizationId(), actionId);
 		}
 	}
 
@@ -80,7 +84,9 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 		}
 
 		for (long organizationId : organizationIds) {
-			check(permissionChecker, organizationId, actionId);
+			if (!contains(permissionChecker, organizationId, actionId)) {
+				return false;
+			}
 		}
 
 		return true;
@@ -124,7 +130,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 
 		while ((organization != null) &&
 			   (organization.getOrganizationId() !=
-					OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID)) {
+				   OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID)) {
 
 			if (actionId.equals(ActionKeys.ADD_ORGANIZATION) &&
 				permissionChecker.hasPermission(
