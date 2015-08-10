@@ -57,18 +57,14 @@ public class ValidatorTest extends PowerMockito {
 
 	@Test
 	public void testIsFileExtension() throws Exception {
-		String[] validFileExtensions = {
-			"abc", ".abc", "."
-		};
+		String[] validFileExtensions = {"abc", ".abc", "."};
 
 		testValidFileExtensions(validFileExtensions, true);
 	}
 
 	@Test
 	public void testIsFileName() throws Exception {
-		String[] validFileNames = {
-			".asdf", "abc", "abc.def", "abc.def.xyz"
-		};
+		String[] validFileNames = {".asdf", "abc", "abc.def", "abc.def.xyz"};
 
 		testValidFileNames(validFileNames, true);
 	}
@@ -111,7 +107,7 @@ public class ValidatorTest extends PowerMockito {
 	@Test
 	public void testIsInvalidFileExtension() throws Exception {
 		String[] invalidFileExtensions = {
-			null, "", "\u0000", ".\u0000", "abc\u0000\u0000/", "a/b", "c\\d",
+			null, "", "\u0000", ".\u0000", "abc\u0000\u0000/", "a/b", "c\\d"
 		};
 
 		testValidFileExtensions(invalidFileExtensions, false);
@@ -131,7 +127,7 @@ public class ValidatorTest extends PowerMockito {
 	@Test
 	public void testIsInvalidFilePath() throws Exception {
 		String[] invalidFilePaths = {
-			null, "", "..", "./..", "../a", "/../a", "\u0000","a\u0000/../a"
+			null, "", "..", "./..", "../a", "/../a", "\u0000", "a\u0000/../a"
 		};
 
 		testValidFilePaths(invalidFilePaths, false, false);
@@ -340,7 +336,7 @@ public class ValidatorTest extends PowerMockito {
 			"::ffff:257.1.2.3", "fe80:0000:0000:0000:0204:61ff:254.157.241.086",
 			"FF01::101::2", "FF02:0000:0000:0000:0000:0000:0000:0000:0001",
 			"ldkfj", "XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:1.2.3.4",
-			"XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX",
+			"XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX"
 		};
 
 		testValidIPv6Addresses(invalidIPv6Addresses, false);
@@ -378,7 +374,7 @@ public class ValidatorTest extends PowerMockito {
 	@Test
 	public void testIsNullInvalid() throws Exception {
 		String[] notNullStrings = {
-			"a", "anull", "nulla", " anull", " nulla ","  null  a"
+			"a", "anull", "nulla", " anull", " nulla ", "  null  a"
 		};
 
 		testIsNull(notNullStrings, false);

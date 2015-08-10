@@ -15,8 +15,8 @@
 package com.liferay.portal.kernel.concurrent;
 
 import com.liferay.portal.kernel.concurrent.BatchablePipe.IncreasableEntryWrapper;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +42,7 @@ public class BatchablePipeTest {
 
 	@Test
 	public void testBatchPutAndGet() {
-		BatchablePipe<String, Integer> batchablePipe =
-			new BatchablePipe<String, Integer>();
+		BatchablePipe<String, Integer> batchablePipe = new BatchablePipe<>();
 
 		// Batch same entry
 
@@ -132,11 +131,10 @@ public class BatchablePipeTest {
 	@Test
 	public void testConcurrent() throws InterruptedException {
 		final BatchablePipe<String, Integer> batchablePipe =
-			new BatchablePipe<String, Integer>();
+			new BatchablePipe<>();
 
 		final BlockingQueue<IncreasableEntry<String, Integer>>
-			resultBlockingQueue = new LinkedBlockingQueue
-				<IncreasableEntry<String, Integer>>();
+			resultBlockingQueue = new LinkedBlockingQueue<>();
 
 		ExecutorService putThreadPool = Executors.newFixedThreadPool(5);
 		ExecutorService takeThreadPool = Executors.newFixedThreadPool(5);
@@ -212,7 +210,7 @@ public class BatchablePipeTest {
 
 		// Do statistics
 
-		Map<String, Integer> verifyMap = new HashMap<String, Integer>();
+		Map<String, Integer> verifyMap = new HashMap<>();
 
 		for (IncreasableEntry<String, Integer> increasableEntry :
 				resultBlockingQueue) {
@@ -241,8 +239,7 @@ public class BatchablePipeTest {
 
 	@Test
 	public void testConcurrentPut() {
-		BatchablePipe<String, Integer> batchablePipe =
-			new BatchablePipe<String, Integer>();
+		BatchablePipe<String, Integer> batchablePipe = new BatchablePipe<>();
 
 		final IncreasableEntry<String, Integer> increasbleEntry1 =
 			new IntegerIncreasableEntry("test", 1);
@@ -285,8 +282,7 @@ public class BatchablePipeTest {
 
 	@Test
 	public void testCreation() {
-		BatchablePipe<String, Integer> batchablePipe =
-			new BatchablePipe<String, Integer>();
+		BatchablePipe<String, Integer> batchablePipe = new BatchablePipe<>();
 
 		Assert.assertNull(batchablePipe.take());
 		Assert.assertNull(batchablePipe.take());
@@ -308,7 +304,7 @@ public class BatchablePipeTest {
 			new IncreasableEntryWrapper<String, Integer>(increasbleEntry2));
 
 		IncreasableEntryWrapper<String, Integer> increasableEntryWrapper =
-			new IncreasableEntryWrapper<String, Integer>(increasbleEntry1);
+			new IncreasableEntryWrapper<>(increasbleEntry1);
 
 		Assert.assertEquals(
 			increasbleEntry1.hashCode(), increasableEntryWrapper.hashCode());
@@ -318,8 +314,7 @@ public class BatchablePipeTest {
 
 	@Test
 	public void testSimplePutAndTake() {
-		BatchablePipe<String, Integer> batchablePipe =
-			new BatchablePipe<String, Integer>();
+		BatchablePipe<String, Integer> batchablePipe = new BatchablePipe<>();
 
 		// Put 1st
 

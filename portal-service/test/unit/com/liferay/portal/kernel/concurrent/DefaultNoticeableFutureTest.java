@@ -14,7 +14,8 @@
 
 package com.liferay.portal.kernel.concurrent;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -53,25 +54,50 @@ public class DefaultNoticeableFutureTest {
 			Assert.assertEquals("Future listener is null", npe.getMessage());
 		}
 
-		RecordedFutureListener<Object> recordedFutureListener =
-			new RecordedFutureListener<Object>();
+		Object futureListeners = ReflectionTestUtil.getFieldValue(
+			defaultNoticeableFuture, "_futureListeners");
+
+		Assert.assertEquals(0, futureListeners.hashCode());
+
+		RecordedFutureListener<Object> recordedFutureListener1 =
+			new RecordedFutureListener<>();
 
 		Assert.assertTrue(
-			defaultNoticeableFuture.addFutureListener(recordedFutureListener));
+			defaultNoticeableFuture.addFutureListener(recordedFutureListener1));
+		Assert.assertEquals(
+			recordedFutureListener1.hashCode(), futureListeners.hashCode());
+
+		RecordedFutureListener<Object> recordedFutureListener2 =
+			new RecordedFutureListener<>();
+
+		Assert.assertTrue(
+			defaultNoticeableFuture.addFutureListener(recordedFutureListener2));
+		Assert.assertEquals(
+			recordedFutureListener1.hashCode() +
+				recordedFutureListener2.hashCode(),
+			futureListeners.hashCode());
 		Assert.assertFalse(
-			defaultNoticeableFuture.addFutureListener(recordedFutureListener));
+			defaultNoticeableFuture.addFutureListener(recordedFutureListener1));
+		Assert.assertFalse(
+			defaultNoticeableFuture.addFutureListener(recordedFutureListener2));
 		Assert.assertTrue(
 			defaultNoticeableFuture.removeFutureListener(
-				recordedFutureListener));
+				recordedFutureListener1));
 		Assert.assertFalse(
 			defaultNoticeableFuture.removeFutureListener(
-				recordedFutureListener));
+				recordedFutureListener1));
+		Assert.assertTrue(
+			defaultNoticeableFuture.removeFutureListener(
+				recordedFutureListener2));
+		Assert.assertFalse(
+			defaultNoticeableFuture.removeFutureListener(
+				recordedFutureListener2));
 	}
 
 	@Test
 	public void testCompleteWithException() throws InterruptedException {
 		RecordedFutureListener<Object> recordedFutureListener1 =
-			new RecordedFutureListener<Object>();
+			new RecordedFutureListener<>();
 
 		Assert.assertTrue(
 			defaultNoticeableFuture.addFutureListener(recordedFutureListener1));
@@ -93,7 +119,7 @@ public class DefaultNoticeableFutureTest {
 		}
 
 		RecordedFutureListener<Object> recordedFutureListener2 =
-			new RecordedFutureListener<Object>();
+			new RecordedFutureListener<>();
 
 		Assert.assertTrue(
 			defaultNoticeableFuture.addFutureListener(recordedFutureListener2));
@@ -104,7 +130,7 @@ public class DefaultNoticeableFutureTest {
 	@Test
 	public void testCompleteWithRaceCondition() {
 		RecordedFutureListener<Object> recordedFutureListener =
-			new RecordedFutureListener<Object>();
+			new RecordedFutureListener<>();
 
 		Assert.assertTrue(
 			defaultNoticeableFuture.addFutureListener(recordedFutureListener));
@@ -125,7 +151,7 @@ public class DefaultNoticeableFutureTest {
 	@Test
 	public void testCompleteWithResult() throws Exception {
 		RecordedFutureListener<Object> recordedFutureListener1 =
-			new RecordedFutureListener<Object>();
+			new RecordedFutureListener<>();
 
 		Assert.assertTrue(
 			defaultNoticeableFuture.addFutureListener(recordedFutureListener1));
@@ -139,7 +165,7 @@ public class DefaultNoticeableFutureTest {
 		Assert.assertSame(result, defaultNoticeableFuture.get());
 
 		RecordedFutureListener<Object> recordedFutureListener2 =
-			new RecordedFutureListener<Object>();
+			new RecordedFutureListener<>();
 
 		Assert.assertTrue(
 			defaultNoticeableFuture.addFutureListener(recordedFutureListener2));
@@ -169,16 +195,16 @@ public class DefaultNoticeableFutureTest {
 		Assert.assertSame(flag, defaultNoticeableFuture.get());
 		Assert.assertTrue(flag.get());
 
-		defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Object>(
-				new Runnable() {
+		defaultNoticeableFuture = new DefaultNoticeableFuture<Object>(
+			new Runnable() {
 
-					@Override
-					public void run() {
-						flag.set(false);
-					}
+				@Override
+				public void run() {
+					flag.set(false);
+				}
 
-				}, flag);
+			},
+			flag);
 
 		defaultNoticeableFuture.run();
 
@@ -187,6 +213,6 @@ public class DefaultNoticeableFutureTest {
 	}
 
 	private final DefaultNoticeableFuture<Object> defaultNoticeableFuture =
-		new DefaultNoticeableFuture<Object>();
+		new DefaultNoticeableFuture<>();
 
 }

@@ -16,6 +16,8 @@ package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.messaging.proxy.BaseMultiDestinationProxyBean;
 import com.liferay.portal.kernel.messaging.proxy.ProxyRequest;
+import com.liferay.portal.kernel.search.suggest.Suggester;
+import com.liferay.portal.kernel.search.suggest.SuggesterResults;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,11 @@ public class IndexSearcherProxyBean
 	}
 
 	@Override
+	public String getQueryString(SearchContext searchContext, Query query) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Hits search(SearchContext searchContext, Query query) {
 		throw new UnsupportedOperationException();
 	}
@@ -65,6 +72,11 @@ public class IndexSearcherProxyBean
 	}
 
 	@Override
+	public long searchCount(SearchContext searchContext, Query query) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public String spellCheckKeywords(SearchContext searchContext) {
 		throw new UnsupportedOperationException();
 	}
@@ -72,6 +84,13 @@ public class IndexSearcherProxyBean
 	@Override
 	public Map<String, List<String>> spellCheckKeywords(
 		SearchContext searchContext, int max) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public SuggesterResults suggest(
+		SearchContext searchContext, Suggester suggester) {
 
 		throw new UnsupportedOperationException();
 	}

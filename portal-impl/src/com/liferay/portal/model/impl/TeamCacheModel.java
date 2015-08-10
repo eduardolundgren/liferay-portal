@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 	MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof TeamCacheModel)) {
+			return false;
+		}
+
+		TeamCacheModel teamCacheModel = (TeamCacheModel)obj;
+
+		if ((teamId == teamCacheModel.teamId) &&
+				(mvccVersion == teamCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, teamId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,10 +79,12 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", uuid=");
+		sb.append(uuid);
 		sb.append(", teamId=");
 		sb.append(teamId);
 		sb.append(", companyId=");
@@ -73,6 +103,8 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -83,6 +115,14 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 		TeamImpl teamImpl = new TeamImpl();
 
 		teamImpl.setMvccVersion(mvccVersion);
+
+		if (uuid == null) {
+			teamImpl.setUuid(StringPool.BLANK);
+		}
+		else {
+			teamImpl.setUuid(uuid);
+		}
+
 		teamImpl.setTeamId(teamId);
 		teamImpl.setCompanyId(companyId);
 		teamImpl.setUserId(userId);
@@ -124,6 +164,13 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 			teamImpl.setDescription(description);
 		}
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			teamImpl.setLastPublishDate(null);
+		}
+		else {
+			teamImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		teamImpl.resetOriginalValues();
 
 		return teamImpl;
@@ -132,6 +179,7 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+		uuid = objectInput.readUTF();
 		teamId = objectInput.readLong();
 		companyId = objectInput.readLong();
 		userId = objectInput.readLong();
@@ -141,12 +189,21 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 		groupId = objectInput.readLong();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		if (uuid == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(uuid);
+		}
+
 		objectOutput.writeLong(teamId);
 		objectOutput.writeLong(companyId);
 		objectOutput.writeLong(userId);
@@ -175,9 +232,12 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 		else {
 			objectOutput.writeUTF(description);
 		}
+
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
+	public String uuid;
 	public long teamId;
 	public long companyId;
 	public long userId;
@@ -187,4 +247,5 @@ public class TeamCacheModel implements CacheModel<Team>, Externalizable,
 	public long groupId;
 	public String name;
 	public String description;
+	public long lastPublishDate;
 }

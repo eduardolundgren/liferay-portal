@@ -14,8 +14,8 @@
 
 package com.liferay.portal.kernel.workflow;
 
-import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 
 /**
  * @author Jorge Ferrer
@@ -35,7 +35,7 @@ public class WorkflowThreadLocal {
 	}
 
 	private static final ThreadLocal<Boolean> _enabled =
-		new AutoResetThreadLocal<Boolean>(
+		new AutoResetThreadLocal<>(
 			WorkflowThreadLocal.class + "._enabled", true);
 
 }

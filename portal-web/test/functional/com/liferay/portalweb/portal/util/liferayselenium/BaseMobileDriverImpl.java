@@ -14,15 +14,9 @@
 
 package com.liferay.portalweb.portal.util.liferayselenium;
 
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portalweb.util.TestPropsValues;
 
 import io.appium.java_client.MobileDriver;
-
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsDriver;
 
 /**
  * @author Kenji Heigel
@@ -34,6 +28,8 @@ public abstract class BaseMobileDriverImpl
 		String projectDirName, String browserURL, MobileDriver mobileDriver) {
 
 		super(mobileDriver);
+
+		_projectDirName = projectDirName;
 	}
 
 	@Override
@@ -68,6 +64,11 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public void assertConsoleTextPresent(String text) throws Exception {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void assertEditable(String locator) throws Exception {
 		throw new UnsupportedOperationException();
 	}
 
@@ -145,6 +146,11 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
+	public void assertNotEditable(String locator) throws Exception {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void assertNotLocation(String pattern) throws Exception {
 		throw new UnsupportedOperationException();
 	}
@@ -178,6 +184,11 @@ public abstract class BaseMobileDriverImpl
 	@Override
 	public void assertNotVisible(String locator) throws Exception {
 		LiferaySeleniumHelper.assertNotVisible(this, locator);
+	}
+
+	@Override
+	public void assertPartialConfirmation(String pattern) throws Exception {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -278,7 +289,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public String getDependenciesDirName() {
-		return _dependenciesDirName;
+		return _DEPENDENCIES_DIR_NAME;
 	}
 
 	@Override
@@ -313,7 +324,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public String getOutputDirName() {
-		return _outputDirName;
+		return _OUTPUT_DIR_NAME;
 	}
 
 	@Override
@@ -328,7 +339,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public String getSikuliImagesDirName() {
-		return _sikuliImagesDirName;
+		return _SIKULI_IMAGES_DIR_NAME;
 	}
 
 	@Override
@@ -363,6 +374,11 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public boolean isNotChecked(String locator) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isNotEditable(String locator) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -402,6 +418,11 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
+	public boolean isSikuliImagePresent(String image) throws Exception {
+		return LiferaySeleniumHelper.isSikuliImagePresent(this, image);
+	}
+
+	@Override
 	public boolean isTCatEnabled() {
 		return LiferaySeleniumHelper.isTCatEnabled();
 	}
@@ -418,6 +439,16 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public boolean isValue(String locator, String value) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void javaScriptMouseDown(String locator) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void javaScriptMouseUp(String locator) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -583,6 +614,13 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
+	public void sikuliClickByIndex(String image, String index)
+		throws Exception {
+
+		LiferaySeleniumHelper.sikuliClickByIndex(this, image, index);
+	}
+
+	@Override
 	public void sikuliDragAndDrop(String image, String coordString)
 		throws Exception {
 
@@ -650,47 +688,18 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public void tap(String locator) {
-		WebElement webElement = getWebElement("//body");
-
-		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
-
-		WebDriver wrappedWebDriver = wrapsDriver.getWrappedDriver();
-
-		JavascriptExecutor javascriptExecutor =
-			(JavascriptExecutor)wrappedWebDriver;
-
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("YUI().use('node-event-simulate', function(Y) {");
-		sb.append("var node = Y.one('");
-
-		String cssLocator = locator;
-
-		cssLocator = cssLocator.replaceAll("\\/\\/", " ");
-		cssLocator = cssLocator.replaceAll(
-			"contains\\(@([^,]*),([^)]*)\\)", "$1*=$2");
-		cssLocator = cssLocator.replaceAll("'", "\"");
-		cssLocator = cssLocator.replaceAll("\\/", " > ");
-		cssLocator = cssLocator.replaceAll("^ ", "");
-		cssLocator = cssLocator.replaceAll(" and ", "][");
-
-		sb.append(cssLocator);
-
-		sb.append("');");
-		sb.append("node.simulateGesture('tap');});");
-
-		javascriptExecutor.executeScript(sb.toString());
-	}
-
-	@Override
 	public void typeAceEditor(String locator, String value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void typeFrame(String locator, String value) {
-		LiferaySeleniumHelper.typeFrame(this, locator, value);
+	public void typeAlloyEditor(String locator, String value) {
+		WebDriverHelper.typeAlloyEditor(this, locator, value);
+	}
+
+	@Override
+	public void typeCKEditor(String locator, String value) {
+		LiferaySeleniumHelper.typeCKEditor(this, locator, value);
 	}
 
 	@Override
@@ -806,12 +815,16 @@ public abstract class BaseMobileDriverImpl
 		throw new UnsupportedOperationException();
 	}
 
-	private String _dependenciesDirName =
+	private static final String _DEPENDENCIES_DIR_NAME =
 		"portal-web//test//functional//com//liferay//portalweb//dependencies//";
-	private String _outputDirName = TestPropsValues.OUTPUT_DIR_NAME;
+
+	private static final String _OUTPUT_DIR_NAME =
+		TestPropsValues.OUTPUT_DIR_NAME;
+
+	private static final String _SIKULI_IMAGES_DIR_NAME =
+		_DEPENDENCIES_DIR_NAME + "sikuli//linux//";
+
 	private String _primaryTestSuiteName;
-	private String _projectDirName;
-	private String _sikuliImagesDirName =
-		_dependenciesDirName + "sikuli//linux//";
+	private final String _projectDirName;
 
 }

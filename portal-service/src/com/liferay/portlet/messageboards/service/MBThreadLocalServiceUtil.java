@@ -245,7 +245,7 @@ public class MBThreadLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -616,6 +616,11 @@ public class MBThreadLocalServiceUtil {
 	public static com.liferay.portlet.messageboards.model.MBThread updateMBThread(
 		com.liferay.portlet.messageboards.model.MBThread mbThread) {
 		return getService().updateMBThread(mbThread);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBThread updateMessageCount(
+		long threadId) {
+		return getService().updateMessageCount(threadId);
 	}
 
 	public static void updateQuestion(long threadId, boolean question)

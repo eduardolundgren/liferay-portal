@@ -274,6 +274,17 @@ public class WebXMLDefinitionLoader extends DefaultHandler {
 
 				xmlReader.parse(new InputSource(inputStream));
 			}
+			catch (SAXParseException e) {
+				String message = e.getMessage();
+
+				if (message.contains("DOCTYPE is disallowed")) {
+					throw new Exception(
+						"WEB-INF/web.xml must be updated to the Servlet 2.4 " +
+							"specification");
+				}
+
+				throw e;
+			}
 		}
 
 		return _webXMLDefinition;

@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.notifications.NotificationEvent;
 import com.liferay.portal.kernel.notifications.NotificationEventFactoryUtil;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.model.UserNotificationEvent;
@@ -133,8 +133,8 @@ public class UserNotificationEventLocalServiceImpl
 			long userId, Collection<NotificationEvent> notificationEvents)
 		throws PortalException {
 
-		List<UserNotificationEvent> userNotificationEvents =
-			new ArrayList<UserNotificationEvent>(notificationEvents.size());
+		List<UserNotificationEvent> userNotificationEvents = new ArrayList<>(
+			notificationEvents.size());
 
 		for (NotificationEvent notificationEvent : notificationEvents) {
 			UserNotificationEvent userNotificationEvent =
@@ -489,8 +489,7 @@ public class UserNotificationEventLocalServiceImpl
 	public List<UserNotificationEvent> updateUserNotificationEvents(
 		Collection<String> uuids, long companyId, boolean archive) {
 
-		List<UserNotificationEvent> userNotificationEvents =
-			new ArrayList<UserNotificationEvent>();
+		List<UserNotificationEvent> userNotificationEvents = new ArrayList<>();
 
 		for (String uuid : uuids) {
 			userNotificationEvents.add(
@@ -503,7 +502,7 @@ public class UserNotificationEventLocalServiceImpl
 	protected void sendPushNotification(
 		final NotificationEvent notificationEvent) {
 
-		TransactionCommitCallbackRegistryUtil.registerCallback(
+		TransactionCommitCallbackUtil.registerCallback(
 			new Callable<Void>() {
 
 				@Override

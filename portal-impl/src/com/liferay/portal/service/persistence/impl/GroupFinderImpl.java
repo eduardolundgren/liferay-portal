@@ -88,8 +88,8 @@ public class GroupFinderImpl
 	public static final String FIND_BY_C_P =
 		GroupFinder.class.getName() + ".findByC_P";
 
-	public static final String FIND_BY_C_N =
-		GroupFinder.class.getName() + ".findByC_N";
+	public static final String FIND_BY_C_GK =
+		GroupFinder.class.getName() + ".findByC_GK";
 
 	public static final String FIND_BY_C_C_PG_N_D =
 		GroupFinder.class.getName() + ".findByC_C_PG_N_D";
@@ -185,23 +185,19 @@ public class GroupFinderImpl
 
 	@Override
 	public int countByG_U(long groupId, long userId, boolean inherit) {
-		LinkedHashMap<String, Object> params1 =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params1 = new LinkedHashMap<>();
 
 		params1.put("usersGroups", userId);
 
-		LinkedHashMap<String, Object> params2 =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params2 = new LinkedHashMap<>();
 
 		params2.put("groupOrg", userId);
 
-		LinkedHashMap<String, Object> params3 =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params3 = new LinkedHashMap<>();
 
 		params3.put("groupsOrgs", userId);
 
-		LinkedHashMap<String, Object> params4 =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params4 = new LinkedHashMap<>();
 
 		params4.put("groupsUserGroups", userId);
 
@@ -260,17 +256,17 @@ public class GroupFinderImpl
 		boolean doUnion = Validator.isNotNull(userId);
 
 		if (doUnion) {
-			params2 = new LinkedHashMap<String, Object>(params1);
+			params2 = new LinkedHashMap<>(params1);
 
 			params2.remove("usersGroups");
 			params2.put("groupOrg", userId);
 
-			params3 = new LinkedHashMap<String, Object>(params1);
+			params3 = new LinkedHashMap<>(params1);
 
 			params3.remove("usersGroups");
 			params3.put("groupsOrgs", userId);
 
-			params4 = new LinkedHashMap<String, Object>(params1);
+			params4 = new LinkedHashMap<>(params1);
 
 			params4.remove("usersGroups");
 			params4.put("groupsUserGroups", userId);
@@ -281,7 +277,7 @@ public class GroupFinderImpl
 		try {
 			session = openSession();
 
-			Set<Long> groupIds = new HashSet<Long>();
+			Set<Long> groupIds = new HashSet<>();
 
 			groupIds.addAll(
 				countByC_C_PG_N_D(
@@ -487,17 +483,17 @@ public class GroupFinderImpl
 		boolean doUnion = Validator.isNotNull(userId) && inherit;
 
 		if (doUnion) {
-			params2 = new LinkedHashMap<String, Object>(params1);
+			params2 = new LinkedHashMap<>(params1);
 
 			params2.remove("usersGroups");
 			params2.put("groupOrg", userId);
 
-			params3 = new LinkedHashMap<String, Object>(params1);
+			params3 = new LinkedHashMap<>(params1);
 
 			params3.remove("usersGroups");
 			params3.put("groupsOrgs", userId);
 
-			params4 = new LinkedHashMap<String, Object>(params1);
+			params4 = new LinkedHashMap<>(params1);
 
 			params4.remove("usersGroups");
 			params4.put("groupsUserGroups", userId);
@@ -585,7 +581,7 @@ public class GroupFinderImpl
 			List<Long> groupIds = (List<Long>)QueryUtil.list(
 				q, getDialect(), start, end);
 
-			List<Group> groups = new ArrayList<Group>(groupIds.size());
+			List<Group> groups = new ArrayList<>(groupIds.size());
 
 			for (Long groupId : groupIds) {
 				Group group = GroupUtil.findByPrimaryKey(groupId);
@@ -643,17 +639,17 @@ public class GroupFinderImpl
 	}
 
 	@Override
-	public Group findByC_N(long companyId, String name)
+	public Group findByC_GK(long companyId, String groupKey)
 		throws NoSuchGroupException {
 
-		name = StringUtil.lowerCase(name);
+		groupKey = StringUtil.lowerCase(groupKey);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(FIND_BY_C_N);
+			String sql = CustomSQLUtil.get(FIND_BY_C_GK);
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -662,7 +658,7 @@ public class GroupFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(companyId);
-			qPos.add(name);
+			qPos.add(groupKey);
 
 			List<Group> groups = q.list();
 
@@ -681,8 +677,8 @@ public class GroupFinderImpl
 
 		sb.append("No Group exists with the key {companyId=");
 		sb.append(companyId);
-		sb.append(", name=");
-		sb.append(name);
+		sb.append(", groupKey=");
+		sb.append(groupKey);
 		sb.append("}");
 
 		throw new NoSuchGroupException(sb.toString());
@@ -721,17 +717,17 @@ public class GroupFinderImpl
 		boolean doUnion = Validator.isNotNull(userId) && inherit;
 
 		if (doUnion) {
-			params2 = new LinkedHashMap<String, Object>(params1);
+			params2 = new LinkedHashMap<>(params1);
 
 			params2.remove("usersGroups");
 			params2.put("groupOrg", userId);
 
-			params3 = new LinkedHashMap<String, Object>(params1);
+			params3 = new LinkedHashMap<>(params1);
 
 			params3.remove("usersGroups");
 			params3.put("groupsOrgs", userId);
 
-			params4 = new LinkedHashMap<String, Object>(params1);
+			params4 = new LinkedHashMap<>(params1);
 
 			params4.remove("usersGroups");
 			params4.put("groupsUserGroups", userId);
@@ -854,7 +850,7 @@ public class GroupFinderImpl
 			List<Long> groupIds = (List<Long>)QueryUtil.list(
 				q, getDialect(), start, end);
 
-			List<Group> groups = new ArrayList<Group>(groupIds.size());
+			List<Group> groups = new ArrayList<>(groupIds.size());
 
 			for (Long groupId : groupIds) {
 				Group group = GroupUtil.findByPrimaryKey(groupId);
@@ -1086,13 +1082,8 @@ public class GroupFinderImpl
 
 		if (params.isEmpty()) {
 			return StringUtil.replace(
-				sql,
-				new String[] {
-					"[$JOIN$]", "[$WHERE$]"
-				},
-				new String[] {
-					StringPool.BLANK, StringPool.BLANK
-				});
+				sql, new String[] {"[$JOIN$]", "[$WHERE$]"},
+				new String[] {StringPool.BLANK, StringPool.BLANK});
 		}
 
 		String cacheKey = _getCacheKey(sql, params);
@@ -1358,7 +1349,7 @@ public class GroupFinderImpl
 			return _joinMap;
 		}
 
-		Map<String, String> joinMap = new HashMap<String, String>();
+		Map<String, String> joinMap = new HashMap<>();
 
 		joinMap.put("active", _removeWhere(CustomSQLUtil.get(JOIN_BY_ACTIVE)));
 		joinMap.put(
@@ -1404,7 +1395,7 @@ public class GroupFinderImpl
 			return _whereMap;
 		}
 
-		Map<String, String> whereMap = new HashMap<String, String>();
+		Map<String, String> whereMap = new HashMap<>();
 
 		whereMap.put(
 			"active", _getCondition(CustomSQLUtil.get(JOIN_BY_ACTIVE)));
@@ -1466,16 +1457,16 @@ public class GroupFinderImpl
 		return join;
 	}
 
-	private LinkedHashMap<String, Object> _emptyLinkedHashMap =
-		new LinkedHashMap<String, Object>(0);
-	private Map<String, String> _findByC_C_PG_N_DSQLCache =
-		new ConcurrentHashMap<String, String>();
-	private Map<String, String> _findByCompanyIdSQLCache =
-		new ConcurrentHashMap<String, String>();
+	private final LinkedHashMap<String, Object> _emptyLinkedHashMap =
+		new LinkedHashMap<>(0);
+	private final Map<String, String> _findByC_C_PG_N_DSQLCache =
+		new ConcurrentHashMap<>();
+	private final Map<String, String> _findByCompanyIdSQLCache =
+		new ConcurrentHashMap<>();
 	private volatile long[] _groupOrganizationClassNameIds;
 	private volatile Map<String, String> _joinMap;
-	private Map<String, String> _replaceJoinAndWhereSQLCache =
-		new ConcurrentHashMap<String, String>();
+	private final Map<String, String> _replaceJoinAndWhereSQLCache =
+		new ConcurrentHashMap<>();
 	private volatile Map<String, String> _whereMap;
 
 }

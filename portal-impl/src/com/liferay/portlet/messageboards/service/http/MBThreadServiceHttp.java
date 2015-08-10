@@ -27,10 +27,10 @@ import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 
 /**
  * Provides the HTTP utility for the
- * {@link com.liferay.portlet.messageboards.service.MBThreadServiceUtil} service utility. The
+ * {@link MBThreadServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * {@link com.liferay.portal.security.auth.HttpPrincipal} parameter.
+ * {@link HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,8 +49,8 @@ import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
  *
  * @author Brian Wing Shun Chan
  * @see MBThreadServiceSoap
- * @see com.liferay.portal.security.auth.HttpPrincipal
- * @see com.liferay.portlet.messageboards.service.MBThreadServiceUtil
+ * @see HttpPrincipal
+ * @see MBThreadServiceUtil
  * @generated
  */
 @ProviderType
@@ -377,7 +377,7 @@ public class MBThreadServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.model.Lock lockThread(
+	public static com.liferay.portal.kernel.lock.Lock lockThread(
 		HttpPrincipal httpPrincipal, long threadId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -399,7 +399,7 @@ public class MBThreadServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.portal.model.Lock)returnObj;
+			return (com.liferay.portal.kernel.lock.Lock)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);

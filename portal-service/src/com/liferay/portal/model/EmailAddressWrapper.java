@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ public class EmailAddressWrapper implements EmailAddress,
 		attributes.put("address", getAddress());
 		attributes.put("typeId", getTypeId());
 		attributes.put("primary", getPrimary());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -138,7 +140,7 @@ public class EmailAddressWrapper implements EmailAddress,
 			setAddress(address);
 		}
 
-		Integer typeId = (Integer)attributes.get("typeId");
+		Long typeId = (Long)attributes.get("typeId");
 
 		if (typeId != null) {
 			setTypeId(typeId);
@@ -148,6 +150,12 @@ public class EmailAddressWrapper implements EmailAddress,
 
 		if (primary != null) {
 			setPrimary(primary);
+		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
 		}
 	}
 
@@ -217,7 +225,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	* @return the create date of this email address
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _emailAddress.getCreateDate();
 	}
 
@@ -237,12 +245,22 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
+	* Returns the last publish date of this email address.
+	*
+	* @return the last publish date of this email address
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _emailAddress.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this email address.
 	*
 	* @return the modified date of this email address
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _emailAddress.getModifiedDate();
 	}
 
@@ -293,7 +311,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	* @return the type ID of this email address
 	*/
 	@Override
-	public int getTypeId() {
+	public long getTypeId() {
 		return _emailAddress.getTypeId();
 	}
 
@@ -428,7 +446,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	* @param createDate the create date of this email address
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_emailAddress.setCreateDate(createDate);
 	}
 
@@ -443,8 +461,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_emailAddress.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -461,12 +478,22 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
+	* Sets the last publish date of this email address.
+	*
+	* @param lastPublishDate the last publish date of this email address
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_emailAddress.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this email address.
 	*
 	* @param modifiedDate the modified date of this email address
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_emailAddress.setModifiedDate(modifiedDate);
 	}
 
@@ -516,7 +543,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	* @param typeId the type ID of this email address
 	*/
 	@Override
-	public void setTypeId(int typeId) {
+	public void setTypeId(long typeId) {
 		_emailAddress.setTypeId(typeId);
 	}
 
@@ -561,7 +588,7 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.EmailAddress> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.EmailAddress> toCacheModel() {
 		return _emailAddress.toCacheModel();
 	}
 

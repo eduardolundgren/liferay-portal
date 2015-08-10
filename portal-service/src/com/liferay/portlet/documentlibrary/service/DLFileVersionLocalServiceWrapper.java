@@ -200,6 +200,13 @@ public class DLFileVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileVersion fetchLatestFileVersion(
+		long fileEntryId, boolean excludeWorkingCopy) {
+		return _dlFileVersionLocalService.fetchLatestFileVersion(fileEntryId,
+			excludeWorkingCopy);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return _dlFileVersionLocalService.getActionableDynamicQuery();
 	}
@@ -305,7 +312,7 @@ public class DLFileVersionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _dlFileVersionLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

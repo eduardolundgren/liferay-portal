@@ -85,7 +85,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param      ownerType the counter's owner type. Acceptable values are
 	 *             <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
 	 *             <code>TYPE_CREATOR</code> defined in {@link
-	 *             com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *             SocialActivityCounterConstants}.
 	 * @param      currentValue the counter's current value (optionally
 	 *             <code>0</code>)
 	 * @param      totalValue the counter's total value (optionally
@@ -128,7 +128,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param      ownerType the counter's owner type. Acceptable values are
 	 *             <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
 	 *             <code>TYPE_CREATOR</code> defined in {@link
-	 *             com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *             SocialActivityCounterConstants}.
 	 * @param      currentValue the current value of the counter (optionally
 	 *             <code>0</code>)
 	 * @param      totalValue the counter's total value (optionally
@@ -142,8 +142,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 *             <code>PERIOD_LENGTH_INFINITE</code> for never ending counters
 	 *             or <code>PERIOD_LENGTH_SYSTEM</code> for the period length
 	 *             defined in <code>portal-ext.properties</code>. For more
-	 *             information see {@link
-	 *             com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *             information see {@link SocialActivityCounterConstants}.
 	 * @return     the added activity counter
 	 * @throws     PortalException if the group or the previous activity counter
 	 *             could not be found
@@ -181,7 +180,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  ownerType the counter's owner type. Acceptable values are
 	 *         <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
 	 *         <code>TYPE_CREATOR</code> defined in {@link
-	 *         com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *         SocialActivityCounterConstants}.
 	 * @param  totalValue the counter's total value (optionally <code>0</code>)
 	 * @param  previousActivityCounterId the primary key of the activity counter
 	 *         for the previous time period (optionally <code>0</code>, if this
@@ -190,8 +189,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 *         <code>PERIOD_LENGTH_INFINITE</code> for never ending counters or
 	 *         <code>PERIOD_LENGTH_SYSTEM</code> for the period length defined
 	 *         in <code>portal-ext.properties</code>. For more information see
-	 *         {@link
-	 *         com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *         {@link SocialActivityCounterConstants}.
 	 * @return the added activity counter
 	 * @throws PortalException if the group or the previous activity counter
 	 *         could not be found
@@ -353,8 +351,7 @@ public class SocialActivityCounterLocalServiceImpl
 		User assetEntryUser = userPersistence.findByPrimaryKey(
 			assetEntry.getUserId());
 
-		List<SocialActivityCounter> activityCounters =
-			new ArrayList<SocialActivityCounter>();
+		List<SocialActivityCounter> activityCounters = new ArrayList<>();
 
 		for (SocialActivityCounterDefinition activityCounterDefinition :
 				activityDefinition.getActivityCounterDefinitions()) {
@@ -427,7 +424,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param      ownerType the counter's owner type. Acceptable values are
 	 *             <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
 	 *             <code>TYPE_CREATOR</code> defined in {@link
-	 *             com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *             SocialActivityCounterConstants}.
 	 * @param      currentValue the counter's current value (optionally
 	 *             <code>0</code>)
 	 * @param      totalValue the counter's total value (optionally
@@ -470,7 +467,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param      ownerType the counter's owner type. Acceptable values are
 	 *             <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
 	 *             <code>TYPE_CREATOR</code> defined in {@link
-	 *             com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 *             SocialActivityCounterConstants}.
 	 * @param      currentValue the counter's current value (optionally
 	 *             <code>0</code>)
 	 * @param      totalValue the counter's total value of the counter
@@ -484,8 +481,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 *             <code>PERIOD_LENGTH_INFINITE</code> for never ending counters
 	 *             or <code>PERIOD_LENGTH_SYSTEM</code> for the period length
 	 *             defined in <code>portal-ext.properties</code>. For more
-	 *             information see {@link
-	 *             com.liferay.portlet.social.model.SocialActivityConstants}.
+	 *             information see {@link SocialActivityConstants}.
 	 * @return     the created activity counter
 	 * @throws     PortalException if the group or the previous activity counter
 	 *             could not be found
@@ -922,8 +918,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *
@@ -960,8 +955,7 @@ public class SocialActivityCounterLocalServiceImpl
 		for (SocialActivityCounter activityCounter : activityCounters) {
 			if (userId != activityCounter.getClassPK()) {
 				userId = activityCounter.getClassPK();
-				activityCountersMap =
-					new HashMap<String, SocialActivityCounter>();
+				activityCountersMap = new HashMap<>();
 
 				Tuple userActivityCounter = new Tuple(
 					userId, activityCountersMap);
@@ -1202,7 +1196,7 @@ public class SocialActivityCounterLocalServiceImpl
 
 	protected void clearFinderCache() {
 		PortalCache<String, SocialActivityCounter> portalCache =
-			MultiVMPoolUtil.getCache(
+			MultiVMPoolUtil.getPortalCache(
 				SocialActivityCounterFinder.class.getName());
 
 		portalCache.removeAll();
@@ -1307,9 +1301,7 @@ public class SocialActivityCounterLocalServiceImpl
 		throws PortalException {
 
 		String lockKey = StringUtil.merge(
-			new Object[] {
-				groupId, classNameId, classPK, name, ownerType
-			},
+			new Object[] {groupId, classNameId, classPK, name, ownerType},
 			StringPool.POUND);
 
 		LockProtectedAction<SocialActivityCounter> lockProtectedAction =
@@ -1388,17 +1380,17 @@ public class SocialActivityCounterLocalServiceImpl
 			lockProtectedAction.getReturnValue());
 	}
 
-	private SocialActivityCounterDefinition
+	private final SocialActivityCounterDefinition
 		_assetActivitiesActivityCounterDefinition =
 			new SocialActivityCounterDefinition(
 				SocialActivityCounterConstants.NAME_ASSET_ACTIVITIES,
 				SocialActivityCounterConstants.TYPE_ASSET);
-	private SocialActivityCounterDefinition
+	private final SocialActivityCounterDefinition
 		_userAchievementsActivityCounterDefinition =
 			new SocialActivityCounterDefinition(
 				SocialActivityCounterConstants.NAME_USER_ACHIEVEMENTS,
 				SocialActivityCounterConstants.TYPE_ACTOR);
-	private SocialActivityCounterDefinition
+	private final SocialActivityCounterDefinition
 		_userActivitiesActivityCounterDefinition =
 			new SocialActivityCounterDefinition(
 				SocialActivityCounterConstants.NAME_USER_ACTIVITIES,

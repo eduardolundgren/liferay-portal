@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.portal.kernel.cluster.Priority;
-
 /**
  * @author Bruno Farache
  * @author Michael C. Han
@@ -25,27 +23,37 @@ public interface SearchEngine {
 	public String backup(long companyId, String backupName)
 		throws SearchException;
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link BooleanClauseFactoryUtil}
+	 */
+	@Deprecated
 	public BooleanClauseFactory getBooleanClauseFactory();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public BooleanQueryFactory getBooleanQueryFactory();
-
-	public Priority getClusteredWritePriority();
 
 	public IndexSearcher getIndexSearcher();
 
 	public IndexWriter getIndexWriter();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public TermQueryFactory getTermQueryFactory();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public TermRangeQueryFactory getTermRangeQueryFactory();
 
 	public String getVendor();
 
 	public void initialize(long companyId);
-
-	public boolean isClusteredWrite();
-
-	public boolean isLuceneBased();
 
 	public void removeBackup(long companyId, String backupName)
 		throws SearchException;

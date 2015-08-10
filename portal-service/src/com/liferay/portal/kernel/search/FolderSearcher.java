@@ -14,6 +14,10 @@
 
 package com.liferay.portal.kernel.search;
 
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
+import com.liferay.portal.kernel.util.ArrayUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +26,7 @@ import java.util.List;
  */
 public class FolderSearcher extends BaseSearcher {
 
-	public static Indexer getInstance() {
+	public static Indexer<?> getInstance() {
 		return new FolderSearcher();
 	}
 
@@ -31,9 +35,9 @@ public class FolderSearcher extends BaseSearcher {
 		setFilterSearch(true);
 		setPermissionAware(true);
 
-		List<String> folderClassNames = new ArrayList<String>();
+		List<String> folderClassNames = new ArrayList<>();
 
-		for (Indexer indexer : IndexerRegistryUtil.getIndexers()) {
+		for (Indexer<?> indexer : IndexerRegistryUtil.getIndexers()) {
 			if (indexer instanceof FolderIndexer) {
 				FolderIndexer folderIndexer = (FolderIndexer)indexer;
 
@@ -50,27 +54,26 @@ public class FolderSearcher extends BaseSearcher {
 	}
 
 	@Override
-	public String[] getClassNames() {
+	public String[] getSearchClassNames() {
 		return _classNames;
 	}
 
 	@Override
 	protected BooleanQuery createFullQuery(
-			BooleanQuery contextQuery, SearchContext searchContext)
+			BooleanFilter fullQueryBooleanFilter, SearchContext searchContext)
 		throws Exception {
 
 		long[] folderIds = searchContext.getFolderIds();
 
-		BooleanQuery entryClassPKQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
+		TermsFilter entryClassPKTermsFilter = new TermsFilter(
+			Field.ENTRY_CLASS_PK);
 
-		for (long folderId : folderIds) {
-			entryClassPKQuery.addTerm(Field.ENTRY_CLASS_PK, folderId);
-		}
+		entryClassPKTermsFilter.addValues(ArrayUtil.toStringArray(folderIds));
 
-		contextQuery.add(entryClassPKQuery, BooleanClauseOccur.MUST);
+		fullQueryBooleanFilter.add(
+			entryClassPKTermsFilter, BooleanClauseOccur.MUST);
 
-		return super.createFullQuery(contextQuery, searchContext);
+		return super.createFullQuery(fullQueryBooleanFilter, searchContext);
 	}
 
 	private final String[] _classNames;

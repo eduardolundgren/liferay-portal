@@ -42,8 +42,7 @@ public class PortletURLListenerFactory {
 	}
 
 	private PortletURLListenerFactory() {
-		_pool = new ConcurrentHashMap
-			<String, Map<String, PortletURLGenerationListener>>();
+		_pool = new ConcurrentHashMap<>();
 	}
 
 	private PortletURLGenerationListener _create(
@@ -57,8 +56,7 @@ public class PortletURLListenerFactory {
 				portletApp.getServletContextName());
 
 		if (portletURLGenerationListeners == null) {
-			portletURLGenerationListeners =
-				new ConcurrentHashMap<String, PortletURLGenerationListener>();
+			portletURLGenerationListeners = new ConcurrentHashMap<>();
 
 			_pool.put(
 				portletApp.getServletContextName(),

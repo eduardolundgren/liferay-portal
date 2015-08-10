@@ -32,6 +32,12 @@ import java.util.Properties;
  */
 public class FileUtil {
 
+	public static String appendParentheticalSuffix(
+		String fileName, String suffix) {
+
+		return getFile().appendParentheticalSuffix(fileName, suffix);
+	}
+
 	public static void copyDirectory(File source, File destination)
 		throws IOException {
 
@@ -137,7 +143,7 @@ public class FileUtil {
 		return getFile().createTempFileName(prefix, extension);
 	}
 
-	public static File createTempFolder() {
+	public static File createTempFolder() throws IOException {
 		PortalFilePermission.checkWrite(
 			SystemProperties.get(SystemProperties.TMP_DIR));
 
@@ -312,6 +318,12 @@ public class FileUtil {
 		return getFile().listFiles(fileName);
 	}
 
+	public static void mkdirs(File file) throws IOException {
+		PortalFilePermission.checkCopy(_getPath(file), _getPath(file));
+
+		getFile().mkdirs(file);
+	}
+
 	public static void mkdirs(String pathName) {
 		PortalFilePermission.checkCopy(pathName, pathName);
 
@@ -360,6 +372,10 @@ public class FileUtil {
 
 	public static String stripExtension(String fileName) {
 		return getFile().stripExtension(fileName);
+	}
+
+	public static String stripParentheticalSuffix(String fileName) {
+		return getFile().stripParentheticalSuffix(fileName);
 	}
 
 	public static List<String> toList(Reader reader) {

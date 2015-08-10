@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -169,12 +170,18 @@ public class LocaleUtil {
 		return getInstance()._toBCP47LanguageIds(languageIds);
 	}
 
-	public static String[] toDisplayNames(Locale[] locales, Locale locale) {
+	public static String[] toDisplayNames(
+		Collection<Locale> locales, Locale locale) {
+
 		return getInstance()._toDisplayNames(locales, locale);
 	}
 
 	public static String toLanguageId(Locale locale) {
 		return getInstance()._toLanguageId(locale);
+	}
+
+	public static String[] toLanguageIds(Collection<Locale> locales) {
+		return getInstance()._toLanguageIds(locales);
 	}
 
 	public static String[] toLanguageIds(Locale[] locales) {
@@ -331,7 +338,7 @@ public class LocaleUtil {
 	}
 
 	private Map<String, String> _getISOLanguages(Locale locale) {
-		Map<String, String> isoLanguages = new TreeMap<String, String>(
+		Map<String, String> isoLanguages = new TreeMap<>(
 			String.CASE_INSENSITIVE_ORDER);
 
 		for (String isoLanguageId : Locale.getISOLanguages()) {
@@ -444,11 +451,15 @@ public class LocaleUtil {
 		return bcp47LanguageIds;
 	}
 
-	private String[] _toDisplayNames(Locale[] locales, Locale locale) {
-		String[] displayNames = new String[locales.length];
+	private String[] _toDisplayNames(
+		Collection<Locale> locales, Locale locale) {
 
-		for (int i = 0; i < locales.length; i++) {
-			displayNames[i] = locales[i].getDisplayName(locale);
+		String[] displayNames = new String[locales.size()];
+
+		int i = 0;
+
+		for (Locale curLocale : locales) {
+			displayNames[i++] = curLocale.getDisplayName(locale);
 		}
 
 		return displayNames;
@@ -502,6 +513,18 @@ public class LocaleUtil {
 		return sb.toString();
 	}
 
+	private String[] _toLanguageIds(Collection<Locale> locales) {
+		String[] languageIds = new String[locales.size()];
+
+		int i = 0;
+
+		for (Locale locale : locales) {
+			languageIds[i++] = _toLanguageId(locale);
+		}
+
+		return languageIds;
+	}
+
 	private String[] _toLanguageIds(Locale[] locales) {
 		String[] languageIds = new String[locales.length];
 
@@ -537,11 +560,11 @@ public class LocaleUtil {
 
 	private static final String _BETA_SUFFIX = " [Beta]";
 
-	private static Log _log = LogFactoryUtil.getLog(LocaleUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(LocaleUtil.class);
 
-	private static LocaleUtil _instance = new LocaleUtil();
+	private static final LocaleUtil _instance = new LocaleUtil();
 
 	private Locale _locale;
-	private Map<String, Locale> _locales = new HashMap<String, Locale>();
+	private final Map<String, Locale> _locales = new HashMap<>();
 
 }

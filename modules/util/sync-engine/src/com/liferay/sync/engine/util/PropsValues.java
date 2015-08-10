@@ -60,10 +60,16 @@ public class PropsValues {
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE = PropsUtil.get(
 		PropsKeys.SYNC_LOGGER_CONFIGURATION_FILE);
 
-	public static final String SYNC_PRODUCT_NAME = PropsUtil.get(
-		PropsKeys.SYNC_PRODUCT_NAME);
+	public static final String SYNC_OAUTH_ACCESS_TOKEN_URL = PropsUtil.get(
+		PropsKeys.SYNC_OAUTH_ACCESS_TOKEN_URL);
 
-	public static final String SYNC_UPDATE_CHECK_URL = PropsUtil.get(
-		PropsKeys.SYNC_UPDATE_CHECK_URL);
+	public static final String SYNC_OAUTH_AUTHORIZATION_URL = PropsUtil.get(
+		PropsKeys.SYNC_OAUTH_AUTHORIZATION_URL);
+
+	public static final String SYNC_OAUTH_REQUEST_TOKEN_URL = PropsUtil.get(
+		PropsKeys.SYNC_OAUTH_REQUEST_TOKEN_URL);
+
+	public static final String SYNC_OAUTH_WEBSITE_URL = PropsUtil.get(
+		PropsKeys.SYNC_OAUTH_WEBSITE_URL);
 
 }

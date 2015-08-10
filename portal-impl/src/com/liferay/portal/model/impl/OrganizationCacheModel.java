@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class OrganizationCacheModel implements CacheModel<Organization>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof OrganizationCacheModel)) {
+			return false;
+		}
+
+		OrganizationCacheModel organizationCacheModel = (OrganizationCacheModel)obj;
+
+		if ((organizationId == organizationCacheModel.organizationId) &&
+				(mvccVersion == organizationCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, organizationId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(39);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -89,6 +117,8 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 		sb.append(comments);
 		sb.append(", logoId=");
 		sb.append(logoId);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -169,6 +199,13 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 
 		organizationImpl.setLogoId(logoId);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			organizationImpl.setLastPublishDate(null);
+		}
+		else {
+			organizationImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		organizationImpl.resetOriginalValues();
 
 		return organizationImpl;
@@ -191,9 +228,10 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 		recursable = objectInput.readBoolean();
 		regionId = objectInput.readLong();
 		countryId = objectInput.readLong();
-		statusId = objectInput.readInt();
+		statusId = objectInput.readLong();
 		comments = objectInput.readUTF();
 		logoId = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -247,7 +285,7 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 		objectOutput.writeBoolean(recursable);
 		objectOutput.writeLong(regionId);
 		objectOutput.writeLong(countryId);
-		objectOutput.writeInt(statusId);
+		objectOutput.writeLong(statusId);
 
 		if (comments == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -257,6 +295,7 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 		}
 
 		objectOutput.writeLong(logoId);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -274,7 +313,8 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 	public boolean recursable;
 	public long regionId;
 	public long countryId;
-	public int statusId;
+	public long statusId;
 	public String comments;
 	public long logoId;
+	public long lastPublishDate;
 }

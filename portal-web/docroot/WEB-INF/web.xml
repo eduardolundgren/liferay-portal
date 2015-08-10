@@ -202,11 +202,6 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>Lucene Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.LuceneServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
 		<servlet-name>Module Framework Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.module.framework.ModuleFrameworkServletAdapter</servlet-class>
 		<load-on-startup>1</load-on-startup>
@@ -684,10 +679,6 @@
 		<url-pattern>/language/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>Lucene Servlet</servlet-name>
-		<url-pattern>/lucene/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>Netvibes Servlet</servlet-name>
 		<url-pattern>/netvibes/*</url-pattern>
 	</servlet-mapping>
@@ -837,11 +828,7 @@
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/aui</taglib-uri>
-			<taglib-location>/WEB-INF/tld/aui.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://liferay.com/tld/ddm</taglib-uri>
-			<taglib-location>/WEB-INF/tld/liferay-ddm.tld</taglib-location>
+			<taglib-location>/WEB-INF/tld/liferay-aui.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/portlet</taglib-uri>
@@ -850,10 +837,6 @@
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/security</taglib-uri>
 			<taglib-location>/WEB-INF/tld/liferay-security.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://liferay.com/tld/staging</taglib-uri>
-			<taglib-location>/WEB-INF/tld/liferay-staging.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/theme</taglib-uri>

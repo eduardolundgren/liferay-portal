@@ -15,11 +15,13 @@
 package com.liferay.portal.convert;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public interface ConvertProcess {
 
 	public void convert() throws ConvertException;
+
+	public String getConfigurationErrorMessage();
 
 	public String getDescription();
 

@@ -57,7 +57,6 @@ public class
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		validate(comments);
 
@@ -68,7 +67,7 @@ public class
 
 		membershipRequest.setCompanyId(user.getCompanyId());
 		membershipRequest.setUserId(userId);
-		membershipRequest.setCreateDate(now);
+		membershipRequest.setCreateDate(new Date());
 		membershipRequest.setGroupId(groupId);
 		membershipRequest.setComments(comments);
 		membershipRequest.setStatusId(
@@ -92,7 +91,7 @@ public class
 	}
 
 	@Override
-	public void deleteMembershipRequests(long groupId, int statusId) {
+	public void deleteMembershipRequests(long groupId, long statusId) {
 		List<MembershipRequest> membershipRequests =
 			membershipRequestPersistence.findByG_S(groupId, statusId);
 
@@ -113,7 +112,7 @@ public class
 
 	@Override
 	public List<MembershipRequest> getMembershipRequests(
-		long userId, long groupId, int statusId) {
+		long userId, long groupId, long statusId) {
 
 		return membershipRequestPersistence.findByG_U_S(
 			groupId, userId, statusId);
@@ -121,7 +120,7 @@ public class
 
 	@Override
 	public boolean hasMembershipRequest(
-		long userId, long groupId, int statusId) {
+		long userId, long groupId, long statusId) {
 
 		List<MembershipRequest> membershipRequests = getMembershipRequests(
 			userId, groupId, statusId);
@@ -150,7 +149,8 @@ public class
 	@Override
 	public void updateStatus(
 			long replierUserId, long membershipRequestId, String replyComments,
-			int statusId, boolean addUserToGroup, ServiceContext serviceContext)
+			long statusId, boolean addUserToGroup,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		validate(replyComments);
@@ -195,7 +195,7 @@ public class
 	protected List<Long> getGroupAdministratorUserIds(long groupId)
 		throws PortalException {
 
-		Set<Long> userIds = new LinkedHashSet<Long>();
+		Set<Long> userIds = new LinkedHashSet<>();
 
 		Group group = groupLocalService.getGroup(groupId);
 		String modelResource = Group.class.getName();
@@ -246,10 +246,10 @@ public class
 				}
 			}
 
-			List<String> currentIndividualActions = new ArrayList<String>();
-			List<String> currentGroupActions = new ArrayList<String>();
-			List<String> currentGroupTemplateActions = new ArrayList<String>();
-			List<String> currentCompanyActions = new ArrayList<String>();
+			List<String> currentIndividualActions = new ArrayList<>();
+			List<String> currentGroupActions = new ArrayList<>();
+			List<String> currentGroupTemplateActions = new ArrayList<>();
+			List<String> currentCompanyActions = new ArrayList<>();
 
 			ResourcePermissionUtil.populateResourcePermissionActionIds(
 				groupId, role, resource, actions, currentIndividualActions,
@@ -272,7 +272,7 @@ public class
 			}
 		}
 
-		return new ArrayList<Long>(userIds);
+		return new ArrayList<>(userIds);
 	}
 
 	protected void notify(
@@ -337,7 +337,6 @@ public class
 		subscriptionSender.setScopeGroupId(membershipRequest.getGroupId());
 		subscriptionSender.setServiceContext(serviceContext);
 		subscriptionSender.setSubject(subject);
-		subscriptionSender.setUserId(userId);
 
 		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
 

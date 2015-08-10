@@ -22,7 +22,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
-import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
@@ -45,7 +46,10 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
+import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.admin.util.PortalMyAccountApplicationType;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
+import com.liferay.portlet.mobiledevicerules.MDRRuleGroupInstance;
 
 import java.io.Serializable;
 
@@ -55,6 +59,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -461,30 +466,6 @@ public class ThemeDisplay
 		return _mdrRuleGroupInstance;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroup}
-	 */
-	@Deprecated
-	public Group getParentGroup() {
-		return getSiteGroup();
-	}
-
-	/**
-	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupId}
-	 */
-	@Deprecated
-	public long getParentGroupId() {
-		return getSiteGroupId();
-	}
-
-	/**
-	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupName}
-	 */
-	@Deprecated
-	public String getParentGroupName() throws PortalException {
-		return getSiteGroupName();
-	}
-
 	public String getPathApplet() {
 		return _pathApplet;
 	}
@@ -505,6 +486,10 @@ public class ThemeDisplay
 
 	public String getPathContext() {
 		return _pathContext;
+	}
+
+	public String getPathEditors() {
+		return _pathEditors;
 	}
 
 	public String getPathFlash() {
@@ -585,14 +570,6 @@ public class ThemeDisplay
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getPathThemeImages}
-	 */
-	@Deprecated
-	public String getPathThemeImage() {
-		return getPathThemeImages();
-	}
-
-	/**
 	 * Returns the URL for the theme's images.
 	 *
 	 * @return the URL for the theme's images
@@ -667,14 +644,6 @@ public class ThemeDisplay
 	@JSON(include = false)
 	public PortletDisplay getPortletDisplay() {
 		return _portletDisplay;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getScopeGroupId}
-	 */
-	@Deprecated
-	public long getPortletGroupId() {
-		return getScopeGroupId();
 	}
 
 	public String getPpid() {
@@ -753,14 +722,6 @@ public class ThemeDisplay
 	 */
 	public long getScopeGroupId() {
 		return _scopeGroupId;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupIdOrLiveGroupId}
-	 */
-	@Deprecated
-	public long getScopeGroupIdOrLiveGroupId() {
-		return getSiteGroupIdOrLiveGroupId();
 	}
 
 	/**
@@ -943,30 +904,46 @@ public class ThemeDisplay
 		return _urlHome;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public String getURLLayoutTemplates() {
 		if (Validator.isNull(_urlLayoutTemplates)) {
-			return _urlPageSettings + "#layout";
+			return getURLPageSettings() + "#layout";
 		}
 
 		return _urlLayoutTemplates;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getURLSiteAdministration()}
-	 */
-	@Deprecated
-	@JSON(include = false)
-	public PortletURL getURLManageSiteMemberships() {
-		return _urlManageSiteMemberships;
-	}
-
 	@JSON(include = false)
 	public PortletURL getURLMyAccount() {
+		if (_urlMyAccount == null) {
+			String portletId = PortletProviderUtil.getPortletId(
+				PortalMyAccountApplicationType.MyAccount.CLASS_NAME,
+				PortletProvider.Action.VIEW);
+
+			_urlMyAccount = PortalUtil.getControlPanelPortletURL(
+				getRequest(), portletId, 0, PortletRequest.RENDER_PHASE);
+		}
+
 		return _urlMyAccount;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@JSON(include = false)
 	public PortletURL getURLPageSettings() {
+		if (_urlPageSettings == null) {
+			String portletId = PortletProviderUtil.getPortletId(
+				Layout.class.getName(), PortletProvider.Action.EDIT);
+
+			_urlPageSettings = PortalUtil.getControlPanelPortletURL(
+				getRequest(), portletId, 0, PortletRequest.RENDER_PHASE);
+		}
+
 		return _urlPageSettings;
 	}
 
@@ -991,35 +968,14 @@ public class ThemeDisplay
 		return _urlSiteAdministration;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getURLSiteAdministration()}
-	 */
-	@Deprecated
-	public String getURLSiteContent() {
-		return getURLSiteAdministration();
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #isShowSiteAdministrationIcon()}
-	 */
-	@Deprecated
-	@JSON(include = false)
-	public PortletURL getURLSiteMapSettings() {
-		return _urlSiteMapSettings;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getURLSiteAdministration()}
-	 */
-	@Deprecated
-	@JSON(include = false)
-	public PortletURL getURLSiteSettings() {
-		return _urlSiteSettings;
-	}
-
 	@JSON(include = false)
 	public PortletURL getURLUpdateManager() {
+		if (_urlUpdateManager == null) {
+			_urlUpdateManager = PortalUtil.getControlPanelPortletURL(
+				getRequest(), PortletKeys.MARKETPLACE_STORE, 0,
+				PortletRequest.RENDER_PHASE);
+		}
+
 		return _urlUpdateManager;
 	}
 
@@ -1482,14 +1438,6 @@ public class ThemeDisplay
 		_mdrRuleGroupInstance = mdrRuleGroupInstance;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0 renamed to {@link #setSiteGroupId(long)}
-	 */
-	@Deprecated
-	public void setParentGroupId(long parentGroupId) {
-		setSiteGroupId(parentGroupId);
-	}
-
 	public void setPathApplet(String pathApplet) {
 		_pathApplet = pathApplet;
 	}
@@ -1504,6 +1452,10 @@ public class ThemeDisplay
 
 	public void setPathContext(String pathContext) {
 		_pathContext = pathContext;
+	}
+
+	public void setPathEditors(String pathEditors) {
+		_pathEditors = pathEditors;
 	}
 
 	public void setPathFlash(String pathFlash) {
@@ -1527,8 +1479,7 @@ public class ThemeDisplay
 	}
 
 	public void setPathImage(String pathImage) {
-		if (isFacebook() &&
-			!pathImage.startsWith(Http.HTTP_WITH_SLASH) &&
+		if (isFacebook() && !pathImage.startsWith(Http.HTTP_WITH_SLASH) &&
 			!pathImage.startsWith(Http.HTTPS_WITH_SLASH)) {
 
 			pathImage = getPortalURL() + pathImage;
@@ -1702,15 +1653,6 @@ public class ThemeDisplay
 		_showSiteAdministrationIcon = showSiteAdministrationIcon;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #setShowSiteAdministrationIcon(boolean)}
-	 */
-	@Deprecated
-	public void setShowSiteContentIcon(boolean showSiteContentIcon) {
-		setShowSiteAdministrationIcon(showSiteContentIcon);
-	}
-
 	public void setShowSiteMapSettingsIcon(boolean showSiteMapSettingsIcon) {
 		_showSiteMapSettingsIcon = showSiteMapSettingsIcon;
 	}
@@ -1816,16 +1758,18 @@ public class ThemeDisplay
 		_urlLayoutTemplates = urlLayoutTemplates;
 	}
 
-	public void setURLManageSiteMemberships(
-		PortletURL urlManageSiteMemberships) {
-
-		_urlManageSiteMemberships = urlManageSiteMemberships;
-	}
-
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public void setURLMyAccount(PortletURL urlMyAccount) {
 		_urlMyAccount = urlMyAccount;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public void setURLPageSettings(PortletURL urlPageSettings) {
 		_urlPageSettings = urlPageSettings;
 	}
@@ -1851,22 +1795,9 @@ public class ThemeDisplay
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #setURLSiteAdministration(String)}
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
-	public void setURLSiteContent(String urlSiteContent) {
-		setURLSiteAdministration(urlSiteContent);
-	}
-
-	public void setURLSiteMapSettings(PortletURL urlSiteMapSettings) {
-		_urlSiteMapSettings = urlSiteMapSettings;
-	}
-
-	public void setURLSiteSettings(PortletURL urlSiteSettings) {
-		_urlSiteSettings = urlSiteSettings;
-	}
-
 	public void setURLUpdateManager(PortletURL urlUpdateManager) {
 		_urlUpdateManager = urlUpdateManager;
 	}
@@ -1935,6 +1866,7 @@ public class ThemeDisplay
 	private String _pathCms = StringPool.BLANK;
 	private String _pathColorSchemeImages = StringPool.BLANK;
 	private String _pathContext = StringPool.BLANK;
+	private String _pathEditors = StringPool.BLANK;
 	private String _pathFlash = StringPool.BLANK;
 	private String _pathFriendlyURLPrivateGroup = StringPool.BLANK;
 	private String _pathFriendlyURLPrivateUser = StringPool.BLANK;
@@ -2004,7 +1936,6 @@ public class ThemeDisplay
 	private String _urlCurrent = StringPool.BLANK;
 	private String _urlHome = StringPool.BLANK;
 	private String _urlLayoutTemplates = StringPool.BLANK;
-	private transient PortletURL _urlManageSiteMemberships = null;
 	private transient PortletURL _urlMyAccount = null;
 	private transient PortletURL _urlPageSettings = null;
 	private String _urlPortal = StringPool.BLANK;
@@ -2012,8 +1943,6 @@ public class ThemeDisplay
 	private String _urlSignIn = StringPool.BLANK;
 	private String _urlSignOut = StringPool.BLANK;
 	private String _urlSiteAdministration = StringPool.BLANK;
-	private transient PortletURL _urlSiteMapSettings = null;
-	private transient PortletURL _urlSiteSettings = null;
 	private transient PortletURL _urlUpdateManager = null;
 	private User _user;
 	private boolean _widget;

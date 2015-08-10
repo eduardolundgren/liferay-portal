@@ -14,13 +14,12 @@
 
 package com.liferay.sync.engine.documentlibrary.handler;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.liferay.sync.engine.documentlibrary.event.AddFileEntryEvent;
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.util.JSONUtil;
+
+import java.net.SocketException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,33 +34,34 @@ public class AddFileFolderHandler extends BaseJSONHandler {
 	}
 
 	@Override
-	protected boolean handlePortalException(String exception) throws Exception {
-		if (exception.equals(
-				"com.liferay.sync.SyncDLObjectChecksumException")) {
+	public void handleException(Exception e) {
+		if (e instanceof SocketException) {
+			String message = e.getMessage();
 
-			if (_logger.isDebugEnabled()) {
-				_logger.debug("Handling exception {}", exception);
+			if (message.equals("Broken pipe")) {
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("Handling exception {}", e.toString());
+				}
+
+				SyncFile syncFile = getLocalSyncFile();
+
+				syncFile.setState(SyncFile.STATE_ERROR);
+				syncFile.setUiEvent(SyncFile.UI_EVENT_UPLOAD_EXCEPTION);
+
+				SyncFileService.update(syncFile);
+
+				return;
 			}
-
-			AddFileEntryEvent addFileEntryEvent = new AddFileEntryEvent(
-				getSyncAccountId(), getParameters());
-
-			addFileEntryEvent.run();
-
-			return true;
 		}
 
-		return super.handlePortalException(exception);
+		super.handleException(e);
 	}
 
 	@Override
-	protected void processResponse(String response) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
+	public void processResponse(String response) throws Exception {
+		SyncFile remoteSyncFile = JSONUtil.readValue(response, SyncFile.class);
 
-		SyncFile remoteSyncFile = objectMapper.readValue(
-			response, new TypeReference<SyncFile>() {});
-
-		SyncFile localSyncFile = (SyncFile)getParameterValue("syncFile");
+		SyncFile localSyncFile = getLocalSyncFile();
 
 		localSyncFile.setCompanyId(remoteSyncFile.getCompanyId());
 		localSyncFile.setCreateTime(remoteSyncFile.getCreateTime());
@@ -80,6 +80,7 @@ public class AddFileFolderHandler extends BaseJSONHandler {
 		localSyncFile.setTypeUuid(remoteSyncFile.getTypeUuid());
 		localSyncFile.setUiEvent(SyncFile.UI_EVENT_UPLOADED);
 		localSyncFile.setVersion(remoteSyncFile.getVersion());
+		localSyncFile.setVersionId(remoteSyncFile.getVersionId());
 
 		SyncFileService.update(localSyncFile);
 	}

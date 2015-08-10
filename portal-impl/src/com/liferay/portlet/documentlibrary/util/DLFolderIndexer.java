@@ -21,10 +21,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.search.BaseIndexer;
-import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
@@ -32,12 +29,13 @@ import com.liferay.portal.kernel.search.FolderIndexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
@@ -46,17 +44,15 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowStateException;
 
 /**
  * @author Alexander Chow
  */
-public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
+@OSGiBeanProperties
+public class DLFolderIndexer
+	extends BaseIndexer<DLFolder> implements FolderIndexer {
 
-	public static final String[] CLASS_NAMES = {DLFolder.class.getName()};
-
-	public static final String PORTLET_ID = PortletKeys.DOCUMENT_LIBRARY;
+	public static final String CLASS_NAME = DLFolder.class.getName();
 
 	public DLFolderIndexer() {
 		setDefaultSelectedFieldNames(
@@ -67,18 +63,13 @@ public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
 	}
 
 	@Override
-	public String[] getClassNames() {
-		return CLASS_NAMES;
+	public String getClassName() {
+		return CLASS_NAME;
 	}
 
 	@Override
 	public String[] getFolderClassNames() {
-		return CLASS_NAMES;
-	}
-
-	@Override
-	public String getPortletId() {
-		return PORTLET_ID;
+		return new String[] {CLASS_NAME};
 	}
 
 	@Override
@@ -94,22 +85,20 @@ public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
 	}
 
 	@Override
-	public void postProcessContextQuery(
-			BooleanQuery contextQuery, SearchContext searchContext)
+	public void postProcessContextBooleanFilter(
+			BooleanFilter contextBooleanFilter, SearchContext searchContext)
 		throws Exception {
 
-		addStatus(contextQuery, searchContext);
+		addStatus(contextBooleanFilter, searchContext);
 
-		contextQuery.addRequiredTerm(Field.HIDDEN, false);
+		contextBooleanFilter.addRequiredTerm(Field.HIDDEN, false);
 	}
 
 	@Override
-	protected void doDelete(Object obj) throws Exception {
-		DLFolder dlFolder = (DLFolder)obj;
-
+	protected void doDelete(DLFolder dlFolder) throws Exception {
 		Document document = new DocumentImpl();
 
-		document.addUID(PORTLET_ID, dlFolder.getFolderId());
+		document.addUID(CLASS_NAME, dlFolder.getFolderId());
 
 		SearchEngineUtil.deleteDocument(
 			getSearchEngineId(), dlFolder.getCompanyId(),
@@ -117,14 +106,12 @@ public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
 	}
 
 	@Override
-	protected Document doGetDocument(Object obj) throws Exception {
-		DLFolder dlFolder = (DLFolder)obj;
-
+	protected Document doGetDocument(DLFolder dlFolder) throws Exception {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Indexing folder " + dlFolder);
 		}
 
-		Document document = getBaseModelDocument(PORTLET_ID, dlFolder);
+		Document document = getBaseModelDocument(CLASS_NAME, dlFolder);
 
 		document.addText(Field.DESCRIPTION, dlFolder.getDescription());
 		document.addKeyword(Field.FOLDER_ID, dlFolder.getParentFolderId());
@@ -145,37 +132,19 @@ public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet, PortletURL portletURL,
+		Document document, Locale locale, String snippet,
 		PortletRequest portletRequest, PortletResponse portletResponse) {
-
-		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
-
-		liferayPortletURL.setLifecycle(PortletRequest.ACTION_PHASE);
-
-		try {
-			liferayPortletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-		}
-		catch (WindowStateException wse) {
-		}
-
-		String folderId = document.get(Field.ENTRY_CLASS_PK);
-
-		portletURL.setParameter("struts_action", "/document_library/view");
-		portletURL.setParameter("folderId", folderId);
 
 		Summary summary = createSummary(
 			document, Field.TITLE, Field.DESCRIPTION);
 
 		summary.setMaxContentLength(200);
-		summary.setPortletURL(portletURL);
 
 		return summary;
 	}
 
 	@Override
-	protected void doReindex(Object obj) throws Exception {
-		DLFolder dlFolder = (DLFolder)obj;
-
+	protected void doReindex(DLFolder dlFolder) throws Exception {
 		if (!dlFolder.isApproved() && !dlFolder.isInTrash()) {
 			return;
 		}
@@ -203,11 +172,6 @@ public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
 		reindexFolders(companyId);
 	}
 
-	@Override
-	protected String getPortletId(SearchContext searchContext) {
-		return PORTLET_ID;
-	}
-
 	protected void reindexFolders(final long companyId) throws PortalException {
 		final ActionableDynamicQuery actionableDynamicQuery =
 			DLFolderLocalServiceUtil.getActionableDynamicQuery();
@@ -229,15 +193,23 @@ public class DLFolderIndexer extends BaseIndexer implements FolderIndexer {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
+				public void performAction(Object object) {
 					DLFolder dlFolder = (DLFolder)object;
 
-					Document document = getDocument(dlFolder);
+					try {
+						Document document = getDocument(dlFolder);
 
-					if (document != null) {
-						actionableDynamicQuery.addDocument(document);
+						if (document != null) {
+							actionableDynamicQuery.addDocument(document);
+						}
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index document library folder " +
+									dlFolder.getFolderId(),
+								pe);
+						}
 					}
 				}
 

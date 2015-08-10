@@ -80,36 +80,37 @@ public class DBLoader {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
 		String databaseName = arguments.get("db.database.name");
 		String databaseType = arguments.get("db.database.type");
 		String sqlDir = arguments.get("db.sql.dir");
-		String fileName = arguments.get("db.file.name");
+		String fileNames = arguments.get("db.file.names");
 
-		new DBLoader(databaseName, databaseType, sqlDir, fileName);
+		try {
+			new DBLoader(databaseName, databaseType, sqlDir, fileNames);
+		}
+		catch (Exception e) {
+			ArgumentsUtil.processMainException(arguments, e);
+		}
 	}
 
 	public DBLoader(
-		String databaseName, String databaseType, String sqlDir,
-		String fileName) {
+			String databaseName, String databaseType, String sqlDir,
+			String fileNames)
+		throws Exception {
 
-		try {
-			_databaseName = databaseName;
-			_databaseType = databaseType;
-			_sqlDir = sqlDir;
-			_fileName = fileName;
+		_databaseName = databaseName;
+		_databaseType = databaseType;
+		_sqlDir = sqlDir;
+		_fileNames = fileNames;
 
-			if (_databaseType.equals("derby")) {
-				_loadDerby();
-			}
-			else if (_databaseType.equals("hypersonic")) {
-				_loadHypersonic();
-			}
+		if (_databaseType.equals("derby")) {
+			_loadDerby();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		else if (_databaseType.equals("hypersonic")) {
+			_loadHypersonic();
 		}
 	}
 
@@ -123,12 +124,14 @@ public class DBLoader {
 				"jdbc:derby:" + _sqlDir + "/" + _databaseName + ";create=true",
 				"", "");
 
-			if (Validator.isNull(_fileName)) {
+			if (Validator.isNull(_fileNames)) {
 				_loadDerby(con, _sqlDir + "/portal/portal-derby.sql");
 				_loadDerby(con, _sqlDir + "/indexes.sql");
 			}
 			else {
-				_loadDerby(con, _sqlDir + "/" + _fileName);
+				for (String fileName : StringUtil.split(_fileNames)) {
+					_loadDerby(con, _sqlDir + "/" + fileName);
+				}
 			}
 		}
 		finally {
@@ -211,12 +214,14 @@ public class DBLoader {
 					";shutdown=true",
 				"sa", "")) {
 
-			if (Validator.isNull(_fileName)) {
+			if (Validator.isNull(_fileNames)) {
 				loadHypersonic(con, _sqlDir + "/portal/portal-hypersonic.sql");
 				loadHypersonic(con, _sqlDir + "/indexes.sql");
 			}
 			else {
-				loadHypersonic(con, _sqlDir + "/" + _fileName);
+				for (String fileName : StringUtil.split(_fileNames)) {
+					loadHypersonic(con, _sqlDir + "/" + fileName);
+				}
 			}
 
 			// Shutdown Hypersonic
@@ -236,11 +241,11 @@ public class DBLoader {
 		_fileUtil.write(_sqlDir + "/" + _databaseName + ".script", content);
 	}
 
-	private static FileImpl _fileUtil = FileImpl.getInstance();
+	private static final FileImpl _fileUtil = FileImpl.getInstance();
 
-	private String _databaseName;
-	private String _databaseType;
-	private String _fileName;
-	private String _sqlDir;
+	private final String _databaseName;
+	private final String _databaseType;
+	private final String _fileNames;
+	private final String _sqlDir;
 
 }

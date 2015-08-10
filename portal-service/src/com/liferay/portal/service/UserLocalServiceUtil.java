@@ -276,7 +276,7 @@ public class UserLocalServiceUtil {
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds, boolean sendEmail,
@@ -382,7 +382,7 @@ public class UserLocalServiceUtil {
 		java.lang.String emailAddress, long facebookId,
 		java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds, boolean sendEmail,
@@ -410,15 +410,13 @@ public class UserLocalServiceUtil {
 	a successful authentication the user's primary key will be placed
 	under the key <code>userId</code>.
 	* @return the authentication status. This can be {@link
-	com.liferay.portal.security.auth.Authenticator#FAILURE}
-	indicating that the user's credentials are invalid, {@link
-	com.liferay.portal.security.auth.Authenticator#SUCCESS}
-	indicating a successful login, or {@link
-	com.liferay.portal.security.auth.Authenticator#DNE} indicating
-	that a user with that login does not exist.
+	Authenticator#FAILURE} indicating that the user's credentials are
+	invalid, {@link Authenticator#SUCCESS} indicating a successful
+	login, or {@link Authenticator#DNE} indicating that a user with
+	that login does not exist.
 	* @throws PortalException if <code>emailAddress</code> or
 	<code>password</code> was <code>null</code>
-	* @see com.liferay.portal.security.auth.AuthPipeline
+	* @see AuthPipeline
 	*/
 	public static int authenticateByEmailAddress(long companyId,
 		java.lang.String emailAddress, java.lang.String password,
@@ -444,15 +442,13 @@ public class UserLocalServiceUtil {
 	a successful authentication the user's primary key will be placed
 	under the key <code>userId</code>.
 	* @return the authentication status. This can be {@link
-	com.liferay.portal.security.auth.Authenticator#FAILURE}
-	indicating that the user's credentials are invalid, {@link
-	com.liferay.portal.security.auth.Authenticator#SUCCESS}
-	indicating a successful login, or {@link
-	com.liferay.portal.security.auth.Authenticator#DNE} indicating
-	that a user with that login does not exist.
+	Authenticator#FAILURE} indicating that the user's credentials are
+	invalid, {@link Authenticator#SUCCESS} indicating a successful
+	login, or {@link Authenticator#DNE} indicating that a user with
+	that login does not exist.
 	* @throws PortalException if <code>screenName</code> or
 	<code>password</code> was <code>null</code>
-	* @see com.liferay.portal.security.auth.AuthPipeline
+	* @see AuthPipeline
 	*/
 	public static int authenticateByScreenName(long companyId,
 		java.lang.String screenName, java.lang.String password,
@@ -478,15 +474,13 @@ public class UserLocalServiceUtil {
 	a successful authentication the user's primary key will be placed
 	under the key <code>userId</code>.
 	* @return the authentication status. This can be {@link
-	com.liferay.portal.security.auth.Authenticator#FAILURE}
-	indicating that the user's credentials are invalid, {@link
-	com.liferay.portal.security.auth.Authenticator#SUCCESS}
-	indicating a successful login, or {@link
-	com.liferay.portal.security.auth.Authenticator#DNE} indicating
-	that a user with that login does not exist.
+	Authenticator#FAILURE} indicating that the user's credentials are
+	invalid, {@link Authenticator#SUCCESS} indicating a successful
+	login, or {@link Authenticator#DNE} indicating that a user with
+	that login does not exist.
 	* @throws PortalException if <code>userId</code> or <code>password</code>
 	was <code>null</code>
-	* @see com.liferay.portal.security.auth.AuthPipeline
+	* @see AuthPipeline
 	*/
 	public static int authenticateByUserId(long companyId, long userId,
 		java.lang.String password,
@@ -1096,8 +1090,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1148,7 +1141,7 @@ public class UserLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -1380,15 +1373,13 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
 	* @param userId the primary key of the user
 	* @param socialRelationType the type of social relation. The possible
-	types can be found in {@link
-	com.liferay.portlet.social.model.SocialRelationConstants}.
+	types can be found in {@link SocialRelationConstants}.
 	* @param start the lower bound of the range of users
 	* @param end the upper bound of the range of users (not inclusive)
 	* @param obc the comparator to order the users by (optionally
@@ -1418,8 +1409,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1433,7 +1423,7 @@ public class UserLocalServiceUtil {
 	* @throws PortalException if a user with the primary key could not be
 	found
 	* @deprecated As of 7.0.0, replaced by {@link #getSocialUsers(long, int,
-	boolean, int, int, OrderByComparator)}
+	String, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	public static java.util.List<com.liferay.portal.model.User> getSocialUsers(
@@ -1452,16 +1442,14 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
 	* @param userId1 the primary key of the first user
 	* @param userId2 the primary key of the second user
 	* @param socialRelationType the type of social relation. The possible
-	types can be found in {@link
-	com.liferay.portlet.social.model.SocialRelationConstants}.
+	types can be found in {@link SocialRelationConstants}.
 	* @param start the lower bound of the range of users
 	* @param end the upper bound of the range of users (not inclusive)
 	* @param obc the comparator to order the users by (optionally
@@ -1488,8 +1476,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1532,8 +1519,7 @@ public class UserLocalServiceUtil {
 	*
 	* @param userId the primary key of the user
 	* @param socialRelationType the type of social relation. The possible
-	types can be found in {@link
-	com.liferay.portlet.social.model.SocialRelationConstants}.
+	types can be found in {@link SocialRelationConstants}.
 	* @return the number of users with a social relation of the type with
 	the user
 	* @throws PortalException if a user with the primary key could not be
@@ -1552,8 +1538,7 @@ public class UserLocalServiceUtil {
 	*
 	* @param userId the primary key of the user
 	* @param socialRelationType the type of social relation. The possible
-	types can be found in {@link
-	com.liferay.portlet.social.model.SocialRelationConstants}.
+	types can be found in {@link SocialRelationConstants}.
 	* @return the number of users with a social relation with the user
 	* @throws PortalException if a user with the primary key could not be found
 	*/
@@ -1586,8 +1571,7 @@ public class UserLocalServiceUtil {
 	* @param userId1 the primary key of the first user
 	* @param userId2 the primary key of the second user
 	* @param socialRelationType the type of social relation. The possible
-	types can be found in {@link
-	com.liferay.portlet.social.model.SocialRelationConstants}.
+	types can be found in {@link SocialRelationConstants}.
 	* @return the number of users with a mutual social relation of the type
 	with the user
 	* @throws PortalException if a user with the primary key could not be found
@@ -2010,8 +1994,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -2060,8 +2043,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -2123,8 +2105,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -2162,8 +2143,7 @@ public class UserLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -2369,18 +2349,79 @@ public class UserLocalServiceUtil {
 			fromAddress, subject, body, serviceContext);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the email
+	* address. The portal's settings determine whether a password is sent
+	* explicitly or whether a link for resetting the user's password is sent.
+	* The method sends the email asynchronously and returns before the email is
+	* sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param emailAddress the user's email address
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the email address could not be
+	found
+	*/
 	public static boolean sendPasswordByEmailAddress(long companyId,
 		java.lang.String emailAddress)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().sendPasswordByEmailAddress(companyId, emailAddress);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the screen name.
+	* The portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param screenName the user's screen name
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the screen name could not be found
+	*/
 	public static boolean sendPasswordByScreenName(long companyId,
 		java.lang.String screenName)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().sendPasswordByScreenName(companyId, screenName);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the ID. The
+	* portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param userId the user's primary key
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the user ID could not be found
+	*/
 	public static boolean sendPasswordByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().sendPasswordByUserId(userId);
@@ -2700,7 +2741,7 @@ public class UserLocalServiceUtil {
 		java.lang.String emailAddress, long facebookId,
 		java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, boolean updateUserInformation,
 		boolean sendEmail,
@@ -3078,11 +3119,11 @@ public class UserLocalServiceUtil {
 	found or if the new information was invalid
 	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
 	String, String, boolean, String, String, String, String,
-	long, String, String, String, String, String, String, String,
-	String, int, int, boolean, int, int, int, String, String,
-	String, String, String, String, String, String, String,
-	String, String, long[], long[], long[], java.util.List,
-	long[], boolean, byte[], ServiceContext)}
+	long, String, boolean, byte[], String, String, String,
+	String, String, String, String, int, int, boolean, int, int,
+	int, String, String, String, String, String, String, String,
+	String, String, String, String, long[], long[], long[], List,
+	long[], ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.model.User updateUser(long userId,
@@ -3094,8 +3135,8 @@ public class UserLocalServiceUtil {
 		java.lang.String openId, java.lang.String languageId,
 		java.lang.String timeZoneId, java.lang.String greeting,
 		java.lang.String comments, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
 		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,
 		java.lang.String jabberSn, java.lang.String msnSn,
@@ -3185,7 +3226,7 @@ public class UserLocalServiceUtil {
 		java.lang.String languageId, java.lang.String timeZoneId,
 		java.lang.String greeting, java.lang.String comments,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String smsSn, java.lang.String aimSn,
 		java.lang.String facebookSn, java.lang.String icqSn,

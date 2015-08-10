@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 	MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof PhoneCacheModel)) {
+			return false;
+		}
+
+		PhoneCacheModel phoneCacheModel = (PhoneCacheModel)obj;
+
+		if ((phoneId == phoneCacheModel.phoneId) &&
+				(mvccVersion == phoneCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, phoneId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(29);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -81,6 +109,8 @@ public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 		sb.append(typeId);
 		sb.append(", primary=");
 		sb.append(primary);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -144,6 +174,13 @@ public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 		phoneImpl.setTypeId(typeId);
 		phoneImpl.setPrimary(primary);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			phoneImpl.setLastPublishDate(null);
+		}
+		else {
+			phoneImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		phoneImpl.resetOriginalValues();
 
 		return phoneImpl;
@@ -163,8 +200,9 @@ public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 		classPK = objectInput.readLong();
 		number = objectInput.readUTF();
 		extension = objectInput.readUTF();
-		typeId = objectInput.readInt();
+		typeId = objectInput.readLong();
 		primary = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -209,8 +247,9 @@ public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 			objectOutput.writeUTF(extension);
 		}
 
-		objectOutput.writeInt(typeId);
+		objectOutput.writeLong(typeId);
 		objectOutput.writeBoolean(primary);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -225,6 +264,7 @@ public class PhoneCacheModel implements CacheModel<Phone>, Externalizable,
 	public long classPK;
 	public String number;
 	public String extension;
-	public int typeId;
+	public long typeId;
 	public boolean primary;
+	public long lastPublishDate;
 }

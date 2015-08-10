@@ -17,7 +17,7 @@ package com.liferay.sync.engine.model;
 import com.liferay.sync.engine.BaseTestCase;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.util.FileUtil;
-import com.liferay.sync.engine.util.SyncFileTestUtil;
+import com.liferay.sync.engine.util.test.SyncFileTestUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,8 +58,7 @@ public class ModelListenerTest extends BaseTestCase {
 
 	private boolean _onCreateCalled;
 	private boolean _onRemoveCalled;
-	private Map<String, Object> _originalFieldValues =
-		new HashMap<String, Object>();
+	private Map<String, Object> _originalFieldValues = new HashMap<>();
 
 	private class SyncFileModelListener implements ModelListener<SyncFile> {
 

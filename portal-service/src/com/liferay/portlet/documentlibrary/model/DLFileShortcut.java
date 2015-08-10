@@ -43,6 +43,9 @@ public interface DLFileShortcut extends DLFileShortcutModel, PersistedModel,
 	public com.liferay.portlet.documentlibrary.model.DLFolder getDLFolder()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public com.liferay.portal.kernel.repository.model.FileVersion getFileVersion()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public com.liferay.portal.kernel.repository.model.Folder getFolder()
 		throws com.liferay.portal.kernel.exception.PortalException;
 

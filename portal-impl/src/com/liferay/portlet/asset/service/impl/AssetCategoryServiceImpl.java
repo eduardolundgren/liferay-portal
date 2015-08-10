@@ -56,32 +56,33 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 	@Override
 	public AssetCategory addCategory(
-			long parentCategoryId, Map<Locale, String> titleMap,
+			long groupId, long parentCategoryId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, long vocabularyId,
 			String[] categoryProperties, ServiceContext serviceContext)
 		throws PortalException {
 
 		AssetCategoryPermission.check(
-			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			parentCategoryId, ActionKeys.ADD_CATEGORY);
+			getPermissionChecker(), groupId, parentCategoryId,
+			ActionKeys.ADD_CATEGORY);
 
 		return assetCategoryLocalService.addCategory(
-			getUserId(), parentCategoryId, titleMap, descriptionMap,
+			getUserId(), groupId, parentCategoryId, titleMap, descriptionMap,
 			vocabularyId, categoryProperties, serviceContext);
 	}
 
 	@Override
 	public AssetCategory addCategory(
-			String title, long vocabularyId, ServiceContext serviceContext)
+			long groupId, String title, long vocabularyId,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		AssetCategoryPermission.check(
-			getPermissionChecker(), serviceContext.getScopeGroupId(),
+			getPermissionChecker(), groupId,
 			AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
 			ActionKeys.ADD_CATEGORY);
 
 		return assetCategoryLocalService.addCategory(
-			getUserId(), title, vocabularyId, serviceContext);
+			getUserId(), groupId, title, vocabularyId, serviceContext);
 	}
 
 	@Override
@@ -103,7 +104,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			long[] categoryIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		List<AssetCategory> failedCategories = new ArrayList<AssetCategory>();
+		List<AssetCategory> failedCategories = new ArrayList<>();
 
 		for (long categoryId : categoryIds) {
 			try {
@@ -141,6 +142,19 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			getPermissionChecker(), categoryId, ActionKeys.DELETE);
 
 		assetCategoryLocalService.deleteCategory(categoryId);
+	}
+
+	@Override
+	public AssetCategory fetchCategory(long categoryId) throws PortalException {
+		AssetCategory category = assetCategoryLocalService.fetchCategory(
+			categoryId);
+
+		if (category != null) {
+			AssetCategoryPermission.check(
+				getPermissionChecker(), category, ActionKeys.VIEW);
+		}
+
+		return category;
 	}
 
 	@Override

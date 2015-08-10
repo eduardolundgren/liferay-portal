@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 		attributes.put("extension", getExtension());
 		attributes.put("typeId", getTypeId());
 		attributes.put("primary", getPrimary());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -144,7 +146,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 			setExtension(extension);
 		}
 
-		Integer typeId = (Integer)attributes.get("typeId");
+		Long typeId = (Long)attributes.get("typeId");
 
 		if (typeId != null) {
 			setTypeId(typeId);
@@ -154,6 +156,12 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 
 		if (primary != null) {
 			setPrimary(primary);
+		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
 		}
 	}
 
@@ -213,7 +221,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	* @return the create date of this phone
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _phone.getCreateDate();
 	}
 
@@ -233,12 +241,22 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	/**
+	* Returns the last publish date of this phone.
+	*
+	* @return the last publish date of this phone
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _phone.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this phone.
 	*
 	* @return the modified date of this phone
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _phone.getModifiedDate();
 	}
 
@@ -309,7 +327,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	* @return the type ID of this phone
 	*/
 	@Override
-	public int getTypeId() {
+	public long getTypeId() {
 		return _phone.getTypeId();
 	}
 
@@ -434,13 +452,12 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	* @param createDate the create date of this phone
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_phone.setCreateDate(createDate);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_phone.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -467,12 +484,22 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	/**
+	* Sets the last publish date of this phone.
+	*
+	* @param lastPublishDate the last publish date of this phone
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_phone.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this phone.
 	*
 	* @param modifiedDate the modified date of this phone
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_phone.setModifiedDate(modifiedDate);
 	}
 
@@ -542,7 +569,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	* @param typeId the type ID of this phone
 	*/
 	@Override
-	public void setTypeId(int typeId) {
+	public void setTypeId(long typeId) {
 		_phone.setTypeId(typeId);
 	}
 
@@ -587,7 +614,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Phone> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Phone> toCacheModel() {
 		return _phone.toCacheModel();
 	}
 

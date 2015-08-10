@@ -26,7 +26,7 @@ if (referer.equals(themeDisplay.getPathMain() + "/portal/update_reminder_query")
 }
 %>
 
-<aui:form action='<%= themeDisplay.getPathMain() + "/portal/update_reminder_query" %>' cssClass="update-reminder-query" method="post" name="fm">
+<aui:form action='<%= themeDisplay.getPathMain() + "/portal/update_reminder_query" %>' autocomplete='<%= PropsValues.COMPANY_SECURITY_PASSWORD_REMINDER_QUERY_FORM_AUTOCOMPLETE ? "on" : "off" %>' cssClass="update-reminder-query" method="post" name="fm">
 	<aui:input name="p_auth" type="hidden" value="<%= AuthTokenUtil.getToken(request) %>" />
 	<aui:input name="doAsUserId" type="hidden" value="<%= themeDisplay.getDoAsUserId() %>" />
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
@@ -59,34 +59,27 @@ if (referer.equals(themeDisplay.getPathMain() + "/portal/update_reminder_query")
 	</aui:button-row>
 </aui:form>
 
-<aui:script use="aui-base">
-	var reminderQueryQuestion = A.one('#reminderQueryQuestion');
-	var customQuestionContainer = A.one('#customQuestionContainer');
+<aui:script sandbox="<%= true %>">
+	var reminderQueryQuestion = $('#reminderQueryQuestion');
+	var customQuestionContainer = $('#customQuestionContainer');
 
-	if (reminderQueryQuestion && customQuestionContainer) {
-		if (reminderQueryQuestion.val() != '<%= UsersAdmin.CUSTOM_QUESTION %>') {
-			customQuestionContainer.hide();
-		}
-		else {
-			customQuestionContainer.show();
-		}
+	customQuestionContainer.toggleClass('hide', reminderQueryQuestion.val() != '<%= UsersAdmin.CUSTOM_QUESTION %>');
 
-		reminderQueryQuestion.on(
-			'change',
-			function(event) {
-				if (this.val() == '<%= UsersAdmin.CUSTOM_QUESTION %>') {
-					<c:if test="<%= PropsValues.USERS_REMINDER_QUERIES_CUSTOM_QUESTION_ENABLED %>">
-						customQuestionContainer.show();
+	reminderQueryQuestion.on(
+		'change',
+		function(event) {
+			if (reminderQueryQuestion.val() == '<%= UsersAdmin.CUSTOM_QUESTION %>') {
+				<c:if test="<%= PropsValues.USERS_REMINDER_QUERIES_CUSTOM_QUESTION_ENABLED %>">
+					customQuestionContainer.removeClass('hide');
 
-						Liferay.Util.focusFormField('#reminderQueryCustomQuestion');
-					</c:if>
-				}
-				else {
-					customQuestionContainer.hide();
-
-					Liferay.Util.focusFormField('#reminderQueryAnswer');
-				}
+					Liferay.Util.focusFormField('#reminderQueryCustomQuestion');
+				</c:if>
 			}
-		);
-	}
+			else {
+				customQuestionContainer.addClass('hide');
+
+				Liferay.Util.focusFormField('#reminderQueryAnswer');
+			}
+		}
+	);
 </aui:script>

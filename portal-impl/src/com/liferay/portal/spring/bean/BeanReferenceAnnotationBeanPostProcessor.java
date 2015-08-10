@@ -51,6 +51,12 @@ public class BeanReferenceAnnotationBeanPostProcessor
 		}
 	}
 
+	public BeanReferenceAnnotationBeanPostProcessor(BeanFactory beanFactory) {
+		this();
+
+		_beanFactory = beanFactory;
+	}
+
 	public void destroy() {
 		_beans.clear();
 	}
@@ -164,7 +170,7 @@ public class BeanReferenceAnnotationBeanPostProcessor
 			ReflectionUtils.makeAccessible(field);
 
 			BeanReferenceRefreshUtil.registerRefreshPoint(
-				targetBean, field, referencedBeanName);
+				_beanFactory, targetBean, field, referencedBeanName);
 
 			try {
 				field.set(targetBean, referencedBean);
@@ -186,6 +192,6 @@ public class BeanReferenceAnnotationBeanPostProcessor
 		BeanReferenceAnnotationBeanPostProcessor.class);
 
 	private BeanFactory _beanFactory;
-	private final Map<String, Object> _beans = new HashMap<String, Object>();
+	private final Map<String, Object> _beans = new HashMap<>();
 
 }

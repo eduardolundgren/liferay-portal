@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -33,66 +32,13 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Julio Camarero
  */
 public class DLUtil {
-
-	public static void addPortletBreadcrumbEntries(
-			DLFileShortcut dlFileShortcut, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(
-			dlFileShortcut, request, renderResponse);
-	}
-
-	public static void addPortletBreadcrumbEntries(
-			FileEntry fileEntry, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(fileEntry, request, renderResponse);
-	}
-
-	public static void addPortletBreadcrumbEntries(
-			Folder folder, HttpServletRequest request,
-			LiferayPortletResponse liferayPortletResponse)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(
-			folder, request, liferayPortletResponse);
-	}
-
-	public static void addPortletBreadcrumbEntries(
-			Folder folder, HttpServletRequest request, PortletURL portletURL)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(folder, request, portletURL);
-	}
-
-	public static void addPortletBreadcrumbEntries(
-			Folder folder, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(folder, request, renderResponse);
-	}
-
-	public static void addPortletBreadcrumbEntries(
-			long folderId, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		getDL().addPortletBreadcrumbEntries(folderId, request, renderResponse);
-	}
 
 	public static int compareVersions(String version1, String version2) {
 		return getDL().compareVersions(version1, version2);
@@ -181,10 +127,6 @@ public class DLUtil {
 
 		return getDL().getEmailFromDefinitionTerms(
 			request, emailFromAddress, emailFromName);
-	}
-
-	public static List<Object> getEntries(Hits hits) {
-		return getDL().getEntries(hits);
 	}
 
 	public static List<FileEntry> getFileEntries(Hits hits) {
@@ -327,14 +269,18 @@ public class DLUtil {
 		return getDL().getThumbnailSrc(fileEntry, themeDisplay);
 	}
 
-	public static String getThumbnailStyle() throws Exception {
+	public static String getThumbnailStyle() {
 		return getDL().getThumbnailStyle();
 	}
 
-	public static String getThumbnailStyle(boolean max, int margin)
-		throws Exception {
-
+	public static String getThumbnailStyle(boolean max, int margin) {
 		return getDL().getThumbnailStyle(max, margin);
+	}
+
+	public static String getThumbnailStyle(
+		boolean max, int margin, int height, int width) {
+
+		return getDL().getThumbnailStyle(max, margin, height, width);
 	}
 
 	public static String getTitleWithExtension(FileEntry fileEntry) {

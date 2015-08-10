@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portal.service.OrgLaborServiceUtil} service utility. The
+ * {@link OrgLaborServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -59,13 +59,13 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see OrgLaborServiceHttp
  * @see com.liferay.portal.model.OrgLaborSoap
- * @see com.liferay.portal.service.OrgLaborServiceUtil
+ * @see OrgLaborServiceUtil
  * @generated
  */
 @ProviderType
 public class OrgLaborServiceSoap {
 	public static com.liferay.portal.model.OrgLaborSoap addOrgLabor(
-		long organizationId, int typeId, int sunOpen, int sunClose,
+		long organizationId, long typeId, int sunOpen, int sunClose,
 		int monOpen, int monClose, int tueOpen, int tueClose, int wedOpen,
 		int wedClose, int thuOpen, int thuClose, int friOpen, int friClose,
 		int satOpen, int satClose) throws RemoteException {
@@ -125,7 +125,7 @@ public class OrgLaborServiceSoap {
 	}
 
 	public static com.liferay.portal.model.OrgLaborSoap updateOrgLabor(
-		long orgLaborId, int typeId, int sunOpen, int sunClose, int monOpen,
+		long orgLaborId, long typeId, int sunOpen, int sunClose, int monOpen,
 		int monClose, int tueOpen, int tueClose, int wedOpen, int wedClose,
 		int thuOpen, int thuClose, int friOpen, int friClose, int satOpen,
 		int satClose) throws RemoteException {

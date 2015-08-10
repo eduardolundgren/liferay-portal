@@ -15,15 +15,15 @@
 package com.liferay.portal.increment;
 
 import com.liferay.portal.kernel.configuration.Filter;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewEnv;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,9 +55,9 @@ public class BufferedIncrementConfigurationTest {
 	@AdviseWith(adviceClasses = PropsUtilAdvice.class)
 	@Test
 	public void testInvalidSettingWithLog() {
-		CaptureHandler captureHandler = _doTestInvalidSetting(Level.WARNING);
+		try (CaptureHandler captureHandler =
+				_doTestInvalidSetting(Level.WARNING)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertEquals(2, logRecords.size());
@@ -76,30 +76,22 @@ public class BufferedIncrementConfigurationTest {
 					"[]=-4. Auto reset to 1.",
 				logRecord2.getMessage());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@AdviseWith(adviceClasses = PropsUtilAdvice.class)
 	@Test
 	public void testInvalidSettingWithoutLog() {
-		CaptureHandler captureHandler = _doTestInvalidSetting(Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler = _doTestInvalidSetting(Level.OFF)) {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
 	@AdviseWith(adviceClasses = PropsUtilAdvice.class)
 	@Test
 	public void testValidSetting() {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 
 		props.put(PropsKeys.BUFFERED_INCREMENT_ENABLED, "false");
 		props.put(PropsKeys.BUFFERED_INCREMENT_STANDBY_QUEUE_THRESHOLD, "10");
@@ -172,7 +164,8 @@ public class BufferedIncrementConfigurationTest {
 		@Around(
 			"execution(public static String com.liferay.portal.util." +
 				"PropsUtil.get(String, com.liferay.portal.kernel." +
-					"configuration.Filter)) && args(key, filter)")
+					"configuration.Filter)) && args(key, filter)"
+		)
 		public Object get(String key, Filter filter) {
 			return _props.get(key);
 		}
@@ -182,7 +175,7 @@ public class BufferedIncrementConfigurationTest {
 	}
 
 	private CaptureHandler _doTestInvalidSetting(Level level) {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 
 		props.put(PropsKeys.BUFFERED_INCREMENT_ENABLED, "false");
 

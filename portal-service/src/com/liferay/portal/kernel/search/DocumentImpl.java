@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -35,12 +36,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.math.BigDecimal;
+
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -78,23 +82,17 @@ public class DocumentImpl implements Document {
 
 		String fieldName = sort.getFieldName();
 
-		if (fieldName.endsWith(_SORTABLE_FIELD_SUFFIX)) {
+		if (DocumentImpl.isSortableFieldName(fieldName)) {
 			return fieldName;
 		}
 
-		String sortFieldName = null;
+		if ((sort.getType() == Sort.STRING_TYPE) &&
+			!DocumentImpl.isSortableTextField(fieldName)) {
 
-		if (DocumentImpl.isSortableTextField(fieldName) ||
-			(sort.getType() != Sort.STRING_TYPE)) {
-
-			sortFieldName = DocumentImpl.getSortableFieldName(fieldName);
+			return scoreFieldName;
 		}
 
-		if (Validator.isNull(sortFieldName)) {
-			sortFieldName = scoreFieldName;
-		}
-
-		return sortFieldName;
+		return DocumentImpl.getSortableFieldName(fieldName);
 	}
 
 	public static boolean isSortableFieldName(String name) {
@@ -131,19 +129,14 @@ public class DocumentImpl implements Document {
 		}
 
 		String[] dates = new String[values.length];
-		String[] datesTime = new String[values.length];
+		Long[] datesTime = new Long[values.length];
 
 		for (int i = 0; i < values.length; i++) {
 			dates[i] = _dateFormat.format(values[i]);
-			datesTime[i] = String.valueOf(values[i].getTime());
+			datesTime[i] = values[i].getTime();
 		}
 
-		String sortableFieldName = getSortableFieldName(name);
-
-		Field field = createField(sortableFieldName, datesTime);
-
-		field.setNumeric(true);
-		field.setNumericClass(Long.class);
+		createSortableNumericField(name, false, datesTime);
 
 		addKeyword(name, dates);
 	}
@@ -174,6 +167,15 @@ public class DocumentImpl implements Document {
 		String name, InputStream is, String fileExt, int maxStringLength) {
 
 		addText(name, FileUtil.extractText(is, fileExt, maxStringLength));
+	}
+
+	@Override
+	public void addGeoLocation(double latitude, double longitude) {
+		Field field = new Field(Field.GEO_LOCATION);
+
+		field.setGeoLocationPoint(new GeoLocationPoint(latitude, longitude));
+
+		add(field);
 	}
 
 	@Override
@@ -351,17 +353,9 @@ public class DocumentImpl implements Document {
 
 	@Override
 	public void addKeyword(String name, String value, boolean lowerCase) {
-		if (lowerCase && Validator.isNotNull(value)) {
-			value = StringUtil.toLowerCase(value);
-		}
+		createKeywordField(name, value, lowerCase);
 
-		Field field = createField(name, value);
-
-		for (String fieldName : Field.UNSCORED_FIELD_NAMES) {
-			if (StringUtil.equalsIgnoreCase(name, fieldName)) {
-				field.setBoost(0);
-			}
-		}
+		createSortableKeywordField(name, value);
 	}
 
 	@Override
@@ -371,6 +365,42 @@ public class DocumentImpl implements Document {
 		}
 
 		createField(name, values);
+	}
+
+	@Override
+	public void addKeywordSortable(String name, Boolean value) {
+		String valueString = String.valueOf(value);
+
+		createKeywordField(name, valueString, false);
+
+		createSortableTextField(name, valueString);
+	}
+
+	@Override
+	public void addKeywordSortable(String name, Boolean[] values) {
+		if (values == null) {
+			return;
+		}
+
+		String[] valuesString = ArrayUtil.toStringArray(values);
+
+		createField(name, valuesString);
+
+		createSortableTextField(name, valuesString);
+	}
+
+	@Override
+	public void addKeywordSortable(String name, String value) {
+		createKeywordField(name, value, false);
+
+		createSortableTextField(name, value);
+	}
+
+	@Override
+	public void addKeywordSortable(String name, String[] values) {
+		createField(name, values);
+
+		createSortableTextField(name, values);
 	}
 
 	@Override
@@ -387,8 +417,7 @@ public class DocumentImpl implements Document {
 		}
 
 		if (lowerCase) {
-			Map<Locale, String> lowerCaseValues = new HashMap<Locale, String>(
-				values.size());
+			Map<Locale, String> lowerCaseValues = new HashMap<>(values.size());
 
 			for (Map.Entry<Locale, String> entry : values.entrySet()) {
 				String value = GetterUtil.getString(entry.getValue());
@@ -413,8 +442,7 @@ public class DocumentImpl implements Document {
 		}
 
 		if (lowerCase) {
-			Map<Locale, String> lowerCaseValues = new HashMap<Locale, String>(
-				values.size());
+			Map<Locale, String> lowerCaseValues = new HashMap<>(values.size());
 
 			for (Map.Entry<Locale, String> entry : values.entrySet()) {
 				String value = GetterUtil.getString(entry.getValue());
@@ -440,139 +468,180 @@ public class DocumentImpl implements Document {
 		field.setTokenized(true);
 	}
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
 	@Override
-	public void addModifiedDate() {
-		addModifiedDate(new Date());
+	public void addNumber(String name, BigDecimal value) {
+		createNumberField(name, value);
 	}
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
 	@Override
-	public void addModifiedDate(Date modifiedDate) {
-		addDate(Field.MODIFIED, modifiedDate);
+	public void addNumber(String name, BigDecimal[] values) {
+		createNumberField(name, values);
 	}
 
 	@Override
 	public void addNumber(String name, double value) {
-		addNumber(name, String.valueOf(value), Double.class);
+		createNumberField(name, Double.valueOf(value));
 	}
 
 	@Override
 	public void addNumber(String name, Double value) {
-		addNumber(name, String.valueOf(value), Double.class);
+		createNumberField(name, value);
 	}
 
 	@Override
 	public void addNumber(String name, double[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Double.class);
-	}
-
-	@Override
-	public void addNumber(String name, Double[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Double.class);
-	}
-
-	@Override
-	public void addNumber(String name, float value) {
-		addNumber(name, String.valueOf(value), Float.class);
-	}
-
-	@Override
-	public void addNumber(String name, Float value) {
-		addNumber(name, String.valueOf(value), Float.class);
-	}
-
-	@Override
-	public void addNumber(String name, float[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Float.class);
-	}
-
-	@Override
-	public void addNumber(String name, Float[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Float.class);
-	}
-
-	@Override
-	public void addNumber(String name, int value) {
-		addNumber(name, String.valueOf(value), Integer.class);
-	}
-
-	@Override
-	public void addNumber(String name, int[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Integer.class);
-	}
-
-	@Override
-	public void addNumber(String name, Integer value) {
-		addNumber(name, String.valueOf(value), Integer.class);
-	}
-
-	@Override
-	public void addNumber(String name, Integer[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Integer.class);
-	}
-
-	@Override
-	public void addNumber(String name, long value) {
-		addNumber(name, String.valueOf(value), Long.class);
-	}
-
-	@Override
-	public void addNumber(String name, Long value) {
-		addNumber(name, String.valueOf(value), Long.class);
-	}
-
-	@Override
-	public void addNumber(String name, long[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Long.class);
-	}
-
-	@Override
-	public void addNumber(String name, Long[] values) {
-		addNumber(name, ArrayUtil.toStringArray(values), Long.class);
-	}
-
-	@Override
-	public void addNumber(String name, String value) {
-		addNumber(name, value, Long.class);
-	}
-
-	public void addNumber(
-		String name, String value, Class<? extends Number> clazz) {
-
-		if (Validator.isNull(value)) {
-			return;
-		}
-
-		addNumber(name, new String[] {value}, clazz);
-	}
-
-	@Override
-	public void addNumber(String name, String[] values) {
-		addNumber(name, values, Long.class);
-	}
-
-	public void addNumber(
-		String name, String[] values, Class<? extends Number> clazz) {
-
 		if (values == null) {
 			return;
 		}
 
-		String sortableFieldName = getSortableFieldName(name);
+		createNumberField(name, ArrayUtil.toArray(values));
+	}
 
-		Field field = createField(sortableFieldName, values);
+	@Override
+	public void addNumber(String name, Double[] values) {
+		createNumberField(name, values);
+	}
 
-		field.setNumeric(true);
-		field.setNumericClass(clazz);
+	@Override
+	public void addNumber(String name, float value) {
+		createNumberField(name, Float.valueOf(value));
+	}
 
-		addKeyword(name, values);
+	@Override
+	public void addNumber(String name, Float value) {
+		createNumberField(name, value);
+	}
+
+	@Override
+	public void addNumber(String name, float[] values) {
+		if (values == null) {
+			return;
+		}
+
+		createNumberField(name, ArrayUtil.toArray(values));
+	}
+
+	@Override
+	public void addNumber(String name, Float[] values) {
+		createNumberField(name, values);
+	}
+
+	@Override
+	public void addNumber(String name, int value) {
+		createNumberField(name, Integer.valueOf(value));
+	}
+
+	@Override
+	public void addNumber(String name, int[] values) {
+		if (values == null) {
+			return;
+		}
+
+		createNumberField(name, ArrayUtil.toArray(values));
+	}
+
+	@Override
+	public void addNumber(String name, Integer value) {
+		createNumberField(name, value);
+	}
+
+	@Override
+	public void addNumber(String name, Integer[] values) {
+		createNumberField(name, values);
+	}
+
+	@Override
+	public void addNumber(String name, long value) {
+		createNumberField(name, Long.valueOf(value));
+	}
+
+	@Override
+	public void addNumber(String name, Long value) {
+		createNumberField(name, value);
+	}
+
+	@Override
+	public void addNumber(String name, long[] values) {
+		if (values == null) {
+			return;
+		}
+
+		createNumberField(name, ArrayUtil.toArray(values));
+	}
+
+	@Override
+	public void addNumber(String name, Long[] values) {
+		createNumberField(name, values);
+	}
+
+	@Override
+	public void addNumber(String name, String value) {
+		createNumberField(name, Long.valueOf(value));
+	}
+
+	@Override
+	public void addNumber(String name, String[] values) {
+		if (values == null) {
+			return;
+		}
+
+		Long[] longs = new Long[values.length];
+
+		for (int i = 0; i < values.length; i++) {
+			longs[i] = Long.valueOf(values[i]);
+		}
+
+		createNumberField(name, longs);
+	}
+
+	@Override
+	public void addNumberSortable(String name, BigDecimal value) {
+		createNumberFieldWithTypedSortable(name, value);
+	}
+
+	@Override
+	public void addNumberSortable(String name, BigDecimal[] values) {
+		createNumberFieldWithTypedSortable(name, values);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Double value) {
+		createNumberFieldWithTypedSortable(name, value);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Double[] values) {
+		createNumberFieldWithTypedSortable(name, values);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Float value) {
+		createNumberFieldWithTypedSortable(name, value);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Float[] values) {
+		createNumberFieldWithTypedSortable(name, values);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Integer value) {
+		createNumberFieldWithTypedSortable(name, value);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Integer[] values) {
+		createNumberFieldWithTypedSortable(name, values);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Long value) {
+		createNumberFieldWithTypedSortable(name, value);
+	}
+
+	@Override
+	public void addNumberSortable(String name, Long[] values) {
+		createNumberFieldWithTypedSortable(name, values);
 	}
 
 	@Override
@@ -585,16 +654,7 @@ public class DocumentImpl implements Document {
 
 		field.setTokenized(true);
 
-		if (_sortableTextFields.contains(name)) {
-			String truncatedValue = value;
-
-			if (value.length() > _SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH) {
-				truncatedValue = value.substring(
-					0, _SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH);
-			}
-
-			addKeyword(getSortableFieldName(name), truncatedValue, true);
-		}
+		createSortableKeywordField(name, value);
 	}
 
 	@Override
@@ -606,6 +666,34 @@ public class DocumentImpl implements Document {
 		Field field = createField(name, values);
 
 		field.setTokenized(true);
+
+		createSortableKeywordField(name, values);
+	}
+
+	@Override
+	public void addTextSortable(String name, String value) {
+		if (Validator.isNull(value)) {
+			return;
+		}
+
+		Field field = createField(name, value);
+
+		field.setTokenized(true);
+
+		createSortableTextField(name, value);
+	}
+
+	@Override
+	public void addTextSortable(String name, String[] values) {
+		if (values == null) {
+			return;
+		}
+
+		Field field = createField(name, values);
+
+		field.setTokenized(true);
+
+		createSortableTextField(name, values);
 	}
 
 	@Override
@@ -864,6 +952,122 @@ public class DocumentImpl implements Document {
 		return createField(name, false, values);
 	}
 
+	protected void createKeywordField(
+		String name, String value, boolean lowerCase) {
+
+		if (lowerCase && Validator.isNotNull(value)) {
+			value = StringUtil.toLowerCase(value);
+		}
+
+		createField(name, value);
+	}
+
+	protected void createNumberField(
+		String name, boolean typify, Number value) {
+
+		if (value == null) {
+			return;
+		}
+
+		String valueString = String.valueOf(value);
+
+		createSortableNumericField(name, typify, valueString, value.getClass());
+
+		createField(name, valueString);
+	}
+
+	protected <T extends Number & Comparable<? super T>> void createNumberField(
+		String name, boolean typify, T... values) {
+
+		if (values == null) {
+			return;
+		}
+
+		createSortableNumericField(name, typify, values);
+
+		createField(name, ArrayUtil.toStringArray(values));
+	}
+
+	protected void createNumberField(String name, Number value) {
+		createNumberField(name, false, value);
+	}
+
+	protected <T extends Number & Comparable<? super T>> void createNumberField(
+		String name, T... values) {
+
+		createNumberField(name, false, values);
+	}
+
+	protected void createNumberFieldWithTypedSortable(
+		String name, Number value) {
+
+		createNumberField(name, true, value);
+	}
+
+	protected <T extends Number & Comparable<? super T>> void
+		createNumberFieldWithTypedSortable(String name, T... values) {
+
+		createNumberField(name, true, values);
+	}
+
+	protected void createSortableKeywordField(String name, String value) {
+		if (isDocumentSortableTextField(name)) {
+			createSortableTextField(name, value);
+		}
+	}
+
+	protected void createSortableKeywordField(String name, String[] values) {
+		if (isDocumentSortableTextField(name)) {
+			createSortableTextField(name, values);
+		}
+	}
+
+	protected void createSortableNumericField(
+		String name, boolean typify, String value,
+		Class<? extends Number> clazz) {
+
+		if (typify) {
+			name = name.concat(StringPool.UNDERLINE).concat("Number");
+		}
+
+		Field field = createField(getSortableFieldName(name), value);
+
+		field.setNumeric(true);
+		field.setNumericClass(clazz);
+	}
+
+	protected <T extends Number & Comparable<? super T>> void
+		createSortableNumericField(String name, boolean typify, T... values) {
+
+		if ((values == null) || (values.length == 0)) {
+			return;
+		}
+
+		T minValue = Collections.min(Arrays.asList(values));
+
+		createSortableNumericField(
+			name, typify, String.valueOf(minValue), minValue.getClass());
+	}
+
+	protected void createSortableTextField(String name, String value) {
+		String truncatedValue = value;
+
+		if (value.length() > _SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH) {
+			truncatedValue = value.substring(
+				0, _SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH);
+		}
+
+		createKeywordField(getSortableFieldName(name), truncatedValue, true);
+	}
+
+	protected void createSortableTextField(String name, String[] values) {
+		if (values.length == 0) {
+			return;
+		}
+
+		createSortableTextField(name, Collections.min(Arrays.asList(values)));
+	}
+
 	protected Field doGetField(String name, boolean createIfNew) {
 		Field field = _fields.get(name);
 
@@ -925,10 +1129,11 @@ public class DocumentImpl implements Document {
 	private static final String _UID_PORTLET = "_PORTLET_";
 
 	private static Format _dateFormat;
-	private static Set<String> _defaultSortableTextFields = SetUtil.fromArray(
-		PropsUtil.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
+	private static final Set<String> _defaultSortableTextFields =
+		SetUtil.fromArray(
+			PropsUtil.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
 
-	private Map<String, Field> _fields = new HashMap<String, Field>();
+	private Map<String, Field> _fields = new HashMap<>();
 	private Set<String> _sortableTextFields = _defaultSortableTextFields;
 
 }

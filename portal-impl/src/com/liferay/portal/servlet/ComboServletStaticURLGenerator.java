@@ -34,7 +34,7 @@ import java.util.Set;
 public class ComboServletStaticURLGenerator {
 
 	public List<String> generate(List<Portlet> portlets) {
-		List<String> urls = new ArrayList<String>();
+		List<String> urls = new ArrayList<>();
 
 		StringBundler sb = new StringBundler();
 
@@ -54,7 +54,13 @@ public class ComboServletStaticURLGenerator {
 						continue;
 					}
 
-					if (_visitedURLs.contains(portletResource)) {
+					String url = portletResource;
+
+					if (!HttpUtil.hasProtocol(portletResource)) {
+						url = portlet.getContextPath() + portletResource;
+					}
+
+					if (_visitedURLs.contains(url)) {
 						continue;
 					}
 
@@ -74,7 +80,7 @@ public class ComboServletStaticURLGenerator {
 						timestamp = Math.max(timestamp, portlet.getTimestamp());
 					}
 
-					_visitedURLs.add(portletResource);
+					_visitedURLs.add(url);
 				}
 			}
 		}

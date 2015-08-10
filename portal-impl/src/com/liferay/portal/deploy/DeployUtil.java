@@ -14,7 +14,6 @@
 
 package com.liferay.portal.deploy;
 
-import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
@@ -28,8 +27,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.ant.CopyTask;
 import com.liferay.util.ant.DeleteTask;
@@ -41,8 +40,6 @@ import java.io.InputStream;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.portlet.PortletPreferences;
 
 import org.apache.commons.io.FileUtils;
 
@@ -84,19 +81,7 @@ public class DeployUtil {
 
 		String serverId = GetterUtil.getString(ServerDetector.getServerId());
 
-		if (serverId.equals(ServerDetector.JBOSS_ID) &&
-			ServerDetector.isJBoss5()) {
-
-			String name = "auto.deploy." + serverId + ".dest.dir";
-
-			PortletPreferences portletPreferences =
-				PrefsPropsUtil.getPreferences(true);
-
-			String value = PropsUtil.get(name, new Filter("5"));
-
-			destDir = portletPreferences.getValue(name, value);
-		}
-		else if (serverId.equals(ServerDetector.TOMCAT_ID)) {
+		if (serverId.equals(ServerDetector.TOMCAT_ID)) {
 			destDir = PrefsPropsUtil.getString(
 				PropsKeys.AUTO_DEPLOY_TOMCAT_DEST_DIR,
 				PropsValues.AUTO_DEPLOY_TOMCAT_DEST_DIR);
@@ -123,7 +108,7 @@ public class DeployUtil {
 	}
 
 	public static void redeployJetty(String context) throws Exception {
-		String contextsDirName = System.getProperty("jetty.home") + "/contexts";
+		String contextsDirName = getJettyHome() + "/contexts";
 
 		if (_isPortalContext(context)) {
 			throw new UnsupportedOperationException(
@@ -136,7 +121,7 @@ public class DeployUtil {
 			FileUtils.touch(contextXml);
 		}
 		else {
-			Map<String, String> filterMap = new HashMap<String, String>();
+			Map<String, String> filterMap = new HashMap<>();
 
 			filterMap.put("context", context);
 
@@ -216,8 +201,7 @@ public class DeployUtil {
 
 		if (appServerType.equals(ServerDetector.JETTY_ID)) {
 			FileUtil.delete(
-				System.getProperty("jetty.home") + "/contexts/" +
-					deployDir.getName() + ".xml");
+				getJettyHome() + "/contexts/" + deployDir.getName() + ".xml");
 		}
 
 		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
@@ -252,6 +236,16 @@ public class DeployUtil {
 		return false;
 	}
 
+	private static String getJettyHome() {
+		String jettyHome = System.getProperty("jetty.home");
+
+		if (jettyHome == null) {
+			jettyHome = PortalUtil.getGlobalLibDir() + "../../..";
+		}
+
+		return jettyHome;
+	}
+
 	private DeployUtil() {
 	}
 
@@ -275,7 +269,7 @@ public class DeployUtil {
 			File parentFile = file.getParentFile();
 
 			if (parentFile != null) {
-				parentFile.mkdirs();
+				FileUtil.mkdirs(parentFile);
 			}
 
 			StreamUtil.transfer(inputStream, new FileOutputStream(file));

@@ -17,6 +17,7 @@ package com.liferay.amazon.rankings.web.portlet.validator;
 import aQute.bnd.annotation.metatype.Configurable;
 
 import com.liferay.amazon.rankings.web.configuration.AmazonRankingsConfiguration;
+import com.liferay.amazon.rankings.web.constants.AmazonRankingsPortletKeys;
 import com.liferay.amazon.rankings.web.model.AmazonRankings;
 import com.liferay.amazon.rankings.web.util.AmazonRankingsUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -40,10 +41,10 @@ import org.osgi.service.component.annotations.Modified;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	configurationPid = "com.liferay.amazon.rankings.web",
+	configurationPid = "com.liferay.amazon.rankings.web.configuration.AmazonRankingsConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_amazon_rankings_web_portlet_AmazonRankingsPortlet"
+		"javax.portlet.name=" + AmazonRankingsPortletKeys.AMAZON_RANKINGS
 	}
 )
 public class AmazonRankingsPreferencesValidator
@@ -53,7 +54,7 @@ public class AmazonRankingsPreferencesValidator
 	public void validate(PortletPreferences portletPreferences)
 		throws ValidatorException {
 
-		List<String> badIsbns = new ArrayList<String>();
+		List<String> badIsbns = new ArrayList<>();
 
 		String[] isbns = portletPreferences.getValues(
 			"isbns", StringPool.EMPTY_ARRAY);

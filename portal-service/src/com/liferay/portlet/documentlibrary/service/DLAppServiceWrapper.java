@@ -78,7 +78,7 @@ public class DLAppServiceWrapper implements DLAppService,
 
 	/**
 	* Adds a file entry and associated metadata. It is created based on a
-	* {@link java.io.File} object.
+	* {@link File} object.
 	*
 	* <p>
 	* This method takes two file names, the <code>sourceFileName</code> and the
@@ -182,7 +182,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	found, or if the file shortcut's information was invalid
 	*/
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut addFileShortcut(
 		long repositoryId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -232,7 +232,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @param mimeType the file's MIME type
 	* @return the temporary file entry
 	* @throws PortalException if the file name was invalid
-	* @see com.liferay.portal.kernel.util.TempFileEntryUtil
+	* @see TempFileEntryUtil
 	*/
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry addTempFileEntry(
@@ -263,7 +263,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @return the temporary file entry
 	* @throws PortalException if the file name was invalid or if a portal
 	exception occurred
-	* @see com.liferay.portal.kernel.util.TempFileEntryUtil
+	* @see TempFileEntryUtil
 	*/
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry addTempFileEntry(
@@ -553,7 +553,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @param folderName the temporary folder's name
 	* @param fileName the file's original name
 	* @throws PortalException if the file name was invalid
-	* @see com.liferay.portal.kernel.util.TempFileEntryUtil
+	* @see TempFileEntryUtil
 	*/
 	@Override
 	public void deleteTempFileEntry(long groupId, long folderId,
@@ -606,15 +606,15 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Returns a range of all the file entries with the file entry type in the
-	* folder.
+	* Returns a name-ordered range of all the file entries with the file entry
+	* type in the folder.
 	*
 	* @param repositoryId the primary key of the file entry's repository
 	* @param folderId the primary key of the file entry's folder
 	* @param fileEntryTypeId the primary key of the file entry type
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the file entries in the folder
+	* @return the name-ordered range of the file entries in the folder
 	* @throws PortalException if the folder could not be found
 	*/
 	@Override
@@ -668,15 +668,14 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Returns a range of all the file entries in the folder.
+	* Returns a name-ordered range of all the file entries in the folder.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -684,7 +683,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @param folderId the primary key of the file entry's folder
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of file entries in the folder
+	* @return the name-ordered range of file entries in the folder
 	* @throws PortalException if the folder could not be found
 	*/
 	@Override
@@ -702,8 +701,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -734,8 +732,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -884,7 +881,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut getFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut getFileShortcut(
 		long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppService.getFileShortcut(fileShortcutId);
@@ -969,16 +966,16 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders of the parent folder,
-	* optionally including mount folders for third-party repositories.
+	* Returns a name-ordered range of all the immediate subfolders of the
+	* parent folder, optionally including mount folders for third-party
+	* repositories.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -988,7 +985,8 @@ public class DLAppServiceWrapper implements DLAppService,
 	third-party repositories
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders of the parent folder
+	* @return the name-ordered range of immediate subfolders of the parent
+	folder
 	* @throws PortalException if the parent folder could not be found
 	*/
 	@Override
@@ -1009,8 +1007,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1037,15 +1034,15 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders of the parent folder.
+	* Returns a name-ordered range of all the immediate subfolders of the
+	* parent folder.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1053,7 +1050,8 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @param parentFolderId the primary key of the folder's parent folder
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders of the parent folder
+	* @return the name-ordered range of immediate subfolders of the parent
+	folder
 	* @throws PortalException if the parent folder could not be found
 	*/
 	@Override
@@ -1072,8 +1070,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1105,8 +1102,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1134,16 +1130,15 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders, file entries, and file
-	* shortcuts in the parent folder.
+	* Returns a name-ordered range of all the immediate subfolders, file
+	* entries, and file shortcuts in the parent folder.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1154,9 +1149,8 @@ public class DLAppServiceWrapper implements DLAppService,
 	third-party repositories
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders, file entries, and file
-	shortcuts in the parent folder ordered by comparator
-	<code>obc</code>
+	* @return the name-ordered range of immediate subfolders, file entries, and
+	file shortcuts in the parent folder
 	* @throws PortalException if the parent folder could not be found
 	*/
 	@Override
@@ -1177,8 +1171,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1341,8 +1334,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1375,8 +1367,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1414,8 +1405,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1445,8 +1435,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1538,17 +1527,16 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders of the parent folder that
-	* are used for mounting third-party repositories. This method is only
-	* supported by the Liferay repository.
+	* Returns a name-ordered range of all the immediate subfolders of the
+	* parent folder that are used for mounting third-party repositories. This
+	* method is only supported by the Liferay repository.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1556,8 +1544,8 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @param parentFolderId the primary key of the parent folder
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders of the parent folder that are
-	used for mounting third-party repositories
+	* @return the name-ordered range of immediate subfolders of the parent
+	folder that are used for mounting third-party repositories
 	* @throws PortalException if the repository or parent folder could not be
 	found
 	*/
@@ -1579,8 +1567,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1674,36 +1661,13 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @return the temporary file entry names
 	* @throws PortalException if the folder was invalid
 	* @see #addTempFileEntry(long, long, String, String, File, String)
-	* @see com.liferay.portal.kernel.util.TempFileEntryUtil
+	* @see TempFileEntryUtil
 	*/
 	@Override
 	public java.lang.String[] getTempFileNames(long groupId, long folderId,
 		java.lang.String folderName)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppService.getTempFileNames(groupId, folderId, folderName);
-	}
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
-	ServiceContext)}
-	*/
-	@Deprecated
-	@Override
-	public com.liferay.portal.model.Lock lockFileEntry(long fileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _dlAppService.lockFileEntry(fileEntryId);
-	}
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
-	String, long, ServiceContext)}
-	*/
-	@Deprecated
-	@Override
-	public com.liferay.portal.model.Lock lockFileEntry(long fileEntryId,
-		java.lang.String owner, long expirationTime)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _dlAppService.lockFileEntry(fileEntryId, owner, expirationTime);
 	}
 
 	/**
@@ -1715,7 +1679,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @throws PortalException if the repository or folder could not be found
 	*/
 	@Override
-	public com.liferay.portal.model.Lock lockFolder(long repositoryId,
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long repositoryId,
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppService.lockFolder(repositoryId, folderId);
@@ -1736,7 +1700,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @throws PortalException if the repository or folder could not be found
 	*/
 	@Override
-	public com.liferay.portal.model.Lock lockFolder(long repositoryId,
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long repositoryId,
 		long folderId, java.lang.String owner, boolean inheritable,
 		long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1807,7 +1771,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	found
 	*/
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutFromTrash(
+	public com.liferay.portal.kernel.repository.model.FileShortcut moveFileShortcutFromTrash(
 		long fileShortcutId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1823,7 +1787,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+	public com.liferay.portal.kernel.repository.model.FileShortcut moveFileShortcutToTrash(
 		long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppService.moveFileShortcutToTrash(fileShortcutId);
@@ -1892,7 +1856,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @throws PortalException if the file entry or lock could not be found
 	*/
 	@Override
-	public com.liferay.portal.model.Lock refreshFileEntryLock(
+	public com.liferay.portal.kernel.lock.Lock refreshFileEntryLock(
 		java.lang.String lockUuid, long companyId, long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppService.refreshFileEntryLock(lockUuid, companyId,
@@ -1912,7 +1876,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	* @throws PortalException if the folder or lock could not be found
 	*/
 	@Override
-	public com.liferay.portal.model.Lock refreshFolderLock(
+	public com.liferay.portal.kernel.lock.Lock refreshFolderLock(
 		java.lang.String lockUuid, long companyId, long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppService.refreshFolderLock(lockUuid, companyId,
@@ -2174,11 +2138,10 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
-	* Updates a file entry and associated metadata based on a {@link
-	* java.io.File} object. If the file data is <code>null</code>, then only
-	* the associated metadata (i.e., <code>title</code>,
-	* <code>description</code>, and parameters in the
-	* <code>serviceContext</code>) will be updated.
+	* Updates a file entry and associated metadata based on a {@link File}
+	* object. If the file data is <code>null</code>, then only the associated
+	* metadata (i.e., <code>title</code>, <code>description</code>, and
+	* parameters in the <code>serviceContext</code>) will be updated.
 	*
 	* <p>
 	* This method takes two file names, the <code>sourceFileName</code> and the
@@ -2310,7 +2273,7 @@ public class DLAppServiceWrapper implements DLAppService,
 	not be found
 	*/
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut updateFileShortcut(
 		long fileShortcutId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {

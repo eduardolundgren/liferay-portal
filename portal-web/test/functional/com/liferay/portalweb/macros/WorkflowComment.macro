@@ -1,0 +1,56 @@
+<definition>
+	<command name="addCP">
+		<var name="key_workflowAssetTitle" value="${workflowAssetTitle}" />
+		<var name="key_workflowComment" value="${workflowComment}" />
+
+		<execute function="Pause" locator1="1000" />
+
+		<if>
+			<equals arg1="${workflowTaskCompleted}" arg2="true" />
+			<then>
+				<execute function="AssertClick" locator1="CPMyworkflowtasks#NAVIGATION_COMPLETED" value1="Completed" />
+
+				<execute function="AssertClick" locator1="CPMyworkflowtasksCompleted#TABLE_GENERIC_ASSET_TITLE" value1="${workflowAssetTitle}" />
+			</then>
+			<else>
+				<execute function="AssertClick" locator1="CPMyworkflowtasks#TABLE_GENERIC_ASSET_TITLE" value1="${workflowAssetTitle}" />
+			</else>
+		</if>
+
+		<execute function="Pause" locator1="1000" />
+
+		<if>
+			<condition function="IsElementPresent" locator1="CPMyworkflowtasksTask#COMMENTS_BE_THE_FIRST" />
+			<then>
+				<execute function="AssertClick" locator1="CPMyworkflowtasksTask#COMMENTS_BE_THE_FIRST" value1="Be the first." />
+			</then>
+			<else>
+				<execute function="AssertClick" locator1="CPMyworkflowtasksTask#COMMENTS_ADD_COMMENT" value1="Add Comment" />
+			</else>
+		</if>
+
+		<execute function="Type" locator1="CPMyworkflowtasksTask#COMMENTS_ADD_FIELD" value1="${workflowComment}" />
+		<execute function="AssertClick" locator1="CPMyworkflowtasksTask#COMMENTS_REPLY_BUTTON" value1="Reply" />
+		<execute function="AssertTextEquals" locator1="CPMyworkflowtasksTask#COMMENTS_SUCCESS_MESSAGE" value1="Your request processed successfully." />
+		<execute function="AssertTextEquals" locator1="CPMyworkflowtasksTask#COMMENTS_COMMENT" value1="${workflowComment}" />
+	</command>
+
+	<command name="viewCP">
+		<var name="key_workflowAssetTitle" value="${workflowAssetTitle}" />
+		<var name="key_workflowComment" value="${workflowComment}" />
+
+		<if>
+			<equals arg1="${workflowTaskCompleted}" arg2="true" />
+			<then>
+				<execute function="AssertClick" locator1="CPMyworkflowtasks#NAVIGATION_COMPLETED" value1="Completed" />
+
+				<execute function="AssertClick" locator1="CPMyworkflowtasksCompleted#TABLE_GENERIC_ASSET_TITLE" value1="${workflowAssetTitle}" />
+			</then>
+			<else>
+				<execute function="AssertClick" locator1="CPMyworkflowtasks#TABLE_GENERIC_ASSET_TITLE" value1="${workflowAssetTitle}" />
+			</else>
+		</if>
+
+		<execute function="AssertTextEquals" locator1="CPMyworkflowtasksTask#COMMENTS_COMMENT" value1="${workflowComment}" />
+	</command>
+</definition>

@@ -44,7 +44,7 @@
 			INNER JOIN
 				(
 					SELECT
-						scope, primKey, roleId, ownerId
+						primKey
 					FROM
 						ResourcePermission
 					WHERE
@@ -53,6 +53,8 @@
 						(ResourcePermission.scope = [$RESOURCE_SCOPE_INDIVIDUAL$]) AND
 						(MOD(ResourcePermission.actionIds, 2) = 1) AND
 						[$ROLE_IDS_OR_OWNER_ID$]
+					GROUP BY
+						primKey
 				)
 			InlineSQLResourcePermission ON
 				[$PRIM_KEYS$]
@@ -182,7 +184,7 @@
 				(Group_.classNameId = ?) AND
 				(Group_.parentGroupId [$PARENT_GROUP_ID_COMPARATOR$] ?) AND
 				(Group_.liveGroupId = 0) AND
-				(Group_.name != 'Control Panel') AND
+				(Group_.groupKey != 'Control Panel') AND
 				(lower(Group_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 				(lower(Group_.description) LIKE ? [$AND_OR_NULL_CHECK$]) AND
 				(Group_.type_ != 4)
@@ -265,8 +267,8 @@
 				WHERE
 					(Group_.companyId = ?) AND
 					(
-						(Group_.name = 'Control Panel') OR
-						(Group_.name = 'Guest') OR
+						(Group_.groupKey = 'Control Panel') OR
+						(Group_.groupKey = 'Guest') OR
 						(Group_.type_ = 4)
 					)
 			)
@@ -301,7 +303,7 @@
 				groupId ASC
 		]]>
 	</sql>
-	<sql id="com.liferay.portal.service.persistence.GroupFinder.findByC_N">
+	<sql id="com.liferay.portal.service.persistence.GroupFinder.findByC_GK">
 		<![CDATA[
 			SELECT
 				{Group_.*}
@@ -310,7 +312,7 @@
 			WHERE
 				(Group_.companyId = ?) AND
 				(Group_.liveGroupId = 0) AND
-				(lower(Group_.name) = ?) AND
+				(lower(Group_.groupKey) = ?) AND
 				(Group_.type_ != 4)
 		]]>
 	</sql>
@@ -327,7 +329,7 @@
 				(Group_.classNameId = ?) AND
 				(Group_.parentGroupId [$PARENT_GROUP_ID_COMPARATOR$] ?) AND
 				(Group_.liveGroupId = 0) AND
-				(Group_.name != 'Control Panel') AND
+				(Group_.groupKey != 'Control Panel') AND
 				(lower(Group_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 				(lower(Group_.description) LIKE ? [$AND_OR_NULL_CHECK$]) AND
 				(Group_.type_ != 4)
@@ -552,18 +554,7 @@
 					(PortletPreferences.portletId = ?) OR
 					(PortletPreferences.portletId LIKE ?)
 				) AND
-				(PortletPreferences.preferences LIKE ?)
-		]]>
-	</sql>
-	<sql id="com.liferay.portal.service.persistence.LockFinder.findByC_K">
-		<![CDATA[
-			SELECT
-				lock
-			FROM
-				Lock lock
-			WHERE
-				(lock.className = ?) AND
-				(lock.key = ?)
+				(CAST_CLOB_TEXT(PortletPreferences.preferences) LIKE ?)
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.service.persistence.OrganizationFinder.countByGroupId">
@@ -838,7 +829,7 @@
 					(PortletPreferences.portletId = ?) OR
 					(PortletPreferences.portletId LIKE ?)
 				) AND
-				(PortletPreferences.preferences != '[$PORTLET_PREFERENCES_PREFERENCES_DEFAULT$]')
+				(CAST_CLOB_TEXT(PortletPreferences.preferences) != '[$PORTLET_PREFERENCES_PREFERENCES_DEFAULT$]')
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.service.persistence.PortletPreferencesFinder.countByO_O_P_P_P">
@@ -855,7 +846,7 @@
 					(PortletPreferences.portletId LIKE ?)
 				) AND
 				(PortletPreferences.plid = ?) AND
-				(PortletPreferences.preferences != '[$PORTLET_PREFERENCES_PREFERENCES_DEFAULT$]')
+				(CAST_CLOB_TEXT(PortletPreferences.preferences) != '[$PORTLET_PREFERENCES_PREFERENCES_DEFAULT$]')
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.service.persistence.PortletPreferencesFinder.findByPortletId">
@@ -928,7 +919,7 @@
 				(ResourcePermission.scope = ?) AND
 				(ResourcePermission.primKey = ?) AND
 				(ResourcePermission.roleId = ?) AND
-				(BITAND(CAST_LONG(ResourcePermission.actionIds, ?)) = ?)
+				(BITAND(CAST_LONG(ResourcePermission.actionIds), ?) = ?)
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.service.persistence.ResourcePermissionFinder.findByResource">
@@ -1305,6 +1296,26 @@
 				(Users_Roles.userId = ?)
 		]]>
 	</sql>
+	<sql id="com.liferay.portal.service.persistence.ServiceComponentFinder.findByMaxBuildNumber">
+		<![CDATA[
+			SELECT
+				{ServiceComponent.*}
+			FROM
+				ServiceComponent
+			WHERE
+				buildNumber =
+					(
+						SELECT
+							MAX(buildNumber)
+						FROM
+							ServiceComponent tempServiceComponent
+						WHERE
+							ServiceComponent.buildNamespace = tempServiceComponent.buildNamespace
+					)
+			ORDER BY
+				buildNamespace DESC
+		]]>
+	</sql>
 	<sql id="com.liferay.portal.service.persistence.TeamFinder.countByG_N_D">
 		<![CDATA[
 			SELECT
@@ -1449,7 +1460,7 @@
 	<sql id="com.liferay.portal.service.persistence.UserFinder.findByC_FN_MN_LN_SN_EA_S">
 		<![CDATA[
 			SELECT
-				DISTINCT User_.userId AS userId, User_.firstName AS firstName, User_.middleName AS middleName, User_.lastName AS lastName
+				DISTINCT User_.userId AS userId, User_.screenName AS screenName, User_.firstName AS firstName, User_.middleName AS middleName, User_.lastName AS lastName
 			FROM
 				User_
 			[$JOIN$]

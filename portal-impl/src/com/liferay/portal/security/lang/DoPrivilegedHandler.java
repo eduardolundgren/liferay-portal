@@ -16,6 +16,7 @@ package com.liferay.portal.security.lang;
 
 import com.liferay.portal.kernel.security.pacl.NotPrivileged;
 import com.liferay.portal.kernel.security.pacl.permission.PortalServicePermission;
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.lang.reflect.InvocationHandler;
@@ -108,7 +109,7 @@ public class DoPrivilegedHandler
 	}
 
 	private void _initNotPrivilegedMethods() {
-		_notPrivilegedMethods = new ArrayList<MethodKey>();
+		_notPrivilegedMethods = new ArrayList<>();
 
 		Class<?> beanClass = _bean.getClass();
 
@@ -202,6 +203,15 @@ public class DoPrivilegedHandler
 			}
 
 			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			int hash = HashUtil.hash(0, _declaringClass);
+
+			hash = HashUtil.hash(hash, _methodName);
+
+			return HashUtil.hash(hash, _parameterTypes);
 		}
 
 		private final Class<?> _declaringClass;

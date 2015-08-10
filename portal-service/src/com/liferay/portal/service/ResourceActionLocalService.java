@@ -45,6 +45,8 @@ public interface ResourceActionLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link ResourceActionLocalServiceUtil} to access the resource action local service. Add custom service methods to {@link com.liferay.portal.service.impl.ResourceActionLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public com.liferay.portal.model.ResourceAction addResourceAction(
+		java.lang.String name, java.lang.String actionId, long bitwiseValue);
 
 	/**
 	* Adds the resource action to the database. Also notifies the appropriate model listeners.
@@ -56,7 +58,7 @@ public interface ResourceActionLocalService extends BaseLocalService,
 	public com.liferay.portal.model.ResourceAction addResourceAction(
 		com.liferay.portal.model.ResourceAction resourceAction);
 
-	@com.liferay.portal.kernel.transaction.Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void checkResourceActions();
 
 	public void checkResourceActions(java.lang.String name,
@@ -80,7 +82,7 @@ public interface ResourceActionLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the resource action from the database. Also notifies the appropriate model listeners.
@@ -101,8 +103,7 @@ public interface ResourceActionLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portal.model.ResourceAction deleteResourceAction(
-		long resourceActionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long resourceActionId) throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -191,14 +192,13 @@ public interface ResourceActionLocalService extends BaseLocalService,
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@com.liferay.portal.kernel.spring.aop.Skip
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.ResourceAction getResourceAction(
 		java.lang.String name, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns the resource action with the primary key.
@@ -209,8 +209,7 @@ public interface ResourceActionLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.ResourceAction getResourceAction(
-		long resourceActionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long resourceActionId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.ResourceAction> getResourceActions(

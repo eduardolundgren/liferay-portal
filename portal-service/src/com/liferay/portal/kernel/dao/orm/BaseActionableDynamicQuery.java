@@ -57,7 +57,7 @@ public abstract class BaseActionableDynamicQuery
 	@Override
 	public void addDocument(Document document) throws PortalException {
 		if (_documents == null) {
-			_documents = new ArrayList<Document>();
+			_documents = new ArrayList<>();
 		}
 
 		_documents.add(document);
@@ -70,6 +70,11 @@ public abstract class BaseActionableDynamicQuery
 	@Override
 	public AddCriteriaMethod getAddCriteriaMethod() {
 		return _addCriteriaMethod;
+	}
+
+	@Override
+	public AddOrderCriteriaMethod getAddOrderCriteriaMethod() {
+		return _addOrderCriteriaMethod;
 	}
 
 	@Override
@@ -119,6 +124,13 @@ public abstract class BaseActionableDynamicQuery
 	@Override
 	public void setAddCriteriaMethod(AddCriteriaMethod addCriteriaMethod) {
 		_addCriteriaMethod = addCriteriaMethod;
+	}
+
+	@Override
+	public void setAddOrderCriteriaMethod(
+		AddOrderCriteriaMethod addOrderCriteriaMethod) {
+
+		_addOrderCriteriaMethod = addOrderCriteriaMethod;
 	}
 
 	@Override
@@ -227,13 +239,23 @@ public abstract class BaseActionableDynamicQuery
 		throws PortalException {
 
 		if (_documents == null) {
-			_documents = new ArrayList<Document>();
+			_documents = new ArrayList<>();
 		}
 
 		_documents.addAll(documents);
 
 		if (_documents.size() >= _interval) {
 			indexInterval();
+		}
+	}
+
+	protected void addOrderCriteria(DynamicQuery dynamicQuery) {
+		if (_addOrderCriteriaMethod != null) {
+			_addOrderCriteriaMethod.addOrderCriteria(dynamicQuery);
+		}
+		else {
+			dynamicQuery.addOrder(
+				OrderFactoryUtil.asc(_primaryKeyPropertyName));
 		}
 	}
 
@@ -248,13 +270,13 @@ public abstract class BaseActionableDynamicQuery
 
 		dynamicQuery.add(property.gt(previousPrimaryKey));
 
-		dynamicQuery.addOrder(OrderFactoryUtil.asc(_primaryKeyPropertyName));
-
 		dynamicQuery.setLimit(0, _interval);
 
 		addDefaultCriteria(dynamicQuery);
 
 		addCriteria(dynamicQuery);
+
+		addOrderCriteria(dynamicQuery);
 
 		Callable<Long> callable = new Callable<Long>() {
 
@@ -374,6 +396,7 @@ public abstract class BaseActionableDynamicQuery
 	}
 
 	private AddCriteriaMethod _addCriteriaMethod;
+	private AddOrderCriteriaMethod _addOrderCriteriaMethod;
 	private BaseLocalService _baseLocalService;
 	private ClassLoader _classLoader;
 	private Class<?> _clazz;

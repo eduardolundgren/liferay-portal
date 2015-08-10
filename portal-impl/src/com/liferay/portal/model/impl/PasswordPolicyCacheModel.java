@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof PasswordPolicyCacheModel)) {
+			return false;
+		}
+
+		PasswordPolicyCacheModel passwordPolicyCacheModel = (PasswordPolicyCacheModel)obj;
+
+		if ((passwordPolicyId == passwordPolicyCacheModel.passwordPolicyId) &&
+				(mvccVersion == passwordPolicyCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, passwordPolicyId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(71);
+		StringBundler sb = new StringBundler(73);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -123,6 +151,8 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 		sb.append(resetFailureCount);
 		sb.append(", resetTicketMaxAge=");
 		sb.append(resetTicketMaxAge);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -214,6 +244,13 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 		passwordPolicyImpl.setResetFailureCount(resetFailureCount);
 		passwordPolicyImpl.setResetTicketMaxAge(resetTicketMaxAge);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			passwordPolicyImpl.setLastPublishDate(null);
+		}
+		else {
+			passwordPolicyImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		passwordPolicyImpl.resetOriginalValues();
 
 		return passwordPolicyImpl;
@@ -256,6 +293,7 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 		requireUnlock = objectInput.readBoolean();
 		resetFailureCount = objectInput.readLong();
 		resetTicketMaxAge = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -330,6 +368,7 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 		objectOutput.writeBoolean(requireUnlock);
 		objectOutput.writeLong(resetFailureCount);
 		objectOutput.writeLong(resetTicketMaxAge);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -367,4 +406,5 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 	public boolean requireUnlock;
 	public long resetFailureCount;
 	public long resetTicketMaxAge;
+	public long lastPublishDate;
 }

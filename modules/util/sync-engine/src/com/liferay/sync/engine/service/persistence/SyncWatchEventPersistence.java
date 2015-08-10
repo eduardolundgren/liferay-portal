@@ -52,7 +52,7 @@ public class SyncWatchEventPersistence
 
 		where.eq("syncAccountId", syncAccountId);
 
-		delete(deleteBuilder.prepare());
+		deleteBuilder.delete();
 	}
 
 	public SyncWatchEvent fetchByE_F_T(
@@ -61,46 +61,31 @@ public class SyncWatchEventPersistence
 
 		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
 
+		queryBuilder.limit(1L);
+
 		Where<SyncWatchEvent, Long> where = queryBuilder.where();
 
 		where.eq("eventType", eventType);
-
-		where.and();
-
 		where.eq("filePathName", new SelectArg(filePathName));
-
-		where.and();
-
 		where.between("timestamp", timestamp - 1000, timestamp + 1000);
 
-		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
+		where.and(3);
 
-		if ((syncWatchEvents == null) || syncWatchEvents.isEmpty()) {
-			return null;
-		}
-
-		return syncWatchEvents.get(0);
+		return where.queryForFirst();
 	}
 
-	public SyncWatchEvent fetchBySyncAccountId_Last(long syncAccountId)
+	public List<SyncWatchEvent> findBySyncAccountId(long syncAccountId)
 		throws SQLException {
 
 		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
+
+		queryBuilder.orderBy("fileType", false);
 
 		Where<SyncWatchEvent, Long> where = queryBuilder.where();
 
 		where.eq("syncAccountId", syncAccountId);
 
-		queryBuilder.limit(1L);
-		queryBuilder.orderBy("timestamp", false);
-
-		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
-
-		if ((syncWatchEvents == null) || syncWatchEvents.isEmpty()) {
-			return null;
-		}
-
-		return syncWatchEvents.get(0);
+		return where.query();
 	}
 
 	public List<SyncWatchEvent> findBySyncAccountId(
@@ -109,14 +94,14 @@ public class SyncWatchEventPersistence
 
 		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
 
+		queryBuilder.orderBy("fileType", false);
+		queryBuilder.orderBy(orderByColumn, ascending);
+
 		Where<SyncWatchEvent, Long> where = queryBuilder.where();
 
 		where.eq("syncAccountId", syncAccountId);
 
-		queryBuilder.orderBy("fileType", false);
-		queryBuilder.orderBy(orderByColumn, ascending);
-
-		return query(queryBuilder.prepare());
+		return where.query();
 	}
 
 }

@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.tools.ToolDependencies;
@@ -38,7 +39,14 @@ public class SeleniumBuilder {
 	public static void main(String[] args) throws Exception {
 		ToolDependencies.wireBasic();
 
-		new SeleniumBuilder(args);
+		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
+
+		try {
+			new SeleniumBuilder(args);
+		}
+		catch (Exception e) {
+			ArgumentsUtil.processMainException(arguments, e);
+		}
 	}
 
 	/**
@@ -284,8 +292,7 @@ public class SeleniumBuilder {
 	 * @throws Exception if an exception occurred
 	 */
 	private void _writeTestCaseMethodNamesFile() throws Exception {
-		Map<String, Set<String>> testCaseMethodNameMap =
-			new TreeMap<String, Set<String>>();
+		Map<String, Set<String>> testCaseMethodNameMap = new TreeMap<>();
 
 		Set<String> testCaseNames = _seleniumBuilderContext.getTestCaseNames();
 
@@ -299,7 +306,7 @@ public class SeleniumBuilder {
 
 			String componentName = rootElement.attributeValue("component-name");
 
-			Set<String> compontentTestCaseMethodNames = new TreeSet<String>();
+			Set<String> compontentTestCaseMethodNames = new TreeSet<>();
 
 			if (testCaseMethodNameMap.containsKey(componentName)) {
 				compontentTestCaseMethodNames = testCaseMethodNameMap.get(
@@ -358,7 +365,7 @@ public class SeleniumBuilder {
 					}
 
 					Set<String> knownIssuesTestCaseMethodNames =
-						new TreeSet<String>();
+						new TreeSet<>();
 
 					if (testCaseMethodNameMap.containsKey(
 							knownIssuesComponent)) {
@@ -453,7 +460,7 @@ public class SeleniumBuilder {
 	 * @throws Exception if an exception occurred
 	 */
 	private void _writeTestCasePropertiesFile() throws Exception {
-		Set<String> testCaseProperties = new TreeSet<String>();
+		Set<String> testCaseProperties = new TreeSet<>();
 
 		Set<String> testCaseNames = _seleniumBuilderContext.getTestCaseNames();
 
@@ -509,6 +516,18 @@ public class SeleniumBuilder {
 				_seleniumBuilderFileUtil.getAllChildElements(
 					rootElement, "command");
 
+			String extendsTestCaseName = rootElement.attributeValue("extends");
+
+			if (extendsTestCaseName != null) {
+				Element extendsRootElement =
+					_seleniumBuilderContext.getTestCaseRootElement(
+						extendsTestCaseName);
+
+				commandElements.addAll(
+					_seleniumBuilderFileUtil.getAllChildElements(
+						extendsRootElement, "command"));
+			}
+
 			for (Element commandElement : commandElements) {
 				List<Element> commandPropertyElements =
 					_seleniumBuilderFileUtil.getAllChildElements(
@@ -528,40 +547,30 @@ public class SeleniumBuilder {
 					testCaseProperties.add(sb.toString());
 				}
 
-				sb = new StringBundler();
+				List<Attribute> commandAttributes = commandElement.attributes();
 
-				sb.append(testCaseName);
-				sb.append("TestCase.test");
-				sb.append(commandElement.attributeValue("name"));
-				sb.append(".testray.testcase.description=");
+				for (Attribute commandAttribute : commandAttributes) {
+					String commandAttributeName = StringUtil.replace(
+						commandAttribute.getName(), "-", ".");
 
-				if (commandElement.attributeValue("description") != null) {
-					sb.append(commandElement.attributeValue("description"));
+					if (commandAttributeName.equals("line.number") ||
+						commandAttributeName.equals("name")) {
+
+						continue;
+					}
+
+					sb = new StringBundler();
+
+					sb.append(testCaseName);
+					sb.append("TestCase.test");
+					sb.append(commandElement.attributeValue("name"));
+					sb.append(".");
+					sb.append(commandAttributeName);
+					sb.append("=");
+					sb.append(commandAttribute.getValue());
+
+					testCaseProperties.add(sb.toString());
 				}
-
-				testCaseProperties.add(sb.toString());
-
-				sb = new StringBundler();
-
-				sb.append(testCaseName);
-				sb.append("TestCase.test");
-				sb.append(commandElement.attributeValue("name"));
-				sb.append(".testray.testcase.name=");
-				sb.append(testCaseName);
-				sb.append("#");
-				sb.append(commandElement.attributeValue("name"));
-
-				testCaseProperties.add(sb.toString());
-
-				sb = new StringBundler();
-
-				sb.append(testCaseName);
-				sb.append("TestCase.test");
-				sb.append(commandElement.attributeValue("name"));
-				sb.append(".testray.testcase.priority=");
-				sb.append(commandElement.attributeValue("priority"));
-
-				testCaseProperties.add(sb.toString());
 			}
 		}
 
@@ -574,7 +583,7 @@ public class SeleniumBuilder {
 			false);
 	}
 
-	private SeleniumBuilderContext _seleniumBuilderContext;
-	private SeleniumBuilderFileUtil _seleniumBuilderFileUtil;
+	private final SeleniumBuilderContext _seleniumBuilderContext;
+	private final SeleniumBuilderFileUtil _seleniumBuilderFileUtil;
 
 }

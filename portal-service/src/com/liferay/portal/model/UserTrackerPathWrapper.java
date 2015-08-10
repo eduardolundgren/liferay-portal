@@ -136,7 +136,7 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	* @return the path date of this user tracker path
 	*/
 	@Override
-	public java.util.Date getPathDate() {
+	public Date getPathDate() {
 		return _userTrackerPath.getPathDate();
 	}
 
@@ -206,8 +206,7 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_userTrackerPath.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -254,7 +253,7 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	* @param pathDate the path date of this user tracker path
 	*/
 	@Override
-	public void setPathDate(java.util.Date pathDate) {
+	public void setPathDate(Date pathDate) {
 		_userTrackerPath.setPathDate(pathDate);
 	}
 
@@ -294,7 +293,7 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.UserTrackerPath> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.UserTrackerPath> toCacheModel() {
 		return _userTrackerPath.toCacheModel();
 	}
 

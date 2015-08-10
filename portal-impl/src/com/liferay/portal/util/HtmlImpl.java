@@ -278,7 +278,16 @@ public class HtmlImpl implements Html {
 			return StringPool.BLANK;
 		}
 
-		if (href.indexOf(StringPool.COLON) == 10) {
+		int index = href.indexOf(StringPool.COLON);
+
+		if (index == 4) {
+			String protocol = StringUtil.toLowerCase(href.substring(0, 4));
+
+			if (protocol.equals("data")) {
+				href = StringUtil.replaceFirst(href, StringPool.COLON, "%3a");
+			}
+		}
+		else if (index == 10) {
 			String protocol = StringUtil.toLowerCase(href.substring(0, 10));
 
 			if (protocol.equals("javascript")) {
@@ -718,7 +727,7 @@ public class HtmlImpl implements Html {
 
 	protected boolean isTag(char[] tag, String text, int pos) {
 		if ((pos + tag.length + 1) <= text.length()) {
-			char item;
+			char item = '\0';
 
 			for (int i = 0; i < tag.length; i++) {
 				item = text.charAt(pos++);
@@ -798,10 +807,10 @@ public class HtmlImpl implements Html {
 
 	private static final char[] _XPATH_TOKENS = {
 		'(', ')', '[', ']', '.', '@', ',', ':', '/', '|', '+', '-', '=', '!',
-		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232};
+		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232
+	};
 
-	private static final Map<String, String> _unescapeMap =
-		new HashMap<String, String>();
+	private static final Map<String, String> _unescapeMap = new HashMap<>();
 
 	static {
 		_unescapeMap.put("lt", "<");
@@ -821,6 +830,6 @@ public class HtmlImpl implements Html {
 		_unescapeMap.put("#045", "-");
 	}
 
-	private Pattern _pattern = Pattern.compile("([\\s<&]|$)");
+	private final Pattern _pattern = Pattern.compile("([\\s<&]|$)");
 
 }

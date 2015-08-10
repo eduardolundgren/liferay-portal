@@ -15,13 +15,13 @@
 package com.liferay.social.activities.web.upgrade;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
+import com.liferay.social.activities.web.constants.SocialActivitiesPortletKeys;
 
 import java.util.Collections;
-
-import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -34,15 +34,16 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = SocialActivitiesWebUpgrade.class)
 public class SocialActivitiesWebUpgrade {
 
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	@Reference(unbind = "-")
 	protected void setReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
 
 		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(target = "(original.bean=*)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
 	}
 
 	@Activate
@@ -53,9 +54,7 @@ public class SocialActivitiesWebUpgrade {
 			protected String[][] getRenamePortletIdsArray() {
 				return new String[][] {
 					new String[] {
-						"116",
-						"com_liferay_social_activities_web_portlet_" +
-							"SocialActivitiesPortlet"
+						"116", SocialActivitiesPortletKeys.SOCIAL_ACTIVITIES
 					}
 				};
 			}
@@ -64,7 +63,7 @@ public class SocialActivitiesWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.social.activities.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

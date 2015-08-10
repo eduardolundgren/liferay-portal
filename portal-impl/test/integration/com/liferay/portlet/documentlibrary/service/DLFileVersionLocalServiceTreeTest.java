@@ -16,19 +16,20 @@ package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,18 +60,19 @@ public class DLFileVersionLocalServiceTreeTest {
 	public void testFileVersionTreePathWhenMovingSubfolderWithFileVersion()
 		throws Exception {
 
-		Folder folderA = DLAppTestUtil.addFolder(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			"Folder A");
-
-		Folder folderAA = DLAppTestUtil.addFolder(
-			_group.getGroupId(), folderA.getFolderId(), "Folder AA");
-
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), folderAA.getFolderId(), "Entry.txt");
-
 		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		Folder folderA = DLAppServiceUtil.addFolder(
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Folder A", RandomTestUtil.randomString(), serviceContext);
+
+		Folder folderAA = DLAppServiceUtil.addFolder(
+			_group.getGroupId(), folderA.getFolderId(), "Folder AA",
+			RandomTestUtil.randomString(), serviceContext);
+
+		FileEntry fileEntry = addFileEntry(folderAA.getFolderId(), "Entry.txt");
 
 		DLAppLocalServiceUtil.moveFolder(
 			TestPropsValues.getUserId(), folderAA.getFolderId(),
@@ -114,24 +116,40 @@ public class DLFileVersionLocalServiceTreeTest {
 		}
 	}
 
+	protected FileEntry addFileEntry(long folderId, String sourceFileName)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		return DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), _group.getGroupId(), folderId,
+			sourceFileName, ContentTypes.TEXT_PLAIN,
+			RandomTestUtil.randomBytes(), serviceContext);
+	}
+
 	protected void createTree() throws Exception {
-		FileEntry fileEntryA = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			"Entry A.txt");
+		FileEntry fileEntryA = addFileEntry(
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Entry A.txt");
 
 		_fileEntries.add(fileEntryA);
 
-		_folder = DLAppTestUtil.addFolder(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			"Folder A");
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
 
-		FileEntry fileEntryAA = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), _folder.getFolderId(), "Entry AA.txt");
+		_folder = DLAppServiceUtil.addFolder(
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Folder A", RandomTestUtil.randomString(), serviceContext);
+
+		FileEntry fileEntryAA = addFileEntry(
+			_folder.getFolderId(), "Entry AA.txt");
 
 		_fileEntries.add(fileEntryAA);
 	}
 
-	private final List<FileEntry> _fileEntries = new ArrayList<FileEntry>();
+	private final List<FileEntry> _fileEntries = new ArrayList<>();
 	private Folder _folder;
 
 	@DeleteAfterTestRun

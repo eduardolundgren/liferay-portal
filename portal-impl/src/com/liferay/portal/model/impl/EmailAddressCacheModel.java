@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof EmailAddressCacheModel)) {
+			return false;
+		}
+
+		EmailAddressCacheModel emailAddressCacheModel = (EmailAddressCacheModel)obj;
+
+		if ((emailAddressId == emailAddressCacheModel.emailAddressId) &&
+				(mvccVersion == emailAddressCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, emailAddressId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -79,6 +107,8 @@ public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 		sb.append(typeId);
 		sb.append(", primary=");
 		sb.append(primary);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -135,6 +165,13 @@ public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 		emailAddressImpl.setTypeId(typeId);
 		emailAddressImpl.setPrimary(primary);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			emailAddressImpl.setLastPublishDate(null);
+		}
+		else {
+			emailAddressImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		emailAddressImpl.resetOriginalValues();
 
 		return emailAddressImpl;
@@ -153,8 +190,9 @@ public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
 		address = objectInput.readUTF();
-		typeId = objectInput.readInt();
+		typeId = objectInput.readLong();
 		primary = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -192,8 +230,9 @@ public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 			objectOutput.writeUTF(address);
 		}
 
-		objectOutput.writeInt(typeId);
+		objectOutput.writeLong(typeId);
 		objectOutput.writeBoolean(primary);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -207,6 +246,7 @@ public class EmailAddressCacheModel implements CacheModel<EmailAddress>,
 	public long classNameId;
 	public long classPK;
 	public String address;
-	public int typeId;
+	public long typeId;
 	public boolean primary;
+	public long lastPublishDate;
 }

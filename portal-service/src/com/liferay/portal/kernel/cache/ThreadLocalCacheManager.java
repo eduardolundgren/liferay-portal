@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.cache;
 
+import com.liferay.portal.kernel.transaction.NewTransactionLifecycleListener;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionLifecycleListener;
 import com.liferay.portal.kernel.transaction.TransactionStatus;
@@ -31,10 +32,10 @@ import java.util.Map;
 public class ThreadLocalCacheManager {
 
 	public static final TransactionLifecycleListener
-		TRANSACTION_LIFECYCLE_LISTENER = new TransactionLifecycleListener() {
+		TRANSACTION_LIFECYCLE_LISTENER = new NewTransactionLifecycleListener() {
 
 		@Override
-		public void committed(
+		protected void doCommitted(
 			TransactionAttribute transactionAttribute,
 			TransactionStatus transactionStatus) {
 
@@ -44,7 +45,7 @@ public class ThreadLocalCacheManager {
 		}
 
 		@Override
-		public void created(
+		protected void doCreated(
 			TransactionAttribute transactionAttribute,
 			TransactionStatus transactionStatus) {
 
@@ -54,7 +55,7 @@ public class ThreadLocalCacheManager {
 		}
 
 		@Override
-		public void rollbacked(
+		protected void doRollbacked(
 			TransactionAttribute transactionAttribute,
 			TransactionStatus transactionStatus, Throwable throwable) {
 
@@ -113,8 +114,7 @@ public class ThreadLocalCacheManager {
 			threadLocalCacheMaps.get(lifecycle);
 
 		if (threadLocalCacheMap == null) {
-			threadLocalCacheMap =
-				new HashMap<Serializable, ThreadLocalCache<?>>();
+			threadLocalCacheMap = new HashMap<>();
 
 			threadLocalCacheMaps.put(lifecycle, threadLocalCacheMap);
 		}
@@ -122,7 +122,7 @@ public class ThreadLocalCacheManager {
 		ThreadLocalCache<?> threadLocalCache = threadLocalCacheMap.get(name);
 
 		if (threadLocalCache == null) {
-			threadLocalCache = new ThreadLocalCache<T>(name, lifecycle);
+			threadLocalCache = new ThreadLocalCache<>(name, lifecycle);
 
 			threadLocalCacheMap.put(name, threadLocalCache);
 		}
@@ -131,7 +131,7 @@ public class ThreadLocalCacheManager {
 	}
 
 	private static final EmptyThreadLocalCahce<?> _emptyThreadLocalCache =
-		new EmptyThreadLocalCahce<Object>();
+		new EmptyThreadLocalCahce<>();
 	private static final ThreadLocal
 		<Map<Lifecycle, Boolean>>
 			_threadLocalCacheDisabledFlags = new InitialThreadLocal

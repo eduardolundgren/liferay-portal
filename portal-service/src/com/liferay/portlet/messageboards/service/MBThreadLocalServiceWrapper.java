@@ -262,7 +262,7 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService,
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _mbThreadLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -681,6 +681,12 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService,
 	public com.liferay.portlet.messageboards.model.MBThread updateMBThread(
 		com.liferay.portlet.messageboards.model.MBThread mbThread) {
 		return _mbThreadLocalService.updateMBThread(mbThread);
+	}
+
+	@Override
+	public com.liferay.portlet.messageboards.model.MBThread updateMessageCount(
+		long threadId) {
+		return _mbThreadLocalService.updateMessageCount(threadId);
 	}
 
 	@Override

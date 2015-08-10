@@ -41,13 +41,24 @@ public abstract class BaseBackgroundTaskExecutor
 	}
 
 	@Override
+	public int getIsolationLevel() {
+		return _isolationLevel;
+	}
+
+	@Override
 	public String handleException(BackgroundTask backgroundTask, Exception e) {
 		return "Unable to execute background task: " + e.getMessage();
 	}
 
 	@Override
 	public boolean isSerial() {
-		return _serial;
+		if (_isolationLevel ==
+				BackgroundTaskConstants.ISOLATION_LEVEL_NOT_ISOLATED) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	protected Locale getLocale(BackgroundTask backgroundTask) {
@@ -82,8 +93,8 @@ public abstract class BaseBackgroundTaskExecutor
 			backgroundTaskStatusMessageTranslator;
 	}
 
-	protected void setSerial(boolean serial) {
-		_serial = serial;
+	protected void setIsolationLevel(int isolationLevel) {
+		_isolationLevel = isolationLevel;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -91,6 +102,7 @@ public abstract class BaseBackgroundTaskExecutor
 
 	private BackgroundTaskStatusMessageTranslator
 		_backgroundTaskStatusMessageTranslator;
-	private boolean _serial;
+	private int _isolationLevel =
+		BackgroundTaskConstants.ISOLATION_LEVEL_NOT_ISOLATED;
 
 }

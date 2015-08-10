@@ -170,7 +170,7 @@ public class EditItemAction extends PortletAction {
 		int fieldsCount = ParamUtil.getInteger(
 			uploadPortletRequest, "fieldsCount", 1);
 
-		List<ShoppingItemField> itemFields = new ArrayList<ShoppingItemField>();
+		List<ShoppingItemField> itemFields = new ArrayList<>();
 
 		for (int i = 0; i < fieldsCount; i ++) {
 			String fieldName = ParamUtil.getString(
@@ -195,7 +195,7 @@ public class EditItemAction extends PortletAction {
 		int pricesCount = ParamUtil.getInteger(
 			uploadPortletRequest, "pricesCount", 1);
 
-		List<ShoppingItemPrice> itemPrices = new ArrayList<ShoppingItemPrice>();
+		List<ShoppingItemPrice> itemPrices = new ArrayList<>();
 
 		for (int i = 0; i < pricesCount; i ++) {
 			int minQuantity = ParamUtil.getInteger(
@@ -203,13 +203,17 @@ public class EditItemAction extends PortletAction {
 			int maxQuantity = ParamUtil.getInteger(
 				uploadPortletRequest, "maxQuantity" + i);
 			double price = ParamUtil.getDouble(
-				uploadPortletRequest, "price" + i);
+				uploadPortletRequest, "price" + i, themeDisplay.getLocale());
+
 			double discount = ParamUtil.getDouble(
-				uploadPortletRequest, "discount" + i) / 100;
+				uploadPortletRequest, "discount" + i, themeDisplay.getLocale());
+
+			discount = discount / 100;
+
 			boolean taxable = ParamUtil.getBoolean(
 				uploadPortletRequest, "taxable" + i);
 			double shipping = ParamUtil.getDouble(
-				uploadPortletRequest, "shipping" + i);
+				uploadPortletRequest, "shipping" + i, themeDisplay.getLocale());
 			boolean useShippingFormula = ParamUtil.getBoolean(
 				uploadPortletRequest, "useShippingFormula" + i);
 			boolean active = ParamUtil.getBoolean(

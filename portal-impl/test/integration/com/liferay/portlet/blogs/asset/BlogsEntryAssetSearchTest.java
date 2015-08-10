@@ -14,17 +14,22 @@
 
 package com.liferay.portlet.blogs.asset;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portlet.asset.service.persistence.BaseAssetSearchTestCase;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portlet.asset.search.test.BaseAssetSearchTestCase;
 import com.liferay.portlet.blogs.model.BlogsEntry;
-import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
+import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
+
+import java.util.Locale;
+import java.util.Map;
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -44,28 +49,39 @@ public class BlogsEntryAssetSearchTest extends BaseAssetSearchTestCase {
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testClassTypeIds1() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testClassTypeIds2() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testOrderByExpirationDateAsc() throws Exception {
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testOrderByExpirationDateDesc() throws Exception {
+	}
+
+	@Override
+	protected BaseModel<?> addBaseModel(
+			BaseModel<?> parentBaseModel, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		return BlogsEntryLocalServiceUtil.addEntry(
+			TestPropsValues.getUserId(), titleMap.get(LocaleUtil.getDefault()),
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 	@Override
@@ -74,8 +90,9 @@ public class BlogsEntryAssetSearchTest extends BaseAssetSearchTestCase {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		return BlogsTestUtil.addEntry(
-			TestPropsValues.getUserId(), keywords, true, serviceContext);
+		return BlogsEntryLocalServiceUtil.addEntry(
+			TestPropsValues.getUserId(), keywords,
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 	@Override
@@ -86,6 +103,11 @@ public class BlogsEntryAssetSearchTest extends BaseAssetSearchTestCase {
 	@Override
 	protected String getSearchKeywords() {
 		return "title";
+	}
+
+	@Override
+	protected boolean isLocalizableTitle() {
+		return false;
 	}
 
 }

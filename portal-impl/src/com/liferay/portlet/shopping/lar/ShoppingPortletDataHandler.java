@@ -14,8 +14,8 @@
 
 package com.liferay.portlet.shopping.lar;
 
-import com.liferay.portal.kernel.lar.BasePortletDataHandler;
-import com.liferay.portlet.shopping.util.ShoppingConstants;
+import com.liferay.portlet.exportimport.lar.BasePortletDataHandler;
+import com.liferay.portlet.shopping.constants.ShoppingConstants;
 
 /**
  * @author Iván Zaera

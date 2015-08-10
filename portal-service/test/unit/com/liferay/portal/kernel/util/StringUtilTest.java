@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,6 +52,32 @@ public class StringUtilTest {
 		Assert.assertEquals(
 			"Hello (World) (Liferay)",
 			StringUtil.appendParentheticalSuffix("Hello (World)", "Liferay"));
+		Assert.assertEquals(
+			"Hello (World) (Liferay Portal)",
+			StringUtil.appendParentheticalSuffix(
+				"Hello (World)", "Liferay Portal"));
+	}
+
+	@Test
+	public void testBytesToHexString() {
+		Random random = new Random();
+
+		byte[] data = new byte[1024];
+
+		random.nextBytes(data);
+
+		String hexString = StringUtil.bytesToHexString(data);
+
+		Assert.assertEquals(data.length * 2, hexString.length());
+
+		for (int i = 0; i < data.length; i++) {
+			Assert.assertEquals(
+				hexString.charAt(i * 2),
+				StringUtil.HEX_DIGITS[(data[i] & 0xFF) >> 4]);
+			Assert.assertEquals(
+				hexString.charAt(i * 2 + 1),
+				StringUtil.HEX_DIGITS[data[i] & 0x0F]);
+		}
 	}
 
 	@Test
@@ -260,7 +287,7 @@ public class StringUtilTest {
 
 	@Test(timeout = 1000)
 	public void testReplaceMap() throws Exception {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 
 		map.put("Hallo", "Hello");
 		map.put("Wirld", "World");
@@ -302,7 +329,7 @@ public class StringUtilTest {
 
 	@Test(timeout = 1000)
 	public void testReplaceWithStringBundle() throws Exception {
-		Map<String, StringBundler> map = new HashMap<String, StringBundler>();
+		Map<String, StringBundler> map = new HashMap<>();
 
 		map.put("Hallo", new StringBundler("Hello"));
 		map.put("Wirld", new StringBundler("World"));
@@ -403,6 +430,46 @@ public class StringUtilTest {
 	@Test
 	public void testStripChar() {
 		Assert.assertEquals("abcd", StringUtil.strip(" a b  c   d", ' '));
+	}
+
+	@Test
+	public void testStripCharArray() {
+		Assert.assertEquals(
+			"HeoWor",
+			StringUtil.strip(
+				"Hello World", new char[] {CharPool.SPACE, 'l', 'd'}));
+	}
+
+	@Test
+	public void testStripParentheticalSuffixInteger() throws Exception {
+		Assert.assertEquals(
+			"Hello World",
+			StringUtil.stripParentheticalSuffix("Hello World (2)"));
+		Assert.assertEquals(
+			"Hello World(2)",
+			StringUtil.stripParentheticalSuffix("Hello World(2)"));
+		Assert.assertEquals(
+			"Hello (World)",
+			StringUtil.stripParentheticalSuffix("Hello (World) (2)"));
+		Assert.assertEquals(
+			"Hello World (2)",
+			StringUtil.stripParentheticalSuffix("Hello World (2) (3)"));
+	}
+
+	@Test
+	public void testStripParentheticalSuffixString() throws Exception {
+		Assert.assertEquals(
+			"Hello", StringUtil.stripParentheticalSuffix("Hello (World)"));
+		Assert.assertEquals(
+			"Hello (World)(Liferay)",
+			StringUtil.stripParentheticalSuffix("Hello (World)(Liferay)"));
+		Assert.assertEquals(
+			"Hello (World)",
+			StringUtil.stripParentheticalSuffix("Hello (World) (Liferay)"));
+		Assert.assertEquals(
+			"Hello (World)",
+			StringUtil.stripParentheticalSuffix(
+				"Hello (World) (Liferay Portal)"));
 	}
 
 	@Test

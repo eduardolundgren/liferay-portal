@@ -43,11 +43,11 @@ public class Randomizer extends Random {
 			size = n;
 		}
 
-		Set<Integer> set = new LinkedHashSet<Integer>();
+		Set<Integer> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < size; i++) {
 			while (true) {
-				Integer value = new Integer(nextInt(n));
+				Integer value = Integer.valueOf(nextInt(n));
 
 				if (!set.contains(value)) {
 					set.add(value);
@@ -137,6 +137,6 @@ public class Randomizer extends Random {
 		return new String(array);
 	}
 
-	private static Randomizer _instance = new Randomizer();
+	private static final Randomizer _instance = new Randomizer();
 
 }

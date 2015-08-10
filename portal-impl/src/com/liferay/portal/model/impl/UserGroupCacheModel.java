@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class UserGroupCacheModel implements CacheModel<UserGroup>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof UserGroupCacheModel)) {
+			return false;
+		}
+
+		UserGroupCacheModel userGroupCacheModel = (UserGroupCacheModel)obj;
+
+		if ((userGroupId == userGroupCacheModel.userGroupId) &&
+				(mvccVersion == userGroupCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, userGroupId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -77,6 +105,8 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 		sb.append(description);
 		sb.append(", addedByLDAPImport=");
 		sb.append(addedByLDAPImport);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -138,6 +168,13 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 
 		userGroupImpl.setAddedByLDAPImport(addedByLDAPImport);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			userGroupImpl.setLastPublishDate(null);
+		}
+		else {
+			userGroupImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		userGroupImpl.resetOriginalValues();
 
 		return userGroupImpl;
@@ -157,6 +194,7 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
 		addedByLDAPImport = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -201,6 +239,7 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 		}
 
 		objectOutput.writeBoolean(addedByLDAPImport);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -215,4 +254,5 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 	public String name;
 	public String description;
 	public boolean addedByLDAPImport;
+	public long lastPublishDate;
 }

@@ -17,16 +17,17 @@ package com.liferay.bookmarks.asset;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.service.permission.BookmarksEntryPermission;
+import com.liferay.bookmarks.service.permission.BookmarksEntryPermissionChecker;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.asset.model.BaseAssetRenderer;
+import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
 
 import java.util.Date;
 import java.util.Locale;
@@ -34,9 +35,10 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Julio Camarero
@@ -44,10 +46,15 @@ import javax.portlet.WindowState;
  * @author Sergio González
  */
 public class BookmarksEntryAssetRenderer
-	extends BaseAssetRenderer implements TrashRenderer {
+	extends BaseJSPAssetRenderer<BookmarksEntry> implements TrashRenderer {
 
 	public BookmarksEntryAssetRenderer(BookmarksEntry entry) {
 		_entry = entry;
+	}
+
+	@Override
+	public BookmarksEntry getAssetObject() {
+		return _entry;
 	}
 
 	@Override
@@ -76,10 +83,26 @@ public class BookmarksEntryAssetRenderer
 	}
 
 	@Override
+	public String getJspPath(HttpServletRequest request, String template) {
+		if (template.equals(TEMPLATE_FULL_CONTENT)) {
+			return "/html/portlet/bookmarks/asset/" + template + ".jsp";
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
 	public String getPortletId() {
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
+		AssetRendererFactory<BookmarksEntry> assetRendererFactory =
+			getAssetRendererFactory();
 
 		return assetRendererFactory.getPortletId();
+	}
+
+	@Override
+	public int getStatus() {
+		return _entry.getStatus();
 	}
 
 	@Override
@@ -116,9 +139,9 @@ public class BookmarksEntryAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
-			getControlPanelPlid(liferayPortletRequest),
-			BookmarksPortletKeys.BOOKMARKS_ADMIN, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, BookmarksPortletKeys.BOOKMARKS_ADMIN, 0,
+			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter("struts_action", "/bookmarks/edit_entry");
 		portletURL.setParameter(
@@ -134,7 +157,8 @@ public class BookmarksEntryAssetRenderer
 			WindowState windowState)
 		throws Exception {
 
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
+		AssetRendererFactory<BookmarksEntry> assetRendererFactory =
+			getAssetRendererFactory();
 
 		PortletURL portletURL = assetRendererFactory.getURLView(
 			liferayPortletResponse, windowState);
@@ -175,7 +199,7 @@ public class BookmarksEntryAssetRenderer
 	@Override
 	public boolean hasEditPermission(PermissionChecker permissionChecker) {
 		try {
-			return BookmarksEntryPermission.contains(
+			return BookmarksEntryPermissionChecker.contains(
 				permissionChecker, _entry, ActionKeys.UPDATE);
 		}
 		catch (Exception e) {
@@ -187,7 +211,7 @@ public class BookmarksEntryAssetRenderer
 	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker) {
 		try {
-			return BookmarksEntryPermission.contains(
+			return BookmarksEntryPermissionChecker.contains(
 				permissionChecker, _entry, ActionKeys.VIEW);
 		}
 		catch (Exception e) {
@@ -197,25 +221,19 @@ public class BookmarksEntryAssetRenderer
 	}
 
 	@Override
-	public boolean isPrintable() {
-		return true;
-	}
-
-	@Override
-	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
 			String template)
 		throws Exception {
 
-		if (template.equals(TEMPLATE_FULL_CONTENT)) {
-			renderRequest.setAttribute(
-				BookmarksWebKeys.BOOKMARKS_ENTRY, _entry);
+		request.setAttribute(BookmarksWebKeys.BOOKMARKS_ENTRY, _entry);
 
-			return "/html/portlet/bookmarks/asset/" + template + ".jsp";
-		}
-		else {
-			return null;
-		}
+		return super.include(request, response, template);
+	}
+
+	@Override
+	public boolean isPrintable() {
+		return true;
 	}
 
 	private final BookmarksEntry _entry;

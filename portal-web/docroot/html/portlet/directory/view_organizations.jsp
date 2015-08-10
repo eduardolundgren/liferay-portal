@@ -32,9 +32,7 @@ if (parentOrganizationId > 0) {
 >
 	<aui:input disabled="<%= true %>" name="organizationsRedirect" type="hidden" value="<%= portletURL.toString() %>" />
 
-	<liferay-ui:search-form
-		page="/html/portlet/directory/organization_search.jsp"
-	/>
+	<liferay-ui:organization-search-form />
 
 	<%
 	OrganizationSearchTerms searchTerms = (OrganizationSearchTerms)organizationSearchContainer.getSearchTerms();
@@ -52,12 +50,12 @@ if (parentOrganizationId > 0) {
 		groupParams.put("site", Boolean.TRUE);
 		groupParams.put("usersGroups", user.getUserId());
 
-		List<Group> groups = GroupLocalServiceUtil.search(user.getCompanyId(), groupParams, QueryUtil.ALL_POS,QueryUtil.ALL_POS);
+		List<Group> groups = GroupLocalServiceUtil.search(user.getCompanyId(), groupParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		organizationParams.put("organizationsGroups", SitesUtil.filterGroups(groups, PropsValues.MY_SITES_DIRECTORY_SITE_EXCLUDES));
 	}
 	else if (portletName.equals(PortletKeys.SITE_MEMBERS_DIRECTORY)) {
-		organizationParams.put("organizationsGroups", new Long(themeDisplay.getScopeGroupId()));
+		organizationParams.put("organizationsGroups", Long.valueOf(themeDisplay.getScopeGroupId()));
 	}
 
 	if (Validator.isNotNull(searchTerms.getKeywords()) || searchTerms.isAdvancedSearch()) {
@@ -79,16 +77,7 @@ if (parentOrganizationId > 0) {
 	}
 	%>
 
-	<liferay-ui:search-container-results>
-		<c:choose>
-			<c:when test="<%= portletName.equals(PortletKeys.DIRECTORY) && PropsValues.ORGANIZATIONS_INDEXER_ENABLED && PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX %>">
-				<%@ include file="/html/portlet/users_admin/organization_search_results_index.jspf" %>
-			</c:when>
-			<c:otherwise>
-				<%@ include file="/html/portlet/users_admin/organization_search_results_database.jspf" %>
-			</c:otherwise>
-		</c:choose>
-	</liferay-ui:search-container-results>
+	<liferay-ui:organization-search-container-results organizationParams="<%= organizationParams %>" />
 
 	<liferay-ui:search-container-row
 		className="com.liferay.portal.model.Organization"

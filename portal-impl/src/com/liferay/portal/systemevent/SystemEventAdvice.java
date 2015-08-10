@@ -14,7 +14,6 @@
 
 package com.liferay.portal.systemevent;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -30,6 +29,7 @@ import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.TypedModel;
 import com.liferay.portal.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -284,7 +284,9 @@ public class SystemEventAdvice
 
 		ClassedModel classedModel = (ClassedModel)arguments[0];
 
-		if (!(classedModel.getPrimaryKeyObj() instanceof Long)) {
+		if ((classedModel == null) ||
+			!(classedModel.getPrimaryKeyObj() instanceof Long)) {
+
 			if (_log.isDebugEnabled() && (phase == _PHASE_BEFORE)) {
 				_log.debug(
 					"The first parameter of " + methodInvocation +

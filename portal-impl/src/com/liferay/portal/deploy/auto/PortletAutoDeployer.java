@@ -42,7 +42,7 @@ public class PortletAutoDeployer
 				PropsValues.AUTO_DEPLOY_DEPLOY_DIR);
 			destDir = DeployUtil.getAutoDeployDestDir();
 			appServerType = ServerDetector.getServerId();
-			auiTaglibDTD = DeployUtil.getResourcePath("aui.tld");
+			auiTaglibDTD = DeployUtil.getResourcePath("liferay-aui.tld");
 			portletTaglibDTD = DeployUtil.getResourcePath(
 				"liferay-portlet.tld");
 			portletExtTaglibDTD = DeployUtil.getResourcePath(
@@ -63,7 +63,7 @@ public class PortletAutoDeployer
 				PropsKeys.AUTO_DEPLOY_TOMCAT_LIB_DIR,
 				PropsValues.AUTO_DEPLOY_TOMCAT_LIB_DIR);
 
-			List<String> jars = new ArrayList<String>();
+			List<String> jars = new ArrayList<>();
 
 			addExtJar(jars, "ext-util-bridges.jar");
 			addExtJar(jars, "ext-util-java.jar");

@@ -15,10 +15,9 @@
 package com.liferay.portal.kernel.cluster;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -31,151 +30,94 @@ import org.junit.Test;
 public class FutureClusterResponsesTest {
 
 	@Test
-	public void testMultipleResponseFailure() throws UnknownHostException {
-		List<Address> addresses = new ArrayList<Address>();
+	public void testMultipleResponseFailure() throws Exception {
+		Set<String> clusterNodeIds = new HashSet<>();
 
-		addresses.add(new MockAddress("1.2.3.4"));
-		addresses.add(new MockAddress("1.2.3.5"));
-		addresses.add(new MockAddress("1.2.3.6"));
-
-		FutureClusterResponses clusterNodeResponses =
-			new FutureClusterResponses(addresses);
-
-		ClusterNodeResponse clusterNodeResponse1 = new ClusterNodeResponse();
-
-		clusterNodeResponse1.setClusterNode(
-			new ClusterNode("1.2.3.4", InetAddress.getLocalHost()));
-
-		clusterNodeResponses.addClusterNodeResponse(clusterNodeResponse1);
-
-		ClusterNodeResponse clusterNodeResponse2 = new ClusterNodeResponse();
-
-		clusterNodeResponse2.setClusterNode(
-			new ClusterNode("1.2.3.5", InetAddress.getLocalHost()));
-
-		clusterNodeResponses.addClusterNodeResponse(clusterNodeResponse2);
-
-		try {
-			clusterNodeResponses.get(500, TimeUnit.MILLISECONDS);
-
-			Assert.fail("Should have failed");
-		}
-		catch (InterruptedException ie) {
-			Assert.fail("Interrupted");
-		}
-		catch (TimeoutException te) {
-		}
-	}
-
-	@Test
-	public void testMultipleResponseSuccess() throws UnknownHostException {
-		List<Address> addresses = new ArrayList<Address>();
-
-		addresses.add(new MockAddress("1.2.3.4"));
-		addresses.add(new MockAddress("1.2.3.5"));
-		addresses.add(new MockAddress("1.2.3.6"));
-
-		FutureClusterResponses clusterNodeResponses =
-			new FutureClusterResponses(addresses);
-
-		ClusterNodeResponse clusterNodeResponse1 = new ClusterNodeResponse();
-
-		clusterNodeResponse1.setClusterNode(
-			new ClusterNode("1.2.3.4", InetAddress.getLocalHost()));
-
-		clusterNodeResponses.addClusterNodeResponse(clusterNodeResponse1);
-
-		ClusterNodeResponse clusterNodeResponse2 = new ClusterNodeResponse();
-
-		clusterNodeResponse2.setClusterNode(
-			new ClusterNode("1.2.3.5", InetAddress.getLocalHost()));
-
-		clusterNodeResponses.addClusterNodeResponse(clusterNodeResponse2);
-
-		ClusterNodeResponse clusterNodeResponse3 = new ClusterNodeResponse();
-
-		clusterNodeResponse3.setClusterNode(
-			new ClusterNode("1.2.3.6", InetAddress.getLocalHost()));
-
-		clusterNodeResponses.addClusterNodeResponse(clusterNodeResponse3);
-
-		try {
-			clusterNodeResponses.get(500, TimeUnit.MILLISECONDS);
-		}
-		catch (InterruptedException ie) {
-			Assert.fail("Interrupted");
-		}
-		catch (TimeoutException te) {
-			Assert.fail("Timed out");
-		}
-	}
-
-	@Test
-	public void testSingleResponseFailure() {
-		List<Address> addresses = new ArrayList<Address>();
-
-		addresses.add(new MockAddress("1.2.3.4"));
+		clusterNodeIds.add("1.2.3.4");
+		clusterNodeIds.add("1.2.3.5");
+		clusterNodeIds.add("1.2.3.6");
 
 		FutureClusterResponses futureClusterResponses =
-			new FutureClusterResponses(addresses);
+			new FutureClusterResponses(clusterNodeIds);
+
+		futureClusterResponses.addClusterNodeResponse(
+			ClusterNodeResponse.createResultClusterNodeResponse(
+				new ClusterNode("1.2.3.4", InetAddress.getLocalHost()), null,
+				null));
+		futureClusterResponses.addClusterNodeResponse(
+			ClusterNodeResponse.createResultClusterNodeResponse(
+				new ClusterNode("1.2.3.5", InetAddress.getLocalHost()), null,
+				null));
 
 		try {
 			futureClusterResponses.get(500, TimeUnit.MILLISECONDS);
 
 			Assert.fail("Should have failed");
 		}
-		catch (InterruptedException ie) {
-			Assert.fail("Interrupted");
+		catch (TimeoutException te) {
+		}
+	}
+
+	@Test
+	public void testMultipleResponseSuccess() throws Exception {
+		Set<String> clusterNodeIds = new HashSet<>();
+
+		clusterNodeIds.add("1.2.3.4");
+		clusterNodeIds.add("1.2.3.5");
+		clusterNodeIds.add("1.2.3.6");
+
+		FutureClusterResponses futureClusterResponses =
+			new FutureClusterResponses(clusterNodeIds);
+
+		futureClusterResponses.addClusterNodeResponse(
+			ClusterNodeResponse.createResultClusterNodeResponse(
+				new ClusterNode("1.2.3.4", InetAddress.getLocalHost()), null,
+				null));
+		futureClusterResponses.addClusterNodeResponse(
+			ClusterNodeResponse.createResultClusterNodeResponse(
+				new ClusterNode("1.2.3.5", InetAddress.getLocalHost()), null,
+				null));
+		futureClusterResponses.addClusterNodeResponse(
+			ClusterNodeResponse.createResultClusterNodeResponse(
+				new ClusterNode("1.2.3.6", InetAddress.getLocalHost()), null,
+				null));
+
+		futureClusterResponses.get(500, TimeUnit.MILLISECONDS);
+	}
+
+	@Test
+	public void testSingleResponseFailure() throws InterruptedException {
+		Set<String> clusterNodeIds = new HashSet<>();
+
+		clusterNodeIds.add("1.2.3.4");
+
+		FutureClusterResponses futureClusterResponses =
+			new FutureClusterResponses(clusterNodeIds);
+
+		try {
+			futureClusterResponses.get(500, TimeUnit.MILLISECONDS);
+
+			Assert.fail("Should have failed");
 		}
 		catch (TimeoutException te) {
 		}
 	}
 
 	@Test
-	public void testSingleResponseSuccess() throws UnknownHostException {
-		List<Address> addresses = new ArrayList<Address>();
+	public void testSingleResponseSuccess() throws Exception {
+		Set<String> clusterNodeIds = new HashSet<>();
 
-		addresses.add(new MockAddress("1.2.3.4"));
+		clusterNodeIds.add("test");
 
 		FutureClusterResponses futureClusterResponses =
-			new FutureClusterResponses(addresses);
+			new FutureClusterResponses(clusterNodeIds);
 
-		ClusterNodeResponse clusterNodeResponse = new ClusterNodeResponse();
+		futureClusterResponses.addClusterNodeResponse(
+			ClusterNodeResponse.createResultClusterNodeResponse(
+				new ClusterNode("test", InetAddress.getLocalHost()), null,
+				null));
 
-		clusterNodeResponse.setClusterNode(
-			new ClusterNode("test", InetAddress.getLocalHost()));
-
-		futureClusterResponses.addClusterNodeResponse(clusterNodeResponse);
-
-		try {
-			futureClusterResponses.get(500, TimeUnit.MILLISECONDS);
-		}
-		catch (InterruptedException ie) {
-			Assert.fail("Interrupted");
-		}
-		catch (TimeoutException te) {
-			Assert.fail("Timed out");
-		}
-	}
-
-	private class MockAddress implements Address {
-
-		public MockAddress(String address) {
-			_address = address;
-		}
-
-		@Override
-		public String getDescription() {
-			return _address;
-		}
-
-		@Override
-		public Object getRealAddress() {
-			return _address;
-		}
-
-		private final String _address;
-
+		futureClusterResponses.get(500, TimeUnit.MILLISECONDS);
 	}
 
 }

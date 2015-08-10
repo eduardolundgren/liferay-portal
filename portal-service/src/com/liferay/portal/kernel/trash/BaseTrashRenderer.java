@@ -53,21 +53,12 @@ public abstract class BaseTrashRenderer implements TrashRenderer {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(PortletRequest,
-	 *             PortletResponse)}
+	 *             javax.portlet.PortletResponse)}
 	 */
 	@Deprecated
 	@Override
 	public String getSummary(Locale locale) {
 		return getSummary(null, null);
-	}
-
-	@Override
-	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
-			String template)
-		throws Exception {
-
-		return null;
 	}
 
 	@Override
