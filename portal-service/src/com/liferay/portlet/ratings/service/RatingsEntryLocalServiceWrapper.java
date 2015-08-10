@@ -58,6 +58,14 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 	}
 
 	@Override
+	public void deleteEntry(
+		com.liferay.portlet.ratings.model.RatingsEntry entry, long userId,
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_ratingsEntryLocalService.deleteEntry(entry, userId, className, classPK);
+	}
+
+	@Override
 	public void deleteEntry(long userId, java.lang.String className,
 		long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -261,7 +269,7 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _ratingsEntryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

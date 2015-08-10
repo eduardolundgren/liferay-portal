@@ -16,14 +16,13 @@ package com.liferay.portal.jsonwebservice;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.access.control.AccessControlThreadLocal;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
-import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.ac.AccessControlThreadLocal;
 import com.liferay.portal.servlet.JSONServlet;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.struts.JSONAction;
@@ -118,8 +117,7 @@ public class JSONWebServiceServlet extends JSONServlet {
 				requestDispatcher.forward(request, response);
 			}
 			else {
-				String servletContextPath = ContextPathUtil.getContextPath(
-					servletContext);
+				String servletContextPath = servletContext.getContextPath();
 
 				String redirectPath =
 					PortalUtil.getPathContext() + "/api/jsonws?contextPath=" +

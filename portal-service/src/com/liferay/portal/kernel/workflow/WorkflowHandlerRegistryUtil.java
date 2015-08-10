@@ -19,7 +19,7 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -34,6 +34,7 @@ import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
+import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 
 import java.io.Serializable;
 
@@ -147,7 +148,7 @@ public class WorkflowHandlerRegistryUtil {
 			status = WorkflowConstants.STATUS_APPROVED;
 		}
 
-		workflowContext = new HashMap<String, Serializable>(workflowContext);
+		workflowContext = new HashMap<>(workflowContext);
 
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_COMPANY_ID, String.valueOf(companyId));
@@ -174,7 +175,7 @@ public class WorkflowHandlerRegistryUtil {
 			final Map<String, Serializable> tempWorkflowContext =
 				workflowContext;
 
-			TransactionCommitCallbackRegistryUtil.registerCallback(
+			TransactionCommitCallbackUtil.registerCallback(
 				new Callable<Void>() {
 
 					@Override
@@ -319,14 +320,13 @@ public class WorkflowHandlerRegistryUtil {
 		new WorkflowHandlerRegistryUtil();
 
 	private final Map<String, WorkflowHandler<?>> _scopeableWorkflowHandlerMap =
-		new ConcurrentSkipListMap<String, WorkflowHandler<?>>();
+		new ConcurrentSkipListMap<>();
 	private final ServiceRegistrationMap<WorkflowHandler<?>>
-		_serviceRegistrations =
-			new ServiceRegistrationMap<WorkflowHandler<?>>();
+		_serviceRegistrations = new ServiceRegistrationMapImpl<>();
 	private final ServiceTracker<WorkflowHandler<?>, WorkflowHandler<?>>
 		_serviceTracker;
 	private final Map<String, WorkflowHandler<?>> _workflowHandlerMap =
-		new TreeMap<String, WorkflowHandler<?>>();
+		new TreeMap<>();
 
 	private class WorkflowHandlerServiceTrackerCustomizer
 		implements

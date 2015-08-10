@@ -14,10 +14,10 @@
 
 package com.liferay.bookmarks.web.upgrade;
 
-import com.liferay.bookmarks.service.configuration.configurator.BookmarksServiceConfigurator;
 import com.liferay.bookmarks.web.upgrade.v1_0_0.UpgradeAdminPortlets;
 import com.liferay.bookmarks.web.upgrade.v1_0_0.UpgradePortletPreferences;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 
@@ -31,14 +31,12 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Miguel Pastor
  */
-@Component(
-	immediate = true, service = BookmarksWebUpgrade.class
-)
+@Component(immediate = true, service = BookmarksWebUpgrade.class)
 public class BookmarksWebUpgrade {
 
-	@Reference(unbind = "-")
-	protected void setBookmarksServiceConfigurator(
-		BookmarksServiceConfigurator bookmarksServiceConfigurator) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")
@@ -56,7 +54,7 @@ public class BookmarksWebUpgrade {
 		upgradeProcesses.add(new UpgradePortletPreferences());
 
 		_releaseLocalService.updateRelease(
-			"com.liferay.bookmarks.web", upgradeProcesses, 1, 0, false);
+			"com.liferay.bookmarks.web", upgradeProcesses, 1, 1, false);
 	}
 
 	private ReleaseLocalService _releaseLocalService;

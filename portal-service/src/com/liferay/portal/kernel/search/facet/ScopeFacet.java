@@ -21,12 +21,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -51,7 +51,7 @@ public class ScopeFacet extends MultiValueFacet {
 
 	protected long[] addScopeGroup(long groupId) {
 		try {
-			List<Long> groupIds = new ArrayList<Long>();
+			List<Long> groupIds = new ArrayList<>();
 
 			groupIds.add(groupId);
 
@@ -83,7 +83,7 @@ public class ScopeFacet extends MultiValueFacet {
 	}
 
 	@Override
-	protected BooleanClause doGetFacetClause() {
+	protected BooleanClause<Filter> doGetFacetFilterBooleanClause() {
 		SearchContext searchContext = getSearchContext();
 
 		FacetConfiguration facetConfiguration = getFacetConfiguration();
@@ -121,18 +121,17 @@ public class ScopeFacet extends MultiValueFacet {
 			return null;
 		}
 
-		BooleanQuery facetQuery = BooleanQueryFactoryUtil.create(searchContext);
+		BooleanFilter facetBooleanFilter = new BooleanFilter();
 
 		long ownerUserId = searchContext.getOwnerUserId();
 
 		if (ownerUserId > 0) {
-			facetQuery.addRequiredTerm(Field.USER_ID, ownerUserId);
+			facetBooleanFilter.addRequiredTerm(Field.USER_ID, ownerUserId);
 		}
 
-		BooleanQuery groupIdsQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
-		BooleanQuery scopeGroupIdsQuery = BooleanQueryFactoryUtil.create(
-			searchContext);
+		TermsFilter groupIdsTermsFilter = new TermsFilter(Field.GROUP_ID);
+		TermsFilter scopeGroupIdsTermsFilter = new TermsFilter(
+			Field.SCOPE_GROUP_ID);
 
 		for (int i = 0; i < groupIds.length; i ++) {
 			long groupId = groupIds[i];
@@ -154,43 +153,37 @@ public class ScopeFacet extends MultiValueFacet {
 					parentGroupId = group.getParentGroupId();
 				}
 
-				groupIdsQuery.addTerm(Field.GROUP_ID, parentGroupId);
+				groupIdsTermsFilter.addValue(String.valueOf(parentGroupId));
 
 				groupIds[i] = parentGroupId;
 
 				if (group.isLayout() || searchContext.isScopeStrict()) {
-					scopeGroupIdsQuery.addTerm(Field.SCOPE_GROUP_ID, groupId);
+					scopeGroupIdsTermsFilter.addValue(String.valueOf(groupId));
 				}
 			}
 			catch (Exception e) {
-				continue;
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
 			}
 		}
 
 		searchContext.setGroupIds(groupIds);
 
-		if (groupIdsQuery.hasClauses()) {
-			try {
-				facetQuery.add(groupIdsQuery, BooleanClauseOccur.MUST);
-			}
-			catch (ParseException pe) {
-				_log.error(pe, pe);
-			}
+		if (!groupIdsTermsFilter.isEmpty()) {
+			facetBooleanFilter.add(
+				groupIdsTermsFilter, BooleanClauseOccur.MUST);
 		}
 
-		if (scopeGroupIdsQuery.hasClauses()) {
-			try {
-				facetQuery.add(scopeGroupIdsQuery, BooleanClauseOccur.MUST);
-			}
-			catch (ParseException pe) {
-				_log.error(pe, pe);
-			}
+		if (!scopeGroupIdsTermsFilter.isEmpty()) {
+			facetBooleanFilter.add(
+				scopeGroupIdsTermsFilter, BooleanClauseOccur.MUST);
 		}
 
-		return BooleanClauseFactoryUtil.create(
-			searchContext, facetQuery, BooleanClauseOccur.MUST.getName());
+		return BooleanClauseFactoryUtil.createFilter(
+			searchContext, facetBooleanFilter, BooleanClauseOccur.MUST);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ScopeFacet.class);
+	private static final Log _log = LogFactoryUtil.getLog(ScopeFacet.class);
 
 }

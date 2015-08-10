@@ -52,6 +52,7 @@ public class OrganizationSoap implements Serializable {
 		soapModel.setStatusId(model.getStatusId());
 		soapModel.setComments(model.getComments());
 		soapModel.setLogoId(model.getLogoId());
+		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
 	}
@@ -228,11 +229,11 @@ public class OrganizationSoap implements Serializable {
 		_countryId = countryId;
 	}
 
-	public int getStatusId() {
+	public long getStatusId() {
 		return _statusId;
 	}
 
-	public void setStatusId(int statusId) {
+	public void setStatusId(long statusId) {
 		_statusId = statusId;
 	}
 
@@ -252,6 +253,14 @@ public class OrganizationSoap implements Serializable {
 		_logoId = logoId;
 	}
 
+	public Date getLastPublishDate() {
+		return _lastPublishDate;
+	}
+
+	public void setLastPublishDate(Date lastPublishDate) {
+		_lastPublishDate = lastPublishDate;
+	}
+
 	private long _mvccVersion;
 	private String _uuid;
 	private long _organizationId;
@@ -267,7 +276,8 @@ public class OrganizationSoap implements Serializable {
 	private boolean _recursable;
 	private long _regionId;
 	private long _countryId;
-	private int _statusId;
+	private long _statusId;
 	private String _comments;
 	private long _logoId;
+	private Date _lastPublishDate;
 }

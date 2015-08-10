@@ -37,7 +37,6 @@ import com.liferay.portlet.messageboards.model.MBMailingList;
 import com.liferay.portlet.messageboards.service.base.MBMailingListLocalServiceBaseImpl;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * @author Thiago Moreira
@@ -59,7 +58,6 @@ public class MBMailingListLocalServiceImpl
 		// Mailing list
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		validate(
 			emailAddress, inServerName, inUserName, outEmailAddress, outCustom,
@@ -75,8 +73,6 @@ public class MBMailingListLocalServiceImpl
 		mailingList.setCompanyId(user.getCompanyId());
 		mailingList.setUserId(user.getUserId());
 		mailingList.setUserName(user.getFullName());
-		mailingList.setCreateDate(serviceContext.getCreateDate(now));
-		mailingList.setModifiedDate(serviceContext.getModifiedDate(now));
 		mailingList.setCategoryId(categoryId);
 		mailingList.setEmailAddress(emailAddress);
 		mailingList.setInProtocol(inUseSSL ? inProtocol + "s" : inProtocol);
@@ -135,6 +131,13 @@ public class MBMailingListLocalServiceImpl
 	}
 
 	@Override
+	public MBMailingList fetchCategoryMailingList(
+		long groupId, long categoryId) {
+
+		return mbMailingListPersistence.fetchByG_C(groupId, categoryId);
+	}
+
+	@Override
 	public MBMailingList getCategoryMailingList(long groupId, long categoryId)
 		throws PortalException {
 
@@ -161,7 +164,6 @@ public class MBMailingListLocalServiceImpl
 		MBMailingList mailingList = mbMailingListPersistence.findByPrimaryKey(
 			mailingListId);
 
-		mailingList.setModifiedDate(serviceContext.getModifiedDate(null));
 		mailingList.setEmailAddress(emailAddress);
 		mailingList.setInProtocol(inUseSSL ? inProtocol + "s" : inProtocol);
 		mailingList.setInServerName(inServerName);

@@ -148,10 +148,10 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 		</liferay-ui:panel>
 
 		<%
-		String[] ccTypes = shoppingSettings.getCcTypes();
+		String[] ccTypes = shoppingGroupServiceSettings.getCcTypes();
 		%>
 
-		<c:if test="<%= !shoppingSettings.usePayPal() && (ccTypes.length > 0) %>">
+		<c:if test="<%= !shoppingGroupServiceSettings.usePayPal() && (ccTypes.length > 0) %>">
 			<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="shoppingCheckoutCreditCardPanel" persistState="<%= true %>" title="credit-card">
 				<liferay-ui:error exception="<%= CCExpirationException.class %>" message="please-enter-a-valid-credit-card-expiration-date" />
 				<liferay-ui:error exception="<%= CCNameException.class %>" message="please-enter-the-full-name-exactly-as-it-is-appears-on-your-credit-card" />
@@ -265,7 +265,7 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 			Country country = address.getCountry();
 		%>
 
-			if ('<%= address.getAddressId() %>' == addressId) {
+			if (addressId == '<%= address.getAddressId() %>') {
 				form.fm(type + 'Street').val('<%= HtmlUtil.escapeJS(address.getStreet1()) %>');
 				form.fm(type + 'City').val('<%= HtmlUtil.escapeJS(address.getCity()) %>');
 

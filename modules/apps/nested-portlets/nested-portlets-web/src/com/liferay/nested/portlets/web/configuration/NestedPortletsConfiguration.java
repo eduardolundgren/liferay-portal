@@ -20,7 +20,8 @@ import aQute.bnd.annotation.metatype.Meta;
  * @author Raymond Augé
  */
 @Meta.OCD(
-	id = "com.liferay.nested.portlets.web", localization = "content.Language"
+	id = "com.liferay.nested.portlets.web.configuration.NestedPortletsConfiguration",
+	localization = "content/Language"
 )
 public interface NestedPortletsConfiguration {
 
@@ -29,14 +30,14 @@ public interface NestedPortletsConfiguration {
 	public static final String TEMPLATE_ID = "TEMPLATE_ID";
 
 	@Meta.AD(
-		id = "layout.template.default", deflt = "2_columns_i", required = false
+		deflt = "2_columns_i", id = "layout.template.default", required = false
 	)
-	public String getLayoutTemplateDefault();
+	public String layoutTemplateDefault();
 
 	@Meta.AD(
-		id = "layout.template.unsupported", deflt = "freeform,1_column",
+		deflt = "freeform,1_column", id = "layout.template.unsupported",
 		required = false
 	)
-	public String[] getLayoutTemplatesUnsupported();
+	public String[] layoutTemplatesUnsupported();
 
 }

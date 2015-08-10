@@ -66,7 +66,7 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 			setMvccVersion(mvccVersion);
 		}
 
-		Integer listTypeId = (Integer)attributes.get("listTypeId");
+		Long listTypeId = (Long)attributes.get("listTypeId");
 
 		if (listTypeId != null) {
 			setListTypeId(listTypeId);
@@ -106,7 +106,7 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	* @return the list type ID of this list type
 	*/
 	@Override
-	public int getListTypeId() {
+	public long getListTypeId() {
 		return _listType.getListTypeId();
 	}
 
@@ -136,7 +136,7 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	* @return the primary key of this list type
 	*/
 	@Override
-	public int getPrimaryKey() {
+	public long getPrimaryKey() {
 		return _listType.getPrimaryKey();
 	}
 
@@ -176,13 +176,17 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	@Override
+	public void persist() {
+		_listType.persist();
+	}
+
+	@Override
 	public void setCachedModel(boolean cachedModel) {
 		_listType.setCachedModel(cachedModel);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_listType.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -204,7 +208,7 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	* @param listTypeId the list type ID of this list type
 	*/
 	@Override
-	public void setListTypeId(int listTypeId) {
+	public void setListTypeId(long listTypeId) {
 		_listType.setListTypeId(listTypeId);
 	}
 
@@ -239,7 +243,7 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	* @param primaryKey the primary key of this list type
 	*/
 	@Override
-	public void setPrimaryKey(int primaryKey) {
+	public void setPrimaryKey(long primaryKey) {
 		_listType.setPrimaryKey(primaryKey);
 	}
 
@@ -259,7 +263,7 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.ListType> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.ListType> toCacheModel() {
 		return _listType.toCacheModel();
 	}
 

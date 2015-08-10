@@ -60,12 +60,12 @@ String userMappingJobTitle = StringPool.BLANK;
 String userMappingLastName = StringPool.BLANK;
 String userMappingMiddleName = StringPool.BLANK;
 String userMappingPassword = StringPool.BLANK;
-String userMappingPortrait= StringPool.BLANK;
+String userMappingPortrait = StringPool.BLANK;
 String userMappingScreenName = StringPool.BLANK;
 String userMappingStatus = StringPool.BLANK;
 String userMappingUuid = StringPool.BLANK;
 
-for (int i = 0 ; i < userMappingArray.length ; i++) {
+for (int i = 0; i < userMappingArray.length; i++) {
 	if (!userMappingArray[i].contains("=")) {
 		continue;
 	}
@@ -128,7 +128,7 @@ String groupMappingDescription = StringPool.BLANK;
 String groupMappingGroupName = StringPool.BLANK;
 String groupMappingUser = StringPool.BLANK;
 
-for (int i = 0 ; i < groupMappingArray.length ; i++) {
+for (int i = 0; i < groupMappingArray.length; i++) {
 	if (!groupMappingArray[i].contains("=")) {
 		continue;
 	}
@@ -216,7 +216,7 @@ for (int i = 0 ; i < groupMappingArray.length ; i++) {
 	<h3><liferay-ui:message key="users" /></h3>
 
 	<aui:fieldset>
-		<aui:input cssClass="lfr-input-text-container" helpMessage="enter-the-search-filter-that-will-be-used-to-test-the-validity-of-a-user" label="authentication-search-filter" name='<%= "settings--" + PropsKeys.LDAP_AUTH_SEARCH_FILTER + postfix + "--" %>' type="text" value="<%= ldapAuthSearchFilter %>" />
+		<aui:input cssClass="lfr-input-text-container" helpMessage="enter-the-search-filter-that-is-used-to-test-the-validity-of-a-user" label="authentication-search-filter" name='<%= "settings--" + PropsKeys.LDAP_AUTH_SEARCH_FILTER + postfix + "--" %>' type="text" value="<%= ldapAuthSearchFilter %>" />
 
 		<aui:input cssClass="lfr-input-text-container" label="import-search-filter" name='<%= "settings--" + PropsKeys.LDAP_IMPORT_USER_SEARCH_FILTER + postfix + "--" %>' type="text" value="<%= ldapImportUserSearchFilter %>" />
 
@@ -457,7 +457,7 @@ for (int i = 0 ; i < groupMappingArray.length ; i++) {
 			exportMappingGroupDefaultObjectClass = '';
 		}
 		else if (ldapType == 'novell') {
-			url = 'ldap://localhost:389';
+			baseProviderURL = 'ldap://localhost:389';
 			baseDN = '';
 			principal = 'cn=admin,ou=test';
 			credentials = 'secret';
@@ -483,7 +483,7 @@ for (int i = 0 ; i < groupMappingArray.length ; i++) {
 			exportMappingGroupDefaultObjectClass = '';
 		}
 		else if (ldapType == 'open') {
-			url = 'ldap://localhost:389';
+			baseProviderURL = 'ldap://localhost:389';
 			baseDN = 'dc=example,dc=com';
 			principal = 'cn=admin,ou=test';
 			credentials = 'secret';

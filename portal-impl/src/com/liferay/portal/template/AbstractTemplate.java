@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import java.io.Serializable;
 import java.io.Writer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +66,7 @@ public abstract class AbstractTemplate implements Template {
 		this.templateResource = templateResource;
 		this.errorTemplateResource = errorTemplateResource;
 
-		this.context = new HashMap<String, Object>();
+		this.context = new HashMap<>();
 
 		if (context != null) {
 			for (Map.Entry<String, Object> entry : context.entrySet()) {
@@ -78,6 +79,21 @@ public abstract class AbstractTemplate implements Template {
 		if (interval != 0) {
 			_cacheTemplateResource(templateManagerName);
 		}
+	}
+
+	@Override
+	public void clear() {
+		context.clear();
+	}
+
+	@Override
+	public boolean containsKey(Object key) {
+		return context.containsKey(key);
+	}
+
+	@Override
+	public boolean containsValue(Object value) {
+		return context.containsValue(value);
 	}
 
 	@Override
@@ -94,6 +110,20 @@ public abstract class AbstractTemplate implements Template {
 	}
 
 	@Override
+	public Set<Entry<String, Object>> entrySet() {
+		return context.entrySet();
+	}
+
+	@Override
+	public Object get(Object key) {
+		if (key == null) {
+			return null;
+		}
+
+		return context.get(key);
+	}
+
+	@Override
 	public Object get(String key) {
 		if (key == null) {
 			return null;
@@ -107,6 +137,16 @@ public abstract class AbstractTemplate implements Template {
 		Set<String> keys = context.keySet();
 
 		return keys.toArray(new String[keys.size()]);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return context.isEmpty();
+	}
+
+	@Override
+	public Set<String> keySet() {
+		return context.keySet();
 	}
 
 	@Override
@@ -146,12 +186,32 @@ public abstract class AbstractTemplate implements Template {
 	}
 
 	@Override
-	public void put(String key, Object value) {
+	public Object put(String key, Object value) {
 		if ((key == null) || (value == null)) {
-			return;
+			return null;
 		}
 
-		context.put(key, value);
+		return context.put(key, value);
+	}
+
+	@Override
+	public void putAll(Map<? extends String, ? extends Object> map) {
+		context.putAll(map);
+	}
+
+	@Override
+	public Object remove(Object key) {
+		return context.remove(key);
+	}
+
+	@Override
+	public int size() {
+		return context.size();
+	}
+
+	@Override
+	public Collection<Object> values() {
+		return context.values();
 	}
 
 	protected String getTemplateResourceUUID(
@@ -187,13 +247,13 @@ public abstract class AbstractTemplate implements Template {
 			templateResource = new CacheTemplateResource(templateResource);
 		}
 
-		String cacheName = TemplateResourceLoader.class.getName();
+		String portalCacheName = TemplateResourceLoader.class.getName();
 
-		cacheName = cacheName.concat(StringPool.PERIOD).concat(
+		portalCacheName = portalCacheName.concat(StringPool.PERIOD).concat(
 			templateManagerName);
 
 		PortalCache<String, Serializable> portalCache = _getPortalCache(
-			templateResource, cacheName);
+			templateResource, portalCacheName);
 
 		Object object = portalCache.get(templateResource.getTemplateId());
 
@@ -220,7 +280,7 @@ public abstract class AbstractTemplate implements Template {
 				errorTemplateResource);
 		}
 
-		portalCache = _getPortalCache(errorTemplateResource, cacheName);
+		portalCache = _getPortalCache(errorTemplateResource, portalCacheName);
 
 		object = portalCache.get(errorTemplateResource.getTemplateId());
 
@@ -231,10 +291,10 @@ public abstract class AbstractTemplate implements Template {
 	}
 
 	private PortalCache<String, Serializable> _getPortalCache(
-		TemplateResource templateResource, String cacheName) {
+		TemplateResource templateResource, String portalCacheName) {
 
 		if (!(templateResource instanceof CacheTemplateResource)) {
-			return MultiVMPoolUtil.getCache(cacheName);
+			return MultiVMPoolUtil.getPortalCache(portalCacheName);
 		}
 
 		CacheTemplateResource cacheTemplateResource =
@@ -244,10 +304,10 @@ public abstract class AbstractTemplate implements Template {
 			cacheTemplateResource.getInnerTemplateResource();
 
 		if (innerTemplateResource instanceof URLTemplateResource) {
-			return SingleVMPoolUtil.getCache(cacheName);
+			return SingleVMPoolUtil.getPortalCache(portalCacheName);
 		}
 
-		return MultiVMPoolUtil.getCache(cacheName);
+		return MultiVMPoolUtil.getPortalCache(portalCacheName);
 	}
 
 	private final TemplateContextHelper _templateContextHelper;

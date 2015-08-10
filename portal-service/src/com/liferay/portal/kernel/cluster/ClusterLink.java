@@ -16,27 +16,12 @@ package com.liferay.portal.kernel.cluster;
 
 import com.liferay.portal.kernel.messaging.Message;
 
-import java.net.InetAddress;
-
-import java.util.List;
-
 /**
  * @author Shuyang Zhou
  */
 public interface ClusterLink {
 
-	public static final String CLUSTER_FORWARD_MESSAGE =
-		"CLUSTER_FORWARD_MESSAGE";
-
 	public static final int MAX_CHANNEL_COUNT = Priority.values().length;
-
-	public InetAddress getBindInetAddress();
-
-	public List<Address> getLocalTransportAddresses();
-
-	public List<Address> getTransportAddresses(Priority priority);
-
-	public void initialize();
 
 	public boolean isEnabled();
 

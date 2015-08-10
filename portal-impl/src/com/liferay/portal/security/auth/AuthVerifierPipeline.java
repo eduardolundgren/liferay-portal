@@ -17,13 +17,15 @@ package com.liferay.portal.security.auth;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.PropertiesUtil;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierConfiguration;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
@@ -69,8 +71,11 @@ public class AuthVerifierPipeline {
 	private AuthVerifierPipeline() {
 		Registry registry = RegistryUtil.getRegistry();
 
+		Filter filter = registry.getFilter(
+			"(objectClass=" + AuthVerifier.class.getName() + ")");
+
 		_serviceTracker = registry.trackServices(
-			AuthVerifier.class, new AuthVerifierTrackerCustomizer());
+			filter, new AuthVerifierTrackerCustomizer());
 
 		_serviceTracker.open();
 	}
@@ -100,7 +105,7 @@ public class AuthVerifierPipeline {
 		HttpServletRequest request = accessControlContext.getRequest();
 
 		List<AuthVerifierConfiguration> authVerifierConfigurations =
-			new ArrayList<AuthVerifierConfiguration>();
+			new ArrayList<>();
 
 		String requestURI = request.getRequestURI();
 
@@ -126,8 +131,6 @@ public class AuthVerifierPipeline {
 		AuthVerifierConfiguration authVerifierConfiguration,
 		String requestURI) {
 
-		AuthVerifier authVerifier = authVerifierConfiguration.getAuthVerifier();
-
 		Properties properties = authVerifierConfiguration.getProperties();
 
 		String[] urlsExcludes = StringUtil.split(
@@ -143,12 +146,6 @@ public class AuthVerifierPipeline {
 			properties.getProperty("urls.includes"));
 
 		if (urlsIncludes.length == 0) {
-			Class<?> authVerifierClass = authVerifier.getClass();
-
-			_log.error(
-				"Auth verifier " + authVerifierClass.getName() +
-					" does not have any URLs configured");
-
 			return false;
 		}
 
@@ -215,8 +212,7 @@ public class AuthVerifierPipeline {
 	private Map<String, Object> _mergeSettings(
 		Properties properties, Map<String, Object> settings) {
 
-		Map<String, Object> mergedSettings = new HashMap<String, Object>(
-			settings);
+		Map<String, Object> mergedSettings = new HashMap<>(settings);
 
 		if (properties != null) {
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
@@ -297,7 +293,7 @@ public class AuthVerifierPipeline {
 		new AuthVerifierPipeline();
 
 	private final List<AuthVerifierConfiguration> _authVerifierConfigurations =
-		new CopyOnWriteArrayList<AuthVerifierConfiguration>();
+		new CopyOnWriteArrayList<>();
 	private final ServiceTracker<AuthVerifier, AuthVerifierConfiguration>
 		_serviceTracker;
 
@@ -309,15 +305,13 @@ public class AuthVerifierPipeline {
 		public AuthVerifierConfiguration addingService(
 			ServiceReference<AuthVerifier> serviceReference) {
 
-			if (Validator.isNull(
-					serviceReference.getProperty("urls.includes"))) {
-
-				return null;
-			}
-
 			Registry registry = RegistryUtil.getRegistry();
 
 			AuthVerifier authVerifier = registry.getService(serviceReference);
+
+			if (authVerifier == null) {
+				return null;
+			}
 
 			Class<?> authVerifierClass = authVerifier.getClass();
 
@@ -328,7 +322,11 @@ public class AuthVerifierPipeline {
 			authVerifierConfiguration.setAuthVerifierClassName(
 				authVerifierClass.getName());
 			authVerifierConfiguration.setProperties(
-				PropertiesUtil.fromMap(serviceReference.getProperties()));
+				_loadProperties(serviceReference, authVerifierClass.getName()));
+
+			if (!_validate(authVerifierConfiguration)) {
+				return null;
+			}
 
 			_authVerifierConfigurations.add(0, authVerifierConfiguration);
 
@@ -348,9 +346,15 @@ public class AuthVerifierPipeline {
 			newAuthVerifierConfiguration.setAuthVerifierClassName(
 				authVerifierConfiguration.getAuthVerifierClassName());
 			newAuthVerifierConfiguration.setProperties(
-				PropertiesUtil.fromMap(serviceReference.getProperties()));
+				_loadProperties(
+					serviceReference,
+					authVerifierConfiguration.getAuthVerifierClassName()));
 
 			if (_authVerifierConfigurations.remove(authVerifierConfiguration)) {
+				if (!_validate(authVerifierConfiguration)) {
+					return;
+				}
+
 				_authVerifierConfigurations.add(
 					0, newAuthVerifierConfiguration);
 			}
@@ -366,6 +370,60 @@ public class AuthVerifierPipeline {
 			registry.ungetService(serviceReference);
 
 			_authVerifierConfigurations.remove(authVerifierConfiguration);
+		}
+
+		private Properties _loadProperties(
+			ServiceReference<AuthVerifier> serviceReference,
+			String authVerifierClassName) {
+
+			Properties properties = new Properties();
+
+			String authVerifierPropertyName = getAuthVerifierPropertyName(
+				authVerifierClassName);
+
+			Map<String, Object> serviceReferenceProperties =
+				serviceReference.getProperties();
+
+			for (String key : serviceReferenceProperties.keySet()) {
+				String propertiesKey = key;
+
+				if (key.startsWith(authVerifierPropertyName)) {
+					propertiesKey = key.substring(
+						authVerifierPropertyName.length());
+				}
+
+				Object value = serviceReferenceProperties.get(key);
+
+				if (value instanceof String) {
+					properties.setProperty(propertiesKey, (String)value);
+				}
+			}
+
+			return properties;
+		}
+
+		private boolean _validate(
+			AuthVerifierConfiguration authVerifierConfiguration) {
+
+			Properties properties = authVerifierConfiguration.getProperties();
+
+			String[] urlsIncludes = StringUtil.split(
+				properties.getProperty("urls.includes"));
+
+			if (urlsIncludes.length == 0) {
+				if (_log.isWarnEnabled()) {
+					String authVerifierClassName =
+						authVerifierConfiguration.getAuthVerifierClassName();
+
+					_log.warn(
+						"Auth verifier " + authVerifierClassName +
+							" does not have URLs configured");
+				}
+
+				return false;
+			}
+
+			return true;
 		}
 
 	}

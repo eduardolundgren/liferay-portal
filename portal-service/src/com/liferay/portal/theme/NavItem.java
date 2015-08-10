@@ -15,7 +15,6 @@
 package com.liferay.portal.theme;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -29,6 +28,7 @@ import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,35 +53,55 @@ public class NavItem implements Serializable {
 	 *
 	 * @param  request the currently served {@link HttpServletRequest}
 	 * @param  layouts the layouts from which to create the navigation items
-	 * @param  template the template to add navigation items to
 	 * @return a single level of navigation items from the layouts, or
 	 *         <code>null</code> if the collection of layouts was
 	 *         <code>null</code>.
 	 */
 	public static List<NavItem> fromLayouts(
-		HttpServletRequest request, List<Layout> layouts, Template template) {
+		HttpServletRequest request, List<Layout> layouts,
+		Map<String, Object> contextObjects) {
 
 		if (layouts == null) {
 			return null;
 		}
 
-		List<NavItem> navItems = new ArrayList<NavItem>(layouts.size());
+		List<NavItem> navItems = new ArrayList<>(layouts.size());
 
 		for (Layout layout : layouts) {
-			navItems.add(new NavItem(request, layout, template));
+			navItems.add(new NavItem(request, layout, contextObjects));
 		}
 
 		return navItems;
 	}
 
 	public NavItem(
-		HttpServletRequest request, Layout layout, Template template) {
+		HttpServletRequest request, Layout layout,
+		Map<String, Object> contextObjects) {
 
 		_request = request;
 		_themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 		_layout = layout;
-		_template = template;
+		_contextObjects = contextObjects;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof NavItem)) {
+			return false;
+		}
+
+		NavItem navItem = (NavItem)obj;
+
+		if (Validator.equals(getLayoutId(), navItem.getLayoutId())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -97,7 +117,7 @@ public class NavItem implements Serializable {
 			List<Layout> layouts = _layout.getChildren(
 				_themeDisplay.getPermissionChecker());
 
-			_children = fromLayouts(_request, layouts, _template);
+			_children = fromLayouts(_request, layouts, _contextObjects);
 		}
 
 		return _children;
@@ -232,10 +252,16 @@ public class NavItem implements Serializable {
 		}
 	}
 
-	public void icon() throws Exception {
-		Object velocityTaglib = _template.get("theme");
+	@Override
+	public int hashCode() {
+		return _layout.hashCode();
+	}
 
-		Method method = (Method)_template.get("velocityTaglib_layoutIcon");
+	public void icon() throws Exception {
+		Object velocityTaglib = _contextObjects.get("theme");
+
+		Method method = (Method)_contextObjects.get(
+			"velocityTaglib_layoutIcon");
 
 		method.invoke(velocityTaglib, _layout);
 	}
@@ -245,6 +271,14 @@ public class NavItem implements Serializable {
 			_themeDisplay.isTilesSelectable(), _themeDisplay.getLayout());
 	}
 
+	public boolean isInNavigation(List<NavItem> navItems) {
+		if (navItems == null) {
+			return false;
+		}
+
+		return navItems.contains(this);
+	}
+
 	public boolean isSelected() throws Exception {
 		return _layout.isSelected(
 			_themeDisplay.isTilesSelectable(), _themeDisplay.getLayout(),
@@ -252,9 +286,9 @@ public class NavItem implements Serializable {
 	}
 
 	private List<NavItem> _children;
+	private final Map<String, Object> _contextObjects;
 	private final Layout _layout;
 	private final HttpServletRequest _request;
-	private final Template _template;
 	private final ThemeDisplay _themeDisplay;
 
 }

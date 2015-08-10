@@ -28,19 +28,32 @@ import java.util.Date;
 public class TicketLocalServiceImpl extends TicketLocalServiceBaseImpl {
 
 	@Override
+	public Ticket addDistinctTicket(
+		long companyId, String className, long classPK, int type,
+		String extraInfo, Date expirationDate, ServiceContext serviceContext) {
+
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		ticketPersistence.removeByC_C_T(classNameId, classPK, type);
+
+		return addTicket(
+			companyId, className, classPK, type, extraInfo, expirationDate,
+			serviceContext);
+	}
+
+	@Override
 	public Ticket addTicket(
 		long companyId, String className, long classPK, int type,
 		String extraInfo, Date expirationDate, ServiceContext serviceContext) {
 
 		long classNameId = classNameLocalService.getClassNameId(className);
-		Date now = new Date();
 
 		long ticketId = counterLocalService.increment();
 
 		Ticket ticket = ticketPersistence.create(ticketId);
 
 		ticket.setCompanyId(companyId);
-		ticket.setCreateDate(now);
+		ticket.setCreateDate(new Date());
 		ticket.setClassNameId(classNameId);
 		ticket.setClassPK(classPK);
 		ticket.setKey(PortalUUIDUtil.generate());

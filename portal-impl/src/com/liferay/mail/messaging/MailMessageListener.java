@@ -15,6 +15,8 @@
 package com.liferay.mail.messaging;
 
 import com.liferay.mail.util.HookFactory;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
@@ -41,6 +43,10 @@ public class MailMessageListener extends BaseMessageListener {
 		InternetAddress from = filterInternetAddress(mailMessage.getFrom());
 
 		if (from == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Skipping email because the sender is not specified");
+			}
+
 			return;
 		}
 
@@ -127,8 +133,8 @@ public class MailMessageListener extends BaseMessageListener {
 			return null;
 		}
 
-		List<InternetAddress> filteredInternetAddresses =
-			new ArrayList<InternetAddress>(internetAddresses.length);
+		List<InternetAddress> filteredInternetAddresses = new ArrayList<>(
+			internetAddresses.length);
 
 		for (InternetAddress internetAddress : internetAddresses) {
 			InternetAddress filteredInternetAddress = filterInternetAddress(
@@ -142,5 +148,8 @@ public class MailMessageListener extends BaseMessageListener {
 		return filteredInternetAddresses.toArray(
 			new InternetAddress[filteredInternetAddresses.size()]);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		MailMessageListener.class);
 
 }

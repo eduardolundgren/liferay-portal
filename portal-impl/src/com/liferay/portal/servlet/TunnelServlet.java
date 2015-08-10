@@ -18,10 +18,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.access.control.AccessControlThreadLocal;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
-import com.liferay.portal.security.ac.AccessControlThreadLocal;
 import com.liferay.portal.security.auth.HttpPrincipal;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class TunnelServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
 
-		ObjectInputStream ois;
+		ObjectInputStream ois = null;
 
 		try {
 			ois = new ObjectInputStream(request.getInputStream());

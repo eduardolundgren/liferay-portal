@@ -14,17 +14,13 @@
 
 package com.liferay.portal.search;
 
-import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.comparator.PortletLuceneComparator;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +35,7 @@ public class SearchEngineInitializer implements Runnable {
 
 	public SearchEngineInitializer(long companyId) {
 		_companyId = companyId;
-		_usedSearchEngineIds = new HashSet<String>();
+		_usedSearchEngineIds = new HashSet<>();
 	}
 
 	public Set<String> getUsedSearchEngineIds() {
@@ -58,14 +54,7 @@ public class SearchEngineInitializer implements Runnable {
 	}
 
 	public void reindex(int delay) {
-		ShardUtil.pushCompanyService(_companyId);
-
-		try {
-			doReIndex(delay);
-		}
-		finally {
-			ShardUtil.popCompanyService();
-		}
+		doReIndex(delay);
 	}
 
 	@Override
@@ -103,35 +92,20 @@ public class SearchEngineInitializer implements Runnable {
 
 			SearchEngineUtil.initialize(_companyId);
 
-			List<Portlet> portlets = PortletLocalServiceUtil.getPortlets(
-				_companyId);
+			List<Indexer<?>> indexers = IndexerRegistryUtil.getIndexers();
 
-			portlets = ListUtil.sort(portlets, new PortletLuceneComparator());
+			Set<String> searchEngineIds = new HashSet<>();
 
-			for (Portlet portlet : portlets) {
-				if (!portlet.isActive()) {
-					continue;
+			for (Indexer<?> indexer : indexers) {
+				String searchEngineId = indexer.getSearchEngineId();
+
+				if (searchEngineIds.add(searchEngineId)) {
+					SearchEngineUtil.deleteEntityDocuments(
+						searchEngineId, _companyId, indexer.getClassName(),
+						true);
 				}
 
-				List<Indexer> indexers = portlet.getIndexerInstances();
-
-				if (indexers == null) {
-					continue;
-				}
-
-				Set<String> searchEngineIds = new HashSet<String>();
-
-				for (Indexer indexer : indexers) {
-					String searchEngineId = indexer.getSearchEngineId();
-
-					if (searchEngineIds.add(searchEngineId)) {
-						SearchEngineUtil.deletePortletDocuments(
-							searchEngineId, _companyId, portlet.getPortletId(),
-							true);
-					}
-
-					reindex(indexer);
-				}
+				reindex(indexer);
 			}
 
 			if (_log.isInfoEnabled()) {
@@ -151,7 +125,7 @@ public class SearchEngineInitializer implements Runnable {
 		_finished = true;
 	}
 
-	protected void reindex(Indexer indexer) throws Exception {
+	protected void reindex(Indexer<?> indexer) throws Exception {
 		StopWatch stopWatch = new StopWatch();
 
 		stopWatch.start();

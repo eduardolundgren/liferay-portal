@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletConfig;
@@ -67,11 +67,9 @@ import org.portletbridge.portlet.PortletBridgeServlet;
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
-		"com.liferay.portlet.struts-path=web_proxy",
 		"javax.portlet.display-name=Web Proxy",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.authenticatorClassName=org.portletbridge.portlet.DefaultBridgeAuthenticator",
-		"javax.portlet.init-param.config-template=/configuration.jsp",
 		"javax.portlet.init-param.cssRegex=(?:url\\((?:'|\")?(.*?)(?:'|\")?\\))|(?:@import\\s+[^url](?:'|\")?(.*?)(?:'|\")|;|\\s+|$)",
 		"javax.portlet.init-param.editStylesheet=classpath:/org/portletbridge/xsl/pages/edit.xsl",
 		"javax.portlet.init-param.errorStylesheet=classpath:/org/portletbridge/xsl/pages/error.xsl",
@@ -174,10 +172,12 @@ public class WebProxyPortlet extends PortletBridgePortlet {
 	}
 
 	protected void doInit() {
+		BundleContext bundleContext = _componentContext.getBundleContext();
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
 		PortletConfig portletConfig = getPortletConfig();
 		PortletContext portletContext = getPortletContext();
-
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -188,21 +188,25 @@ public class WebProxyPortlet extends PortletBridgePortlet {
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/pbhs/*");
 		properties.put(
-			"servlet.init.mementoSessionKey",
-			portletConfig.getInitParameter("mementoSessionKey"));
-		properties.put(
-			"servlet.init.cssRegex",
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX +
+				"cssRegex",
 			portletConfig.getInitParameter("cssRegex"));
 		properties.put(
-			"servlet.init.jsRegex", portletConfig.getInitParameter("jsRegex"));
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX +
+				"ignorePostToGetRequestHeaders",
+			"content-type,content-length");
 		properties.put(
-			"servlet.init.ignoreRequestHeaders",
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX +
+				"ignoreRequestHeaders",
 			"accept-encoding,connection,keep-alive");
 		properties.put(
-			"servlet.init.ignorePostToGetRequestHeaders",
-			"content-type,content-length");
-
-		BundleContext bundleContext = _componentContext.getBundleContext();
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX +
+				"jsRegex",
+			portletConfig.getInitParameter("jsRegex"));
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX +
+				"mementoSessionKey",
+			portletConfig.getInitParameter("mementoSessionKey"));
 
 		_serviceRegistration = bundleContext.registerService(
 			Servlet.class, new PortletBridgeServlet(), properties);

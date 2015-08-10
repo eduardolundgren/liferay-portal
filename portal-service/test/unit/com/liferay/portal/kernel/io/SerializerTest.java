@@ -18,10 +18,10 @@ import com.liferay.portal.kernel.io.Serializer.BufferNode;
 import com.liferay.portal.kernel.io.Serializer.BufferQueue;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.IOException;
@@ -584,7 +584,7 @@ public class SerializerTest {
 	public void testWriteObjectByte() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Byte((byte)101));
+		serializer.writeObject(Byte.valueOf((byte)101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -597,7 +597,7 @@ public class SerializerTest {
 	public void testWriteObjectCharacter() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Character('a'));
+		serializer.writeObject(Character.valueOf('a'));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -636,7 +636,7 @@ public class SerializerTest {
 	public void testWriteObjectDouble() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Double(17.58D));
+		serializer.writeObject(Double.valueOf(17.58D));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -649,7 +649,7 @@ public class SerializerTest {
 	public void testWriteObjectFloat() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Float(17.58F));
+		serializer.writeObject(Float.valueOf(17.58F));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -662,7 +662,7 @@ public class SerializerTest {
 	public void testWriteObjectInteger() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Integer(101));
+		serializer.writeObject(Integer.valueOf(101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -676,7 +676,7 @@ public class SerializerTest {
 	public void testWriteObjectLong() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Long(101));
+		serializer.writeObject(Long.valueOf(101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -760,7 +760,7 @@ public class SerializerTest {
 	public void testWriteObjectShort() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Short((short)101));
+		serializer.writeObject(Short.valueOf((short)101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -904,6 +904,6 @@ public class SerializerTest {
 
 	private static final int _COUNT = 1024;
 
-	private Random _random = new Random();
+	private final Random _random = new Random();
 
 }

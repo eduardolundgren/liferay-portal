@@ -15,16 +15,16 @@
 package com.liferay.portal.search;
 
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.util.test.GroupTestUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class BackupAndRestoreIndexesTest {
 
 	@Test
 	public void testBackupAndRestore() throws Exception {
-		Map<Long, String> backupNames = new HashMap<Long, String>();
+		Map<Long, String> backupNames = new HashMap<>();
 
 		for (long companyId : PortalInstances.getCompanyIds()) {
 			String backupName = StringUtil.lowerCase(

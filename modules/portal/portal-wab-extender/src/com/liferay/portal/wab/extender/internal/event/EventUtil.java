@@ -15,19 +15,18 @@
 package com.liferay.portal.wab.extender.internal.event;
 
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.wab.extender.internal.WabUtil;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -53,11 +52,7 @@ public class EventUtil
 
 		_webExtenderBundle = _bundleContext.getBundle();
 
-		Map<String, Object> properties = new Hashtable<String, Object>();
-
-		properties.put(EventConstants.EVENT_TOPIC, _EVENT_TOPICS);
-
-		_eventAdminServiceTracker = new ServiceTracker<EventAdmin, EventAdmin>(
+		_eventAdminServiceTracker = new ServiceTracker<>(
 			_bundleContext, EventAdmin.class.getName(), this);
 
 		_eventAdminServiceTracker.open();
@@ -94,7 +89,7 @@ public class EventUtil
 		Bundle bundle, String eventTopic, Exception exception,
 		boolean collision) {
 
-		Map<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("bundle", bundle);
 		properties.put("bundle.id", bundle.getBundleId());
@@ -107,7 +102,7 @@ public class EventUtil
 		if (collision) {
 			properties.put("collision", contextPath);
 
-			List<Long> collidedBundleIds = new ArrayList<Long>();
+			List<Long> collidedBundleIds = new ArrayList<>();
 
 			BundleContext bundleContext = bundle.getBundleContext();
 
@@ -160,10 +155,6 @@ public class EventUtil
 
 		_eventAdmin.sendEvent(event);
 	}
-
-	private static final String[] _EVENT_TOPICS = new String[] {
-		DEPLOYED, DEPLOYING, FAILED, UNDEPLOYED, UNDEPLOYING
-	};
 
 	private final BundleContext _bundleContext;
 	private EventAdmin _eventAdmin;

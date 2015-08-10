@@ -237,7 +237,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	* @return the create date of this layout set
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _layoutSet.getCreateDate();
 	}
 
@@ -354,7 +354,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	* @return the modified date of this layout set
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _layoutSet.getModifiedDate();
 	}
 
@@ -491,6 +491,11 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	}
 
 	@Override
+	public boolean hasSetModifiedDate() {
+		return _layoutSet.hasSetModifiedDate();
+	}
+
+	@Override
 	public int hashCode() {
 		return _layoutSet.hashCode();
 	}
@@ -582,7 +587,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	* @param createDate the create date of this layout set
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_layoutSet.setCreateDate(createDate);
 	}
 
@@ -597,8 +602,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_layoutSet.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -672,7 +676,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	* @param modifiedDate the modified date of this layout set
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_layoutSet.setModifiedDate(modifiedDate);
 	}
 
@@ -784,7 +788,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.LayoutSet> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.LayoutSet> toCacheModel() {
 		return _layoutSet.toCacheModel();
 	}
 

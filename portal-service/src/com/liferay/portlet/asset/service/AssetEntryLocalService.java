@@ -119,8 +119,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.asset.model.AssetEntry deleteAssetEntry(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long entryId) throws PortalException;
 
 	public void deleteAssetTagAssetEntries(long tagId,
 		java.util.List<com.liferay.portlet.asset.model.AssetEntry> AssetEntries);
@@ -133,16 +132,14 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	public void deleteAssetTagAssetEntry(long tagId, long entryId);
 
 	public void deleteEntry(java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void deleteEntry(com.liferay.portlet.asset.model.AssetEntry entry)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
-	public void deleteEntry(long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteEntry(long entryId) throws PortalException;
 
-	public void deleteGroupEntries(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteGroupEntries(long groupId) throws PortalException;
 
 	/**
 	* @throws PortalException
@@ -150,7 +147,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -237,8 +234,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getAncestorEntries(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long entryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getAssetCategoryAssetEntries(
@@ -297,8 +293,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getAssetEntry(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long entryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getAssetTagAssetEntries(
@@ -334,8 +329,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getChildEntries(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long entryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getCompanyEntries(
@@ -349,22 +343,35 @@ public interface AssetEntryLocalService extends BaseLocalService,
 		com.liferay.portlet.asset.service.persistence.AssetEntryQuery entryQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getEntries(
+		long[] groupIds, long[] classNameIds, java.lang.String keywords,
+		java.lang.String userName, java.lang.String title,
+		java.lang.String description, java.lang.Boolean listable,
+		boolean advancedSearch, boolean andOperator, int start, int end,
+		java.lang.String orderByCol1, java.lang.String orderByCol2,
+		java.lang.String orderByType1, java.lang.String orderByType2);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getEntriesCount(
 		com.liferay.portlet.asset.service.persistence.AssetEntryQuery entryQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getEntriesCount(long[] groupIds, long[] classNameIds,
+		java.lang.String keywords, java.lang.String userName,
+		java.lang.String title, java.lang.String description,
+		java.lang.Boolean listable, boolean advancedSearch, boolean andOperator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getEntry(
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String className, long classPK) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getEntry(long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getEntry(long groupId,
-		java.lang.String classUuid)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String classUuid) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getGroupEntries(
@@ -372,31 +379,28 @@ public interface AssetEntryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getNextEntry(long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getParentEntry(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long entryId) throws PortalException;
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetEntry getPreviousEntry(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getTopViewedEntries(
-		java.lang.String className, boolean asc, int start, int end);
+		long entryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getTopViewedEntries(
 		java.lang.String[] className, boolean asc, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> getTopViewedEntries(
+		java.lang.String className, boolean asc, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasAssetCategoryAssetEntries(long categoryId);
@@ -412,7 +416,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 
 	public com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
 		long userId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	@com.liferay.portal.kernel.increment.BufferedIncrement(configuration = "AssetEntry", incrementClass = com.liferay.portal.kernel.increment.NumberIncrement.class)
 	public void incrementViewCounter(long userId, java.lang.String className,
@@ -421,7 +425,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void reindex(
 		java.util.List<com.liferay.portlet.asset.model.AssetEntry> entries)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 6.2.0, replaced by {@link #search(long, long[], long,
@@ -507,17 +511,16 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	public com.liferay.portlet.asset.model.AssetEntry updateEntry(
 		java.lang.String className, long classPK, java.util.Date publishDate,
 		java.util.Date expirationDate, boolean visible)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portlet.asset.model.AssetEntry updateEntry(
 		java.lang.String className, long classPK, java.util.Date publishDate,
-		boolean visible)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean visible) throws PortalException;
 
 	public com.liferay.portlet.asset.model.AssetEntry updateEntry(long userId,
 		long groupId, java.lang.String className, long classPK,
 		long[] categoryIds, java.lang.String[] tagNames)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 6.2.0, replaced by {@link #updateEntry(long, long,
@@ -535,7 +538,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 		java.lang.String description, java.lang.String summary,
 		java.lang.String url, java.lang.String layoutUuid, int height,
 		int width, java.lang.Integer priority, boolean sync)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 6.2.0, replaced by {@link #updateEntry(long, long,
@@ -553,8 +556,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 		java.lang.String title, java.lang.String description,
 		java.lang.String summary, java.lang.String url,
 		java.lang.String layoutUuid, int height, int width,
-		java.lang.Integer priority, boolean sync)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.Integer priority, boolean sync) throws PortalException;
 
 	public com.liferay.portlet.asset.model.AssetEntry updateEntry(long userId,
 		long groupId, java.util.Date createDate, java.util.Date modifiedDate,
@@ -565,12 +567,29 @@ public interface AssetEntryLocalService extends BaseLocalService,
 		java.lang.String title, java.lang.String description,
 		java.lang.String summary, java.lang.String url,
 		java.lang.String layoutUuid, int height, int width,
-		java.lang.Integer priority, boolean sync)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.Integer priority) throws PortalException;
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
+	Date, Date, String, long, String, long, long[], String[],
+	boolean, Date, Date, Date, String, String, String, String,
+	String, String, int, int, Integer)}
+	*/
+	@java.lang.Deprecated
+	public com.liferay.portlet.asset.model.AssetEntry updateEntry(long userId,
+		long groupId, java.util.Date createDate, java.util.Date modifiedDate,
+		java.lang.String className, long classPK, java.lang.String classUuid,
+		long classTypeId, long[] categoryIds, java.lang.String[] tagNames,
+		boolean visible, java.util.Date startDate, java.util.Date endDate,
+		java.util.Date expirationDate, java.lang.String mimeType,
+		java.lang.String title, java.lang.String description,
+		java.lang.String summary, java.lang.String url,
+		java.lang.String layoutUuid, int height, int width,
+		java.lang.Integer priority, boolean sync) throws PortalException;
 
 	public com.liferay.portlet.asset.model.AssetEntry updateVisible(
 		java.lang.String className, long classPK, boolean visible)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link #validate(long, String, long,
@@ -579,9 +598,9 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	@java.lang.Deprecated
 	public void validate(long groupId, java.lang.String className,
 		long[] categoryIds, java.lang.String[] tagNames)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void validate(long groupId, java.lang.String className,
 		long classTypePK, long[] categoryIds, java.lang.String[] tagNames)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 }

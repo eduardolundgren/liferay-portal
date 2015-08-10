@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.rss.web.constants.RSSPortletKeys;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,19 +28,25 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
-	immediate = true,
-	property = {
-		"javax.portlet.name=com_liferay_rss_web_portlet_RSSPortlet"
-	},
+	immediate = true, property = {"javax.portlet.name=" + RSSPortletKeys.RSS},
 	service = ConfigurationAction.class
 )
 public class RSSConfigurationAction extends DefaultConfigurationAction {
+
+	@Override
+	public String getJspPath(HttpServletRequest request) {
+		return "/configuration.jsp";
+	}
 
 	@Override
 	public void processAction(
@@ -52,13 +59,21 @@ public class RSSConfigurationAction extends DefaultConfigurationAction {
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.rss.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	protected void updateSubscriptions(ActionRequest actionRequest)
 		throws Exception {
 
 		int[] subscriptionIndexes = StringUtil.split(
 			ParamUtil.getString(actionRequest, "subscriptionIndexes"), 0);
 
-		Map<String, String> subscriptions = new LinkedHashMap<String, String>();
+		Map<String, String> subscriptions = new LinkedHashMap<>();
 
 		for (int subscriptionIndex : subscriptionIndexes) {
 			String url = ParamUtil.getString(

@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -88,6 +89,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 		attributes.put("requireUnlock", getRequireUnlock());
 		attributes.put("resetFailureCount", getResetFailureCount());
 		attributes.put("resetTicketMaxAge", getResetTicketMaxAge());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -304,6 +306,12 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 		if (resetTicketMaxAge != null) {
 			setResetTicketMaxAge(resetTicketMaxAge);
 		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
 	}
 
 	@Override
@@ -372,7 +380,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	* @return the create date of this password policy
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _passwordPolicy.getCreateDate();
 	}
 
@@ -439,6 +447,16 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	@Override
 	public int getHistoryCount() {
 		return _passwordPolicy.getHistoryCount();
+	}
+
+	/**
+	* Returns the last publish date of this password policy.
+	*
+	* @return the last publish date of this password policy
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _passwordPolicy.getLastPublishDate();
 	}
 
 	/**
@@ -557,7 +575,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	* @return the modified date of this password policy
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _passwordPolicy.getModifiedDate();
 	}
 
@@ -872,7 +890,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	* @param createDate the create date of this password policy
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_passwordPolicy.setCreateDate(createDate);
 	}
 
@@ -897,8 +915,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_passwordPolicy.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -952,6 +969,16 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	@Override
 	public void setHistoryCount(int historyCount) {
 		_passwordPolicy.setHistoryCount(historyCount);
+	}
+
+	/**
+	* Sets the last publish date of this password policy.
+	*
+	* @param lastPublishDate the last publish date of this password policy
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_passwordPolicy.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -1070,7 +1097,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	* @param modifiedDate the modified date of this password policy
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_passwordPolicy.setModifiedDate(modifiedDate);
 	}
 
@@ -1215,7 +1242,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.PasswordPolicy> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.PasswordPolicy> toCacheModel() {
 		return _passwordPolicy.toCacheModel();
 	}
 

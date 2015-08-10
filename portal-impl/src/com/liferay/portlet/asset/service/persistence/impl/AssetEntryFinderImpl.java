@@ -173,7 +173,7 @@ public class AssetEntryFinderImpl
 		String categoryIdsString = null;
 
 		if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
-			List<Long> categoryIdsList = new ArrayList<Long>();
+			List<Long> categoryIdsList = new ArrayList<>();
 
 			for (long categoryId : categoryIds) {
 				categoryIdsList.addAll(getSubcategoryIds(categoryId));
@@ -307,23 +307,29 @@ public class AssetEntryFinderImpl
 				 Validator.isNotNull(entryQuery.getDescription())) {
 
 			sb.append(" AND (");
-			sb.append(
-				entryQuery.isAndOperator() ? Boolean.TRUE : Boolean.FALSE);
+
+			boolean requiresOperator = false;
 
 			if (Validator.isNotNull(entryQuery.getUserName())) {
-				sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
-
 				sb.append("(AssetEntry.userName LIKE ?)");
+
+				requiresOperator = true;
 			}
 
 			if (Validator.isNotNull(entryQuery.getTitle())) {
-				sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+				if (requiresOperator) {
+					sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+				}
 
 				sb.append("(AssetEntry.title LIKE ?)");
+
+				requiresOperator = true;
 			}
 
 			if (Validator.isNotNull(entryQuery.getDescription())) {
-				sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+				if (requiresOperator) {
+					sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+				}
 
 				sb.append("(AssetEntry.description LIKE ?)");
 			}
@@ -587,7 +593,7 @@ public class AssetEntryFinderImpl
 		String notCategoryIdsString = null;
 
 		if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
-			List<Long> notCategoryIdsList = new ArrayList<Long>();
+			List<Long> notCategoryIdsList = new ArrayList<>();
 
 			for (long notCategoryId : notCategoryIds) {
 				notCategoryIdsList.addAll(getSubcategoryIds(notCategoryId));

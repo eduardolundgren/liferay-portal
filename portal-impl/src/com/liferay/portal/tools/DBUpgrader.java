@@ -40,6 +40,9 @@ import com.liferay.portal.spring.aop.ServiceBeanAopCacheManagerUtil;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceRegistrar;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.lang.annotation.Annotation;
@@ -51,6 +54,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -179,14 +183,6 @@ public class DBUpgrader {
 
 		ResourceActionLocalServiceUtil.checkResourceActions();
 
-		// Delete temporary images
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Delete temporary images");
-		}
-
-		_deleteTempImages();
-
 		// Clear the caches only if the upgrade process was run
 
 		if (_log.isDebugEnabled()) {
@@ -243,6 +239,9 @@ public class DBUpgrader {
 		catch (Exception e) {
 			_updateReleaseState(ReleaseConstants.STATE_VERIFY_FAILURE);
 
+			_log.error(
+				"Unable to execute verify process: " + e.getMessage(), e);
+
 			throw e;
 		}
 		finally {
@@ -267,13 +266,28 @@ public class DBUpgrader {
 			verified = true;
 		}
 
-		ReleaseLocalServiceUtil.updateRelease(
+		release = ReleaseLocalServiceUtil.updateRelease(
 			release.getReleaseId(), ReleaseInfo.getParentBuildNumber(),
 			ReleaseInfo.getBuildDate(), verified);
 
 		// Enable database caching after verify
 
 		CacheRegistryUtil.setActive(true);
+
+		// Register release service
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		ServiceRegistrar<Release> serviceRegistrar =
+			registry.getServiceRegistrar(Release.class);
+
+		Map<String, Object> properties = new HashMap<>();
+
+		properties.put("build.date", release.getBuildDate());
+		properties.put("build.number", release.getBuildNumber());
+		properties.put("servlet.context.name", release.getServletContextName());
+
+		serviceRegistrar.registerService(Release.class, release, properties);
 	}
 
 	private static void _checkPermissionAlgorithm() throws Exception {
@@ -312,13 +326,6 @@ public class DBUpgrader {
 		sb.append("from a corrupt database.");
 
 		throw new IllegalStateException(sb.toString());
-	}
-
-	private static void _deleteTempImages() throws Exception {
-		DB db = DBFactoryUtil.getDB();
-
-		db.runSQL(_DELETE_TEMP_IMAGES_1);
-		db.runSQL(_DELETE_TEMP_IMAGES_2);
 	}
 
 	private static void _disableTransactions() throws Exception {
@@ -455,13 +462,6 @@ public class DBUpgrader {
 			DataAccess.cleanUp(con, ps);
 		}
 	}
-
-	private static final String _DELETE_TEMP_IMAGES_1 =
-		"delete from Image where imageId IN (SELECT articleImageId FROM " +
-			"JournalArticleImage where tempImage = TRUE)";
-
-	private static final String _DELETE_TEMP_IMAGES_2 =
-		"delete from JournalArticleImage where tempImage = TRUE";
 
 	private static final Log _log = LogFactoryUtil.getLog(DBUpgrader.class);
 

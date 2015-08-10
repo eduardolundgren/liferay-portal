@@ -14,6 +14,9 @@
 
 package com.liferay.portal.kernel.search;
 
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.query.QueryVisitor;
+
 import java.io.Serializable;
 
 /**
@@ -21,9 +24,29 @@ import java.io.Serializable;
  */
 public interface Query extends Serializable {
 
+	public static final float BOOST_DEFAULT = 1.0f;
+
+	public <T> T accept(QueryVisitor<T> queryVisitor);
+
+	public float getBoost();
+
+	public BooleanFilter getPreBooleanFilter();
+
 	public QueryConfig getQueryConfig();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public Object getWrappedQuery();
+
+	public boolean hasChildren();
+
+	public boolean isDefaultBoost();
+
+	public void setBoost(float boost);
+
+	public void setPreBooleanFilter(BooleanFilter preBooleanFilter);
 
 	public void setQueryConfig(QueryConfig queryConfig);
 

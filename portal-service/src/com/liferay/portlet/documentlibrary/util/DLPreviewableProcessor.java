@@ -18,8 +18,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.io.FileFilter;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
@@ -39,8 +37,9 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.documentlibrary.DuplicateDirectoryException;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
 
 import java.awt.image.RenderedImage;
 
@@ -82,19 +81,9 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		long[] companyIds = PortalUtil.getCompanyIds();
 
 		for (long companyId : companyIds) {
-			try {
-				DLStoreUtil.deleteDirectory(
-					companyId, REPOSITORY_ID, PREVIEW_PATH);
-			}
-			catch (Exception e) {
-			}
-
-			try {
-				DLStoreUtil.deleteDirectory(
-					companyId, REPOSITORY_ID, THUMBNAIL_PATH);
-			}
-			catch (Exception e) {
-			}
+			DLStoreUtil.deleteDirectory(companyId, REPOSITORY_ID, PREVIEW_PATH);
+			DLStoreUtil.deleteDirectory(
+				companyId, REPOSITORY_ID, THUMBNAIL_PATH);
 		}
 	}
 
@@ -228,11 +217,7 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 			long companyId, String dirName, String filePath, File srcFile)
 		throws PortalException {
 
-		try {
-			DLStoreUtil.addDirectory(companyId, REPOSITORY_ID, dirName);
-		}
-		catch (DuplicateDirectoryException dde) {
-		}
+		DLStoreUtil.addDirectory(companyId, REPOSITORY_ID, dirName);
 
 		DLStoreUtil.addFile(companyId, REPOSITORY_ID, filePath, false, srcFile);
 	}
@@ -241,11 +226,7 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 			long companyId, String dirName, String filePath, InputStream is)
 		throws PortalException {
 
-		try {
-			DLStoreUtil.addDirectory(companyId, REPOSITORY_ID, dirName);
-		}
-		catch (DuplicateDirectoryException dde) {
-		}
+		DLStoreUtil.addDirectory(companyId, REPOSITORY_ID, dirName);
 
 		DLStoreUtil.addFile(companyId, REPOSITORY_ID, filePath, false, is);
 	}
@@ -331,12 +312,7 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		String previewFilePath = getPreviewFilePath(
 			groupId, fileEntryId, fileVersionId, null);
 
-		try {
-			DLStoreUtil.deleteDirectory(
-				companyId, REPOSITORY_ID, previewFilePath);
-		}
-		catch (Exception e) {
-		}
+		DLStoreUtil.deleteDirectory(companyId, REPOSITORY_ID, previewFilePath);
 	}
 
 	protected void deleteThumbnail(
@@ -1280,10 +1256,9 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 			fileVersion, renderedImage, THUMBNAIL_INDEX_CUSTOM_2);
 	}
 
-	protected Map<String, Future<?>> futures =
-		new ConcurrentHashMap<String, Future<?>>();
+	protected Map<String, Future<?>> futures = new ConcurrentHashMap<>();
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		DLPreviewableProcessor.class);
 
 }

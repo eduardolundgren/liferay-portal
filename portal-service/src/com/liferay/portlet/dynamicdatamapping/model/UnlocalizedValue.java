@@ -15,6 +15,7 @@
 package com.liferay.portlet.dynamicdatamapping.model;
 
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,9 +31,33 @@ public class UnlocalizedValue implements Value {
 		_values.put(LocaleUtil.ROOT, value);
 	}
 
+	public UnlocalizedValue(UnlocalizedValue unlocalizedValue) {
+		_values.put(
+			LocaleUtil.ROOT, unlocalizedValue.getString(LocaleUtil.ROOT));
+	}
+
 	@Override
 	public void addString(Locale locale, String value) {
 		_values.put(LocaleUtil.ROOT, value);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof UnlocalizedValue)) {
+			return false;
+		}
+
+		UnlocalizedValue unlocalizedValue = (UnlocalizedValue)obj;
+
+		if (Validator.equals(_values, unlocalizedValue._values)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -56,6 +81,11 @@ public class UnlocalizedValue implements Value {
 	}
 
 	@Override
+	public int hashCode() {
+		return _values.hashCode();
+	}
+
+	@Override
 	public boolean isLocalized() {
 		return false;
 	}
@@ -65,6 +95,6 @@ public class UnlocalizedValue implements Value {
 		throw new UnsupportedOperationException();
 	}
 
-	private final Map<Locale, String> _values = new HashMap<Locale, String>();
+	private final Map<Locale, String> _values = new HashMap<>();
 
 }

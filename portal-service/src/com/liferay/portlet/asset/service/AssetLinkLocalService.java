@@ -65,11 +65,10 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	* @param entryId1 the primary key of the first asset entry
 	* @param entryId2 the primary key of the second asset entry
 	* @param type the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @param weight the weight of the relationship, allowing precedence
 	ordering of links
 	* @return the asset link
@@ -77,7 +76,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	*/
 	public com.liferay.portlet.asset.model.AssetLink addLink(long userId,
 		long entryId1, long entryId2, int type, int weight)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Creates a new asset link with the primary key. Does not add the asset link to the database.
@@ -107,7 +106,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.asset.model.AssetLink deleteAssetLink(
-		long linkId) throws com.liferay.portal.kernel.exception.PortalException;
+		long linkId) throws PortalException;
 
 	/**
 	* Deletes the asset link.
@@ -122,8 +121,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	* @param linkId the primary key of the asset link
 	* @throws PortalException if the asset link could not be found
 	*/
-	public void deleteLink(long linkId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteLink(long linkId) throws PortalException;
 
 	/**
 	* Deletes all links associated with the asset entry.
@@ -146,7 +144,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -228,7 +226,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetLink getAssetLink(long linkId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Returns a range of all the asset links.
@@ -276,11 +274,10 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	*
 	* @param entryId the primary key of the asset entry
 	* @param typeId the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @return the asset links of the given link type whose first entry ID is
 	the given entry ID
 	*/
@@ -306,11 +303,10 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	*
 	* @param entryId the primary key of the asset entry
 	* @param typeId the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @return the asset links of the given link type whose first or second
 	entry ID is the given entry ID
 	*/
@@ -321,8 +317,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Returns all the asset links of the given link type whose second entry ID
@@ -330,11 +325,10 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	*
 	* @param entryId the primary key of the asset entry
 	* @param typeId the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @return the asset links of the given link type whose second entry ID is
 	the given entry ID
 	*/
@@ -361,7 +355,7 @@ public interface AssetLinkLocalService extends BaseLocalService,
 
 	public com.liferay.portlet.asset.model.AssetLink updateLink(long userId,
 		long entryId1, long entryId2, int typeId, int weight)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates all links of the asset entry, replacing them with links
@@ -380,14 +374,12 @@ public interface AssetLinkLocalService extends BaseLocalService,
 	* @param linkEntryIds the primary keys of the asset entries to be linked
 	with the asset entry to be managed
 	* @param typeId the type of the asset links to be created. Acceptable
-	values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	values include {@link AssetLinkConstants#TYPE_RELATED} which is a
+	bidirectional relationship and {@link
+	AssetLinkConstants#TYPE_CHILD} which is a unidirectional
+	relationship. For more information see {@link AssetLinkConstants}
 	* @throws PortalException if the user could not be found
 	*/
 	public void updateLinks(long userId, long entryId, long[] linkEntryIds,
-		int typeId) throws com.liferay.portal.kernel.exception.PortalException;
+		int typeId) throws PortalException;
 }

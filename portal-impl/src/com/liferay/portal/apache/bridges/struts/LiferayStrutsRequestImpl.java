@@ -48,7 +48,7 @@ public class LiferayStrutsRequestImpl extends HttpServletRequestWrapper {
 				WebKeys.STRUTS_BRIDGES_ATTRIBUTES);
 
 		if (strutsAttributes == null) {
-			strutsAttributes = new HashMap<String, Object>();
+			strutsAttributes = new HashMap<>();
 
 			request.setAttribute(
 				WebKeys.STRUTS_BRIDGES_ATTRIBUTES, strutsAttributes);
@@ -75,7 +75,7 @@ public class LiferayStrutsRequestImpl extends HttpServletRequestWrapper {
 
 	@Override
 	public Enumeration<String> getAttributeNames() {
-		List<String> attributeNames = new Vector<String>();
+		List<String> attributeNames = new Vector<>();
 
 		Enumeration<String> enu = super.getAttributeNames();
 

@@ -38,7 +38,7 @@ public class PortletSandboxDeployListener
 
 		String portalWebDir = PortalUtil.getPortalWebDir();
 
-		auiTaglibDTD = portalWebDir + "/WEB-INF/tld/aui.tld";
+		auiTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-aui.tld";
 		portletTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-portlet.tld";
 		portletExtTaglibDTD =
 			portalWebDir + "/WEB-INF/tld/liferay-portlet-ext.tld";
@@ -47,7 +47,7 @@ public class PortletSandboxDeployListener
 		uiTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-ui.tld";
 		utilTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-util.tld";
 
-		jars = new ArrayList<String>();
+		jars = new ArrayList<>();
 
 		String portalLibDir = PortalUtil.getPortalLibDir();
 

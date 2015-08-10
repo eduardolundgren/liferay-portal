@@ -47,14 +47,16 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel, TreeModel
 
 	public long getDataRepositoryId();
 
+	public java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues> getDDMFormValuesMap(
+		long fileVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public com.liferay.portlet.documentlibrary.model.DLFileEntryType getDLFileEntryType()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portal.kernel.util.UnicodeProperties getExtraSettingsProperties();
 
-	public java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.Fields> getFieldsMap(
-		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileShortcut> getFileShortcuts();
 
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersion()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -79,7 +81,7 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel, TreeModel
 		boolean trusted)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public com.liferay.portal.model.Lock getLock();
+	public com.liferay.portal.kernel.lock.Lock getLock();
 
 	public java.lang.String getLuceneProperties();
 

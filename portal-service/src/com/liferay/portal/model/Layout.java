@@ -313,6 +313,8 @@ public interface Layout extends LayoutModel, PersistedModel {
 	public boolean hasScopeGroup()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public boolean hasSetModifiedDate();
+
 	public boolean includeLayoutContent(
 		javax.servlet.http.HttpServletRequest request,
 		javax.servlet.http.HttpServletResponse response)
@@ -412,6 +414,10 @@ public interface Layout extends LayoutModel, PersistedModel {
 	*/
 	public boolean isSupportsEmbeddedPortlets();
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	*/
+	@java.lang.Deprecated()
 	public boolean isTypeArticle();
 
 	public boolean isTypeControlPanel();

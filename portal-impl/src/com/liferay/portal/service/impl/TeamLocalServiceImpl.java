@@ -26,9 +26,9 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.TeamLocalServiceBaseImpl;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -37,15 +37,30 @@ import java.util.List;
  */
 public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
+	/**
+	 * @throws     PortalException
+	 * @deprecated As of 7.0.0, replaced by {@link #addTeam(long, long, String,
+	 *             String, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public Team addTeam(
 			long userId, long groupId, String name, String description)
 		throws PortalException {
 
+		return addTeam(
+			userId, groupId, name, description, new ServiceContext());
+	}
+
+	@Override
+	public Team addTeam(
+			long userId, long groupId, String name, String description,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		// Team
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		validate(0, groupId, name);
 
@@ -53,11 +68,10 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
 		Team team = teamPersistence.create(teamId);
 
+		team.setUuid(serviceContext.getUuid());
 		team.setUserId(userId);
 		team.setCompanyId(user.getCompanyId());
 		team.setUserName(user.getFullName());
-		team.setCreateDate(now);
-		team.setModifiedDate(now);
 		team.setGroupId(groupId);
 		team.setName(name);
 		team.setDescription(description);
@@ -129,8 +143,7 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
 	@Override
 	public List<Team> getUserTeams(long userId, long groupId) {
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("usersTeams", userId);
 
@@ -161,13 +174,10 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 	public Team updateTeam(long teamId, String name, String description)
 		throws PortalException {
 
-		Date now = new Date();
-
 		Team team = teamPersistence.findByPrimaryKey(teamId);
 
 		validate(teamId, team.getGroupId(), name);
 
-		team.setModifiedDate(now);
 		team.setName(name);
 		team.setDescription(description);
 

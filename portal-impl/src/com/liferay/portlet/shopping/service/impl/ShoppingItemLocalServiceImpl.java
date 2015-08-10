@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portlet.shopping.DuplicateItemFieldNameException;
 import com.liferay.portlet.shopping.DuplicateItemSKUException;
@@ -48,7 +49,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,8 +86,6 @@ public class ShoppingItemLocalServiceImpl
 		catch (IOException ioe) {
 		}
 
-		Date now = new Date();
-
 		validate(
 			user.getCompanyId(), 0, sku, name, smallImage, smallImageURL,
 			smallImageFile, smallImageBytes, mediumImage, mediumImageURL,
@@ -102,8 +100,6 @@ public class ShoppingItemLocalServiceImpl
 		item.setCompanyId(user.getCompanyId());
 		item.setUserId(user.getUserId());
 		item.setUserName(user.getFullName());
-		item.setCreateDate(now);
-		item.setModifiedDate(now);
 		item.setCategoryId(categoryId);
 		item.setSku(sku);
 		item.setName(name);
@@ -127,7 +123,7 @@ public class ShoppingItemLocalServiceImpl
 
 			if ((sale == null) && (itemPrice.getDiscount() > 0) &&
 				((itemPrice.getStatus() ==
-					 ShoppingItemPriceConstants.STATUS_ACTIVE_DEFAULT) ||
+					ShoppingItemPriceConstants.STATUS_ACTIVE_DEFAULT) ||
 				 (itemPrice.getStatus() ==
 					 ShoppingItemPriceConstants.STATUS_ACTIVE))) {
 
@@ -161,9 +157,7 @@ public class ShoppingItemLocalServiceImpl
 				serviceContext.isAddGuestPermissions());
 		}
 		else {
-			addItemResources(
-				item, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
+			addItemResources(item, serviceContext.getModelPermissions());
 		}
 
 		// Images
@@ -215,13 +209,12 @@ public class ShoppingItemLocalServiceImpl
 	}
 
 	@Override
-	public void addItemResources(
-			long itemId, String[] groupPermissions, String[] guestPermissions)
+	public void addItemResources(long itemId, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		ShoppingItem item = shoppingItemPersistence.findByPrimaryKey(itemId);
 
-		addItemResources(item, groupPermissions, guestPermissions);
+		addItemResources(item, modelPermissions);
 	}
 
 	@Override
@@ -238,14 +231,12 @@ public class ShoppingItemLocalServiceImpl
 
 	@Override
 	public void addItemResources(
-			ShoppingItem item, String[] groupPermissions,
-			String[] guestPermissions)
+			ShoppingItem item, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		resourceLocalService.addModelResources(
 			item.getCompanyId(), item.getGroupId(), item.getUserId(),
-			ShoppingItem.class.getName(), item.getItemId(), groupPermissions,
-			guestPermissions);
+			ShoppingItem.class.getName(), item.getItemId(), modelPermissions);
 	}
 
 	@Override
@@ -472,7 +463,6 @@ public class ShoppingItemLocalServiceImpl
 			mediumImageFile, mediumImageBytes, largeImage, largeImageURL,
 			largeImageFile, largeImageBytes, itemFields);
 
-		item.setModifiedDate(new Date());
 		item.setCategoryId(categoryId);
 		item.setSku(sku);
 		item.setName(name);
@@ -496,7 +486,7 @@ public class ShoppingItemLocalServiceImpl
 
 			if ((sale == null) && (itemPrice.getDiscount() > 0) &&
 				((itemPrice.getStatus() ==
-					 ShoppingItemPriceConstants.STATUS_ACTIVE_DEFAULT) ||
+					ShoppingItemPriceConstants.STATUS_ACTIVE_DEFAULT) ||
 				 (itemPrice.getStatus() ==
 					 ShoppingItemPriceConstants.STATUS_ACTIVE))) {
 
@@ -663,8 +653,8 @@ public class ShoppingItemLocalServiceImpl
 		}
 
 		if (!itemFields.isEmpty()) {
-			List<String> itemFieldNames = new ArrayList<String>();
-			List<String> duplicateItemFieldNames = new ArrayList<String>();
+			List<String> itemFieldNames = new ArrayList<>();
+			List<String> duplicateItemFieldNames = new ArrayList<>();
 
 			StringBundler sb = new StringBundler(itemFields.size());
 
@@ -721,7 +711,7 @@ public class ShoppingItemLocalServiceImpl
 			}
 
 			long smallImageMaxSize = PrefsPropsUtil.getLong(
-				PropsKeys.SHOPPING_IMAGE_MEDIUM_MAX_SIZE);
+				PropsKeys.SHOPPING_IMAGE_SMALL_MAX_SIZE);
 
 			if ((smallImageMaxSize > 0) &&
 				((smallImageBytes == null) ||

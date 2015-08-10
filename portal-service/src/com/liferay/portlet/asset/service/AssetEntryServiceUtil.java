@@ -40,6 +40,11 @@ public class AssetEntryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.asset.service.impl.AssetEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.portlet.asset.model.AssetEntry fetchEntry(
+		long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchEntry(entryId);
+	}
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -141,6 +146,31 @@ public class AssetEntryServiceUtil {
 			url, layoutUuid, height, width, priority, sync);
 	}
 
+	public static com.liferay.portlet.asset.model.AssetEntry updateEntry(
+		long groupId, java.util.Date createDate, java.util.Date modifiedDate,
+		java.lang.String className, long classPK, java.lang.String classUuid,
+		long classTypeId, long[] categoryIds, java.lang.String[] tagNames,
+		boolean visible, java.util.Date startDate, java.util.Date endDate,
+		java.util.Date expirationDate, java.lang.String mimeType,
+		java.lang.String title, java.lang.String description,
+		java.lang.String summary, java.lang.String url,
+		java.lang.String layoutUuid, int height, int width,
+		java.lang.Integer priority)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateEntry(groupId, createDate, modifiedDate, className,
+			classPK, classUuid, classTypeId, categoryIds, tagNames, visible,
+			startDate, endDate, expirationDate, mimeType, title, description,
+			summary, url, layoutUuid, height, width, priority);
+	}
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, Date,
+	Date, String, long, String, long, long[], String[], boolean,
+	Date, Date, Date, String, String, String, String, String,
+	String, int, int, Integer)}
+	*/
+	@Deprecated
 	public static com.liferay.portlet.asset.model.AssetEntry updateEntry(
 		long groupId, java.util.Date createDate, java.util.Date modifiedDate,
 		java.lang.String className, long classPK, java.lang.String classUuid,

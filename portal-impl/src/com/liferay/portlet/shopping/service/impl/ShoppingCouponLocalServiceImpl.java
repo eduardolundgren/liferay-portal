@@ -87,8 +87,6 @@ public class ShoppingCouponLocalServiceImpl
 			throw new CouponDateException();
 		}
 
-		Date now = new Date();
-
 		validate(
 			user.getCompanyId(), groupId, code, autoCode, name, description,
 			limitCategories, limitSkus, minOrder, discount);
@@ -101,8 +99,6 @@ public class ShoppingCouponLocalServiceImpl
 		coupon.setCompanyId(user.getCompanyId());
 		coupon.setUserId(user.getUserId());
 		coupon.setUserName(user.getFullName());
-		coupon.setCreateDate(now);
-		coupon.setModifiedDate(now);
 		coupon.setCode(code);
 		coupon.setName(name);
 		coupon.setDescription(description);
@@ -212,7 +208,6 @@ public class ShoppingCouponLocalServiceImpl
 			coupon.getCompanyId(), coupon.getGroupId(), name, description,
 			limitCategories, limitSkus, minOrder, discount);
 
-		coupon.setModifiedDate(new Date());
 		coupon.setName(name);
 		coupon.setDescription(description);
 		coupon.setStartDate(startDate);
@@ -281,7 +276,7 @@ public class ShoppingCouponLocalServiceImpl
 
 		// Category IDs
 
-		List<Long> categoryIds = new ArrayList<Long>();
+		List<Long> categoryIds = new ArrayList<>();
 
 		String[] categoryNames = StringUtil.split(limitCategories);
 
@@ -292,7 +287,7 @@ public class ShoppingCouponLocalServiceImpl
 			categoryIds.add(category.getCategoryId());
 		}
 
-		List<Long> invalidCategoryIds = new ArrayList<Long>();
+		List<Long> invalidCategoryIds = new ArrayList<>();
 
 		for (long categoryId : categoryIds) {
 			ShoppingCategory category =
@@ -316,7 +311,7 @@ public class ShoppingCouponLocalServiceImpl
 
 		String[] skus = StringUtil.split(limitSkus);
 
-		List<String> invalidSkus = new ArrayList<String>();
+		List<String> invalidSkus = new ArrayList<>();
 
 		for (String sku : skus) {
 			ShoppingItem item = shoppingItemPersistence.fetchByC_S(

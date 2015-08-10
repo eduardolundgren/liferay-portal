@@ -16,7 +16,7 @@ package com.liferay.portal.fabric.agent;
 
 import com.liferay.portal.fabric.local.agent.EmbeddedProcessExecutor;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +205,7 @@ public class FabricAgentRegistryTest {
 			_objects.clear();
 		}
 
-		private final List<Object> _objects = new ArrayList<Object>();
+		private final List<Object> _objects = new ArrayList<>();
 
 	}
 

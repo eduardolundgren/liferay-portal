@@ -44,12 +44,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
+import java.io.WriteAbortedException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -61,13 +65,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class LocalProcessExecutor implements ProcessExecutor {
 
-	public void destroy() {
+	public Set<Process> destroy() {
 		if (_threadPoolExecutor == null) {
-			return;
+			return Collections.emptySet();
 		}
+
+		Set<Process> processes = Collections.emptySet();
 
 		synchronized (this) {
 			if (_threadPoolExecutor != null) {
+				processes = new HashSet<>();
+
 				_threadPoolExecutor.shutdownNow();
 
 				// At this point, the thread pool will no longer take in any
@@ -77,13 +85,18 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				// destroy the same process, but this is JDK's job to ensure
 				// that processes are destroyed in a thread safe manner.
 
-				Collection<NoticeableFuture<?>> values =
-					_managedProcesses.values();
+				Set<Entry<Process, NoticeableFuture<?>>> set =
+					_managedProcesses.entrySet();
 
-				Iterator<NoticeableFuture<?>> iterator = values.iterator();
+				Iterator<Entry<Process, NoticeableFuture<?>>> iterator =
+					set.iterator();
 
 				while (iterator.hasNext()) {
-					NoticeableFuture<?> noticeableFuture = iterator.next();
+					Entry<Process, NoticeableFuture<?>> entry = iterator.next();
+
+					processes.add(entry.getKey());
+
+					NoticeableFuture<?> noticeableFuture = entry.getValue();
 
 					noticeableFuture.cancel(true);
 
@@ -100,6 +113,15 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				_threadPoolExecutor = null;
 			}
 		}
+
+		// Whip's instrument logic sees a label on a synchronized block exit and
+		// asks for coverage, but it does not understand that this is actually
+		// the same as exiting a method. To overcome this limitation, the code
+		// logic has to explicitly leave the synchronized block before leaving
+		// the method. This limitation will be removed in a future version of
+		// Whip.
+
+		return processes;
 	}
 
 	@Override
@@ -110,7 +132,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		try {
 			List<String> arguments = processConfig.getArguments();
 
-			List<String> commands = new ArrayList<String>(arguments.size() + 4);
+			List<String> commands = new ArrayList<>(arguments.size() + 4);
 
 			commands.add(processConfig.getJavaExecutable());
 			commands.add("-cp");
@@ -138,8 +160,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 			ThreadPoolExecutor threadPoolExecutor = _getThreadPoolExecutor();
 
-			AsyncBroker<Long, Serializable> asyncBroker =
-				new AsyncBroker<Long, Serializable>();
+			AsyncBroker<Long, Serializable> asyncBroker = new AsyncBroker<>();
 
 			SubprocessReactor subprocessReactor = new SubprocessReactor(
 				process, processConfig.getReactClassLoader(), asyncBroker);
@@ -197,7 +218,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 						};
 
-				return new LocalProcessChannel<T>(
+				return new LocalProcessChannel<>(
 					noticeableFuture, objectOutputStream, asyncBroker);
 			}
 			catch (RejectedExecutionException ree) {
@@ -237,7 +258,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		LocalProcessExecutor.class);
 
 	private final Map<Process, NoticeableFuture<?>> _managedProcesses =
-		new ConcurrentHashMap<Process, NoticeableFuture<?>>();
+		new ConcurrentHashMap<>();
 	private volatile ThreadPoolExecutor _threadPoolExecutor;
 
 	private class SubprocessReactor
@@ -304,8 +325,31 @@ public class LocalProcessExecutor implements ProcessExecutor {
 				}
 
 				while (true) {
+					Object obj = null;
+
+					try {
+						obj = objectInputStream.readObject();
+					}
+					catch (WriteAbortedException wae) {
+						if (_log.isWarnEnabled()) {
+							_log.warn("Caught a write aborted exception", wae);
+						}
+
+						continue;
+					}
+
+					if (!(obj instanceof ProcessCallable)) {
+						if (_log.isInfoEnabled()) {
+							_log.info(
+								"Received a nonprocess callable piping back " +
+									obj);
+						}
+
+						continue;
+					}
+
 					ProcessCallable<?> processCallable =
-						(ProcessCallable<?>)objectInputStream.readObject();
+						(ProcessCallable<?>)obj;
 
 					if ((processCallable instanceof ExceptionProcessCallable) ||
 						(processCallable instanceof ReturnProcessCallable<?>)) {

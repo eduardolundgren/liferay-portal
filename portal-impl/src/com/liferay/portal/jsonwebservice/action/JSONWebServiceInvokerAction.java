@@ -60,16 +60,18 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 	public JSONWebServiceInvokerAction(HttpServletRequest request) {
 		_request = request;
 
-		_command = request.getParameter(Constants.CMD);
+		String command = request.getParameter(Constants.CMD);
 
-		if (_command == null) {
+		if (command == null) {
 			try {
-				_command = ServletUtil.readRequestBody(request);
+				command = ServletUtil.readRequestBody(request);
 			}
 			catch (IOException ioe) {
 				throw new IllegalArgumentException(ioe);
 			}
 		}
+
+		_command = command;
 	}
 
 	@Override
@@ -91,7 +93,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 			batchMode = true;
 		}
 		else if (command instanceof Map) {
-			list = new ArrayList<Object>(1);
+			list = new ArrayList<>(1);
 
 			list.add(command);
 
@@ -181,7 +183,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 
 	private void _addInclude(Statement statement, String name) {
 		if (_includes == null) {
-			_includes = new ArrayList<String>();
+			_includes = new ArrayList<>();
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -239,7 +241,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 		if (innerObject instanceof List) {
 			List<Object> innerList = (List<Object>)innerObject;
 
-			List<Object> newInnerList = new ArrayList<Object>(innerList.size());
+			List<Object> newInnerList = new ArrayList<>(innerList.size());
 
 			for (Object innerListElement : innerList) {
 				Map<String, Object> newInnerListElement = _convertObjectToMap(
@@ -298,7 +300,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 		}
 
 		if (object instanceof Iterable) {
-			List<Object> list = new ArrayList<Object>();
+			List<Object> list = new ArrayList<>();
 
 			Iterable<?> iterable = (Iterable<?>)object;
 
@@ -323,7 +325,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 			return ListUtil.toList((Object[])object);
 		}
 
-		List<Object> list = new ArrayList<Object>();
+		List<Object> list = new ArrayList<>();
 
 		for (int i = 0; i < Array.getLength(object); i++) {
 			list.add(Array.get(object, i));
@@ -457,8 +459,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 
 		Map<String, Object> map = _convertObjectToMap(statement, result, null);
 
-		Map<String, Object> whitelistMap = new HashMap<String, Object>(
-			whitelist.length);
+		Map<String, Object> whitelistMap = new HashMap<>(whitelist.length);
 
 		for (String key : whitelist) {
 			Object value = map.get(key);
@@ -507,7 +508,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 			statement.setMethod(assignment.substring(x + 1).trim());
 		}
 
-		HashMap<String, Object> parameterMap = new HashMap<String, Object>(
+		HashMap<String, Object> parameterMap = new HashMap<>(
 			statementBody.size());
 
 		statement.setParameterMap(parameterMap);
@@ -519,7 +520,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 				List<Flag> flags = statement.getFlags();
 
 				if (flags == null) {
-					flags = new ArrayList<Flag>();
+					flags = new ArrayList<>();
 
 					statement.setFlags(flags);
 				}
@@ -539,7 +540,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 					statement.getVariableStatements();
 
 				if (variableStatements == null) {
-					variableStatements = new ArrayList<Statement>();
+					variableStatements = new ArrayList<>();
 
 					statement.setVariableStatements(variableStatements);
 				}
@@ -650,12 +651,12 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 		}
 	}
 
-	private static JsonSerializer _jsonSerializer = new JsonSerializer();
+	private static final JsonSerializer _jsonSerializer = new JsonSerializer();
 
-	private String _command;
+	private final String _command;
 	private List<String> _includes;
-	private HttpServletRequest _request;
-	private List<Statement> _statements = new ArrayList<Statement>();
+	private final HttpServletRequest _request;
+	private final List<Statement> _statements = new ArrayList<>();
 
 	private class Flag extends NameValue<String, String> {
 	}

@@ -16,6 +16,7 @@ package com.liferay.portal.servlet;
 
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.PortalMessages;
@@ -188,7 +189,11 @@ public class FriendlyURLServlet extends HttpServlet {
 			requestURI = requestURI.substring(0, pos);
 		}
 
-		return requestURI.substring(_friendlyURLPathPrefix.length());
+		String pathProxy = PortalUtil.getPathProxy();
+
+		pos = _friendlyURLPathPrefix.length() - pathProxy.length();
+
+		return requestURI.substring(pos);
 	}
 
 	protected Object[] getRedirect(
@@ -288,7 +293,7 @@ public class FriendlyURLServlet extends HttpServlet {
 				WebKeys.REDIRECT_TO_DEFAULT_LAYOUT, Boolean.TRUE);
 		}
 
-		Map<String, Object> requestContext = new HashMap<String, Object>();
+		Map<String, Object> requestContext = new HashMap<>();
 
 		requestContext.put("request", request);
 
@@ -325,7 +330,9 @@ public class FriendlyURLServlet extends HttpServlet {
 
 					Locale locale = PortalUtil.getLocale(request);
 
-					if (!StringUtil.equalsIgnoreCase(
+					if (LanguageUtil.isAvailableLocale(
+							group.getGroupId(), locale) &&
+						!StringUtil.equalsIgnoreCase(
 							layoutFriendlyURLCompositeFriendlyURL,
 							layout.getFriendlyURL(locale))) {
 

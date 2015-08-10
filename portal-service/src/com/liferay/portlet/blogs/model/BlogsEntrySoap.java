@@ -51,12 +51,14 @@ public class BlogsEntrySoap implements Serializable {
 		soapModel.setAllowPingbacks(model.getAllowPingbacks());
 		soapModel.setAllowTrackbacks(model.getAllowTrackbacks());
 		soapModel.setTrackbacks(model.getTrackbacks());
+		soapModel.setCoverImageCaption(model.getCoverImageCaption());
 		soapModel.setCoverImageFileEntryId(model.getCoverImageFileEntryId());
 		soapModel.setCoverImageURL(model.getCoverImageURL());
 		soapModel.setSmallImage(model.getSmallImage());
 		soapModel.setSmallImageFileEntryId(model.getSmallImageFileEntryId());
 		soapModel.setSmallImageId(model.getSmallImageId());
 		soapModel.setSmallImageURL(model.getSmallImageURL());
+		soapModel.setLastPublishDate(model.getLastPublishDate());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
 		soapModel.setStatusByUserName(model.getStatusByUserName());
@@ -257,6 +259,14 @@ public class BlogsEntrySoap implements Serializable {
 		_trackbacks = trackbacks;
 	}
 
+	public String getCoverImageCaption() {
+		return _coverImageCaption;
+	}
+
+	public void setCoverImageCaption(String coverImageCaption) {
+		_coverImageCaption = coverImageCaption;
+	}
+
 	public long getCoverImageFileEntryId() {
 		return _coverImageFileEntryId;
 	}
@@ -309,6 +319,14 @@ public class BlogsEntrySoap implements Serializable {
 		_smallImageURL = smallImageURL;
 	}
 
+	public Date getLastPublishDate() {
+		return _lastPublishDate;
+	}
+
+	public void setLastPublishDate(Date lastPublishDate) {
+		_lastPublishDate = lastPublishDate;
+	}
+
 	public int getStatus() {
 		return _status;
 	}
@@ -358,12 +376,14 @@ public class BlogsEntrySoap implements Serializable {
 	private boolean _allowPingbacks;
 	private boolean _allowTrackbacks;
 	private String _trackbacks;
+	private String _coverImageCaption;
 	private long _coverImageFileEntryId;
 	private String _coverImageURL;
 	private boolean _smallImage;
 	private long _smallImageFileEntryId;
 	private long _smallImageId;
 	private String _smallImageURL;
+	private Date _lastPublishDate;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;

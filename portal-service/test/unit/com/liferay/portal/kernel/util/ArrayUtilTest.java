@@ -123,18 +123,18 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testContainsByteArray() throws Exception {
-		byte[] array1 = {2, 3};
+		byte[] array = {2, 3};
 
-		Assert.assertFalse(ArrayUtil.contains(array1, (byte)1));
-		Assert.assertTrue(ArrayUtil.contains(array1, (byte)2));
+		Assert.assertFalse(ArrayUtil.contains(array, (byte)1));
+		Assert.assertTrue(ArrayUtil.contains(array, (byte)2));
 	}
 
 	@Test
 	public void testContainsCharArray() throws Exception {
-		char[] array1 = {'b', 'c'};
+		char[] array = {'a', 'b'};
 
-		Assert.assertFalse(ArrayUtil.contains(array1, 'a'));
-		Assert.assertTrue(ArrayUtil.contains(array1, 'b'));
+		Assert.assertFalse(ArrayUtil.contains(array, 'C'));
+		Assert.assertTrue(ArrayUtil.contains(array, 'a'));
 	}
 
 	@Test
@@ -175,6 +175,17 @@ public class ArrayUtilTest {
 
 		Assert.assertFalse(ArrayUtil.contains(array, (short)1));
 		Assert.assertTrue(ArrayUtil.contains(array, (short)2));
+	}
+
+	@Test
+	public void testContainsStringArray() throws Exception {
+		String[] array = {"a", "b"};
+
+		Assert.assertFalse(ArrayUtil.contains(array, "c", true));
+		Assert.assertFalse(ArrayUtil.contains(array, "C", false));
+		Assert.assertTrue(ArrayUtil.contains(array, "a", true));
+		Assert.assertTrue(ArrayUtil.contains(array, "a", false));
+		Assert.assertTrue(ArrayUtil.contains(array, "A", true));
 	}
 
 	@Test
@@ -460,6 +471,249 @@ public class ArrayUtilTest {
 	}
 
 	@Test
+	public void testRemoveFromBooleanArray() {
+		boolean[] array = {true, true, false};
+
+		array = ArrayUtil.remove(array, false);
+
+		Assert.assertArrayEquals(new boolean[] {true, true}, array);
+	}
+
+	@Test
+	public void testRemoveFromBooleanEmptyArray() {
+		boolean[] array = {};
+
+		array = ArrayUtil.remove(array, false);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromBooleanNullArray() {
+		boolean[] array = null;
+
+		array = ArrayUtil.remove(array, false);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromByteArray() {
+		byte[] array = {1, 2, 3};
+
+		array = ArrayUtil.remove(array, (byte)3);
+
+		Assert.assertArrayEquals(new byte[] {1, 2}, array);
+	}
+
+	@Test
+	public void testRemoveFromByteEmptyArray() {
+		byte[] array = {};
+
+		array = ArrayUtil.remove(array, (byte)3);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromByteNullArray() {
+		byte[] array = null;
+
+		array = ArrayUtil.remove(array, (byte)3);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromCharArray() {
+		char[] array = {'a', 'b', 'c'};
+
+		array = ArrayUtil.remove(array, 'c');
+
+		Assert.assertArrayEquals(new char[] {'a', 'b'}, array);
+	}
+
+	@Test
+	public void testRemoveFromCharEmptyArray() {
+		char[] array = {};
+
+		array = ArrayUtil.remove(array, 'c');
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromCharNullArray() {
+		char[] array = null;
+
+		array = ArrayUtil.remove(array, 'c');
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromDoubleArray() {
+		double[] array = {1.0D, 2.0D, 3.0D};
+
+		array = ArrayUtil.remove(array, 3.0D);
+
+		Assert.assertArrayEquals(new double[] {1.0D, 2.0D}, array, 0);
+	}
+
+	@Test
+	public void testRemoveFromDoubleEmptyArray() {
+		double[] array = {};
+
+		array = ArrayUtil.remove(array, 3.0D);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromDoubleNullArray() {
+		double[] array = null;
+
+		array = ArrayUtil.remove(array, 3.0D);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromFloatArray() {
+		float[] array = {1.5f, 2.5f, 3.5f};
+
+		array = ArrayUtil.remove(array, 3.5f);
+
+		Assert.assertArrayEquals(new float[] {1.5f, 2.5f}, array, 0);
+	}
+
+	@Test
+	public void testRemoveFromFloatEmptyArray() {
+		float[] array = {};
+
+		array = ArrayUtil.remove(array, 3.5f);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromFloatNullArray() {
+		float[] array = null;
+
+		array = ArrayUtil.remove(array, 3.5f);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromIntArray() {
+		int[] array = {1, 2, 3};
+
+		array = ArrayUtil.remove(array, (byte)3);
+
+		Assert.assertArrayEquals(new int[] {1, 2}, array);
+	}
+
+	@Test
+	public void testRemoveFromIntEmptyArray() {
+		int[] array = {};
+
+		array = ArrayUtil.remove(array, (byte)3);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromIntNullArray() {
+		int[] array = null;
+
+		array = ArrayUtil.remove(array, (byte)3);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromLongArray() {
+		long[] array = {1L, 2L, 3L};
+
+		array = ArrayUtil.remove(array, 3L);
+
+		Assert.assertArrayEquals(new long[] {1L, 2L}, array);
+	}
+
+	@Test
+	public void testRemoveFromLongEmptyArray() {
+		long[] array = {};
+
+		array = ArrayUtil.remove(array, 3L);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromLongNullArray() {
+		long[] array = null;
+
+		array = ArrayUtil.remove(array, 3L);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromShortArray() {
+		short[] array = {1, 2, 3};
+
+		array = ArrayUtil.remove(array, (short)3);
+
+		Assert.assertArrayEquals(new short[] {1, 2}, array);
+	}
+
+	@Test
+	public void testRemoveFromShortEmptyArray() {
+		short[] array = {};
+
+		array = ArrayUtil.remove(array, (short)3);
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromShortNullArray() {
+		short[] array = null;
+
+		array = ArrayUtil.remove(array, (short)3);
+
+		Assert.assertNull(array);
+	}
+
+	@Test
+	public void testRemoveFromStringArray() {
+		String[] array = {"a", "b", "c"};
+
+		array = ArrayUtil.remove(array, "c");
+
+		Assert.assertArrayEquals(new String[] {"a", "b"}, array);
+	}
+
+	@Test
+	public void testRemoveFromStringEmptyArray() {
+		String[] array = {};
+
+		array = ArrayUtil.remove(array, "c");
+
+		Assert.assertTrue(ArrayUtil.isEmpty(array));
+	}
+
+	@Test
+	public void testRemoveFromStringNullArray() {
+		String[] array = null;
+
+		array = ArrayUtil.remove(array, "c");
+
+		Assert.assertNull(array);
+	}
+
+	@Test
 	public void testReverseBooleanArray() throws Exception {
 		boolean[] array = new boolean[] {true, true, false};
 
@@ -526,7 +780,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testToDoubleArray() throws Exception {
-		List<Double> list = new ArrayList<Double>();
+		List<Double> list = new ArrayList<>();
 
 		list.add(1.0);
 		list.add(2.0);
@@ -544,7 +798,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testToFloatArray() throws Exception {
-		List<Float> list = new ArrayList<Float>();
+		List<Float> list = new ArrayList<>();
 
 		list.add(1.0F);
 		list.add(2.0F);
@@ -562,7 +816,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testToIntArray() throws Exception {
-		List<Integer> list = new ArrayList<Integer>();
+		List<Integer> list = new ArrayList<>();
 
 		list.add(1);
 		list.add(2);
@@ -580,7 +834,7 @@ public class ArrayUtilTest {
 
 	@Test
 	public void testToLongArray() throws Exception {
-		List<Long> list = new ArrayList<Long>();
+		List<Long> list = new ArrayList<>();
 
 		list.add(1L);
 		list.add(2L);
@@ -596,7 +850,7 @@ public class ArrayUtilTest {
 		}
 	}
 
-	private PredicateFilter<Double> _doublePredicateFilter =
+	private final PredicateFilter<Double> _doublePredicateFilter =
 		new PredicateFilter<Double>() {
 
 			@Override
@@ -606,7 +860,7 @@ public class ArrayUtilTest {
 
 		};
 
-	private PredicateFilter<Integer> _integerPredicateFilter =
+	private final PredicateFilter<Integer> _integerPredicateFilter =
 		new PredicateFilter<Integer>() {
 
 			@Override
@@ -616,7 +870,7 @@ public class ArrayUtilTest {
 
 		};
 
-	private PredicateFilter<User> _userPredicateFilter =
+	private final PredicateFilter<User> _userPredicateFilter =
 		new PredicateFilter<User>() {
 
 			@Override
@@ -641,8 +895,8 @@ public class ArrayUtilTest {
 			return _name;
 		}
 
-		private int _age;
-		private String _name;
+		private final int _age;
+		private final String _name;
 
 	}
 

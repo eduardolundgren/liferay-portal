@@ -14,31 +14,43 @@
 
 package com.liferay.sync.engine.model;
 
+import com.barbarysoftware.watchservice.ExtendedWatchEventKind;
+import com.barbarysoftware.watchservice.StandardWatchEventKind;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import com.liferay.sync.engine.service.persistence.BasePersistenceImpl;
 
-import java.nio.file.StandardWatchEventKinds;
-
 /**
  * @author Michael Young
  */
 @DatabaseTable(
-	daoClass = BasePersistenceImpl.class, tableName = "SyncWatchEvent")
+	daoClass = BasePersistenceImpl.class, tableName = "SyncWatchEvent"
+)
 public class SyncWatchEvent extends BaseModel {
 
 	public static final String EVENT_TYPE_CREATE =
-		StandardWatchEventKinds.ENTRY_CREATE.name();
+		StandardWatchEventKind.ENTRY_CREATE.name();
 
 	public static final String EVENT_TYPE_DELETE =
-		StandardWatchEventKinds.ENTRY_DELETE.name();
+		StandardWatchEventKind.ENTRY_DELETE.name();
 
 	public static final String EVENT_TYPE_MODIFY =
-		StandardWatchEventKinds.ENTRY_MODIFY.name();
+		StandardWatchEventKind.ENTRY_MODIFY.name();
+
+	public static final String EVENT_TYPE_MOVE = "ENTRY_MOVE";
 
 	public static final String EVENT_TYPE_OVERFLOW =
-		StandardWatchEventKinds.OVERFLOW.name();
+		StandardWatchEventKind.OVERFLOW.name();
+
+	public static final String EVENT_TYPE_RENAME = "ENTRY_RENAME";
+
+	public static final String EVENT_TYPE_RENAME_FROM =
+		ExtendedWatchEventKind.ENTRY_RENAME_FROM.name();
+
+	public static final String EVENT_TYPE_RENAME_TO =
+		ExtendedWatchEventKind.ENTRY_RENAME_TO.name();
 
 	public String getEventType() {
 		return eventType;
@@ -50,6 +62,10 @@ public class SyncWatchEvent extends BaseModel {
 
 	public String getFileType() {
 		return fileType;
+	}
+
+	public String getPreviousFilePathName() {
+		return previousFilePathName;
 	}
 
 	public long getSyncAccountId() {
@@ -76,6 +92,10 @@ public class SyncWatchEvent extends BaseModel {
 		this.fileType = fileType;
 	}
 
+	public void setPreviousFilePathName(String previousFilePathName) {
+		this.previousFilePathName = previousFilePathName;
+	}
+
 	public void setSyncAccountId(long syncAccountId) {
 		this.syncAccountId = syncAccountId;
 	}
@@ -96,6 +116,9 @@ public class SyncWatchEvent extends BaseModel {
 
 	@DatabaseField(useGetSet = true)
 	protected String fileType;
+
+	@DatabaseField(useGetSet = true, width = 16777216)
+	protected String previousFilePathName;
 
 	@DatabaseField(useGetSet = true)
 	protected long syncAccountId;

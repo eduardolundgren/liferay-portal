@@ -680,6 +680,29 @@ public class ArrayUtil {
 		return false;
 	}
 
+	public static boolean contains(
+		String[] array, String value, boolean ignoreCase) {
+
+		if (isEmpty(array)) {
+			return false;
+		}
+
+		for (int i = 0; i < array.length; i++) {
+			if (ignoreCase) {
+				if (StringUtil.equalsIgnoreCase(array[i], value )) {
+					return true;
+				}
+			}
+			else {
+				if (array[i].equals(value)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public static boolean containsAll(boolean[] array1, boolean[] array2) {
 		if (isEmpty(array1) || isEmpty(array2)) {
 			return false;
@@ -836,10 +859,10 @@ public class ArrayUtil {
 		Set<String> set = null;
 
 		if (comparator == null) {
-			set = new TreeSet<String>();
+			set = new TreeSet<>();
 		}
 		else {
-			set = new TreeSet<String>(comparator);
+			set = new TreeSet<>(comparator);
 		}
 
 		for (String s : array) {
@@ -872,7 +895,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Boolean> filteredList = new ArrayList<Boolean>();
+		List<Boolean> filteredList = new ArrayList<>();
 
 		for (boolean b : array) {
 			if (predicateFilter.filter(b)) {
@@ -890,7 +913,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Byte> filteredList = new ArrayList<Byte>();
+		List<Byte> filteredList = new ArrayList<>();
 
 		for (byte b : array) {
 			if (predicateFilter.filter(b)) {
@@ -908,7 +931,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Character> filteredList = new ArrayList<Character>();
+		List<Character> filteredList = new ArrayList<>();
 
 		for (char c : array) {
 			if (predicateFilter.filter(c)) {
@@ -927,7 +950,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Double> filteredList = new ArrayList<Double>();
+		List<Double> filteredList = new ArrayList<>();
 
 		for (double d : array) {
 			if (predicateFilter.filter(d)) {
@@ -945,7 +968,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Float> filteredList = new ArrayList<Float>();
+		List<Float> filteredList = new ArrayList<>();
 
 		for (float f : array) {
 			if (predicateFilter.filter(f)) {
@@ -963,7 +986,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Integer> filteredList = new ArrayList<Integer>();
+		List<Integer> filteredList = new ArrayList<>();
 
 		for (int i : array) {
 			if (predicateFilter.filter(i)) {
@@ -981,7 +1004,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Long> filteredList = new ArrayList<Long>();
+		List<Long> filteredList = new ArrayList<>();
 
 		for (long l : array) {
 			if (predicateFilter.filter(l)) {
@@ -999,7 +1022,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Short> filteredList = new ArrayList<Short>();
+		List<Short> filteredList = new ArrayList<>();
 
 		for (short s : array) {
 			if (predicateFilter.filter(s)) {
@@ -1017,7 +1040,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<T> filteredList = new ArrayList<T>();
+		List<T> filteredList = new ArrayList<>();
 
 		for (T t : array) {
 			if (filterPredicate.filter(t)) {
@@ -1162,11 +1185,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Boolean> list = new ArrayList<Boolean>();
+		List<Boolean> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Boolean(array[i]));
+				list.add(array[i]);
 			}
 		}
 
@@ -1178,11 +1201,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Byte> list = new ArrayList<Byte>();
+		List<Byte> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Byte(array[i]));
+				list.add(Byte.valueOf(array[i]));
 			}
 		}
 
@@ -1194,11 +1217,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Character> list = new ArrayList<Character>();
+		List<Character> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Character(array[i]));
+				list.add(Character.valueOf(array[i]));
 			}
 		}
 
@@ -1210,11 +1233,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Double> list = new ArrayList<Double>();
+		List<Double> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Double(array[i]));
+				list.add(Double.valueOf(array[i]));
 			}
 		}
 
@@ -1226,11 +1249,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Float> list = new ArrayList<Float>();
+		List<Float> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Float(array[i]));
+				list.add(Float.valueOf(array[i]));
 			}
 		}
 
@@ -1242,11 +1265,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Integer> list = new ArrayList<Integer>();
+		List<Integer> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Integer(array[i]));
+				list.add(Integer.valueOf(array[i]));
 			}
 		}
 
@@ -1258,11 +1281,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Long> list = new ArrayList<Long>();
+		List<Long> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Long(array[i]));
+				list.add(Long.valueOf(array[i]));
 			}
 		}
 
@@ -1274,11 +1297,11 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Short> list = new ArrayList<Short>();
+		List<Short> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Short(array[i]));
+				list.add(Short.valueOf(array[i]));
 			}
 		}
 
@@ -1290,7 +1313,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		for (String s : array) {
 			if (!s.equals(value)) {
@@ -1302,7 +1325,7 @@ public class ArrayUtil {
 	}
 
 	public static String[] removeByPrefix(String[] array, String prefix) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		for (String s : array) {
 			if (!s.startsWith(prefix)) {
@@ -1575,7 +1598,7 @@ public class ArrayUtil {
 		Double[] newArray = new Double[array.length];
 
 		for (int i = 0; i < array.length; i++) {
-			newArray[i] = new Double(array[i]);
+			newArray[i] = Double.valueOf(array[i]);
 		}
 
 		return newArray;
@@ -1595,7 +1618,7 @@ public class ArrayUtil {
 		Float[] newArray = new Float[array.length];
 
 		for (int i = 0; i < array.length; i++) {
-			newArray[i] = new Float(array[i]);
+			newArray[i] = Float.valueOf(array[i]);
 		}
 
 		return newArray;
@@ -1615,7 +1638,7 @@ public class ArrayUtil {
 		Integer[] newArray = new Integer[array.length];
 
 		for (int i = 0; i < array.length; i++) {
-			newArray[i] = new Integer(array[i]);
+			newArray[i] = Integer.valueOf(array[i]);
 		}
 
 		return newArray;
@@ -1635,7 +1658,7 @@ public class ArrayUtil {
 		Long[] newArray = new Long[array.length];
 
 		for (int i = 0; i < array.length; i++) {
-			newArray[i] = new Long(array[i]);
+			newArray[i] = Long.valueOf(array[i]);
 		}
 
 		return newArray;
@@ -1655,7 +1678,7 @@ public class ArrayUtil {
 		Short[] newArray = new Short[array.length];
 
 		for (int i = 0; i < array.length; i++) {
-			newArray[i] = new Short(array[i]);
+			newArray[i] = Short.valueOf(array[i]);
 		}
 
 		return newArray;
@@ -1666,6 +1689,16 @@ public class ArrayUtil {
 
 		for (int i = 0; i < array.length; i++) {
 			newArray[i] = array[i].shortValue();
+		}
+
+		return newArray;
+	}
+
+	public static String[] toArray(String[] array) {
+		String[] newArray = new String[array.length];
+
+		for (int i = 0; i < array.length; i++) {
+			newArray[i] = array[i].toString();
 		}
 
 		return newArray;
@@ -2083,7 +2116,7 @@ public class ArrayUtil {
 	}
 
 	public static byte[] unique(byte[] array) {
-		Set<Byte> set = new LinkedHashSet<Byte>();
+		Set<Byte> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2093,7 +2126,7 @@ public class ArrayUtil {
 	}
 
 	public static double[] unique(double[] array) {
-		Set<Double> set = new LinkedHashSet<Double>();
+		Set<Double> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2103,7 +2136,7 @@ public class ArrayUtil {
 	}
 
 	public static float[] unique(float[] array) {
-		Set<Float> set = new LinkedHashSet<Float>();
+		Set<Float> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2113,7 +2146,7 @@ public class ArrayUtil {
 	}
 
 	public static int[] unique(int[] array) {
-		Set<Integer> set = new LinkedHashSet<Integer>();
+		Set<Integer> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2123,7 +2156,7 @@ public class ArrayUtil {
 	}
 
 	public static long[] unique(long[] array) {
-		Set<Long> set = new LinkedHashSet<Long>();
+		Set<Long> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2133,13 +2166,23 @@ public class ArrayUtil {
 	}
 
 	public static short[] unique(short[] array) {
-		Set<Short> set = new LinkedHashSet<Short>();
+		Set<Short> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
 		}
 
 		return toArray(set.toArray(new Short[set.size()]));
+	}
+
+	public static String[] unique(String[] array) {
+		Set<String> set = new LinkedHashSet<>();
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return toArray(set.toArray(new String[set.size()]));
 	}
 
 }

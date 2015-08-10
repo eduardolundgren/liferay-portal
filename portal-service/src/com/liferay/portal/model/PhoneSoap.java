@@ -48,6 +48,7 @@ public class PhoneSoap implements Serializable {
 		soapModel.setExtension(model.getExtension());
 		soapModel.setTypeId(model.getTypeId());
 		soapModel.setPrimary(model.getPrimary());
+		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
 	}
@@ -196,11 +197,11 @@ public class PhoneSoap implements Serializable {
 		_extension = extension;
 	}
 
-	public int getTypeId() {
+	public long getTypeId() {
 		return _typeId;
 	}
 
-	public void setTypeId(int typeId) {
+	public void setTypeId(long typeId) {
 		_typeId = typeId;
 	}
 
@@ -216,6 +217,14 @@ public class PhoneSoap implements Serializable {
 		_primary = primary;
 	}
 
+	public Date getLastPublishDate() {
+		return _lastPublishDate;
+	}
+
+	public void setLastPublishDate(Date lastPublishDate) {
+		_lastPublishDate = lastPublishDate;
+	}
+
 	private long _mvccVersion;
 	private String _uuid;
 	private long _phoneId;
@@ -228,6 +237,7 @@ public class PhoneSoap implements Serializable {
 	private long _classPK;
 	private String _number;
 	private String _extension;
-	private int _typeId;
+	private long _typeId;
 	private boolean _primary;
+	private Date _lastPublishDate;
 }

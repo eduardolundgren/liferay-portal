@@ -1,0 +1,53 @@
+.portlet-blogs {
+	.entry-subtitle {
+		margin-bottom: 20px;
+
+		h4 {
+			line-height: 30px;
+		}
+	}
+
+	.entry-body {
+		position: relative;
+
+		h1 {
+			font-weight: bold;
+		}
+
+		p {
+			margin-bottom: 30px;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		img {
+			max-width: 100%;
+		}
+
+		.cover-image-container {
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+			height: 400px;
+		}
+
+		.cover-image-caption {
+			color: #868896;
+			text-align: right;
+		}
+
+		.uploading-image-container {
+			display: inline-block;
+
+			.progressbar {
+				height: 20px;
+			}
+		}
+
+		.uploading-image {
+			opacity: 0.4;
+		}
+	}
+}

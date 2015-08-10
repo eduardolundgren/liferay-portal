@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.util.ProxyFactory;
 
 import java.util.List;
 
@@ -34,6 +35,14 @@ public class SortFactoryUtil {
 
 	public static Sort[] getDefaultSorts() {
 		return getSortFactory().getDefaultSorts();
+	}
+
+	public static Sort getSort(
+		Class<?> clazz, int type, String orderByCol, boolean inferSortField,
+		String orderByType) {
+
+		return getSortFactory().getSort(
+			clazz, type, orderByCol, inferSortField, orderByType);
 	}
 
 	public static Sort getSort(
@@ -58,12 +67,7 @@ public class SortFactoryUtil {
 		return getSortFactory().toArray(sorts);
 	}
 
-	public void setSortFactory(SortFactory sortFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_sortFactory = sortFactory;
-	}
-
-	private static SortFactory _sortFactory;
+	private static final SortFactory _sortFactory =
+		ProxyFactory.newServiceTrackedInstance(SortFactory.class);
 
 }

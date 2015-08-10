@@ -15,6 +15,8 @@
 package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.ModelHintsConstants;
@@ -22,6 +24,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class InputLocalizedTag extends IncludeTag {
 
-	public Locale[] getAvailableLocales() {
+	public Set<Locale> getAvailableLocales() {
 		return _availableLocales;
 	}
 
@@ -42,7 +45,7 @@ public class InputLocalizedTag extends IncludeTag {
 		_autoSize = autoSize;
 	}
 
-	public void setAvailableLocales(Locale[] availableLocales) {
+	public void setAvailableLocales(Set<Locale> availableLocales) {
 		_availableLocales = availableLocales;
 	}
 
@@ -60,6 +63,10 @@ public class InputLocalizedTag extends IncludeTag {
 
 	public void setDisplayWidth(String displayWidth) {
 		_displayWidth = displayWidth;
+	}
+
+	public void setEditorName(String editorName) {
+		_editorName = editorName;
 	}
 
 	public void setFieldPrefix(String fieldPrefix) {
@@ -113,6 +120,7 @@ public class InputLocalizedTag extends IncludeTag {
 		_cssClass = null;
 		_disabled = false;
 		_displayWidth = ModelHintsConstants.TEXT_DISPLAY_WIDTH;
+		_editorName = _EDITOR_WYSIWYG_DEFAULT;
 		_fieldPrefix = null;
 		_fieldPrefixSeparator = null;
 		_formName = null;
@@ -133,7 +141,7 @@ public class InputLocalizedTag extends IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		Locale[] availableLocales = _availableLocales;
+		Set<Locale> availableLocales = _availableLocales;
 
 		if (availableLocales == null) {
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -172,6 +180,8 @@ public class InputLocalizedTag extends IncludeTag {
 			"liferay-ui:input-localized:dynamicAttributes",
 			getDynamicAttributes());
 		request.setAttribute(
+			"liferay-ui:input-localized:editorName", _editorName);
+		request.setAttribute(
 			"liferay-ui:input-localized:fieldPrefix", _fieldPrefix);
 		request.setAttribute(
 			"liferay-ui:input-localized:fieldPrefixSeparator",
@@ -192,16 +202,20 @@ public class InputLocalizedTag extends IncludeTag {
 		request.setAttribute("liferay-ui:input-localized:xml", _xml);
 	}
 
+	private static final String _EDITOR_WYSIWYG_DEFAULT = PropsUtil.get(
+		PropsKeys.EDITOR_WYSIWYG_DEFAULT);
+
 	private static final String _PAGE =
 		"/html/taglib/ui/input_localized/page.jsp";
 
 	private boolean _autoFocus;
 	private boolean _autoSize;
-	private Locale[] _availableLocales;
+	private Set<Locale> _availableLocales;
 	private String _cssClass;
 	private String _defaultLanguageId;
 	private boolean _disabled;
 	private String _displayWidth = ModelHintsConstants.TEXT_DISPLAY_WIDTH;
+	private String _editorName = _EDITOR_WYSIWYG_DEFAULT;
 	private String _fieldPrefix;
 	private String _fieldPrefixSeparator;
 	private String _formName;

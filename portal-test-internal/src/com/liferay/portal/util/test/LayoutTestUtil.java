@@ -15,6 +15,11 @@
 package com.liferay.portal.util.test;
 
 import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
+import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -34,8 +39,6 @@ import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.randomizerbumpers.FriendlyURLRandomizerBumper;
-import com.liferay.portal.test.randomizerbumpers.NumericStringRandomizerBumper;
-import com.liferay.portal.test.randomizerbumpers.UniqueStringRandomizerBumper;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 
 import java.util.HashMap;
@@ -186,7 +189,7 @@ public class LayoutTestUtil {
 	public static LayoutPrototype addLayoutPrototype(String name)
 		throws Exception {
 
-		HashMap<Locale, String> nameMap = new HashMap<Locale, String>();
+		HashMap<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), name);
 
@@ -199,7 +202,7 @@ public class LayoutTestUtil {
 	public static LayoutSetPrototype addLayoutSetPrototype(String name)
 		throws Exception {
 
-		HashMap<Locale, String> nameMap = new HashMap<Locale, String>();
+		HashMap<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), name);
 
@@ -266,23 +269,6 @@ public class LayoutTestUtil {
 		portletPreferences.store();
 
 		return newPortletId;
-	}
-
-	public static Layout addTypeArticleLayout(long groupId, String articleId)
-		throws Exception {
-
-		Layout layout = addLayout(groupId, false);
-
-		UnicodeProperties typeSettingsProperties =
-			layout.getTypeSettingsProperties();
-
-		typeSettingsProperties.setProperty("article-id", articleId);
-
-		layout.setType(LayoutConstants.TYPE_ARTICLE);
-
-		LayoutLocalServiceUtil.updateLayout(layout);
-
-		return layout;
 	}
 
 	public static Layout addTypeLinkToLayoutLayout(

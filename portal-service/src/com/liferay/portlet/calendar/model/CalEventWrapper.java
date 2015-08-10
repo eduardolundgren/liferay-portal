@@ -16,7 +16,6 @@ package com.liferay.portlet.calendar.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
 
@@ -31,8 +30,10 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see CalEvent
+ * @deprecated As of 7.0.0, with no direct replacement
  * @generated
  */
+@Deprecated
 @ProviderType
 public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	public CalEventWrapper(CalEvent calEvent) {
@@ -257,7 +258,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @return the create date of this cal event
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _calEvent.getCreateDate();
 	}
 
@@ -297,7 +298,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @return the end date of this cal event
 	*/
 	@Override
-	public java.util.Date getEndDate() {
+	public Date getEndDate() {
 		return _calEvent.getEndDate();
 	}
 
@@ -352,7 +353,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @return the modified date of this cal event
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _calEvent.getModifiedDate();
 	}
 
@@ -422,7 +423,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @return the start date of this cal event
 	*/
 	@Override
-	public java.util.Date getStartDate() {
+	public Date getStartDate() {
 		return _calEvent.getStartDate();
 	}
 
@@ -582,7 +583,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @param createDate the create date of this cal event
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_calEvent.setCreateDate(createDate);
 	}
 
@@ -622,7 +623,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @param endDate the end date of this cal event
 	*/
 	@Override
-	public void setEndDate(java.util.Date endDate) {
+	public void setEndDate(Date endDate) {
 		_calEvent.setEndDate(endDate);
 	}
 
@@ -690,7 +691,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @param modifiedDate the modified date of this cal event
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_calEvent.setModifiedDate(modifiedDate);
 	}
 
@@ -766,7 +767,7 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 	* @param startDate the start date of this cal event
 	*/
 	@Override
-	public void setStartDate(java.util.Date startDate) {
+	public void setStartDate(Date startDate) {
 		_calEvent.setStartDate(startDate);
 	}
 
@@ -882,11 +883,6 @@ public class CalEventWrapper implements CalEvent, ModelWrapper<CalEvent> {
 		}
 
 		return false;
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return _calEvent.getStagedModelType();
 	}
 
 	/**

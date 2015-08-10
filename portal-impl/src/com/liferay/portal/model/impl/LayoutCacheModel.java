@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 	MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof LayoutCacheModel)) {
+			return false;
+		}
+
+		LayoutCacheModel layoutCacheModel = (LayoutCacheModel)obj;
+
+		if ((plid == layoutCacheModel.plid) &&
+				(mvccVersion == layoutCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, plid);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(63);
+		StringBundler sb = new StringBundler(65);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -115,6 +143,8 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 		sb.append(layoutPrototypeLinkEnabled);
 		sb.append(", sourcePrototypeLayoutUuid=");
 		sb.append(sourcePrototypeLayoutUuid);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -276,6 +306,13 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 			layoutImpl.setSourcePrototypeLayoutUuid(sourcePrototypeLayoutUuid);
 		}
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			layoutImpl.setLastPublishDate(null);
+		}
+		else {
+			layoutImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		layoutImpl.resetOriginalValues();
 
 		return layoutImpl;
@@ -314,6 +351,7 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 		layoutPrototypeUuid = objectInput.readUTF();
 		layoutPrototypeLinkEnabled = objectInput.readBoolean();
 		sourcePrototypeLayoutUuid = objectInput.readUTF();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -458,6 +496,8 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 		else {
 			objectOutput.writeUTF(sourcePrototypeLayoutUuid);
 		}
+
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -491,4 +531,5 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 	public String layoutPrototypeUuid;
 	public boolean layoutPrototypeLinkEnabled;
 	public String sourcePrototypeLayoutUuid;
+	public long lastPublishDate;
 }

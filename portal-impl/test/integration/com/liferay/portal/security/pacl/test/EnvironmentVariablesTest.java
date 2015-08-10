@@ -14,7 +14,7 @@
 
 package com.liferay.portal.security.pacl.test;
 
-import com.liferay.portal.test.PACLTestRule;
+import com.liferay.portal.test.rule.PACLTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -32,12 +32,7 @@ public class EnvironmentVariablesTest {
 
 	@Test
 	public void test1() throws Exception {
-		try {
-			System.getenv("JAVA_HOME");
-		}
-		catch (SecurityException se) {
-			Assert.fail();
-		}
+		System.getenv("JAVA_HOME");
 	}
 
 	@Test

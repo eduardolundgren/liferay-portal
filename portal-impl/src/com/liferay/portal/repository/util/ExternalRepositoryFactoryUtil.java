@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.repository.RepositoryException;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Adolfo Pérez
@@ -28,7 +29,7 @@ public class ExternalRepositoryFactoryUtil {
 
 	/**
 	 * @deprecated As of 7.0.0 replaced by {@link
-	 *             com.liferay.portal.repository.registry.RepositoryClassDefinitionCatalogUtil#getExternalRepositoryClassNames(
+	 *             com.liferay.portal.repository.registry.RepositoryDefinitionCatalogUtil#getExternalRepositoryClassNames(
 	 *             )}
 	 */
 	@Deprecated
@@ -68,8 +69,7 @@ public class ExternalRepositoryFactoryUtil {
 		externalRepositoryFactories.remove(className);
 	}
 
-	private static final ConcurrentHashMap<String, ExternalRepositoryFactory>
-		externalRepositoryFactories =
-			new ConcurrentHashMap<String, ExternalRepositoryFactory>();
+	private static final ConcurrentMap<String, ExternalRepositoryFactory>
+		externalRepositoryFactories = new ConcurrentHashMap<>();
 
 }

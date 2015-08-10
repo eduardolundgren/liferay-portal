@@ -58,7 +58,7 @@ public class ResultRow
 		_primaryKey = primaryKey;
 		_pos = pos;
 		_bold = bold;
-		_searchEntries = new ArrayList<SearchEntry>();
+		_searchEntries = new ArrayList<>();
 	}
 
 	@Override
@@ -233,6 +233,25 @@ public class ResultRow
 		addJSP(
 			_searchEntries.size(), align, valign, colspan, path, servletContext,
 			request, response);
+	}
+
+	@Override
+	public void addJSP(
+		String path, String cssClass, ServletContext servletContext,
+		HttpServletRequest request, HttpServletResponse response) {
+
+		JSPSearchEntry jspSearchEntry = new JSPSearchEntry();
+
+		jspSearchEntry.setAlign(SearchEntry.DEFAULT_ALIGN);
+		jspSearchEntry.setColspan(SearchEntry.DEFAULT_COLSPAN);
+		jspSearchEntry.setCssClass(cssClass);
+		jspSearchEntry.setPath(path);
+		jspSearchEntry.setRequest(request);
+		jspSearchEntry.setResponse(response);
+		jspSearchEntry.setServletContext(servletContext);
+		jspSearchEntry.setValign(SearchEntry.DEFAULT_VALIGN);
+
+		_searchEntries.add(_searchEntries.size(), jspSearchEntry);
 	}
 
 	@Override
@@ -532,7 +551,7 @@ public class ResultRow
 	@Override
 	public Object getParameter(String param) {
 		if (_params == null) {
-			_params = new HashMap<String, Object>();
+			_params = new HashMap<>();
 		}
 
 		return _params.get(param);
@@ -601,7 +620,7 @@ public class ResultRow
 	@Override
 	public void setParameter(String param, Object value) {
 		if (_params == null) {
-			_params = new HashMap<String, Object>();
+			_params = new HashMap<>();
 		}
 
 		_params.put(param, value);

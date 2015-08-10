@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class UserCacheModel implements CacheModel<User>, Externalizable,
 	MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof UserCacheModel)) {
+			return false;
+		}
+
+		UserCacheModel userCacheModel = (UserCacheModel)obj;
+
+		if ((userId == userCacheModel.userId) &&
+				(mvccVersion == userCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, userId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class UserCacheModel implements CacheModel<User>, Externalizable,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(83);
+		StringBundler sb = new StringBundler(85);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -133,6 +161,8 @@ public class UserCacheModel implements CacheModel<User>, Externalizable,
 		sb.append(agreedToTermsOfUse);
 		sb.append(", emailAddressVerified=");
 		sb.append(emailAddressVerified);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append("}");
@@ -342,6 +372,14 @@ public class UserCacheModel implements CacheModel<User>, Externalizable,
 
 		userImpl.setAgreedToTermsOfUse(agreedToTermsOfUse);
 		userImpl.setEmailAddressVerified(emailAddressVerified);
+
+		if (lastPublishDate == Long.MIN_VALUE) {
+			userImpl.setLastPublishDate(null);
+		}
+		else {
+			userImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		userImpl.setStatus(status);
 
 		userImpl.resetOriginalValues();
@@ -391,6 +429,7 @@ public class UserCacheModel implements CacheModel<User>, Externalizable,
 		lockoutDate = objectInput.readLong();
 		agreedToTermsOfUse = objectInput.readBoolean();
 		emailAddressVerified = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 		status = objectInput.readInt();
 	}
 
@@ -553,6 +592,7 @@ public class UserCacheModel implements CacheModel<User>, Externalizable,
 		objectOutput.writeLong(lockoutDate);
 		objectOutput.writeBoolean(agreedToTermsOfUse);
 		objectOutput.writeBoolean(emailAddressVerified);
+		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeInt(status);
 	}
 
@@ -596,5 +636,6 @@ public class UserCacheModel implements CacheModel<User>, Externalizable,
 	public long lockoutDate;
 	public boolean agreedToTermsOfUse;
 	public boolean emailAddressVerified;
+	public long lastPublishDate;
 	public int status;
 }

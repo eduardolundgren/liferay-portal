@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service;
 
+import com.liferay.portal.backgroundtask.BaseBackgroundTaskTestCase;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -21,19 +22,19 @@ import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.SynchronousDestination;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.lar.backgroundtask.PortletStagingBackgroundTaskExecutor;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.BackgroundTaskImpl;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portlet.exportimport.backgroundtask.PortletStagingBackgroundTaskExecutor;
 
 import java.io.File;
 import java.io.InputStream;
@@ -56,7 +57,7 @@ import org.junit.Test;
 /**
  * @author Cristina González
  */
-public class BackgroundTaskLocalServiceTest {
+public class BackgroundTaskLocalServiceTest extends BaseBackgroundTaskTestCase {
 
 	@ClassRule
 	@Rule
@@ -65,11 +66,13 @@ public class BackgroundTaskLocalServiceTest {
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_group = GroupTestUtil.addGroup();
 
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), _group.getGroupId());
+		_user = UserTestUtil.addUser(_group.getGroupId());
 
 		MessageBus messageBus = MessageBusUtil.getMessageBus();
 
@@ -82,7 +85,10 @@ public class BackgroundTaskLocalServiceTest {
 	}
 
 	@After
+	@Override
 	public void tearDown() throws Exception {
+		super.tearDown();
+
 		MessageBus messageBus = MessageBusUtil.getMessageBus();
 
 		Destination destination = messageBus.getDestination(
@@ -96,6 +102,8 @@ public class BackgroundTaskLocalServiceTest {
 
 	@Test
 	public void testAddBackgroundTask() throws Exception {
+		initalizeThreadLocals();
+
 		Map<String, Serializable> taskContextMap = getTaskContextMap();
 
 		BackgroundTask backgroundTask =
@@ -113,10 +121,13 @@ public class BackgroundTaskLocalServiceTest {
 			backgroundTask.getTaskExecutorClassName());
 		AssertUtils.assertEquals(
 			taskContextMap, backgroundTask.getTaskContextMap());
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
 	public void testAddBackgroundTaskAttachmentFromFile() throws Exception {
+		initalizeThreadLocals();
+
 		BackgroundTask backgroundTask =
 			BackgroundTaskLocalServiceUtil.addBackgroundTask(
 				_user.getUserId(), _group.getGroupId(), _BACKGROUND_TASK_NAME,
@@ -139,11 +150,14 @@ public class BackgroundTaskLocalServiceTest {
 			backgroundTask.getBackgroundTaskId());
 
 		Assert.assertEquals(backgroundTask.getAttachmentsFileEntriesCount(), 1);
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
 	public void testAddBackgroundTaskAttachmentFromInputStream()
 		throws Exception {
+
+		initalizeThreadLocals();
 
 		BackgroundTask backgroundTask =
 			BackgroundTaskLocalServiceUtil.addBackgroundTask(
@@ -174,10 +188,13 @@ public class BackgroundTaskLocalServiceTest {
 		FileEntry attachment = attachmentsFileEntries.get(0);
 
 		Assert.assertEquals(fileName, attachment.getTitle());
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
 	public void testAddBackgroundTaskFromBackgroundTask() throws Exception {
+		initalizeThreadLocals();
+
 		BackgroundTask backgroundTaskImpl = new BackgroundTaskImpl();
 
 		backgroundTaskImpl.setUserId(_user.getUserId());
@@ -203,6 +220,7 @@ public class BackgroundTaskLocalServiceTest {
 			backgroundTask.getTaskExecutorClassName());
 		AssertUtils.assertEquals(
 			taskContextMap, backgroundTask.getTaskContextMap());
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
@@ -220,6 +238,8 @@ public class BackgroundTaskLocalServiceTest {
 
 	@Test
 	public void testAmendBackgroundTaskWithStatusFailed() throws Exception {
+		initalizeThreadLocals();
+
 		ServiceContext serviceContext = new ServiceContext();
 
 		BackgroundTask backgroundTask =
@@ -239,10 +259,13 @@ public class BackgroundTaskLocalServiceTest {
 		Assert.assertEquals(
 			BackgroundTaskConstants.STATUS_FAILED, backgroundTask.getStatus());
 		Assert.assertTrue(backgroundTask.isCompleted());
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
 	public void testAmendBackgroundTaskWithStatusInProgress() throws Exception {
+		initalizeThreadLocals();
+
 		ServiceContext serviceContext = new ServiceContext();
 
 		BackgroundTask backgroundTask =
@@ -263,10 +286,13 @@ public class BackgroundTaskLocalServiceTest {
 			BackgroundTaskConstants.STATUS_IN_PROGRESS,
 			backgroundTask.getStatus());
 		Assert.assertFalse(backgroundTask.isCompleted());
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
 	public void testAmendBackgroundTaskWithStatusSuccessful() throws Exception {
+		initalizeThreadLocals();
+
 		ServiceContext serviceContext = new ServiceContext();
 
 		BackgroundTask backgroundTask =
@@ -287,10 +313,13 @@ public class BackgroundTaskLocalServiceTest {
 			BackgroundTaskConstants.STATUS_SUCCESSFUL,
 			backgroundTask.getStatus());
 		Assert.assertTrue(backgroundTask.isCompleted());
+		assertThreadLocalValues(backgroundTask);
 	}
 
 	@Test
 	public void testAmendBackgroundTaskWithTaskContextMap() throws Exception {
+		initalizeThreadLocals();
+
 		ServiceContext serviceContext = new ServiceContext();
 
 		BackgroundTask backgroundTask =
@@ -307,11 +336,21 @@ public class BackgroundTaskLocalServiceTest {
 
 		AssertUtils.assertEquals(
 			backgroundTask.getTaskContextMap(), taskContextMap);
+		assertThreadLocalValues(backgroundTask);
+	}
+
+	protected void assertThreadLocalValues(BackgroundTask backgroundTask) {
+		Map<String, Serializable> taskContextMap =
+			backgroundTask.getTaskContextMap();
+
+		Map<String, Serializable> threadLocalValues =
+			(Map<String, Serializable>)taskContextMap.get("threadLocalValues");
+
+		assertThreadLocalValues(threadLocalValues);
 	}
 
 	protected Map<String, Serializable> getTaskContextMap() throws Exception {
-		Map<String, Serializable> taskContext =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> taskContext = new HashMap<>();
 
 		taskContext.put("param1", RandomTestUtil.randomBoolean());
 		taskContext.put("param2", RandomTestUtil.randomString());

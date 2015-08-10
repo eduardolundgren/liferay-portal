@@ -14,11 +14,11 @@
 
 package com.liferay.portlet.shopping.util.test;
 
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.shopping.model.ShoppingCategory;
 import com.liferay.portlet.shopping.model.ShoppingCategoryConstants;
 import com.liferay.portlet.shopping.model.ShoppingItem;
@@ -126,8 +126,8 @@ public class ShoppingTestUtil {
 		boolean largeImage = false;
 		String largeImageURL = null;
 		File largeImageFile = null;
-		List<ShoppingItemField> itemFields = new ArrayList<ShoppingItemField>();
-		List<ShoppingItemPrice> itemPrices = new ArrayList<ShoppingItemPrice>();
+		List<ShoppingItemField> itemFields = new ArrayList<>();
+		List<ShoppingItemPrice> itemPrices = new ArrayList<>();
 
 		return ShoppingItemServiceUtil.addItem(
 			groupId, parentCategoryId, sku, name, description, properties,

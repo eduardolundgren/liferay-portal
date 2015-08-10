@@ -30,13 +30,9 @@ import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletPreferences;
 import com.liferay.portal.model.PortletPreferencesIds;
 import com.liferay.portal.service.base.PortletPreferencesLocalServiceBaseImpl;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletPreferencesImpl;
-import com.liferay.portlet.Preference;
-import com.liferay.portlet.StrictPortletPreferencesImpl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
@@ -73,6 +69,26 @@ public class PortletPreferencesLocalServiceImpl
 
 		portletPreferences.setPreferences(defaultPreferences);
 
+		if (_log.isDebugEnabled()) {
+			StringBundler sb = new StringBundler(13);
+
+			sb.append("Add {companyId=");
+			sb.append(companyId);
+			sb.append(", ownerId=");
+			sb.append(ownerId);
+			sb.append(", ownerType=");
+			sb.append(ownerType);
+			sb.append(", plid=");
+			sb.append(plid);
+			sb.append(", portletId=");
+			sb.append(portletId);
+			sb.append(", defaultPreferences=");
+			sb.append(defaultPreferences);
+			sb.append("}");
+
+			_log.debug(sb.toString());
+		}
+
 		try {
 			portletPreferencesPersistence.update(portletPreferences);
 		}
@@ -107,12 +123,22 @@ public class PortletPreferencesLocalServiceImpl
 			long ownerId, int ownerType, long plid, String portletId)
 		throws PortalException {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Delete {ownerId=" + ownerId + ", ownerType=" + ownerType +
+					", plid=" + plid + ", portletId=" + portletId + "}");
+		}
+
 		portletPreferencesPersistence.removeByO_O_P_P(
 			ownerId, ownerType, plid, portletId);
 	}
 
 	@Override
 	public void deletePortletPreferencesByPlid(long plid) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Delete {plid=" + plid + "}");
+		}
+
 		portletPreferencesPersistence.removeByPlid(plid);
 	}
 
@@ -286,8 +312,7 @@ public class PortletPreferencesLocalServiceImpl
 		String portletId) {
 
 		return getPreferences(
-			companyId, ownerId, ownerType, plid, portletId, null,
-			!PropsValues.TCK_URL);
+			companyId, ownerId, ownerType, plid, portletId, null, true);
 	}
 
 	@Override
@@ -315,6 +340,13 @@ public class PortletPreferencesLocalServiceImpl
 	@Override
 	public PortletPreferences updatePreferences(
 		long ownerId, int ownerType, long plid, String portletId, String xml) {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Update {ownerId=" + ownerId + ", ownerType=" + ownerType +
+					", plid=" + plid + ", portletId=" + portletId + ", xml=" +
+						xml + "}");
+		}
 
 		PortletPreferences portletPreferences =
 			portletPreferencesPersistence.fetchByO_O_P_P(
@@ -355,9 +387,16 @@ public class PortletPreferencesLocalServiceImpl
 				(Validator.isNull(defaultPreferences) ||
 				 ((portlet != null) && portlet.isUndeployedPortlet()))) {
 
-				return new StrictPortletPreferencesImpl(
-					companyId, ownerId, ownerType, plid, portletId, null,
-					Collections.<String, Preference>emptyMap());
+				if (portlet == null) {
+					defaultPreferences = PortletConstants.DEFAULT_PREFERENCES;
+				}
+				else {
+					defaultPreferences = portlet.getDefaultPreferences();
+				}
+
+				return PortletPreferencesFactoryUtil.strictFromXML(
+					companyId, ownerId, ownerType, plid, portletId,
+					defaultPreferences);
 			}
 
 			portletPreferences =

@@ -16,6 +16,7 @@ package com.liferay.social.activities.web.portlet.route;
 
 import com.liferay.portal.kernel.portlet.DefaultFriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
+import com.liferay.social.activities.web.constants.SocialActivitiesPortletKeys;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -23,12 +24,20 @@ import org.osgi.service.component.annotations.Component;
  * @author Raymond Augé
  */
 @Component(
-	immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_social_activities_web_portlet_SocialActivitiesPortlet"
+		"com.liferay.portlet.friendly-url-routes=META-INF/friendly-url-routes/routes.xml",
+		"javax.portlet.name=" + SocialActivitiesPortletKeys.SOCIAL_ACTIVITIES
 	},
 	service = FriendlyURLMapper.class
 )
 public class SocialActivitiesFriendlyURLMapper
 	extends DefaultFriendlyURLMapper {
+
+	@Override
+	public String getMapping() {
+		return _MAPPING;
+	}
+
+	private static final String _MAPPING = "activities";
+
 }

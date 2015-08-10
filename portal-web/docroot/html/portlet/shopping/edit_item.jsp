@@ -128,7 +128,11 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 				<aui:button id="selectCategoryButton" value="select" />
 
-				<aui:button onClick='<%= renderResponse.getNamespace() + "removeCategory();" %>' value="remove" />
+				<%
+				String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('categoryId', 'categoryName', this, '" + renderResponse.getNamespace() + "');";
+				%>
+
+				<aui:button onClick="<%= taglibRemoveFolder %>" value="remove" />
 			</div>
 
 			<aui:script sandbox="<%= true %>">
@@ -312,7 +316,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 						}
 					}
 
-					double price = ParamUtil.getDouble(request, "price" + curPriceId);
+					double price = ParamUtil.getDouble(request, "price" + curPriceId, locale);
 					String priceParam = request.getParameter("price" + curPriceId);
 					if ((priceParam == null) || priceParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
@@ -320,7 +324,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 						}
 					}
 
-					double discount = ParamUtil.getDouble(request, "discount" + curPriceId) / 100;
+					double discount = ParamUtil.getDouble(request, "discount" + curPriceId, locale) / 100;
 					String discountParam = request.getParameter("discount" + curPriceId);
 					if ((discountParam == null) || discountParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
@@ -336,7 +340,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 						}
 					}
 
-					double shipping = ParamUtil.getDouble(request, "shipping" + curPriceId);
+					double shipping = ParamUtil.getDouble(request, "shipping" + curPriceId, locale);
 					String shippingParam = request.getParameter("shipping" + curPriceId);
 					if ((shippingParam == null) || shippingParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
@@ -405,7 +409,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 									<aui:input field="price" fieldParam='<%= "price" + i %>' format="<%= doubleFormat %>" ignoreRequestValue="<%= true %>" label="price" model="<%= ShoppingItemPrice.class %>" name="price" value="<%= String.valueOf(price) %>" />
 								</td>
 								<td>
-									<aui:input field="discount" fieldParam='<%= "discount" + i %>' ignoreRequestValue="<%= true %>" label="discount" model="<%= ShoppingItemPrice.class %>" name="discount" value="<%= percentFormat.format(discount) %>" />
+									<aui:input field="discount" fieldParam='<%= "discount" + i %>' ignoreRequestValue="<%= true %>" label="discount" model="<%= ShoppingItemPrice.class %>" name="discount" value="<%= String.valueOf(discount * 100) %>" />
 								</td>
 								<td>
 									<aui:input ignoreRequestValue="<%= true %>" label="taxable" name='<%= "taxable" + i %>' param='<%= "taxable" + i %>' type="checkbox" value="<%= taxable %>" />
@@ -607,14 +611,6 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 				uri: itemQuantitiesURL
 			}
 		);
-	}
-
-	function <portlet:namespace />removeCategory() {
-		var form = AUI.$(document.<portlet:namespace />fm);
-
-		form.fm('categoryId').val('<%= ShoppingCategoryConstants.DEFAULT_PARENT_CATEGORY_ID %>');
-
-		form.fm('categoryName').val('');
 	}
 
 	function <portlet:namespace />saveItem() {

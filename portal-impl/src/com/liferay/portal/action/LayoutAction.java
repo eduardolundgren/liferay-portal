@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
@@ -41,10 +40,6 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletRequestImpl;
 import com.liferay.portlet.RenderParametersPool;
 import com.liferay.portlet.login.util.LoginUtil;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -64,13 +59,6 @@ import org.apache.struts.action.ActionMapping;
  */
 public class LayoutAction extends Action {
 
-	public LayoutAction() {
-		_layoutResetPortletIds = new HashSet<String>(
-			Arrays.asList(PropsValues.LAYOUT_RESET_PORTLET_IDS));
-
-		_layoutResetPortletIds.add(StringPool.BLANK);
-	}
-
 	@Override
 	public ActionForward execute(
 			ActionMapping actionMapping, ActionForm actionForm,
@@ -86,7 +74,7 @@ public class LayoutAction extends Action {
 				metaInfoCacheServletResponse);
 		}
 		finally {
-			metaInfoCacheServletResponse.finishResponse();
+			metaInfoCacheServletResponse.finishResponse(false);
 		}
 	}
 
@@ -250,13 +238,22 @@ public class LayoutAction extends Action {
 		try {
 			Layout layout = themeDisplay.getLayout();
 
-			Layout previousLayout = (Layout)session.getAttribute(
-				WebKeys.PREVIOUS_LAYOUT);
+			if ((layout != null) && layout.isTypeURL()) {
+				String redirect = PortalUtil.getLayoutActualURL(layout);
 
-			if ((previousLayout == null) ||
-				(layout.getPlid() != previousLayout.getPlid())) {
+				response.sendRedirect(redirect);
 
-				session.setAttribute(WebKeys.PREVIOUS_LAYOUT, layout);
+				return null;
+			}
+
+			Long previousLayoutPlid = (Long)session.getAttribute(
+				WebKeys.PREVIOUS_LAYOUT_PLID);
+
+			if ((previousLayoutPlid == null) ||
+				(layout.getPlid() != previousLayoutPlid.longValue())) {
+
+				session.setAttribute(
+					WebKeys.PREVIOUS_LAYOUT_PLID, layout.getPlid());
 
 				if (themeDisplay.isSignedIn() &&
 					PropsValues.
@@ -279,10 +276,10 @@ public class LayoutAction extends Action {
 
 			String portletId = ParamUtil.getString(request, "p_p_id");
 
-			if (!PropsValues.TCK_URL && resetLayout &&
-				(_layoutResetPortletIds.contains(portletId) ||
-				 ((previousLayout != null) &&
-				  (layout.getPlid() != previousLayout.getPlid())))) {
+			if (resetLayout &&
+				(Validator.isNull(portletId) ||
+				 ((previousLayoutPlid != null) &&
+				  (layout.getPlid() != previousLayoutPlid.longValue())))) {
 
 				// Always clear render parameters on a layout url, but do not
 				// clear on portlet urls invoked on the same layout
@@ -358,7 +355,5 @@ public class LayoutAction extends Action {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(LayoutAction.class);
-
-	private final Set<String> _layoutResetPortletIds;
 
 }

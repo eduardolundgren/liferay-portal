@@ -317,14 +317,14 @@ public interface OrganizationModel extends BaseModel<Organization>, MVCCModel,
 	 *
 	 * @return the status ID of this organization
 	 */
-	public int getStatusId();
+	public long getStatusId();
 
 	/**
 	 * Sets the status ID of this organization.
 	 *
 	 * @param statusId the status ID of this organization
 	 */
-	public void setStatusId(int statusId);
+	public void setStatusId(long statusId);
 
 	/**
 	 * Returns the comments of this organization.
@@ -354,6 +354,22 @@ public interface OrganizationModel extends BaseModel<Organization>, MVCCModel,
 	 * @param logoId the logo ID of this organization
 	 */
 	public void setLogoId(long logoId);
+
+	/**
+	 * Returns the last publish date of this organization.
+	 *
+	 * @return the last publish date of this organization
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this organization.
+	 *
+	 * @param lastPublishDate the last publish date of this organization
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
 
 	@Override
 	public boolean isNew();

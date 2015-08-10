@@ -17,9 +17,11 @@ package com.liferay.registry.internal;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceRegistrar;
 import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
+import com.liferay.registry.dependency.ServiceDependencyManager;
 
 import java.lang.reflect.Array;
 
@@ -27,9 +29,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -93,6 +97,11 @@ public class RegistryImpl implements Registry {
 	}
 
 	@Override
+	public Collection<ServiceDependencyManager> getServiceDependencyManagers() {
+		return Collections.unmodifiableCollection(_serviceDependencyManagers);
+	}
+
+	@Override
 	public <T> ServiceReference<T> getServiceReference(Class<T> clazz) {
 		org.osgi.framework.ServiceReference<T> serviceReference =
 			_bundleContext.getServiceReference(clazz);
@@ -101,7 +110,7 @@ public class RegistryImpl implements Registry {
 			return null;
 		}
 
-		return new ServiceReferenceWrapper<T>(serviceReference);
+		return new ServiceReferenceWrapper<>(serviceReference);
 	}
 
 	@Override
@@ -114,7 +123,7 @@ public class RegistryImpl implements Registry {
 			return null;
 		}
 
-		return new ServiceReferenceWrapper<T>(serviceReference);
+		return new ServiceReferenceWrapper<>(serviceReference);
 	}
 
 	@Override
@@ -130,8 +139,8 @@ public class RegistryImpl implements Registry {
 			return Collections.emptyList();
 		}
 
-		Collection<ServiceReference<T>> serviceReferences =
-			new ArrayList<ServiceReference<T>>(osgiServiceReferences.size());
+		Collection<ServiceReference<T>> serviceReferences = new ArrayList<>(
+			osgiServiceReferences.size());
 
 		Iterator<org.osgi.framework.ServiceReference<T>> iterator =
 			osgiServiceReferences.iterator();
@@ -141,7 +150,7 @@ public class RegistryImpl implements Registry {
 				iterator.next();
 
 			ServiceReference<T> serviceReference =
-				new ServiceReferenceWrapper<T>(osgiServiceReference);
+				new ServiceReferenceWrapper<>(osgiServiceReference);
 
 			serviceReferences.add(serviceReference);
 		}
@@ -169,11 +178,16 @@ public class RegistryImpl implements Registry {
 			org.osgi.framework.ServiceReference<T> osgiServiceReference =
 				osgiServiceReferences[i];
 
-			serviceReferences[i] = new ServiceReferenceWrapper<T>(
+			serviceReferences[i] = new ServiceReferenceWrapper<>(
 				osgiServiceReference);
 		}
 
 		return serviceReferences;
+	}
+
+	@Override
+	public <T> ServiceRegistrar<T> getServiceRegistrar(Class<T> clazz) {
+		return new ServiceRegistrar<>(this, clazz);
 	}
 
 	@Override
@@ -187,7 +201,7 @@ public class RegistryImpl implements Registry {
 			return Collections.emptyList();
 		}
 
-		List<T> services = new ArrayList<T>();
+		List<T> services = new ArrayList<>();
 
 		Iterator<org.osgi.framework.ServiceReference<T>> iterator =
 			serviceReferences.iterator();
@@ -255,7 +269,7 @@ public class RegistryImpl implements Registry {
 			_bundleContext.registerService(
 				clazz, service, new MapWrapper(properties));
 
-		return new ServiceRegistrationWrapper<T>(serviceRegistration);
+		return new ServiceRegistrationWrapper<>(serviceRegistration);
 	}
 
 	@Override
@@ -301,6 +315,13 @@ public class RegistryImpl implements Registry {
 	}
 
 	@Override
+	public synchronized void registerServiceDependencyManager(
+		ServiceDependencyManager serviceDependencyManager) {
+
+		_serviceDependencyManagers.add(serviceDependencyManager);
+	}
+
+	@Override
 	public Registry setRegistry(Registry registry) throws SecurityException {
 		return registry;
 	}
@@ -311,7 +332,7 @@ public class RegistryImpl implements Registry {
 			new org.osgi.util.tracker.ServiceTracker<S, T>(
 				_bundleContext, clazz, null);
 
-		return new ServiceTrackerWrapper<S, T>(serviceTracker);
+		return new ServiceTrackerWrapper<>(serviceTracker);
 	}
 
 	@Override
@@ -325,7 +346,7 @@ public class RegistryImpl implements Registry {
 				new ServiceTrackerCustomizerAdapter<S, T>(
 					serviceTrackerCustomizer));
 
-		return new ServiceTrackerWrapper<S, T>(serviceTracker);
+		return new ServiceTrackerWrapper<>(serviceTracker);
 	}
 
 	@Override
@@ -340,7 +361,7 @@ public class RegistryImpl implements Registry {
 			new org.osgi.util.tracker.ServiceTracker<S, T>(
 				_bundleContext, filterWrapper.getFilter(), null);
 
-		return new ServiceTrackerWrapper<S, T>(serviceTracker);
+		return new ServiceTrackerWrapper<>(serviceTracker);
 	}
 
 	@Override
@@ -360,7 +381,7 @@ public class RegistryImpl implements Registry {
 				new ServiceTrackerCustomizerAdapter<S, T>(
 					serviceTrackerCustomizer));
 
-		return new ServiceTrackerWrapper<S, T>(serviceTracker);
+		return new ServiceTrackerWrapper<>(serviceTracker);
 	}
 
 	@Override
@@ -369,7 +390,7 @@ public class RegistryImpl implements Registry {
 			new org.osgi.util.tracker.ServiceTracker<S, T>(
 				_bundleContext, className, null);
 
-		return new ServiceTrackerWrapper<S, T>(serviceTracker);
+		return new ServiceTrackerWrapper<>(serviceTracker);
 	}
 
 	@Override
@@ -383,7 +404,7 @@ public class RegistryImpl implements Registry {
 				new ServiceTrackerCustomizerAdapter<S, T>(
 					serviceTrackerCustomizer));
 
-		return new ServiceTrackerWrapper<S, T>(serviceTracker);
+		return new ServiceTrackerWrapper<>(serviceTracker);
 	}
 
 	@Override
@@ -399,13 +420,20 @@ public class RegistryImpl implements Registry {
 			serviceReferenceWrapper.getServiceReference());
 	}
 
+	@Override
+	public void unregisterServiceDependencyManager(
+		ServiceDependencyManager serviceDependencyManager) {
+
+		_serviceDependencyManagers.remove(serviceDependencyManager);
+	}
+
 	private Map<String, Object> addBundleContextProperties(
 		Map<String, Object> properties) {
 
 		Bundle bundle = _bundleContext.getBundle();
 
 		if (properties == null) {
-			properties = new HashMap<String, Object>();
+			properties = new HashMap<>();
 		}
 
 		properties.put("bundle.id", bundle.getBundleId());
@@ -416,5 +444,7 @@ public class RegistryImpl implements Registry {
 	}
 
 	private final BundleContext _bundleContext;
+	private final Set<ServiceDependencyManager> _serviceDependencyManagers =
+		new HashSet<>();
 
 }

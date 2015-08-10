@@ -79,16 +79,15 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	invalid, or if the user did not have permission to add the
 	organization
 	* @deprecated As of 6.2.0, replaced by {@link #addOrganization(long,
-	String, String, long, long, int, String, boolean,
-	java.util.List, java.util.List, java.util.List,
-	java.util.List, java.util.List, ServiceContext)}
+	String, String, long, long, int, String, boolean, List, List,
+	List, List, List, ServiceContext)}
 	*/
 	@Deprecated
 	@Override
 	public com.liferay.portal.model.Organization addOrganization(
 		long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		java.util.List<com.liferay.portal.model.Address> addresses,
 		java.util.List<com.liferay.portal.model.EmailAddress> emailAddresses,
 		java.util.List<com.liferay.portal.model.OrgLabor> orgLabors,
@@ -139,7 +138,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	public com.liferay.portal.model.Organization addOrganization(
 		long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organizationService.addOrganization(parentOrganizationId, name,
@@ -182,7 +181,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	@Override
 	public com.liferay.portal.model.Organization addOrganization(
 		long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean site,
 		java.util.List<com.liferay.portal.model.Address> addresses,
 		java.util.List<com.liferay.portal.model.EmailAddress> emailAddresses,
@@ -225,7 +224,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	@Override
 	public com.liferay.portal.model.Organization addOrganization(
 		long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -278,6 +277,22 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	public void deleteOrganization(long organizationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_organizationService.deleteOrganization(organizationId);
+	}
+
+	/**
+	* Returns the organization with the primary key.
+	*
+	* @param organizationId the primary key of the organization
+	* @return the organization with the primary key, or <code>null</code> if an
+	organization with the primary key could not be found or if the
+	user did not have permission to view the organization
+	* @throws PortalException if a portal exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.Organization fetchOrganization(
+		long organizationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _organizationService.fetchOrganization(organizationId);
 	}
 
 	/**
@@ -399,10 +414,17 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	}
 
 	/**
-	* Returns all the organizations associated with the user.
+	* Returns all the organizations with which the user is explicitly
+	* associated.
+	*
+	* <p>
+	* A user is considered to be <i>explicitly</i> associated with an
+	* organization if his account is individually created within the
+	* organization or if the user is later added as a member.
+	* </p>
 	*
 	* @param userId the primary key of the user
-	* @return the organizations associated with the user
+	* @return the organizations with which the user is explicitly associated
 	* @throws PortalException if a user with the primary key could not be found
 	*/
 	@Override
@@ -501,8 +523,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	the new information was invalid
 	* @deprecated As of 6.2.0, replaced by {@link #updateOrganization(long,
 	long, String, String, long, long, int, String, boolean,
-	java.util.List, java.util.List, java.util.List,
-	java.util.List, java.util.List, boolean, byte[],
+	byte[], boolean, List, List, List, List, List,
 	ServiceContext)}
 	*/
 	@Deprecated
@@ -510,7 +531,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	public com.liferay.portal.model.Organization updateOrganization(
 		long organizationId, long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		java.util.List<com.liferay.portal.model.Address> addresses,
 		java.util.List<com.liferay.portal.model.EmailAddress> emailAddresses,
 		java.util.List<com.liferay.portal.model.OrgLabor> orgLabors,
@@ -558,7 +579,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	public com.liferay.portal.model.Organization updateOrganization(
 		long organizationId, long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organizationService.updateOrganization(organizationId,
@@ -600,7 +621,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	@Override
 	public com.liferay.portal.model.Organization updateOrganization(
 		long organizationId, long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean logo, byte[] logoBytes,
 		boolean site,
 		java.util.List<com.liferay.portal.model.Address> addresses,
@@ -646,15 +667,14 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	the new information was invalid
 	* @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
 	long, String, String, long, long, int, String, boolean,
-	java.util.List, java.util.List, java.util.List,
-	java.util.List, java.util.List, boolean, byte[],
+	byte[], boolean, List, List, List, List, List,
 	ServiceContext)}
 	*/
 	@Deprecated
 	@Override
 	public com.liferay.portal.model.Organization updateOrganization(
 		long organizationId, long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean site,
 		java.util.List<com.liferay.portal.model.Address> addresses,
 		java.util.List<com.liferay.portal.model.EmailAddress> emailAddresses,
@@ -696,7 +716,7 @@ public class OrganizationServiceWrapper implements OrganizationService,
 	@Override
 	public com.liferay.portal.model.Organization updateOrganization(
 		long organizationId, long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {

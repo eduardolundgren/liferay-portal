@@ -437,9 +437,31 @@ public class AssetEntryLocalServiceUtil {
 		return getService().getEntries(entryQuery);
 	}
 
+	public static java.util.List<com.liferay.portlet.asset.model.AssetEntry> getEntries(
+		long[] groupIds, long[] classNameIds, java.lang.String keywords,
+		java.lang.String userName, java.lang.String title,
+		java.lang.String description, java.lang.Boolean listable,
+		boolean advancedSearch, boolean andOperator, int start, int end,
+		java.lang.String orderByCol1, java.lang.String orderByCol2,
+		java.lang.String orderByType1, java.lang.String orderByType2) {
+		return getService()
+				   .getEntries(groupIds, classNameIds, keywords, userName,
+			title, description, listable, advancedSearch, andOperator, start,
+			end, orderByCol1, orderByCol2, orderByType1, orderByType2);
+	}
+
 	public static int getEntriesCount(
 		com.liferay.portlet.asset.service.persistence.AssetEntryQuery entryQuery) {
 		return getService().getEntriesCount(entryQuery);
+	}
+
+	public static int getEntriesCount(long[] groupIds, long[] classNameIds,
+		java.lang.String keywords, java.lang.String userName,
+		java.lang.String title, java.lang.String description,
+		java.lang.Boolean listable, boolean advancedSearch, boolean andOperator) {
+		return getService()
+				   .getEntriesCount(groupIds, classNameIds, keywords, userName,
+			title, description, listable, advancedSearch, andOperator);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetEntry getEntry(
@@ -490,12 +512,12 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetEntry> getTopViewedEntries(
-		java.lang.String className, boolean asc, int start, int end) {
+		java.lang.String[] className, boolean asc, int start, int end) {
 		return getService().getTopViewedEntries(className, asc, start, end);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetEntry> getTopViewedEntries(
-		java.lang.String[] className, boolean asc, int start, int end) {
+		java.lang.String className, boolean asc, int start, int end) {
 		return getService().getTopViewedEntries(className, asc, start, end);
 	}
 
@@ -719,6 +741,31 @@ public class AssetEntryLocalServiceUtil {
 			url, layoutUuid, height, width, priority, sync);
 	}
 
+	public static com.liferay.portlet.asset.model.AssetEntry updateEntry(
+		long userId, long groupId, java.util.Date createDate,
+		java.util.Date modifiedDate, java.lang.String className, long classPK,
+		java.lang.String classUuid, long classTypeId, long[] categoryIds,
+		java.lang.String[] tagNames, boolean visible, java.util.Date startDate,
+		java.util.Date endDate, java.util.Date expirationDate,
+		java.lang.String mimeType, java.lang.String title,
+		java.lang.String description, java.lang.String summary,
+		java.lang.String url, java.lang.String layoutUuid, int height,
+		int width, java.lang.Integer priority)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateEntry(userId, groupId, createDate, modifiedDate,
+			className, classPK, classUuid, classTypeId, categoryIds, tagNames,
+			visible, startDate, endDate, expirationDate, mimeType, title,
+			description, summary, url, layoutUuid, height, width, priority);
+	}
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
+	Date, Date, String, long, String, long, long[], String[],
+	boolean, Date, Date, Date, String, String, String, String,
+	String, String, int, int, Integer)}
+	*/
+	@Deprecated
 	public static com.liferay.portlet.asset.model.AssetEntry updateEntry(
 		long userId, long groupId, java.util.Date createDate,
 		java.util.Date modifiedDate, java.lang.String className, long classPK,

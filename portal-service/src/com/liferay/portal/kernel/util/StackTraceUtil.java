@@ -23,6 +23,18 @@ import java.io.PrintWriter;
  */
 public class StackTraceUtil {
 
+	public static String getCallerKey() {
+		Exception e = new Exception();
+
+		StackTraceElement[] stackTraceElements = e.getStackTrace();
+
+		StackTraceElement stackTraceElement = stackTraceElements[1];
+
+		return stackTraceElement.getClassName() + "#" +
+			stackTraceElement.getMethodName() + "#" +
+				stackTraceElement.getLineNumber();
+	}
+
 	public static String getStackTrace(Throwable t) {
 		String stackTrace = null;
 

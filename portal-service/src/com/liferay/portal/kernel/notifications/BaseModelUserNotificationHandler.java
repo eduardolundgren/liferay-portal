@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserNotificationEventLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
@@ -37,15 +38,17 @@ import com.liferay.portlet.asset.model.AssetRendererFactory;
 public abstract class BaseModelUserNotificationHandler
 	extends BaseUserNotificationHandler {
 
-	protected AssetRenderer getAssetRenderer(JSONObject jsonObject) {
+	protected AssetRenderer<?> getAssetRenderer(JSONObject jsonObject) {
 		String className = jsonObject.getString("className");
 		long classPK = jsonObject.getLong("classPK");
 
 		return getAssetRenderer(className, classPK);
 	}
 
-	protected AssetRenderer getAssetRenderer(String className, long classPK) {
-		AssetRendererFactory assetRendererFactory =
+	protected AssetRenderer<?> getAssetRenderer(
+		String className, long classPK) {
+
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				className);
 
@@ -53,7 +56,7 @@ public abstract class BaseModelUserNotificationHandler
 			return null;
 		}
 
-		AssetRenderer assetRenderer = null;
+		AssetRenderer<?> assetRenderer = null;
 
 		try {
 			assetRenderer = assetRendererFactory.getAssetRenderer(classPK);
@@ -73,7 +76,7 @@ public abstract class BaseModelUserNotificationHandler
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			userNotificationEvent.getPayload());
 
-		AssetRenderer assetRenderer = getAssetRenderer(jsonObject);
+		AssetRenderer<?> assetRenderer = getAssetRenderer(jsonObject);
 
 		if (assetRenderer == null) {
 			UserNotificationEventLocalServiceUtil.deleteUserNotificationEvent(
@@ -86,9 +89,13 @@ public abstract class BaseModelUserNotificationHandler
 			getBodyTemplate(), new String[] {"[$BODY$]", "[$TITLE$]"},
 			new String[] {
 				HtmlUtil.escape(
-					StringUtil.shorten(jsonObject.getString("entryTitle"), 70)),
+					StringUtil.shorten(getBodyContent(jsonObject), 70)),
 				getTitle(jsonObject, assetRenderer, serviceContext)
 			});
+	}
+
+	protected String getBodyContent(JSONObject jsonObject) {
+		return jsonObject.getString("entryTitle");
 	}
 
 	@Override
@@ -104,12 +111,12 @@ public abstract class BaseModelUserNotificationHandler
 	}
 
 	protected String getTitle(
-		JSONObject jsonObject, AssetRenderer assetRenderer,
+		JSONObject jsonObject, AssetRenderer<?> assetRenderer,
 		ServiceContext serviceContext) {
 
 		String message = StringPool.BLANK;
 
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				assetRenderer.getClassName());
 
@@ -133,7 +140,9 @@ public abstract class BaseModelUserNotificationHandler
 		return LanguageUtil.format(
 			serviceContext.getLocale(), message,
 			new String[] {
-				HtmlUtil.escape(assetRenderer.getUserName()),
+				HtmlUtil.escape(
+					PortalUtil.getUserName(
+						jsonObject.getLong("userId"), StringPool.BLANK)),
 				StringUtil.toLowerCase(HtmlUtil.escape(typeName))
 			},
 			false);

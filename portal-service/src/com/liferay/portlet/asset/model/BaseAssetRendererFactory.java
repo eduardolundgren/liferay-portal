@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.model;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.Tuple;
@@ -47,7 +46,8 @@ import javax.portlet.WindowState;
  * @author Raymond Augé
  * @author Sergio González
  */
-public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
+public abstract class BaseAssetRendererFactory<T>
+	implements AssetRendererFactory<T> {
 
 	@Override
 	public AssetEntry getAssetEntry(long assetEntryId) throws PortalException {
@@ -62,21 +62,28 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	}
 
 	@Override
-	public AssetRenderer getAssetRenderer(long classPK) throws PortalException {
+	public AssetRenderer<T> getAssetRenderer(long classPK)
+		throws PortalException {
+
 		return getAssetRenderer(classPK, TYPE_LATEST_APPROVED);
 	}
 
 	@Override
 	@SuppressWarnings("unused")
-	public AssetRenderer getAssetRenderer(long groupId, String urlTitle)
+	public AssetRenderer<T> getAssetRenderer(long groupId, String urlTitle)
 		throws PortalException {
 
 		return null;
 	}
 
 	@Override
+	public String getClassName() {
+		return _className;
+	}
+
+	@Override
 	public long getClassNameId() {
-		return PortalUtil.getClassNameId(_className);
+		return PortalUtil.getClassNameId(getClassName());
 	}
 
 	@Deprecated
@@ -113,7 +120,7 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 		List<ClassTypeField> classTypeFields = classType.getClassTypeFields(
 			start, end);
 
-		List<Tuple> tuples = new ArrayList<Tuple>(classTypeFields.size());
+		List<Tuple> tuples = new ArrayList<>(classTypeFields.size());
 
 		for (ClassTypeField classTypeField : classTypeFields) {
 			tuples.add(toTuple(classTypeField));
@@ -141,15 +148,15 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 
 	@Deprecated
 	@Override
-	public Map<Long, String> getClassTypes(long[] groupId, Locale locale)
+	public Map<Long, String> getClassTypes(long[] groupIds, Locale locale)
 		throws Exception {
 
 		ClassTypeReader classTypeReader = getClassTypeReader();
 
 		List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(
-			groupId, locale);
+			groupIds, locale);
 
-		Map<Long, String> classTypesMap = new HashMap<Long, String>();
+		Map<Long, String> classTypesMap = new HashMap<>();
 
 		for (ClassType classType : classTypes) {
 			classTypesMap.put(classType.getClassTypeId(), classType.getName());
@@ -195,11 +202,21 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 		return getTypeName(locale);
 	}
 
+	@Deprecated
+	@Override
+	public PortletURL getURLAdd(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse)
+		throws PortalException {
+
+		return getURLAdd(liferayPortletRequest, liferayPortletResponse, 0);
+	}
+
 	@Override
 	@SuppressWarnings("unused")
 	public PortletURL getURLAdd(
 			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse)
+			LiferayPortletResponse liferayPortletResponse, long classTypeId)
 		throws PortalException {
 
 		return null;
@@ -253,13 +270,10 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 			return true;
 		}
 
-		Portlet portlet = null;
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			companyId, getPortletId());
 
-		try {
-			portlet = PortletLocalServiceUtil.getPortletById(
-				companyId, getPortletId());
-		}
-		catch (SystemException se) {
+		if (portlet == null) {
 			portlet = PortletLocalServiceUtil.getPortletById(getPortletId());
 		}
 

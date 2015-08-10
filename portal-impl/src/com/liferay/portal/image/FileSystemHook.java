@@ -33,12 +33,10 @@ import java.io.InputStream;
  */
 public class FileSystemHook extends BaseHook {
 
-	public FileSystemHook() {
+	public FileSystemHook() throws IOException {
 		_rootDir = new File(PropsValues.IMAGE_HOOK_FILE_SYSTEM_ROOT_DIR);
 
-		if (!_rootDir.exists()) {
-			_rootDir.mkdirs();
-		}
+		FileUtil.mkdirs(_rootDir);
 	}
 
 	@Override
@@ -120,6 +118,6 @@ public class FileSystemHook extends BaseHook {
 				imageId + StringPool.PERIOD + type);
 	}
 
-	private File _rootDir;
+	private final File _rootDir;
 
 }

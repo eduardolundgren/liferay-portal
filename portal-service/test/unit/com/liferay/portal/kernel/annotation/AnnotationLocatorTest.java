@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.annotation;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -255,9 +255,9 @@ public class AnnotationLocatorTest {
 			SuperInterface1.class, OriginInterface2.class,
 			OriginInterface1.class);
 
-		List<Class<?>> actualClassHierarchy = new ArrayList<Class<?>>();
+		List<Class<?>> actualClassHierarchy = new ArrayList<>();
 
-		Queue<Class<?>> queue = new LinkedList<Class<?>>();
+		Queue<Class<?>> queue = new LinkedList<>();
 
 		queue.offer(TestClass.class);
 

@@ -31,7 +31,6 @@ import com.liferay.portal.service.base.WorkflowInstanceLinkLocalServiceBaseImpl;
 
 import java.io.Serializable;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,15 +51,12 @@ public class WorkflowInstanceLinkLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long classNameId = classNameLocalService.getClassNameId(className);
-		Date now = new Date();
 
 		long workflowInstanceLinkId = counterLocalService.increment();
 
 		WorkflowInstanceLink workflowInstanceLink =
 			workflowInstanceLinkPersistence.create(workflowInstanceLinkId);
 
-		workflowInstanceLink.setCreateDate(now);
-		workflowInstanceLink.setModifiedDate(now);
 		workflowInstanceLink.setUserId(userId);
 		workflowInstanceLink.setUserName(user.getFullName());
 		workflowInstanceLink.setGroupId(groupId);
@@ -266,11 +262,10 @@ public class WorkflowInstanceLinkLocalServiceImpl
 			workflowDefinitionLink.getWorkflowDefinitionVersion();
 
 		if (workflowContext != null) {
-			workflowContext = new HashMap<String, Serializable>(
-				workflowContext);
+			workflowContext = new HashMap<>(workflowContext);
 		}
 		else {
-			workflowContext = new HashMap<String, Serializable>();
+			workflowContext = new HashMap<>();
 		}
 
 		workflowContext.put(
@@ -320,9 +315,8 @@ public class WorkflowInstanceLinkLocalServiceImpl
 
 			workflowInstanceLinkPersistence.update(workflowInstanceLink);
 
-			Map<String, Serializable> workflowContext =
-				new HashMap<String, Serializable>(
-					workflowInstance.getWorkflowContext());
+			Map<String, Serializable> workflowContext = new HashMap<>(
+				workflowInstance.getWorkflowContext());
 
 			workflowContext.put(
 				WorkflowConstants.CONTEXT_ENTRY_CLASS_PK,

@@ -16,6 +16,11 @@ package com.liferay.xsl.content.web.util;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.xsl.content.web.configuration.XSLContentConfiguration;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +36,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+
 import org.w3c.dom.Document;
 
 /**
@@ -42,6 +50,26 @@ public class XSLContentUtil {
 	public static final String DEFAULT_XML_URL = "/example.xml";
 
 	public static final String DEFAULT_XSL_URL = "/example.xsl";
+
+	public static String replaceUrlTokens(
+		ThemeDisplay themeDisplay, String url) {
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(themeDisplay.getPortalURL());
+		sb.append(PortalUtil.getPathModule());
+		sb.append(StringPool.SLASH);
+
+		Bundle bundle = FrameworkUtil.getBundle(XSLContentUtil.class);
+
+		String symbolicName = bundle.getSymbolicName();
+
+		sb.append(symbolicName.replaceAll("[^a-zA-Z0-9]", StringPool.BLANK));
+
+		return StringUtil.replace(
+			url, new String[] {"@portal_url@", "@portlet_context_url@"},
+			new String[] {themeDisplay.getPortalURL(), sb.toString()});
+	}
 
 	public static String transform(
 			XSLContentConfiguration xslContentConfiguration, URL xmlUrl,
@@ -76,13 +104,13 @@ public class XSLContentUtil {
 
 		documentBuilderFactory.setFeature(
 			"http://apache.org/xml/features/disallow-doctype-decl",
-			!xslContentConfiguration.isXmlDoctypeDeclarationAllowed());
+			!xslContentConfiguration.xmlDoctypeDeclarationAllowed());
 		documentBuilderFactory.setFeature(
 			"http://xml.org/sax/features/external-general-entities",
-			xslContentConfiguration.isXmlExternalGeneralEntitiesAllowed());
+			xslContentConfiguration.xmlExternalGeneralEntitiesAllowed());
 		documentBuilderFactory.setFeature(
 			"http://xml.org/sax/features/external-parameter-entities",
-			xslContentConfiguration.isXmlExternalGeneralEntitiesAllowed());
+			xslContentConfiguration.xmlExternalGeneralEntitiesAllowed());
 
 		documentBuilderFactory.setNamespaceAware(true);
 
@@ -98,7 +126,7 @@ public class XSLContentUtil {
 
 		transformerFactory.setFeature(
 			XMLConstants.FEATURE_SECURE_PROCESSING,
-			xslContentConfiguration.isXslSecureProcessingEnabled());
+			xslContentConfiguration.xslSecureProcessingEnabled());
 
 		return transformerFactory;
 	}

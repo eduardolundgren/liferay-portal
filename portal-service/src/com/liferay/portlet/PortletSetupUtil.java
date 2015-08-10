@@ -94,10 +94,8 @@ public class PortletSetupUtil {
 
 		portletDataJSONObject.put("titles", titlesJSONObject);
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (int i = 0; i < locales.length; i++) {
-			String languageId = LocaleUtil.toLanguageId(locales[i]);
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
+			String languageId = LocaleUtil.toLanguageId(locale);
 
 			String title = portletSetup.getValue(
 				"portletSetupTitle_" + languageId, null);
@@ -121,6 +119,7 @@ public class PortletSetupUtil {
 		return cssJSONObject;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PortletSetupUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletSetupUtil.class);
 
 }

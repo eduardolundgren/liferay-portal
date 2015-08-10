@@ -355,14 +355,14 @@ public interface AddressModel extends AttachedModel, BaseModel<Address>,
 	 *
 	 * @return the type ID of this address
 	 */
-	public int getTypeId();
+	public long getTypeId();
 
 	/**
 	 * Sets the type ID of this address.
 	 *
 	 * @param typeId the type ID of this address
 	 */
-	public void setTypeId(int typeId);
+	public void setTypeId(long typeId);
 
 	/**
 	 * Returns the mailing of this address.
@@ -405,6 +405,22 @@ public interface AddressModel extends AttachedModel, BaseModel<Address>,
 	 * @param primary the primary of this address
 	 */
 	public void setPrimary(boolean primary);
+
+	/**
+	 * Returns the last publish date of this address.
+	 *
+	 * @return the last publish date of this address
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this address.
+	 *
+	 * @param lastPublishDate the last publish date of this address
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
 
 	@Override
 	public boolean isNew();

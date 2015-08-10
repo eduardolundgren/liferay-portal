@@ -16,7 +16,6 @@ package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
-import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
@@ -37,6 +36,7 @@ import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.exportimport.staging.permission.StagingPermissionUtil;
 import com.liferay.portlet.sites.util.SitesUtil;
 
 import java.util.List;
@@ -61,7 +61,9 @@ public class LayoutPermissionImpl
 		if (!contains(
 				permissionChecker, layout, checkViewableGroup, actionId)) {
 
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Layout.class.getName(), layout.getLayoutId(),
+				actionId);
 		}
 	}
 
@@ -71,7 +73,9 @@ public class LayoutPermissionImpl
 		throws PortalException {
 
 		if (!contains(permissionChecker, layout, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Layout.class.getName(), layout.getLayoutId(),
+				actionId);
 		}
 	}
 
@@ -85,7 +89,8 @@ public class LayoutPermissionImpl
 				permissionChecker, groupId, privateLayout, layoutId,
 				actionId)) {
 
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Layout.class.getName(), layoutId, actionId);
 		}
 	}
 
@@ -94,9 +99,9 @@ public class LayoutPermissionImpl
 			PermissionChecker permissionChecker, long plid, String actionId)
 		throws PortalException {
 
-		if (!contains(permissionChecker, plid, actionId)) {
-			throw new PrincipalException();
-		}
+		Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
+		check(permissionChecker, layout, actionId);
 	}
 
 	@Override
@@ -216,8 +221,7 @@ public class LayoutPermissionImpl
 			return false;
 		}
 
-		if (checkLayoutUpdateable &&
-			!actionId.equals(ActionKeys.CUSTOMIZE) &&
+		if (checkLayoutUpdateable && !actionId.equals(ActionKeys.CUSTOMIZE) &&
 			!actionId.equals(ActionKeys.VIEW) &&
 			(layout instanceof VirtualLayout)) {
 

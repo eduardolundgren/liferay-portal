@@ -19,11 +19,6 @@ import com.liferay.portal.module.framework.ModuleFramework;
 
 import java.io.InputStream;
 
-import java.net.URL;
-
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Raymond Augé
  * @author Miguel Pastor
@@ -38,14 +33,6 @@ public class ModuleFrameworkUtil {
 		throws PortalException {
 
 		return getModuleFramework().addBundle(location, inputStream);
-	}
-
-	public static Map<String, List<URL>> getExtraPackageMap() {
-		return getModuleFramework().getExtraPackageMap();
-	}
-
-	public static List<URL> getExtraPackageURLs() {
-		return getModuleFramework().getExtraPackageURLs();
 	}
 
 	public static Object getFramework() {
@@ -111,8 +98,8 @@ public class ModuleFrameworkUtil {
 		getModuleFramework().stopBundle(bundleId, options);
 	}
 
-	public static void stopFramework() throws Exception {
-		getModuleFramework().stopFramework();
+	public static void stopFramework(long timeout) throws Exception {
+		getModuleFramework().stopFramework(timeout);
 	}
 
 	public static void stopRuntime() throws Exception {

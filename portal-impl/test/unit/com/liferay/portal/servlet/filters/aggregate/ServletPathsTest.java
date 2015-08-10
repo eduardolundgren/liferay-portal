@@ -16,8 +16,8 @@ package com.liferay.portal.servlet.filters.aggregate;
 
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
@@ -69,7 +69,7 @@ public class ServletPathsTest {
 	}
 
 	@Test
-	public void testConstructor() throws MalformedURLException {
+	public void testConstructor() {
 		try {
 			new ServletPaths(null, null);
 
@@ -91,10 +91,8 @@ public class ServletPathsTest {
 		ServletContext servletContext = _prepareServletContext(
 			new MockServletContext());
 
-		String rootPath = ServletContextUtil.getRootPath(servletContext);
-
 		ServletPaths servletPaths = new ServletPaths(
-			servletContext, rootPath + "/test1/test2/");
+			servletContext, "/test1/test2/");
 
 		Assert.assertEquals("/test1/test2/", servletPaths.getResourcePath());
 
@@ -104,7 +102,7 @@ public class ServletPathsTest {
 	}
 
 	@Test
-	public void testDown() throws MalformedURLException {
+	public void testDown() {
 		ServletContext servletContext = _prepareServletContext(
 			new MockServletContext());
 
@@ -158,10 +156,10 @@ public class ServletPathsTest {
 
 		Assert.assertNull(servletPaths.getContent());
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ServletPaths.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ServletPaths.class.getName(), Level.SEVERE)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			servletPaths = new ServletPaths(servletContext, file1.getName());
@@ -179,9 +177,6 @@ public class ServletPathsTest {
 			servletPaths = new ServletPaths(servletContext, file2.getName());
 
 			Assert.assertEquals(testContent, servletPaths.getContent());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

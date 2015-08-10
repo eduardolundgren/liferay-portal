@@ -18,13 +18,12 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
-<%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
-<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page contentType="text/html; charset=UTF-8" %>
-
-<%@ page import="com.liferay.currency.converter.web.model.CurrencyConverter" %><%@
+<%@ page import="com.liferay.currency.converter.web.configuration.CurrencyConverterConfiguration" %><%@
+page import="com.liferay.currency.converter.web.model.CurrencyConverter" %><%@
 page import="com.liferay.currency.converter.web.util.CurrencyConverterUtil" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
@@ -45,13 +44,16 @@ page import="java.util.Map" %>
 page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<liferay-theme:defineObjects />
 <portlet:defineObjects />
+
+<liferay-theme:defineObjects />
 
 <%
 WindowState windowState = liferayPortletRequest.getWindowState();
 
-String[] symbols = portletPreferences.getValues("symbols", new String[0]);
+CurrencyConverterConfiguration currencyConverterConfiguration = (CurrencyConverterConfiguration)request.getAttribute(CurrencyConverterConfiguration.class.getName());
+
+String[] symbols = portletPreferences.getValues("symbols", currencyConverterConfiguration.symbols());
 
 Map<String, String> allSymbols = CurrencyConverterUtil.getAllSymbols(request);
 %>

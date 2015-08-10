@@ -29,6 +29,9 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SyncContext {
 
+	public static final String PREFERENCE_KEY_BATCH_FILE_MAX_SIZE =
+		"sync.client.batch.file.max.size";
+
 	public static final String PREFERENCE_KEY_MAX_CONNECTIONS =
 		"sync.client.max.connections";
 
@@ -37,6 +40,18 @@ public class SyncContext {
 
 	public String getAuthType() {
 		return authType;
+	}
+
+	public String getOAuthConsumerKey() {
+		return oAuthConsumerKey;
+	}
+
+	public String getOAuthConsumerSecret() {
+		return oAuthConsumerSecret;
+	}
+
+	public boolean getOAuthEnabled() {
+		return oAuthEnabled;
 	}
 
 	public String getPluginVersion() {
@@ -59,12 +74,28 @@ public class SyncContext {
 		return syncUser;
 	}
 
+	public boolean isOAuthEnabled() {
+		return getOAuthEnabled();
+	}
+
 	public boolean isSocialOfficeInstalled() {
 		return socialOfficeInstalled;
 	}
 
 	public void setAuthType(String authType) {
 		this.authType = authType;
+	}
+
+	public void setOAuthConsumerKey(String oAuthConsumerKey) {
+		this.oAuthConsumerKey = oAuthConsumerKey;
+	}
+
+	public void setOAuthConsumerSecret(String oAuthConsumerSecret) {
+		this.oAuthConsumerSecret = oAuthConsumerSecret;
+	}
+
+	public void setOAuthEnabled(boolean oAuthEnabled) {
+		this.oAuthEnabled = oAuthEnabled;
 	}
 
 	public void setPluginVersion(String pluginVersion) {
@@ -94,6 +125,16 @@ public class SyncContext {
 	}
 
 	protected String authType;
+
+	@JsonProperty("OAuthConsumerKey")
+	protected String oAuthConsumerKey;
+
+	@JsonProperty("OAuthConsumerSecret")
+	protected String oAuthConsumerSecret;
+
+	@JsonProperty("OAuthEnabled")
+	protected boolean oAuthEnabled;
+
 	protected String pluginVersion;
 	protected int portalBuildNumber;
 	protected Map<String, String> portletPreferencesMap;

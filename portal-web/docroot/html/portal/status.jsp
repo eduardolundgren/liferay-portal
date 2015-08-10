@@ -53,7 +53,7 @@ if (Validator.isNotNull(exception)) {
 %>
 
 <c:choose>
-	<c:when test="<%= SessionErrors.contains(request, PrincipalException.class.getName()) %>">
+	<c:when test="<%= SessionErrors.contains(request, PrincipalException.getNestedClasses()) %>">
 		<h3 class="alert alert-danger">
 			<liferay-ui:message key="forbidden" />
 		</h3>
@@ -101,7 +101,7 @@ if (Validator.isNotNull(exception)) {
 			<liferay-ui:message key="not-found" />
 		</h3>
 
-		<liferay-ui:message key="the-requested-resource-was-not-found" />
+		<liferay-ui:message key="the-requested-resource-could-not-be-found" />
 
 		<br /><br />
 

@@ -33,6 +33,7 @@ import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
+import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class POPServerUtil {
 		_instance._deleteListener(listener);
 	}
 
-	public static List<MessageListener> getListeners() throws Exception {
+	public static List<MessageListener> getListeners() {
 		return _instance._getListeners();
 	}
 
@@ -140,10 +141,9 @@ public class POPServerUtil {
 
 	private static final POPServerUtil _instance = new POPServerUtil();
 
-	private final List<MessageListener> _listeners =
-		new ArrayList<MessageListener>();
+	private final List<MessageListener> _listeners = new ArrayList<>();
 	private final ServiceRegistrationMap<MessageListener>
-		_serviceRegistrations = new ServiceRegistrationMap<MessageListener>();
+		_serviceRegistrations = new ServiceRegistrationMapImpl<>();
 	private final ServiceTracker<MessageListener, MessageListenerWrapper>
 		_serviceTracker;
 

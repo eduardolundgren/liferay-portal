@@ -23,9 +23,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
-* @author Raymond Augé
-* @author Peter Fellwock
-*/
+ * @author Raymond Augé
+ * @author Peter Fellwock
+ */
 @Component(
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-unit-converter",
@@ -33,9 +33,8 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
-		"com.liferay.portlet.render-weight=50",
 		"com.liferay.portlet.remoteable=true",
-		"com.liferay.portlet.struts-path=unit_converter",
+		"com.liferay.portlet.render-weight=50",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Unit Converter",
 		"javax.portlet.expiration-cache=0",

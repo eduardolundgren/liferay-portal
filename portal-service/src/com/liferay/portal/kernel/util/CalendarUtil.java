@@ -32,8 +32,8 @@ public class CalendarUtil {
 
 	public static final String[] DAYS_ABBREVIATION = new String[] {
 		"sunday-abbreviation", "monday-abbreviation", "tuesday-abbreviation",
-		"wednesday-abbreviation", "thursday-abbreviation","friday-abbreviation",
-		"saturday-abbreviation"
+		"wednesday-abbreviation", "thursday-abbreviation",
+		"friday-abbreviation", "saturday-abbreviation"
 	};
 
 	public static final String ICAL_EXTENSION = "ics";
@@ -468,7 +468,7 @@ public class CalendarUtil {
 		return millis;
 	}
 
-	private static Map<String, String[]> _calendarPool =
-		new ConcurrentHashMap<String, String[]>();
+	private static final Map<String, String[]> _calendarPool =
+		new ConcurrentHashMap<>();
 
 }
