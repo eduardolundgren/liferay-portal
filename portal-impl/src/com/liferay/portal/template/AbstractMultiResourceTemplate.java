@@ -13,8 +13,11 @@
  */
 package com.liferay.portal.template;
 
+import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
 
+import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +25,7 @@ import java.util.Map;
  * @author Miroslav Ligas
  */
 public abstract class AbstractMultiResourceTemplate extends AbstractTemplate{
+
 	public AbstractMultiResourceTemplate(
 		List<TemplateResource> templateResources,
 		TemplateResource errorTemplateResource, Map<String, Object> context,
@@ -34,5 +38,30 @@ public abstract class AbstractMultiResourceTemplate extends AbstractTemplate{
 		if (templateResources == null || templateResources.isEmpty()) {
 			throw new IllegalArgumentException("Template resource is null");
 		}
+
+		this.templateResources = templateResources;
 	}
+
+	@Override
+	public void doProcessTemplate(Writer writer) throws Exception {
+
+	}
+
+	@Override
+	public void processTemplate(Writer writer) throws TemplateException {
+
+	}
+
+	@Override
+	protected void processTemplate(TemplateResource templateResource,
+		Writer writer) throws Exception {
+
+		processTemplates(Collections.singletonList(templateResource), writer);
+	}
+
+	protected abstract void processTemplates(
+		List<TemplateResource> templateResource, Writer writer)
+		throws Exception;
+
+	protected List<TemplateResource> templateResources;
 }
