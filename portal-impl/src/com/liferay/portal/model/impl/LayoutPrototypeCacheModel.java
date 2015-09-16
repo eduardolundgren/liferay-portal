@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof LayoutPrototypeCacheModel)) {
+			return false;
+		}
+
+		LayoutPrototypeCacheModel layoutPrototypeCacheModel = (LayoutPrototypeCacheModel)obj;
+
+		if ((layoutPrototypeId == layoutPrototypeCacheModel.layoutPrototypeId) &&
+				(mvccVersion == layoutPrototypeCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, layoutPrototypeId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -77,6 +105,8 @@ public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 		sb.append(settings);
 		sb.append(", active=");
 		sb.append(active);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -143,6 +173,13 @@ public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 
 		layoutPrototypeImpl.setActive(active);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			layoutPrototypeImpl.setLastPublishDate(null);
+		}
+		else {
+			layoutPrototypeImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		layoutPrototypeImpl.resetOriginalValues();
 
 		return layoutPrototypeImpl;
@@ -162,6 +199,7 @@ public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 		description = objectInput.readUTF();
 		settings = objectInput.readUTF();
 		active = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -212,6 +250,7 @@ public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 		}
 
 		objectOutput.writeBoolean(active);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -226,4 +265,5 @@ public class LayoutPrototypeCacheModel implements CacheModel<LayoutPrototype>,
 	public String description;
 	public String settings;
 	public boolean active;
+	public long lastPublishDate;
 }

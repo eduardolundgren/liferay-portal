@@ -45,12 +45,9 @@ public abstract class BaseLayoutTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
-		_cssClass = null;
-	}
+		super.cleanUp();
 
-	@Override
-	protected String getEndPage() {
-		return _END_PAGE;
+		_cssClass = null;
 	}
 
 	@Override
@@ -64,9 +61,6 @@ public abstract class BaseLayoutTag extends com.liferay.taglib.util.IncludeTag {
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:layout:";
-
-	private static final String _END_PAGE =
-		"/html/taglib/aui/layout/end.jsp";
 
 	private static final String _START_PAGE =
 		"/html/taglib/aui/layout/start.jsp";

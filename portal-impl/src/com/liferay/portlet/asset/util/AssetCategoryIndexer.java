@@ -21,19 +21,21 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
@@ -44,16 +46,14 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 /**
  * @author Istvan Andras Dezsi
  */
-public class AssetCategoryIndexer extends BaseIndexer {
+@OSGiBeanProperties
+public class AssetCategoryIndexer extends BaseIndexer<AssetCategory> {
 
-	public static final String[] CLASS_NAMES = {AssetCategory.class.getName()};
-
-	public static final String PORTLET_ID = PortletKeys.ASSET_CATEGORIES_ADMIN;
+	public static final String CLASS_NAME = AssetCategory.class.getName();
 
 	public AssetCategoryIndexer() {
 		setCommitImmediately(true);
@@ -65,13 +65,8 @@ public class AssetCategoryIndexer extends BaseIndexer {
 	}
 
 	@Override
-	public String[] getClassNames() {
-		return CLASS_NAMES;
-	}
-
-	@Override
-	public String getPortletId() {
-		return PORTLET_ID;
+	public String getClassName() {
+		return CLASS_NAME;
 	}
 
 	@Override
@@ -88,52 +83,49 @@ public class AssetCategoryIndexer extends BaseIndexer {
 	}
 
 	@Override
-	public void postProcessContextQuery(
-			BooleanQuery contextQuery, SearchContext searchContext)
+	public void postProcessContextBooleanFilter(
+			BooleanFilter contextBooleanFilter, SearchContext searchContext)
 		throws Exception {
 
 		long[] parentCategoryIds = (long[])searchContext.getAttribute(
 			Field.ASSET_PARENT_CATEGORY_IDS);
 
 		if (!ArrayUtil.isEmpty(parentCategoryIds)) {
-			BooleanQuery parentCategoryQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			TermsFilter parentCategoryTermsFilter = new TermsFilter(
+				Field.ASSET_PARENT_CATEGORY_ID);
 
-			for (long parentCategoryId : parentCategoryIds) {
-				parentCategoryQuery.addTerm(
-					Field.ASSET_PARENT_CATEGORY_ID,
-					String.valueOf(parentCategoryId));
-			}
+			parentCategoryTermsFilter.addValues(
+				ArrayUtil.toStringArray(parentCategoryIds));
 
-			contextQuery.add(parentCategoryQuery, BooleanClauseOccur.MUST);
+			contextBooleanFilter.add(
+				parentCategoryTermsFilter, BooleanClauseOccur.MUST);
 		}
 
 		long[] vocabularyIds = (long[])searchContext.getAttribute(
 			Field.ASSET_VOCABULARY_IDS);
 
 		if (!ArrayUtil.isEmpty(vocabularyIds)) {
-			BooleanQuery vocabularyQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			TermsFilter vocabularyTermsFilter = new TermsFilter(
+				Field.ASSET_VOCABULARY_ID);
 
-			for (long vocabularyId : vocabularyIds) {
-				vocabularyQuery.addTerm(
-					Field.ASSET_VOCABULARY_ID, String.valueOf(vocabularyId));
-			}
+			vocabularyTermsFilter.addValues(
+				ArrayUtil.toStringArray(vocabularyIds));
 
-			contextQuery.add(vocabularyQuery, BooleanClauseOccur.MUST);
+			contextBooleanFilter.add(
+				vocabularyTermsFilter, BooleanClauseOccur.MUST);
 		}
 	}
 
 	@Override
 	public void postProcessSearchQuery(
-			BooleanQuery searchQuery, SearchContext searchContext)
+			BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
+			SearchContext searchContext)
 		throws Exception {
 
 		String title = (String)searchContext.getAttribute(Field.TITLE);
 
 		if (Validator.isNotNull(title)) {
-			BooleanQuery localizedQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			BooleanQuery localizedQuery = new BooleanQueryImpl();
 
 			searchContext.setAttribute(Field.ASSET_CATEGORY_TITLE, title);
 
@@ -148,12 +140,10 @@ public class AssetCategoryIndexer extends BaseIndexer {
 	}
 
 	@Override
-	protected void doDelete(Object obj) throws Exception {
-		AssetCategory assetCategory = (AssetCategory)obj;
-
+	protected void doDelete(AssetCategory assetCategory) throws Exception {
 		Document document = new DocumentImpl();
 
-		document.addUID(PORTLET_ID, assetCategory.getCategoryId());
+		document.addUID(CLASS_NAME, assetCategory.getCategoryId());
 
 		SearchEngineUtil.deleteDocument(
 			getSearchEngineId(), assetCategory.getCompanyId(),
@@ -161,35 +151,37 @@ public class AssetCategoryIndexer extends BaseIndexer {
 	}
 
 	@Override
-	protected Document doGetDocument(Object obj) throws Exception {
-		AssetCategory category = (AssetCategory)obj;
+	protected Document doGetDocument(AssetCategory assetCategory)
+		throws Exception {
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Indexing category " + category);
+			_log.debug("Indexing asset category " + assetCategory);
 		}
 
-		Document document = getBaseModelDocument(PORTLET_ID, category);
+		Document document = getBaseModelDocument(CLASS_NAME, assetCategory);
 
-		document.addKeyword(Field.ASSET_CATEGORY_ID, category.getCategoryId());
+		document.addKeyword(
+			Field.ASSET_CATEGORY_ID, assetCategory.getCategoryId());
 
-		List<AssetCategory> categories = new ArrayList<AssetCategory>(1);
+		List<AssetCategory> categories = new ArrayList<>(1);
 
-		categories.add(category);
+		categories.add(assetCategory);
 
 		addSearchAssetCategoryTitles(
 			document, Field.ASSET_CATEGORY_TITLE, categories);
 
 		document.addKeyword(
-			Field.ASSET_PARENT_CATEGORY_ID, category.getParentCategoryId());
+			Field.ASSET_PARENT_CATEGORY_ID,
+			assetCategory.getParentCategoryId());
 		document.addKeyword(
-			Field.ASSET_VOCABULARY_ID, category.getVocabularyId());
+			Field.ASSET_VOCABULARY_ID, assetCategory.getVocabularyId());
 		document.addLocalizedText(
-			Field.DESCRIPTION, category.getDescriptionMap());
-		document.addText(Field.NAME, category.getName());
-		document.addLocalizedText(Field.TITLE, category.getTitleMap());
+			Field.DESCRIPTION, assetCategory.getDescriptionMap());
+		document.addText(Field.NAME, assetCategory.getName());
+		document.addLocalizedText(Field.TITLE, assetCategory.getTitleMap());
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Document " + category + " indexed successfully");
+			_log.debug("Document " + assetCategory + " indexed successfully");
 		}
 
 		return document;
@@ -197,21 +189,19 @@ public class AssetCategoryIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet, PortletURL portletURL,
+		Document document, Locale locale, String snippet,
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		return null;
 	}
 
 	@Override
-	protected void doReindex(Object obj) throws Exception {
-		AssetCategory category = (AssetCategory)obj;
-
-		Document document = getDocument(category);
+	protected void doReindex(AssetCategory assetCategory) throws Exception {
+		Document document = getDocument(assetCategory);
 
 		if (document != null) {
 			SearchEngineUtil.updateDocument(
-				getSearchEngineId(), category.getCompanyId(), document,
+				getSearchEngineId(), assetCategory.getCompanyId(), document,
 				isCommitImmediately());
 		}
 	}
@@ -231,11 +221,6 @@ public class AssetCategoryIndexer extends BaseIndexer {
 		reindexCategories(companyId);
 	}
 
-	@Override
-	protected String getPortletId(SearchContext searchContext) {
-		return PORTLET_ID;
-	}
-
 	protected void reindexCategories(final long companyId)
 		throws PortalException {
 
@@ -247,15 +232,23 @@ public class AssetCategoryIndexer extends BaseIndexer {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
+				public void performAction(Object object) {
 					AssetCategory category = (AssetCategory)object;
 
-					Document document = getDocument(category);
+					try {
+						Document document = getDocument(category);
 
-					if (document != null) {
-						actionableDynamicQuery.addDocument(document);
+						if (document != null) {
+							actionableDynamicQuery.addDocument(document);
+						}
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index asset category " +
+									category.getCategoryId(),
+								pe);
+						}
 					}
 				}
 

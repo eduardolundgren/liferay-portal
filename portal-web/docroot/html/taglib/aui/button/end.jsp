@@ -17,13 +17,13 @@
 <%@ include file="/html/taglib/aui/button/init.jsp" %>
 
 <c:if test="<%= dropdown %>">
-	<div class="btn-group" id="<%= id %>BtnGroup">
+	<div class="btn-group lfr-icon-menu" id="<%= id %>BtnGroup">
 </c:if>
 
 <c:choose>
 	<c:when test="<%= Validator.isNotNull(escapedHREF) %>">
 		<a
-			class="<%= AUIUtil.buildCss(AUIUtil.BUTTON_PREFIX, disabled, false, false, cssClass) %> btn-default"
+			class="<%= AUIUtil.buildCss(AUIUtil.BUTTON_PREFIX, disabled, false, false, cssClass) %> <%= type.equals("cancel") ? "btn-link" : "btn-default" %>"
 			href="<%= escapedHREF %>"
 			id="<%= id %>"
 
@@ -37,7 +37,7 @@
 	</c:when>
 	<c:otherwise>
 		<button
-			class="<%= AUIUtil.buildCss(AUIUtil.BUTTON_PREFIX, disabled, false, false, cssClass) %> btn-default"
+			class="<%= AUIUtil.buildCss(AUIUtil.BUTTON_PREFIX, disabled, false, false, cssClass) %> <%= type.equals("cancel") ? "btn-link" : "btn-default" %>"
 
 			<c:if test="<%= disabled %>">
 				disabled
@@ -65,7 +65,9 @@
 	<i class="<%= icon %>"></i>
 </c:if>
 
-<%= LanguageUtil.get(request, value) %>
+<c:if test="<%= Validator.isNotNull(value) %>">
+	<span class="lfr-btn-label"><%= LanguageUtil.get(request, value) %></span>
+</c:if>
 
 <c:if test='<%= Validator.isNotNull(icon) && iconAlign.equals("right") %>'>
 	<i class="<%= icon %>"></i>
@@ -85,20 +87,13 @@
 </c:choose>
 
 <c:if test="<%= dropdown %>">
-		<ul class="dropdown-menu" role="menu">
+		<ul class="direction-down dropdown-menu lfr-menu-list" role="menu">
 			<%= bodyContentString %>
 		</ul>
 	</div>
 
-	<aui:script use="aui-dropdown">
-		new A.Dropdown(
-			{
-				boundingBox: '#<%= id %>BtnGroup',
-				contentBox: '#<%= id %>BtnGroup',
-				render: true,
-				trigger: '#<%= id %>'
-			}
-		);
+	<aui:script use="liferay-menu">
+		Liferay.Menu.register('<%= id %>');
 	</aui:script>
 </c:if>
 

@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.xml.Document;
 
@@ -148,6 +149,16 @@ public class LocalizationUtil {
 	}
 
 	public static Map<Locale, String> getLocalizationMap(
+		PortletPreferences preferences, String preferenceName,
+		String propertyName, String defaultPropertyValue,
+		ClassLoader classLoader) {
+
+		return getLocalization().getLocalizationMap(
+			preferences, preferenceName, propertyName, defaultPropertyValue,
+			classLoader);
+	}
+
+	public static Map<Locale, String> getLocalizationMap(
 		PortletRequest portletRequest, String parameter) {
 
 		return getLocalization().getLocalizationMap(portletRequest, parameter);
@@ -224,6 +235,12 @@ public class LocalizationUtil {
 			portletRequest, parameter);
 	}
 
+	public static Map<Locale, String> getMap(
+		LocalizedValuesMap localizedValuesMap) {
+
+		return getLocalization().getMap(localizedValuesMap);
+	}
+
 	public static List<Locale> getModifiedLocales(
 		Map<Locale, String> oldMap, Map<Locale, String> newMap) {
 
@@ -231,11 +248,9 @@ public class LocalizationUtil {
 			return Collections.emptyList();
 		}
 
-		List<Locale> modifiedLocales = new ArrayList<Locale>();
+		List<Locale> modifiedLocales = new ArrayList<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			String oldValue = oldMap.get(locale);
 			String newValue = newMap.get(locale);
 
@@ -248,8 +263,8 @@ public class LocalizationUtil {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0 replaced by {@link
-	 *             #getLocalizedName(String, String)}
+	 * @deprecated As of 7.0.0 replaced by {@link #getLocalizedName(String,
+	 *             String)}
 	 */
 	@Deprecated
 	public static String getPreferencesKey(String key, String languageId) {
@@ -310,6 +325,12 @@ public class LocalizationUtil {
 
 		return getLocalization().getSettingsValues(
 			settings, key, languageId, useDefault);
+	}
+
+	public static String getXml(
+		LocalizedValuesMap localizedValuesMap, String key) {
+
+		return getLocalization().getXml(localizedValuesMap, key);
 	}
 
 	public static String removeLocalization(

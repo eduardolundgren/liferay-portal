@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.io;
 
+import com.liferay.portal.kernel.test.SyncThrowableThread;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -23,6 +25,7 @@ import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -154,29 +157,28 @@ public class CharPipeTest {
 
 		final AtomicLong timestampBeforeClose = new AtomicLong();
 
-		Thread thread = new Thread() {
+		SyncThrowableThread<Void> syncThrowableThread =
+			new SyncThrowableThread<>(
+				new Callable<Void>() {
 
-			@Override
-			public void run() {
-				try {
-					timestampBeforeClose.set(System.currentTimeMillis());
+					@Override
+					public Void call() throws Exception {
+						timestampBeforeClose.set(System.currentTimeMillis());
 
-					charPipe.close();
-				}
-				catch (Exception e) {
-					Assert.fail(e.getMessage());
-				}
-			}
+						charPipe.close();
 
-		};
+						return null;
+					}
 
-		thread.start();
+				});
+
+		syncThrowableThread.start();
 
 		int result = reader.read();
 
 		long timestampAfterRead = System.currentTimeMillis();
 
-		thread.join();
+		syncThrowableThread.sync();
 
 		Assert.assertEquals(-1, result);
 		Assert.assertTrue(timestampAfterRead >= timestampBeforeClose.get());
@@ -848,13 +850,13 @@ public class CharPipeTest {
 			}
 		}
 
-		private char[] _buffer;
-		private boolean _close;
+		private final char[] _buffer;
+		private final boolean _close;
 		private boolean _failed;
-		private boolean _force;
-		private Reader _reader;
+		private final boolean _force;
+		private final Reader _reader;
 		private final BlockingQueue<Long> _timestampsBeforeRead =
-			new LinkedBlockingQueue<Long>();
+			new LinkedBlockingQueue<>();
 
 	}
 
@@ -898,12 +900,12 @@ public class CharPipeTest {
 			}
 		}
 
-		private int _dataSize;
-		private boolean _expectException;
+		private final int _dataSize;
+		private final boolean _expectException;
 		private boolean _failed;
 		private final BlockingQueue<Long> _timestampsBeforeWrite =
-			new LinkedBlockingQueue<Long>();
-		private Writer _writer;
+			new LinkedBlockingQueue<>();
+		private final Writer _writer;
 
 	}
 

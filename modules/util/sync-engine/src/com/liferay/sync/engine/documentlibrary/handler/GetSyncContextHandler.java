@@ -14,15 +14,14 @@
 
 package com.liferay.sync.engine.documentlibrary.handler;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.documentlibrary.model.SyncContext;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncUserService;
+import com.liferay.sync.engine.util.GetterUtil;
+import com.liferay.sync.engine.util.JSONUtil;
 
 import java.util.Map;
 
@@ -44,10 +43,8 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 	}
 
 	protected SyncContext doProcessResponse(String response) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		SyncContext syncContext = objectMapper.readValue(
-			response, new TypeReference<SyncContext>() {});
+		SyncContext syncContext = JSONUtil.readValue(
+			response, SyncContext.class);
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			getSyncAccountId());
@@ -70,15 +67,22 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 		Map<String, String> portletPreferencesMap =
 			syncContext.getPortletPreferencesMap();
 
-		int maxConnections = Integer.parseInt(
+		int batchFileMaxSize = GetterUtil.getInteger(
 			portletPreferencesMap.get(
-				SyncContext.PREFERENCE_KEY_MAX_CONNECTIONS));
+				SyncContext.PREFERENCE_KEY_BATCH_FILE_MAX_SIZE));
+
+		syncAccount.setBatchFileMaxSize(batchFileMaxSize);
+
+		int maxConnections = GetterUtil.getInteger(
+			portletPreferencesMap.get(
+				SyncContext.PREFERENCE_KEY_MAX_CONNECTIONS),
+			1);
 
 		syncAccount.setMaxConnections(maxConnections);
 
-		int pollInterval = Integer.parseInt(
-			portletPreferencesMap.get(
-				SyncContext.PREFERENCE_KEY_POLL_INTERVAL));
+		int pollInterval = GetterUtil.getInteger(
+			portletPreferencesMap.get(SyncContext.PREFERENCE_KEY_POLL_INTERVAL),
+			5);
 
 		syncAccount.setPollInterval(pollInterval);
 
@@ -88,6 +92,11 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 		SyncAccountService.update(syncAccount);
 
 		return syncContext;
+	}
+
+	@Override
+	protected void logResponse(String response) {
+		super.logResponse("");
 	}
 
 }

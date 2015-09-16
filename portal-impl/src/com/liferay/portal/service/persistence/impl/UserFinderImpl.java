@@ -257,11 +257,25 @@ public class UserFinderImpl
 		String screenName, String emailAddress, int status,
 		LinkedHashMap<String, Object> params, boolean andOperator) {
 
-		String[] firstNames = CustomSQLUtil.keywords(firstName);
-		String[] middleNames = CustomSQLUtil.keywords(middleName);
-		String[] lastNames = CustomSQLUtil.keywords(lastName);
-		String[] screenNames = CustomSQLUtil.keywords(screenName);
-		String[] emailAddresses = CustomSQLUtil.keywords(emailAddress);
+		String[] firstNames = null;
+		String[] middleNames = null;
+		String[] lastNames = null;
+		String[] screenNames = null;
+		String[] emailAddresses = null;
+
+		if (Validator.isNotNull(firstName) || Validator.isNotNull(middleName) ||
+			Validator.isNotNull(lastName) || Validator.isNotNull(screenName) ||
+			Validator.isNotNull(emailAddress)) {
+
+			firstNames = CustomSQLUtil.keywords(firstName);
+			middleNames = CustomSQLUtil.keywords(middleName);
+			lastNames = CustomSQLUtil.keywords(lastName);
+			screenNames = CustomSQLUtil.keywords(screenName);
+			emailAddresses = CustomSQLUtil.keywords(emailAddress);
+		}
+		else {
+			andOperator = true;
+		}
 
 		return countByC_FN_MN_LN_SN_EA_S(
 			companyId, firstNames, middleNames, lastNames, screenNames,
@@ -440,11 +454,25 @@ public class UserFinderImpl
 		LinkedHashMap<String, Object> params, boolean andOperator, int start,
 		int end, OrderByComparator<User> obc) {
 
-		String[] firstNames = CustomSQLUtil.keywords(firstName);
-		String[] middleNames = CustomSQLUtil.keywords(middleName);
-		String[] lastNames = CustomSQLUtil.keywords(lastName);
-		String[] screenNames = CustomSQLUtil.keywords(screenName);
-		String[] emailAddresses = CustomSQLUtil.keywords(emailAddress);
+		String[] firstNames = null;
+		String[] middleNames = null;
+		String[] lastNames = null;
+		String[] screenNames = null;
+		String[] emailAddresses = null;
+
+		if (Validator.isNotNull(firstName) || Validator.isNotNull(middleName) ||
+			Validator.isNotNull(lastName) || Validator.isNotNull(screenName) ||
+			Validator.isNotNull(emailAddress)) {
+
+			firstNames = CustomSQLUtil.keywords(firstName);
+			middleNames = CustomSQLUtil.keywords(middleName);
+			lastNames = CustomSQLUtil.keywords(lastName);
+			screenNames = CustomSQLUtil.keywords(screenName);
+			emailAddresses = CustomSQLUtil.keywords(emailAddress);
+		}
+		else {
+			andOperator = true;
+		}
 
 		return findByC_FN_MN_LN_SN_EA_S(
 			companyId, firstNames, middleNames, lastNames, screenNames,
@@ -463,7 +491,7 @@ public class UserFinderImpl
 				companyId, firstNames, middleNames, lastNames, screenNames,
 				emailAddresses, status, params, andOperator, start, end, obc);
 
-			List<User> users = new ArrayList<User>(userIds.size());
+			List<User> users = new ArrayList<>(userIds.size());
 
 			for (Long userId : userIds) {
 				User user = UserUtil.findByPrimaryKey(userId);
@@ -539,9 +567,9 @@ public class UserFinderImpl
 		if (ArrayUtil.isNotEmpty(groupIds) && inherit &&
 			!socialRelationTypeUnionUserGroups) {
 
-			List<Long> organizationIds = new ArrayList<Long>();
-			List<Long> siteGroupIds = new ArrayList<Long>();
-			List<Long> userGroupIds = new ArrayList<Long>();
+			List<Long> organizationIds = new ArrayList<>();
+			List<Long> siteGroupIds = new ArrayList<>();
+			List<Long> userGroupIds = new ArrayList<>();
 
 			for (long groupId : groupIds) {
 				Group group = GroupLocalServiceUtil.fetchGroup(groupId);
@@ -562,7 +590,7 @@ public class UserFinderImpl
 			}
 
 			if (!organizationIds.isEmpty()) {
-				params2 = new LinkedHashMap<String, Object>(params1);
+				params2 = new LinkedHashMap<>(params1);
 
 				params2.remove("usersGroups");
 
@@ -584,13 +612,13 @@ public class UserFinderImpl
 				Long[] siteGroupIdsArray = siteGroupIds.toArray(
 					new Long[siteGroupIds.size()]);
 
-				params3 = new LinkedHashMap<String, Object>(params1);
+				params3 = new LinkedHashMap<>(params1);
 
 				params3.remove("usersGroups");
 
 				params3.put("groupsOrgs", siteGroupIdsArray);
 
-				params4 = new LinkedHashMap<String, Object>(params1);
+				params4 = new LinkedHashMap<>(params1);
 
 				params4.remove("usersGroups");
 
@@ -598,7 +626,7 @@ public class UserFinderImpl
 			}
 
 			if (!userGroupIds.isEmpty()) {
-				params5 = new LinkedHashMap<String, Object>(params1);
+				params5 = new LinkedHashMap<>(params1);
 
 				params5.remove("usersGroups");
 
@@ -611,9 +639,9 @@ public class UserFinderImpl
 		if (ArrayUtil.isNotEmpty(roleIds) && inherit &&
 			!socialRelationTypeUnionUserGroups) {
 
-			List<Long> organizationIds = new ArrayList<Long>();
-			List<Long> siteGroupIds = new ArrayList<Long>();
-			List<Long> userGroupIds = new ArrayList<Long>();
+			List<Long> organizationIds = new ArrayList<>();
+			List<Long> siteGroupIds = new ArrayList<>();
+			List<Long> userGroupIds = new ArrayList<>();
 
 			for (long roleId : roleIds) {
 				List<Group> groups = RoleUtil.getGroups(roleId);
@@ -632,7 +660,7 @@ public class UserFinderImpl
 			}
 
 			if (!organizationIds.isEmpty()) {
-				params2 = new LinkedHashMap<String, Object>(params1);
+				params2 = new LinkedHashMap<>(params1);
 
 				params2.remove("usersRoles");
 
@@ -657,19 +685,19 @@ public class UserFinderImpl
 				Long[] siteGroupIdsArray = siteGroupIds.toArray(
 					new Long[siteGroupIds.size()]);
 
-				params3 = new LinkedHashMap<String, Object>(params1);
+				params3 = new LinkedHashMap<>(params1);
 
 				params3.remove("usersRoles");
 
 				params3.put("usersGroups", siteGroupIdsArray);
 
-				params4 = new LinkedHashMap<String, Object>(params1);
+				params4 = new LinkedHashMap<>(params1);
 
 				params4.remove("usersRoles");
 
 				params4.put("groupsOrgs", siteGroupIdsArray);
 
-				params5 = new LinkedHashMap<String, Object>(params1);
+				params5 = new LinkedHashMap<>(params1);
 
 				params5.remove("usersRoles");
 
@@ -677,7 +705,7 @@ public class UserFinderImpl
 			}
 
 			if (!userGroupIds.isEmpty()) {
-				params6 = new LinkedHashMap<String, Object>(params1);
+				params6 = new LinkedHashMap<>(params1);
 
 				params6.remove("usersRoles");
 
@@ -692,7 +720,7 @@ public class UserFinderImpl
 				params.get("socialRelationType"));
 
 			if (hasSocialRelationTypes && ArrayUtil.isNotEmpty(groupIds)) {
-				params2 = new LinkedHashMap<String, Object>(params1);
+				params2 = new LinkedHashMap<>(params1);
 
 				params1.remove("socialRelationType");
 
@@ -1350,7 +1378,7 @@ public class UserFinderImpl
 
 	private static final String _STATUS_SQL = "AND (User_.status = ?)";
 
-	private LinkedHashMap<String, Object> _emptyLinkedHashMap =
-		new LinkedHashMap<String, Object>(0);
+	private final LinkedHashMap<String, Object> _emptyLinkedHashMap =
+		new LinkedHashMap<>(0);
 
 }

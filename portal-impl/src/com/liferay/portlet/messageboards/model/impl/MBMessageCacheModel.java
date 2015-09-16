@@ -16,6 +16,7 @@ package com.liferay.portlet.messageboards.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class MBMessageCacheModel implements CacheModel<MBMessage>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MBMessageCacheModel)) {
+			return false;
+		}
+
+		MBMessageCacheModel mbMessageCacheModel = (MBMessageCacheModel)obj;
+
+		if (messageId == mbMessageCacheModel.messageId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, messageId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(51);
+		StringBundler sb = new StringBundler(53);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -85,6 +110,8 @@ public class MBMessageCacheModel implements CacheModel<MBMessage>,
 		sb.append(allowPingbacks);
 		sb.append(", answer=");
 		sb.append(answer);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -167,6 +194,14 @@ public class MBMessageCacheModel implements CacheModel<MBMessage>,
 		mbMessageImpl.setPriority(priority);
 		mbMessageImpl.setAllowPingbacks(allowPingbacks);
 		mbMessageImpl.setAnswer(answer);
+
+		if (lastPublishDate == Long.MIN_VALUE) {
+			mbMessageImpl.setLastPublishDate(null);
+		}
+		else {
+			mbMessageImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		mbMessageImpl.setStatus(status);
 		mbMessageImpl.setStatusByUserId(statusByUserId);
 
@@ -212,6 +247,7 @@ public class MBMessageCacheModel implements CacheModel<MBMessage>,
 		priority = objectInput.readDouble();
 		allowPingbacks = objectInput.readBoolean();
 		answer = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 		status = objectInput.readInt();
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
@@ -274,6 +310,7 @@ public class MBMessageCacheModel implements CacheModel<MBMessage>,
 		objectOutput.writeDouble(priority);
 		objectOutput.writeBoolean(allowPingbacks);
 		objectOutput.writeBoolean(answer);
+		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeInt(status);
 		objectOutput.writeLong(statusByUserId);
 
@@ -308,6 +345,7 @@ public class MBMessageCacheModel implements CacheModel<MBMessage>,
 	public double priority;
 	public boolean allowPingbacks;
 	public boolean answer;
+	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ColorScheme;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
@@ -78,6 +79,7 @@ import javax.portlet.WindowState;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Represents a portal layout, providing access to the layout's URLs, parent
@@ -182,7 +184,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public List<Layout> getAllChildren() {
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		for (Layout layout : getChildren()) {
 			layouts.add(layout);
@@ -260,7 +262,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public List<Layout> getAncestors() throws PortalException {
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		Layout layout = this;
 
@@ -331,12 +333,15 @@ public class LayoutImpl extends LayoutBaseImpl {
 	@Override
 	public ColorScheme getColorScheme() throws PortalException {
 		if (isInheritLookAndFeel()) {
-			return getLayoutSet().getColorScheme();
+			LayoutSet layoutSet = getLayoutSet();
+
+			return layoutSet.getColorScheme();
 		}
 		else {
+			Theme theme = getTheme();
+
 			return ThemeLocalServiceUtil.getColorScheme(
-				getCompanyId(), getTheme().getThemeId(), getColorSchemeId(),
-				false);
+				getCompanyId(), theme.getThemeId(), getColorSchemeId(), false);
 		}
 	}
 
@@ -356,7 +361,9 @@ public class LayoutImpl extends LayoutBaseImpl {
 	@Override
 	public String getCssText() throws PortalException {
 		if (isInheritLookAndFeel()) {
-			return getLayoutSet().getCss();
+			LayoutSet layoutSet = getLayoutSet();
+
+			return layoutSet.getCss();
 		}
 		else {
 			return getCss();
@@ -407,7 +414,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 				group.getTypeSettingsProperties();
 
 			if (!GetterUtil.getBoolean(
-					typeSettingsProperties.getProperty("inheritLocales"),
+					typeSettingsProperties.getProperty(
+						GroupConstants.TYPE_SETTINGS_KEY_INHERIT_LOCALES),
 					true)) {
 
 				String[] locales = StringUtil.split(
@@ -439,7 +447,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public Map<Locale, String> getFriendlyURLMap() {
-		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(getPlid());
@@ -448,6 +456,21 @@ public class LayoutImpl extends LayoutBaseImpl {
 			friendlyURLMap.put(
 				LocaleUtil.fromLanguageId(layoutFriendlyURL.getLanguageId()),
 				layoutFriendlyURL.getFriendlyURL());
+		}
+
+		// If the site/portal default language changes, there may not exist a
+		// value for the new default language. In this situation, we will use
+		// the value from the previous default language.
+
+		Locale defaultSiteLocale = LocaleUtil.getSiteDefault();
+
+		if (Validator.isNull(friendlyURLMap.get(defaultSiteLocale))) {
+			Locale defaultLocale = LocaleUtil.fromLanguageId(
+				getDefaultLanguageId());
+
+			String defaultFriendlyURL = friendlyURLMap.get(defaultLocale);
+
+			friendlyURLMap.put(defaultSiteLocale, defaultFriendlyURL);
 		}
 
 		return friendlyURLMap;
@@ -459,7 +482,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 		return LocalizationUtil.updateLocalization(
 			friendlyURLMap, StringPool.BLANK, "FriendlyURL",
-			LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
 	}
 
 	/**
@@ -649,7 +672,9 @@ public class LayoutImpl extends LayoutBaseImpl {
 	@Override
 	public Theme getTheme() throws PortalException {
 		if (isInheritLookAndFeel()) {
-			return getLayoutSet().getTheme();
+			LayoutSet layoutSet = getLayoutSet();
+
+			return layoutSet.getTheme();
 		}
 		else {
 			return ThemeLocalServiceUtil.getTheme(
@@ -716,19 +741,25 @@ public class LayoutImpl extends LayoutBaseImpl {
 	@Override
 	public ColorScheme getWapColorScheme() throws PortalException {
 		if (isInheritLookAndFeel()) {
-			return getLayoutSet().getWapColorScheme();
+			LayoutSet layoutSet = getLayoutSet();
+
+			return layoutSet.getWapColorScheme();
 		}
 		else {
+			Theme theme = getWapTheme();
+
 			return ThemeLocalServiceUtil.getColorScheme(
-				getCompanyId(), getWapTheme().getThemeId(),
-				getWapColorSchemeId(), true);
+				getCompanyId(), theme.getThemeId(), getWapColorSchemeId(),
+				true);
 		}
 	}
 
 	@Override
 	public Theme getWapTheme() throws PortalException {
 		if (isInheritWapLookAndFeel()) {
-			return getLayoutSet().getWapTheme();
+			LayoutSet layoutSet = getLayoutSet();
+
+			return layoutSet.getWapTheme();
 		}
 		else {
 			return ThemeLocalServiceUtil.getTheme(
@@ -788,6 +819,11 @@ public class LayoutImpl extends LayoutBaseImpl {
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean hasSetModifiedDate() {
+		return true;
 	}
 
 	@Override
@@ -992,27 +1028,29 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public boolean isSupportsEmbeddedPortlets() {
-		if (isTypeArticle() || isTypeEmbedded() || isTypePanel() ||
-			isTypePortlet()) {
-
+		if (isTypeEmbedded() || isTypePanel() || isTypePortlet()) {
 			return true;
 		}
 
 		return false;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isTypeArticle() {
-		if (getType().equals(LayoutConstants.TYPE_ARTICLE)) {
-			return true;
-		}
-
 		return false;
 	}
 
 	@Override
 	public boolean isTypeControlPanel() {
-		if (getType().equals(LayoutConstants.TYPE_CONTROL_PANEL)) {
+		if (Validator.equals(getType(), LayoutConstants.TYPE_CONTROL_PANEL) ||
+			Validator.equals(
+				_getLayoutTypeControllerType(),
+				LayoutConstants.TYPE_CONTROL_PANEL)) {
+
 			return true;
 		}
 
@@ -1021,7 +1059,11 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeEmbedded() {
-		if (getType().equals(LayoutConstants.TYPE_EMBEDDED)) {
+		if (Validator.equals(getType(), LayoutConstants.TYPE_EMBEDDED) ||
+			Validator.equals(
+				_getLayoutTypeControllerType(),
+				LayoutConstants.TYPE_EMBEDDED)) {
+
 			return true;
 		}
 
@@ -1030,7 +1072,11 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeLinkToLayout() {
-		if (getType().equals(LayoutConstants.TYPE_LINK_TO_LAYOUT)) {
+		if (Validator.equals(getType(), LayoutConstants.TYPE_LINK_TO_LAYOUT) ||
+			Validator.equals(
+				_getLayoutTypeControllerType(),
+				LayoutConstants.TYPE_LINK_TO_LAYOUT)) {
+
 			return true;
 		}
 
@@ -1039,7 +1085,10 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypePanel() {
-		if (getType().equals(LayoutConstants.TYPE_PANEL)) {
+		if (Validator.equals(getType(), LayoutConstants.TYPE_PANEL) ||
+			Validator.equals(
+				_getLayoutTypeControllerType(), LayoutConstants.TYPE_PANEL)) {
+
 			return true;
 		}
 
@@ -1048,7 +1097,10 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypePortlet() {
-		if (getType().equals(LayoutConstants.TYPE_PORTLET)) {
+		if (Validator.equals(getType(), LayoutConstants.TYPE_PORTLET) ||
+			Validator.equals(
+				_getLayoutTypeControllerType(), LayoutConstants.TYPE_PORTLET)) {
+
 			return true;
 		}
 
@@ -1057,7 +1109,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeURL() {
-		if (getType().equals(LayoutConstants.TYPE_URL)) {
+		if (Validator.equals(getType(), LayoutConstants.TYPE_URL)) {
 			return true;
 		}
 
@@ -1156,6 +1208,15 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 			_friendlyURLKeywords[i] = StringUtil.toLowerCase(keyword);
 		}
+	}
+
+	private String _getLayoutTypeControllerType() {
+		LayoutType layoutType = getLayoutType();
+
+		LayoutTypeController layoutTypeController =
+			layoutType.getLayoutTypeController();
+
+		return layoutTypeController.getType();
 	}
 
 	private LayoutTypePortlet _getLayoutTypePortletClone(
@@ -1262,8 +1323,9 @@ public class LayoutImpl extends LayoutBaseImpl {
 		if (!CookieKeys.hasSessionId(request) &&
 			(url.startsWith(portalURL) || url.startsWith(StringPool.SLASH))) {
 
-			url = PortalUtil.getURLWithSessionId(
-				url, request.getSession().getId());
+			HttpSession session = request.getSession();
+
+			url = PortalUtil.getURLWithSessionId(url, session.getId());
 		}
 
 		if (!resetMaxState) {
@@ -1282,7 +1344,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return url;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(LayoutImpl.class);
 
 	private static String[] _friendlyURLKeywords;
 

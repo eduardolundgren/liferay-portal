@@ -80,7 +80,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<aui:model-context bean="<%= entry %>" model="<%= BookmarksEntry.class %>" />
 
 	<aui:fieldset>
-		<c:if test="<%= ((entry != null) || (folderId <= 0) || Validator.isNotNull(referringPortletResource)) %>">
+		<c:if test="<%= (entry != null) || (folderId <= 0) || Validator.isNotNull(referringPortletResource) %>">
 
 			<%
 			String folderName = StringPool.BLANK;
@@ -129,7 +129,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 				</aui:script>
 
 				<%
-				String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('folderId', 'folderName', '" + renderResponse.getNamespace() + "');";
+				String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('folderId', 'folderName', this, '" + renderResponse.getNamespace() + "');";
 				%>
 
 				<aui:button disabled="<%= (folderId <= 0) %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />

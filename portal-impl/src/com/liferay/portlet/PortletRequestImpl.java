@@ -161,7 +161,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 	@Override
 	public Enumeration<String> getAttributeNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		Enumeration<String> enu = _request.getAttributeNames();
 
@@ -284,6 +284,11 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	@Override
+	public long getPlid() {
+		return _plid;
+	}
+
+	@Override
 	public PortalContext getPortalContext() {
 		return _portalContext;
 	}
@@ -301,6 +306,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		return _portletMode;
 	}
 
+	@Override
 	public String getPortletName() {
 		return _portletName;
 	}
@@ -342,7 +348,16 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 	@Override
 	public PortletPreferences getPreferences() {
-		return DoPrivilegedUtil.wrap(new PortletPreferencesPrivilegedAction());
+		String lifecycle = getLifecycle();
+
+		if (lifecycle.equals(PortletRequest.RENDER_PHASE) &&
+			PropsValues.PORTLET_PREFERENCES_STRICT_STORE) {
+
+			return DoPrivilegedUtil.wrap(
+				new PortletPreferencesPrivilegedAction());
+		}
+
+		return getPreferencesImpl();
 	}
 
 	public PortletPreferencesImpl getPreferencesImpl() {
@@ -370,8 +385,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			}
 
 			if (privateParameterMap == null) {
-				privateParameterMap = new HashMap<String, String[]>(
-					parameterMap.size(), 1);
+				privateParameterMap = new HashMap<>(parameterMap.size(), 1);
 			}
 
 			privateParameterMap.put(name, entry.getValue());
@@ -386,7 +400,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 	@Override
 	public Enumeration<String> getProperties(String name) {
-		List<String> values = new ArrayList<String>();
+		List<String> values = new ArrayList<>();
 
 		String value = _portalContext.getProperty(name);
 
@@ -425,8 +439,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 			if (_portlet.getPublicRenderParameter(name) != null) {
 				if (publicParameterMap == null) {
-					publicParameterMap = new HashMap<String, String[]>(
-						parameterMap.size(), 1);
+					publicParameterMap = new HashMap<>(parameterMap.size(), 1);
 				}
 
 				publicParameterMap.put(name, entry.getValue());
@@ -479,7 +492,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 	@Override
 	public Enumeration<String> getResponseContentTypes() {
-		List<String> responseContentTypes = new ArrayList<String>();
+		List<String> responseContentTypes = new ArrayList<>();
 
 		responseContentTypes.add(getResponseContentType());
 
@@ -755,8 +768,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		}
 
 		if (portletFocus) {
-			Map<String, String[]> renderParameters =
-				new HashMap<String, String[]>();
+			Map<String, String[]> renderParameters = new HashMap<>();
 
 			if (getLifecycle().equals(PortletRequest.RENDER_PHASE) &&
 				!LiferayWindowState.isExclusive(request) &&
@@ -982,8 +994,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 		@Override
 		public PortletPreferences run() {
-			return new PortletPreferencesWrapper(
-				getPreferencesImpl(), getLifecycle());
+			return new PortletPreferencesWrapper(getPreferencesImpl());
 		}
 
 	}

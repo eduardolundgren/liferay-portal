@@ -21,7 +21,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 PortletURL serverURL = renderResponse.createRenderURL();
 
-serverURL.setParameter("struts_action", "/admin/view");
+serverURL.setParameter("mvcRenderCommandName", "/admin/view");
 serverURL.setParameter("tabs1", tabs1);
 serverURL.setParameter("tabs2", tabs2);
 serverURL.setParameter("tabs3", tabs3);
@@ -59,7 +59,7 @@ serverURL.setParameter("tabs3", tabs3);
 	</c:when>
 	<c:otherwise>
 		<div class="form-search">
-			<liferay-ui:input-search placeholder='<%= LanguageUtil.get(locale, "keywords") %>' title='<%= LanguageUtil.get(locale, "search-categories") %>' />
+			<liferay-ui:input-search placeholder='<%= LanguageUtil.get(request, "keywords") %>' title='<%= LanguageUtil.get(request, "search-categories") %>' />
 		</div>
 
 		<%

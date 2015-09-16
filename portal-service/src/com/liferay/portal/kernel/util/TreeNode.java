@@ -41,7 +41,7 @@ public class TreeNode<T extends Comparable<T>> {
 	}
 
 	public TreeNode<T> addChildNode(T value) {
-		TreeNode<T> childNode = new TreeNode<T>(value, this);
+		TreeNode<T> childNode = new TreeNode<>(value, this);
 
 		_childNodes.add(childNode);
 
@@ -53,7 +53,7 @@ public class TreeNode<T extends Comparable<T>> {
 	}
 
 	public List<T> getChildValues() {
-		List<T> values = new ArrayList<T>(_childNodes.size());
+		List<T> values = new ArrayList<>(_childNodes.size());
 
 		for (TreeNode<T> childNode : _childNodes) {
 			values.add(childNode.getValue());

@@ -14,35 +14,30 @@
 
 package com.liferay.polls.upgrade;
 
+import com.liferay.polls.upgrade.v1_0_0.UpgradeClassNames;
+import com.liferay.polls.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import org.springframework.context.ApplicationContext;
-
 /**
  * @author Miguel Pastor
  */
-@Component(
-	immediate = true, service = PollsServiceUpgrade.class
-)
+@Component(immediate = true, service = PollsServiceUpgrade.class)
 public class PollsServiceUpgrade {
 
-	@Reference(
-		target =
-			"(org.springframework.context.service.name=" +
-				"com.liferay.polls.service)",
-		unbind = "-"
-	)
-	protected void setApplicationContext(
-		ApplicationContext applicationContext) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")
@@ -54,22 +49,15 @@ public class PollsServiceUpgrade {
 
 	@Activate
 	protected void upgrade() throws PortalException {
-		UpgradePortletId upgradePortletId = new UpgradePortletId() {
+		List<UpgradeProcess> upgradeProcesses = new ArrayList<>();
 
-			@Override
-			protected String[][] getRenamePortletIdsArray() {
-				return new String[][] {
-					new String[] {"25", "25_WAR_pollsweb"},
-					new String[] {"59", "59_WAR_pollsweb"}
-				};
-			}
+		upgradeProcesses.add(new UpgradePortletId());
 
-		};
+		upgradeProcesses.add(new UpgradeClassNames());
+		upgradeProcesses.add(new UpgradeLastPublishDate());
 
 		_releaseLocalService.updateRelease(
-			"com.liferay.polls.service",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
-			false);
+			"com.liferay.polls.service", upgradeProcesses, 1, 1, false);
 	}
 
 	private ReleaseLocalService _releaseLocalService;

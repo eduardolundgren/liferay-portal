@@ -365,7 +365,7 @@ public class BookmarksFolderLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _bookmarksFolderLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -460,6 +460,12 @@ public class BookmarksFolderLocalServiceWrapper
 	}
 
 	@Override
+	public void mergeFolders(long folderId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_bookmarksFolderLocalService.mergeFolders(folderId, parentFolderId);
+	}
+
+	@Override
 	public com.liferay.bookmarks.model.BookmarksFolder moveFolder(
 		long folderId, long parentFolderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -496,9 +502,11 @@ public class BookmarksFolderLocalServiceWrapper
 	}
 
 	@Override
-	public void restoreFolderFromTrash(long userId, long folderId)
+	public com.liferay.bookmarks.model.BookmarksFolder restoreFolderFromTrash(
+		long userId, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_bookmarksFolderLocalService.restoreFolderFromTrash(userId, folderId);
+		return _bookmarksFolderLocalService.restoreFolderFromTrash(userId,
+			folderId);
 	}
 
 	/**
@@ -545,6 +553,12 @@ public class BookmarksFolderLocalServiceWrapper
 		return _bookmarksFolderLocalService.updateBookmarksFolder(bookmarksFolder);
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #updateFolder(long, long,
+	long, String, String, ServiceContext)} and {@link
+	#mergeFolders(long, long)}
+	*/
+	@Deprecated
 	@Override
 	public com.liferay.bookmarks.model.BookmarksFolder updateFolder(
 		long userId, long folderId, long parentFolderId, java.lang.String name,
@@ -554,6 +568,16 @@ public class BookmarksFolderLocalServiceWrapper
 		return _bookmarksFolderLocalService.updateFolder(userId, folderId,
 			parentFolderId, name, description, mergeWithParentFolder,
 			serviceContext);
+	}
+
+	@Override
+	public com.liferay.bookmarks.model.BookmarksFolder updateFolder(
+		long userId, long folderId, long parentFolderId, java.lang.String name,
+		java.lang.String description,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _bookmarksFolderLocalService.updateFolder(userId, folderId,
+			parentFolderId, name, description, serviceContext);
 	}
 
 	@Override

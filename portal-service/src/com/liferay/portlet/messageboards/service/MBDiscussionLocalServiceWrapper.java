@@ -234,6 +234,12 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 	}
 
 	@Override
+	public com.liferay.portlet.messageboards.model.MBDiscussion fetchThreadDiscussion(
+		long threadId) {
+		return _mbDiscussionLocalService.fetchThreadDiscussion(threadId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return _mbDiscussionLocalService.getActionableDynamicQuery();
 	}
@@ -264,7 +270,7 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _mbDiscussionLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

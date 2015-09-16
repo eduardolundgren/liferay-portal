@@ -17,16 +17,10 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-
 /**
  * @author Brian Wing Shun Chan
  */
 public class ServerDetector {
-
-	public static final String GERONIMO_ID = "geronimo";
 
 	public static final String GLASSFISH_ID = "glassfish";
 
@@ -45,6 +39,8 @@ public class ServerDetector {
 	public static final String WEBLOGIC_ID = "weblogic";
 
 	public static final String WEBSPHERE_ID = "websphere";
+
+	public static final String WILDFLY_ID = "wildfly";
 
 	public static ServerDetector getInstance() {
 		if (_instance == null) {
@@ -65,10 +61,7 @@ public class ServerDetector {
 
 		serverDetector._serverId = serverId;
 
-		if (serverId.equals(GERONIMO_ID)) {
-			serverDetector._geronimo = true;
-		}
-		else if (serverId.equals(GLASSFISH_ID)) {
+		if (serverId.equals(GLASSFISH_ID)) {
 			serverDetector._glassfish = true;
 		}
 		else if (serverId.equals(JBOSS_ID)) {
@@ -95,15 +88,14 @@ public class ServerDetector {
 		else if (serverId.equals(WEBSPHERE_ID)) {
 			serverDetector._webSphere = true;
 		}
+		else if (serverId.equals(WILDFLY_ID)) {
+			serverDetector._wildfly = true;
+		}
 		else {
 			serverDetector._init();
 		}
 
 		_instance = serverDetector;
-	}
-
-	public static boolean isGeronimo() {
-		return getInstance()._geronimo;
 	}
 
 	public static boolean isGlassfish() {
@@ -112,14 +104,6 @@ public class ServerDetector {
 
 	public static boolean isJBoss() {
 		return getInstance()._jBoss;
-	}
-
-	public static boolean isJBoss5() {
-		return getInstance()._jBoss5;
-	}
-
-	public static boolean isJBoss7() {
-		return getInstance()._jBoss7;
 	}
 
 	public static boolean isJetty() {
@@ -156,6 +140,10 @@ public class ServerDetector {
 
 	public static boolean isWebSphere() {
 		return getInstance()._webSphere;
+	}
+
+	public static boolean isWildfly() {
+		return getInstance()._wildfly;
 	}
 
 	public static void setSupportsHotDeploy(boolean supportsHotDeploy) {
@@ -203,24 +191,13 @@ public class ServerDetector {
 	}
 
 	private void _init() {
-		if (_isGeronimo()) {
-			_serverId = GERONIMO_ID;
-			_geronimo = true;
-		}
-		else if (_isGlassfish()) {
+		if (_isGlassfish()) {
 			_serverId = GLASSFISH_ID;
 			_glassfish = true;
 		}
 		else if (_isJBoss()) {
 			_serverId = JBOSS_ID;
 			_jBoss = true;
-
-			if (_isJBoss5()) {
-				_jBoss5 = true;
-			}
-			else {
-				_jBoss7 = true;
-			}
 		}
 		else if (_isJOnAS()) {
 			_serverId = JONAS_ID;
@@ -241,6 +218,10 @@ public class ServerDetector {
 		else if (_isWebSphere()) {
 			_serverId = WEBSPHERE_ID;
 			_webSphere = true;
+		}
+		else if (_isWildfly()) {
+			_serverId = WILDFLY_ID;
+			_wildfly = true;
 		}
 
 		if (_serverId == null) {
@@ -270,45 +251,12 @@ public class ServerDetector {
 		}*/
 	}
 
-	private boolean _isGeronimo() {
-		return _hasSystemProperty("org.apache.geronimo.home.dir");
-	}
-
 	private boolean _isGlassfish() {
 		return _hasSystemProperty("com.sun.aas.instanceRoot");
 	}
 
 	private boolean _isJBoss() {
 		return _hasSystemProperty("jboss.home.dir");
-	}
-
-	private boolean _isJBoss5() {
-		try {
-			for (MBeanServer mBeanServer :
-					MBeanServerFactory.findMBeanServer(null)) {
-
-				String defaultDomain = mBeanServer.getDefaultDomain();
-
-				if (defaultDomain.equals("jboss")) {
-					ObjectName objectName = new ObjectName(
-						"jboss.system:type=Server");
-
-					String version = (String)mBeanServer.getAttribute(
-						objectName, "VersionNumber");
-
-					if (version.startsWith("5")) {
-						return true;
-					}
-
-					return false;
-				}
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		return false;
 	}
 
 	private boolean _isJetty() {
@@ -339,17 +287,18 @@ public class ServerDetector {
 		return _detect("/com/ibm/websphere/product/VersionInfo.class");
 	}
 
+	private boolean _isWildfly() {
+		return _hasSystemProperty("jboss.home.dir");
+	}
+
 	private static final boolean _SUPPORTS_COMET = false;
 
 	private static final Log _log = LogFactoryUtil.getLog(ServerDetector.class);
 
 	private static ServerDetector _instance;
 
-	private boolean _geronimo;
 	private boolean _glassfish;
 	private boolean _jBoss;
-	private boolean _jBoss5;
-	private boolean _jBoss7;
 	private boolean _jetty;
 	private boolean _jonas;
 	private boolean _oc4j;
@@ -359,5 +308,6 @@ public class ServerDetector {
 	private boolean _tomcat;
 	private boolean _webLogic;
 	private boolean _webSphere;
+	private boolean _wildfly;
 
 }

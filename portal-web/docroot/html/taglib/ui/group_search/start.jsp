@@ -28,23 +28,31 @@ GroupSearch searchContainer = new GroupSearch(renderRequest, portletURL);
 request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
 
 searchContainer.setRowChecker(rowChecker);
-%>
 
-<liferay-ui:search-form
-	page="/html/portlet/users_admin/group_search.jsp"
-	searchContainer="<%= searchContainer %>"
-/>
-
-<%
 GroupSearchTerms searchTerms = (GroupSearchTerms)searchContainer.getSearchTerms();
 
 List<Group> results = null;
 int total = 0;
 %>
 
-<%@ include file="/html/portlet/users_admin/group_search_results.jspf" %>
+<liferay-ui:group-search-form />
 
 <%
+if (searchTerms.isAdvancedSearch()) {
+	total = GroupLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getName(), searchTerms.getDescription(), groupParams, searchTerms.isAndOperator());
+
+	searchContainer.setTotal(total);
+
+	results = GroupLocalServiceUtil.search(company.getCompanyId(), searchTerms.getName(), searchTerms.getDescription(), groupParams, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+}
+else {
+	total = GroupLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), groupParams);
+
+	searchContainer.setTotal(total);
+
+	results = GroupLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), groupParams, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+}
+
 searchContainer.setResults(results);
 searchContainer.setTotal(total);
 %>

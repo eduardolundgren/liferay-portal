@@ -22,15 +22,17 @@ import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.persistence.SyncAccountPersistence;
 import com.liferay.sync.engine.util.Encryptor;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.OSDetector;
 
 import java.io.IOException;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import java.sql.SQLException;
 
@@ -40,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +66,7 @@ public class SyncAccountService {
 				syncAccountId);
 
 			for (SyncSite syncSite : syncSites) {
-				syncSite.setRemoteSyncTime(0);
+				syncSite.setRemoteSyncTime(-1);
 
 				SyncSiteService.update(syncSite);
 			}
@@ -78,6 +81,19 @@ public class SyncAccountService {
 			SyncUser syncUser, boolean trustSelfSigned, String url)
 		throws Exception {
 
+		return addSyncAccount(
+			filePathName, login, maxConnections, "", "", false, password,
+			pollInterval, syncSites, syncUser, trustSelfSigned, url);
+	}
+
+	public static SyncAccount addSyncAccount(
+			String filePathName, String login, int maxConnections,
+			String oAuthConsumerKey, String oAuthConsumerSecret,
+			boolean oAuthEnabled, String password, int pollInterval,
+			SyncSite[] syncSites, SyncUser syncUser, boolean trustSelfSigned,
+			String url)
+		throws Exception {
+
 		// Sync account
 
 		SyncAccount syncAccount = new SyncAccount();
@@ -85,6 +101,9 @@ public class SyncAccountService {
 		syncAccount.setFilePathName(filePathName);
 		syncAccount.setLogin(login);
 		syncAccount.setMaxConnections(maxConnections);
+		syncAccount.setOAuthConsumerKey(oAuthConsumerKey);
+		syncAccount.setOAuthConsumerSecret(oAuthConsumerSecret);
+		syncAccount.setOAuthEnabled(oAuthEnabled);
 		syncAccount.setPassword(Encryptor.encrypt(password));
 		syncAccount.setPollInterval(pollInterval);
 		syncAccount.setTrustSelfSigned(trustSelfSigned);
@@ -105,7 +124,7 @@ public class SyncAccountService {
 		SyncFileService.addSyncFile(
 			null, null, null, filePathName, null,
 			String.valueOf(filePath.getFileName()), 0, 0, SyncFile.STATE_SYNCED,
-			syncAccount.getSyncAccountId(), SyncFile.TYPE_SYSTEM);
+			syncAccount.getSyncAccountId(), SyncFile.TYPE_SYSTEM, false);
 
 		// Sync sites
 
@@ -121,6 +140,7 @@ public class SyncAccountService {
 					FileUtil.getFilePathName(
 						syncAccount.getFilePathName(), syncSiteName));
 
+				syncSite.setRemoteSyncTime(-1);
 				syncSite.setSyncAccountId(syncAccount.getSyncAccountId());
 
 				SyncSiteService.update(syncSite);
@@ -216,7 +236,7 @@ public class SyncAccountService {
 		}
 
 		try {
-			_activeSyncAccountIds = new HashSet<Long>(
+			_activeSyncAccountIds = new HashSet<>(
 				_syncAccountPersistence.findByActive(true));
 
 			return _activeSyncAccountIds;
@@ -274,30 +294,34 @@ public class SyncAccountService {
 
 		update(syncAccount);
 
+		// Sync file
+
+		SyncFile syncFile = SyncFileService.fetchSyncFile(sourceFilePathName);
+
+		syncFile.setFilePathName(targetFilePathName);
+
+		SyncFileService.update(syncFile);
+
 		// Sync files
 
-		List<SyncFile> syncFiles = SyncFileService.findSyncFiles(syncAccountId);
-
-		for (SyncFile syncFile : syncFiles) {
-			String syncFileFilePathName = syncFile.getFilePathName();
-
-			syncFileFilePathName = syncFileFilePathName.replace(
+		if (syncFile.isFolder()) {
+			SyncFileService.renameSyncFiles(
 				sourceFilePathName, targetFilePathName);
-
-			syncFile.setFilePathName(syncFileFilePathName);
-
-			SyncFileService.update(syncFile);
 		}
 
 		// Sync sites
+
+		FileSystem fileSystem = FileSystems.getDefault();
 
 		List<SyncSite> syncSites = SyncSiteService.findSyncSites(syncAccountId);
 
 		for (SyncSite syncSite : syncSites) {
 			String syncSiteFilePathName = syncSite.getFilePathName();
 
-			syncSiteFilePathName = syncSiteFilePathName.replace(
-				sourceFilePathName, targetFilePathName);
+			syncSiteFilePathName = StringUtils.replaceOnce(
+				syncSiteFilePathName,
+				sourceFilePathName + fileSystem.getSeparator(),
+				targetFilePathName + fileSystem.getSeparator());
 
 			syncSite.setFilePathName(syncSiteFilePathName);
 
@@ -329,7 +353,7 @@ public class SyncAccountService {
 	}
 
 	public static void updateSyncAccountSyncFile(
-			Path filePath, long syncAccountId, boolean moveFile)
+			Path targetFilePath, long syncAccountId, boolean moveFile)
 		throws Exception {
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
@@ -339,11 +363,9 @@ public class SyncAccountService {
 			SyncFile syncFile = SyncFileService.fetchSyncFile(
 				syncAccount.getFilePathName());
 
-			String sourceFileKey = syncFile.getFileKey();
+			if (!FileKeyUtil.hasFileKey(
+					targetFilePath, syncFile.getSyncFileId())) {
 
-			String targetFileKey = FileUtil.getFileKey(filePath);
-
-			if (!sourceFileKey.equals(targetFileKey)) {
 				throw new Exception(
 					"Target folder is not the moved sync data folder");
 			}
@@ -353,18 +375,39 @@ public class SyncAccountService {
 
 		SyncAccountService.update(syncAccount);
 
-		if (moveFile) {
-			Files.createDirectories(filePath);
+		boolean resetFileKeys = false;
 
-			Files.move(
-				Paths.get(syncAccount.getFilePathName()), filePath,
-				StandardCopyOption.REPLACE_EXISTING);
+		if (moveFile) {
+			Path sourceFilePath = Paths.get(syncAccount.getFilePathName());
+
+			try {
+				FileUtil.moveFile(sourceFilePath, targetFilePath, false);
+			}
+			catch (Exception e1) {
+				try {
+					FileUtils.moveDirectory(
+						sourceFilePath.toFile(), targetFilePath.toFile());
+
+					resetFileKeys = true;
+				}
+				catch (Exception e2) {
+					syncAccount.setActive(true);
+
+					SyncAccountService.update(syncAccount);
+
+					throw e2;
+				}
+			}
 		}
 
-		syncAccount = setFilePathName(syncAccountId, filePath.toString());
+		syncAccount = setFilePathName(syncAccountId, targetFilePath.toString());
+
+		if (resetFileKeys) {
+			FileKeyUtil.writeFileKeys(targetFilePath);
+		}
 
 		syncAccount.setActive(true);
-		syncAccount.setUiEvent(SyncAccount.UI_EVENT_DEFAULT);
+		syncAccount.setUiEvent(SyncAccount.UI_EVENT_NONE);
 
 		SyncAccountService.update(syncAccount);
 	}

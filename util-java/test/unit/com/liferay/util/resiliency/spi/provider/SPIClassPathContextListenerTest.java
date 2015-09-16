@@ -22,9 +22,9 @@ import com.liferay.portal.kernel.resiliency.spi.MockSPIProvider;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
 import com.liferay.portal.kernel.resiliency.spi.provider.SPIProvider;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Props;
@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -147,7 +148,7 @@ public class SPIClassPathContextListenerTest {
 
 		// Mock lookup
 
-		final Map<String, URL> resources = new HashMap<String, URL>();
+		final Map<String, URL> resources = new HashMap<>();
 
 		final String driverClassName = "TestDriver";
 
@@ -206,10 +207,9 @@ public class SPIClassPathContextListenerTest {
 
 	@Test
 	public void testClassPathGeneration() {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			SPIClassPathContextListener.class.getName(), Level.FINE);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					SPIClassPathContextListener.class.getName(), Level.FINE)) {
 
 			// With log
 
@@ -276,9 +276,6 @@ public class SPIClassPathContextListenerTest {
 			Assert.assertEquals(
 				spiClassPath, SPIClassPathContextListener.SPI_CLASS_PATH);
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -362,10 +359,11 @@ public class SPIClassPathContextListenerTest {
 
 		// Duplicate register
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			SPIClassPathContextListener.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					SPIClassPathContextListener.class.getName(),
+					Level.SEVERE)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			spiClassPathContextListener.contextInitialized(
@@ -380,9 +378,6 @@ public class SPIClassPathContextListenerTest {
 					" is already registered in servlet context " +
 						_mockServletContext.getContextPath(),
 				logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Unregister
@@ -435,7 +430,7 @@ public class SPIClassPathContextListenerTest {
 	}
 
 	protected void deleteFile(File file) {
-		Queue<File> fileQueue = new LinkedList<File>();
+		Queue<File> fileQueue = new LinkedList<>();
 
 		fileQueue.offer(file);
 
@@ -476,7 +471,9 @@ public class SPIClassPathContextListenerTest {
 
 		// Does not exist
 
-		deleteFile(new File(_CONTEXT_PATH, dirName));
+		File file = new File(_CONTEXT_PATH, dirName);
+
+		deleteFile(file);
 
 		SPIClassPathContextListener spiClassPathContextListener =
 			new SPIClassPathContextListener();
@@ -489,13 +486,11 @@ public class SPIClassPathContextListenerTest {
 		}
 		catch (RuntimeException re) {
 			Assert.assertEquals(
-				"Unable to find directory " + _CONTEXT_PATH +
-					dirName, re.getMessage());
+				"Unable to find directory " + file.getAbsolutePath(),
+				re.getMessage());
 		}
 
 		// Not a directory
-
-		File file = new File(_CONTEXT_PATH, dirName);
 
 		file.deleteOnExit();
 
@@ -509,16 +504,16 @@ public class SPIClassPathContextListenerTest {
 		}
 		catch (RuntimeException re) {
 			Assert.assertEquals(
-				"Unable to find directory " + _CONTEXT_PATH +
-					dirName, re.getMessage());
+				"Unable to find directory " + file.getAbsolutePath(),
+				re.getMessage());
 		}
 		finally {
 			file.delete();
 		}
 	}
 
-	private static final String _CONTEXT_PATH = System.getProperty(
-		"java.io.tmpdir");
+	private static final String _CONTEXT_PATH = StringUtil.toLowerCase(
+		System.getProperty("java.io.tmpdir"));
 
 	private static final String _EMBEDDED_LIB_DIR_NAME = "/embeddedLib";
 

@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DLFileShortcutCacheModel)) {
+			return false;
+		}
+
+		DLFileShortcutCacheModel dlFileShortcutCacheModel = (DLFileShortcutCacheModel)obj;
+
+		if (fileShortcutId == dlFileShortcutCacheModel.fileShortcutId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, fileShortcutId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(35);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -69,6 +94,8 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 		sb.append(treePath);
 		sb.append(", active=");
 		sb.append(active);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -131,6 +158,14 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 		}
 
 		dlFileShortcutImpl.setActive(active);
+
+		if (lastPublishDate == Long.MIN_VALUE) {
+			dlFileShortcutImpl.setLastPublishDate(null);
+		}
+		else {
+			dlFileShortcutImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		dlFileShortcutImpl.setStatus(status);
 		dlFileShortcutImpl.setStatusByUserId(statusByUserId);
 
@@ -168,6 +203,7 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 		toFileEntryId = objectInput.readLong();
 		treePath = objectInput.readUTF();
 		active = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 		status = objectInput.readInt();
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
@@ -210,6 +246,7 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 		}
 
 		objectOutput.writeBoolean(active);
+		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeInt(status);
 		objectOutput.writeLong(statusByUserId);
 
@@ -236,6 +273,7 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 	public long toFileEntryId;
 	public String treePath;
 	public boolean active;
+	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

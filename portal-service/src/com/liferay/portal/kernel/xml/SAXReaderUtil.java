@@ -17,6 +17,9 @@ package com.liferay.portal.kernel.xml;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -121,6 +124,10 @@ public class SAXReaderUtil {
 	public static SAXReader getSAXReader() {
 		PortalRuntimePermission.checkGetBeanProperty(SAXReaderUtil.class);
 
+		if (!_XML_SECURITY_ENABLED) {
+			return UnsecureSAXReaderUtil.getSAXReader();
+		}
+
 		return _saxReader;
 	}
 
@@ -219,6 +226,9 @@ public class SAXReaderUtil {
 
 		_saxReader = saxReader;
 	}
+
+	private static final boolean _XML_SECURITY_ENABLED = GetterUtil.getBoolean(
+		PropsUtil.get(PropsKeys.XML_SECURITY_ENABLED));
 
 	private static SAXReader _saxReader;
 

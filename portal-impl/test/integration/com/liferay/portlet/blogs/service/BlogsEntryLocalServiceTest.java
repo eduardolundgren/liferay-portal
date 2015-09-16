@@ -16,28 +16,44 @@ package com.liferay.portlet.blogs.service;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.OrganizationTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.blogs.EntryContentException;
+import com.liferay.portlet.blogs.EntryTitleException;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 
+import java.io.InputStream;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -96,6 +112,36 @@ public class BlogsEntryLocalServiceTest {
 		BlogsTestUtil.assertEquals(expectedEntry, actualEntry);
 	}
 
+	@Test(expected = EntryContentException.class)
+	public void testAddEntryWithVeryLongContent() throws Exception {
+		int maxLength = ModelHintsUtil.getMaxLength(
+			BlogsEntry.class.getName(), "content");
+
+		String content = repeat("0", maxLength + 1);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
+
+		BlogsEntryLocalServiceUtil.addEntry(
+			_user.getUserId(), RandomTestUtil.randomString(), content,
+			new Date(), serviceContext);
+	}
+
+	@Test(expected = EntryTitleException.class)
+	public void testAddEntryWithVeryLongTitle() throws Exception {
+		int maxLength = ModelHintsUtil.getMaxLength(
+			BlogsEntry.class.getName(), "title");
+
+		String title = repeat("0", maxLength + 1);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
+
+		BlogsEntryLocalServiceUtil.addEntry(
+			_user.getUserId(), title, RandomTestUtil.randomString(), new Date(),
+			serviceContext);
+	}
+
 	@Test
 	public void testGetCompanyEntriesCountInTrash() throws Exception {
 		testGetCompanyEntriesCount(true);
@@ -120,17 +166,10 @@ public class BlogsEntryLocalServiceTest {
 	public void testGetDiscussionMessageDisplay() throws Exception {
 		BlogsEntry entry = addEntry(false);
 
-		try {
-			MBMessageLocalServiceUtil.getDiscussionMessageDisplay(
-				TestPropsValues.getUserId(), _group.getGroupId(),
-				BlogsEntry.class.getName(), entry.getEntryId(),
-				WorkflowConstants.STATUS_ANY);
-		}
-		catch (Exception e) {
-			Assert.fail(
-				"The initial discussion does not exist for entry " +
-					entry.getEntryId());
-		}
+		MBMessageLocalServiceUtil.getDiscussionMessageDisplay(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			BlogsEntry.class.getName(), entry.getEntryId(),
+			WorkflowConstants.STATUS_ANY);
 	}
 
 	@Test
@@ -330,17 +369,13 @@ public class BlogsEntryLocalServiceTest {
 		Assert.assertEquals(initialCount + 1, groupsEntriesInTrash.size());
 
 		for (BlogsEntry groupsEntry : groupsEntriesInTrash) {
-			if (WorkflowConstants.STATUS_IN_TRASH != groupsEntry.getStatus()) {
-				Assert.fail(
-					"Entry " + groupsEntry.getEntryId() + " is not in trash");
-			}
-
-			if (groupsEntry.getCompanyId() != _user.getCompanyId()) {
-				Assert.fail(
-					"Entry belongs to company " + groupsEntry.getCompanyId() +
-						" but should belong to company " +
-							_user.getCompanyId());
-			}
+			Assert.assertEquals(
+				"Entry " + groupsEntry.getEntryId() + " is not in trash",
+				WorkflowConstants.STATUS_IN_TRASH, groupsEntry.getStatus());
+			Assert.assertEquals(
+				"Entry belongs to company " + groupsEntry.getCompanyId() +
+					" but should belong to company " + _user.getCompanyId(),
+				_user.getCompanyId(), groupsEntry.getCompanyId());
 		}
 	}
 
@@ -366,7 +401,7 @@ public class BlogsEntryLocalServiceTest {
 
 	@Test
 	public void testGetNoAssetEntries() throws Exception {
-		BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
+		BlogsEntry entry = addEntry(false);
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 			BlogsEntry.class.getName(), entry.getEntryId());
@@ -452,7 +487,17 @@ public class BlogsEntryLocalServiceTest {
 	protected BlogsEntry addEntry(long userId, boolean statusInTrash)
 		throws Exception {
 
-		BlogsEntry entry = BlogsTestUtil.addEntry(userId, _group, true);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), userId);
+
+		Calendar displayDateCalendar = CalendarFactoryUtil.getCalendar(
+			2012, 1, 1);
+
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
+			userId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), displayDateCalendar.getTime(),
+			serviceContext);
 
 		if (statusInTrash) {
 			entry = BlogsEntryLocalServiceUtil.moveEntryToTrash(userId, entry);
@@ -461,21 +506,60 @@ public class BlogsEntryLocalServiceTest {
 		return entry;
 	}
 
+	protected BlogsEntry addEntryWithSmallImage(long userId) throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), userId);
+
+		ClassLoader classLoader = getClass().getClassLoader();
+
+		InputStream inputStream = classLoader.getResourceAsStream(
+			"com/liferay/portal/util/dependencies/test.jpg");
+
+		FileEntry fileEntry = null;
+
+		try {
+			fileEntry = TempFileEntryUtil.getTempFileEntry(
+				serviceContext.getScopeGroupId(), userId,
+				BlogsEntry.class.getName(), "image.jpg");
+		}
+		catch (Exception e) {
+			fileEntry = TempFileEntryUtil.addTempFileEntry(
+				serviceContext.getScopeGroupId(), userId,
+				BlogsEntry.class.getName(), "image.jpg", inputStream,
+				MimeTypesUtil.getContentType("image.jpg"));
+		}
+
+		ImageSelector coverImageSelector = null;
+		ImageSelector smallImageSelector = new ImageSelector(
+			fileEntry.getFileEntryId(), StringPool.BLANK, null);
+
+		Calendar displayCalendar = CalendarFactoryUtil.getCalendar(2012, 1, 1);
+
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
+			userId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), displayCalendar.getTime(), true,
+			true, new String[0], StringPool.BLANK, coverImageSelector,
+			smallImageSelector, serviceContext);
+
+		return entry;
+	}
+
 	protected void assertBlogsEntriesStatus(
 		List<BlogsEntry> entries, boolean statusInTrash) {
 
 		for (BlogsEntry entry : entries) {
-			if (statusInTrash &&
-				(WorkflowConstants.STATUS_IN_TRASH != entry.getStatus())) {
-
-				Assert.fail(
-					"The entry " + entry.getEntryId() + " should be in trash");
+			if (statusInTrash) {
+				Assert.assertEquals(
+					"The entry " + entry.getEntryId() + " should be in trash",
+					WorkflowConstants.STATUS_IN_TRASH, entry.getStatus());
 			}
-			else if (!statusInTrash &&
-					 (WorkflowConstants.STATUS_IN_TRASH == entry.getStatus())) {
-
-				Assert.fail(
-					"Entry " + entry.getEntryId() + " should not be in trash");
+			else {
+				Assert.assertNotEquals(
+					"The entry " + entry.getEntryId() +
+						" should not be in trash",
+					WorkflowConstants.STATUS_IN_TRASH, entry.getStatus());
 			}
 		}
 	}
@@ -484,8 +568,14 @@ public class BlogsEntryLocalServiceTest {
 		int initialCount = BlogsEntryLocalServiceUtil.getGroupEntriesCount(
 			_group.getGroupId(), _statusApprovedQueryDefinition);
 
-		BlogsEntry entry = BlogsTestUtil.addEntry(
-			TestPropsValues.getUserId(), _group, true, smallImage);
+		BlogsEntry entry = null;
+
+		if (smallImage) {
+			entry = addEntryWithSmallImage(TestPropsValues.getUserId());
+		}
+		else {
+			entry = addEntry(false);
+		}
 
 		int actualCount = BlogsEntryLocalServiceUtil.getGroupEntriesCount(
 			_group.getGroupId(), _statusApprovedQueryDefinition);
@@ -746,6 +836,16 @@ public class BlogsEntryLocalServiceTest {
 				organization.getOrganizationId(), new Date(), queryDefinition);
 
 		Assert.assertEquals(initialCount + 1, actualCount);
+	}
+
+	private static String repeat(String string, int times) {
+		StringBundler sb = new StringBundler(string.length() * times);
+
+		for (int i = 0; i < times; i++) {
+			sb.append(string);
+		}
+
+		return sb.toString();
 	}
 
 	@DeleteAfterTestRun

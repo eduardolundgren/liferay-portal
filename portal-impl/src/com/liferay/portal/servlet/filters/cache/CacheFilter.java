@@ -69,8 +69,7 @@ public class CacheFilter extends BasePortalFilter {
 		_pattern = GetterUtil.getInteger(
 			filterConfig.getInitParameter("pattern"));
 
-		if ((_pattern != _PATTERN_FRIENDLY) &&
-			(_pattern != _PATTERN_LAYOUT) &&
+		if ((_pattern != _PATTERN_FRIENDLY) && (_pattern != _PATTERN_LAYOUT) &&
 			(_pattern != _PATTERN_RESOURCE)) {
 
 			_log.error("Cache pattern is invalid");
@@ -399,10 +398,21 @@ public class CacheFilter extends BasePortalFilter {
 		CacheResponseData cacheResponseData = CacheUtil.getCacheResponseData(
 			companyId, key);
 
-		if (cacheResponseData == null) {
-			if (!isCacheableData(companyId, request)) {
+		if ((cacheResponseData == null) || !cacheResponseData.isValid()) {
+			if (!_isValidCache(cacheResponseData) ||
+				!isCacheableData(companyId, request)) {
+
 				if (_log.isDebugEnabled()) {
 					_log.debug("Request is not cacheable " + key);
+				}
+
+				if (cacheResponseData == null) {
+					if (_log.isInfoEnabled()) {
+						_log.info("Caching request with invalid state " + key);
+					}
+
+					CacheUtil.putCacheResponseData(
+						companyId, key, new CacheResponseData());
 				}
 
 				processFilter(
@@ -463,6 +473,14 @@ public class CacheFilter extends BasePortalFilter {
 		}
 
 		CacheResponseUtil.write(response, cacheResponseData);
+	}
+
+	private boolean _isValidCache(CacheResponseData cacheResponseData) {
+		if ((cacheResponseData != null) && !cacheResponseData.isValid()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private static final int _PATTERN_FRIENDLY = 0;

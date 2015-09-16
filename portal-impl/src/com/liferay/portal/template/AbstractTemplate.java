@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import java.io.Serializable;
 import java.io.Writer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,14 +45,9 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class AbstractTemplate implements Template {
 
 	public AbstractTemplate(
-		TemplateResource templateResource,
 		TemplateResource errorTemplateResource, Map<String, Object> context,
-		TemplateContextHelper templateContextHelper, String templateManagerName,
-		long interval) {
-
-		if (templateResource == null) {
-			throw new IllegalArgumentException("Template resource is null");
-		}
+		TemplateContextHelper templateContextHelper,
+		String templateManagerName) {
 
 		if (templateContextHelper == null) {
 			throw new IllegalArgumentException(
@@ -62,10 +58,9 @@ public abstract class AbstractTemplate implements Template {
 			throw new IllegalArgumentException("Template manager name is null");
 		}
 
-		this.templateResource = templateResource;
 		this.errorTemplateResource = errorTemplateResource;
 
-		this.context = new HashMap<String, Object>();
+		this.context = new HashMap<>();
 
 		if (context != null) {
 			for (Map.Entry<String, Object> entry : context.entrySet()) {
@@ -75,22 +70,36 @@ public abstract class AbstractTemplate implements Template {
 
 		_templateContextHelper = templateContextHelper;
 
-		if (interval != 0) {
-			_cacheTemplateResource(templateManagerName);
-		}
 	}
 
 	@Override
-	public void doProcessTemplate(Writer writer) throws Exception {
-		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+	public void clear() {
+		context.clear();
+	}
 
-		put(TemplateConstants.WRITER, unsyncStringWriter);
+	@Override
+	public boolean containsKey(Object key) {
+		return context.containsKey(key);
+	}
 
-		processTemplate(templateResource, unsyncStringWriter);
+	@Override
+	public boolean containsValue(Object value) {
+		return context.containsValue(value);
+	}
 
-		StringBundler sb = unsyncStringWriter.getStringBundler();
 
-		sb.writeTo(writer);
+	@Override
+	public Set<Entry<String, Object>> entrySet() {
+		return context.entrySet();
+	}
+
+	@Override
+	public Object get(Object key) {
+		if (key == null) {
+			return null;
+		}
+
+		return context.get(key);
 	}
 
 	@Override
@@ -110,48 +119,48 @@ public abstract class AbstractTemplate implements Template {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		return context.isEmpty();
+	}
+
+	@Override
+	public Set<String> keySet() {
+		return context.keySet();
+	}
+
+	@Override
 	public void prepare(HttpServletRequest request) {
 		_templateContextHelper.prepare(this, request);
 	}
 
+
 	@Override
-	public void processTemplate(Writer writer) throws TemplateException {
-		if (errorTemplateResource == null) {
-			try {
-				processTemplate(templateResource, writer);
-
-				return;
-			}
-			catch (Exception e) {
-				throw new TemplateException(
-					"Unable to process template " +
-						templateResource.getTemplateId(),
-					e);
-			}
+	public Object put(String key, Object value) {
+		if ((key == null) || (value == null)) {
+			return null;
 		}
 
-		Writer oldWriter = (Writer)get(TemplateConstants.WRITER);
-
-		try {
-			doProcessTemplate(writer);
-		}
-		catch (Exception e) {
-			put(TemplateConstants.WRITER, writer);
-
-			handleException(e, writer);
-		}
-		finally {
-			put(TemplateConstants.WRITER, oldWriter);
-		}
+		return context.put(key, value);
 	}
 
 	@Override
-	public void put(String key, Object value) {
-		if ((key == null) || (value == null)) {
-			return;
-		}
+	public void putAll(Map<? extends String, ? extends Object> map) {
+		context.putAll(map);
+	}
 
-		context.put(key, value);
+	@Override
+	public Object remove(Object key) {
+		return context.remove(key);
+	}
+
+	@Override
+	public int size() {
+		return context.size();
+	}
+
+	@Override
+	public Collection<Object> values() {
+		return context.values();
 	}
 
 	protected String getTemplateResourceUUID(
@@ -170,85 +179,6 @@ public abstract class AbstractTemplate implements Template {
 
 	protected Map<String, Object> context;
 	protected TemplateResource errorTemplateResource;
-	protected TemplateResource templateResource;
-
-	private void _cacheTemplateResource(String templateManagerName) {
-		String templateId = templateResource.getTemplateId();
-
-		if (templateManagerName.equals(TemplateConstants.LANG_TYPE_VM) &&
-			templateId.contains(SandboxHandler.SANDBOX_MARKER)) {
-
-			return;
-		}
-
-		if (!(templateResource instanceof CacheTemplateResource) &&
-			!(templateResource instanceof StringTemplateResource)) {
-
-			templateResource = new CacheTemplateResource(templateResource);
-		}
-
-		String cacheName = TemplateResourceLoader.class.getName();
-
-		cacheName = cacheName.concat(StringPool.PERIOD).concat(
-			templateManagerName);
-
-		PortalCache<String, Serializable> portalCache = _getPortalCache(
-			templateResource, cacheName);
-
-		Object object = portalCache.get(templateResource.getTemplateId());
-
-		if ((object == null) || !templateResource.equals(object)) {
-			portalCache.put(templateResource.getTemplateId(), templateResource);
-		}
-
-		if (errorTemplateResource == null) {
-			return;
-		}
-
-		String errorTemplateId = errorTemplateResource.getTemplateId();
-
-		if (templateManagerName.equals(TemplateConstants.LANG_TYPE_VM) &&
-			errorTemplateId.contains(SandboxHandler.SANDBOX_MARKER)) {
-
-			return;
-		}
-
-		if (!(errorTemplateResource instanceof CacheTemplateResource) &&
-			!(errorTemplateResource instanceof StringTemplateResource)) {
-
-			errorTemplateResource = new CacheTemplateResource(
-				errorTemplateResource);
-		}
-
-		portalCache = _getPortalCache(errorTemplateResource, cacheName);
-
-		object = portalCache.get(errorTemplateResource.getTemplateId());
-
-		if ((object == null) || !errorTemplateResource.equals(object)) {
-			portalCache.put(
-				errorTemplateResource.getTemplateId(), errorTemplateResource);
-		}
-	}
-
-	private PortalCache<String, Serializable> _getPortalCache(
-		TemplateResource templateResource, String cacheName) {
-
-		if (!(templateResource instanceof CacheTemplateResource)) {
-			return MultiVMPoolUtil.getCache(cacheName);
-		}
-
-		CacheTemplateResource cacheTemplateResource =
-			(CacheTemplateResource)templateResource;
-
-		TemplateResource innerTemplateResource =
-			cacheTemplateResource.getInnerTemplateResource();
-
-		if (innerTemplateResource instanceof URLTemplateResource) {
-			return SingleVMPoolUtil.getCache(cacheName);
-		}
-
-		return MultiVMPoolUtil.getCache(cacheName);
-	}
 
 	private final TemplateContextHelper _templateContextHelper;
 

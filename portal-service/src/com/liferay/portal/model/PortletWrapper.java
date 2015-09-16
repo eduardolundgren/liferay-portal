@@ -239,7 +239,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return the asset type instances of the portlet
 	*/
 	@Override
-	public java.util.List<com.liferay.portlet.asset.model.AssetRendererFactory> getAssetRendererFactoryInstances() {
+	public java.util.List<com.liferay.portlet.asset.model.AssetRendererFactory<?>> getAssetRendererFactoryInstances() {
 		return _portlet.getAssetRendererFactoryInstances();
 	}
 
@@ -419,17 +419,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.CustomAttributesDisplay> getCustomAttributesDisplayInstances() {
 		return _portlet.getCustomAttributesDisplayInstances();
-	}
-
-	/**
-	* Returns the name of the dynamic data mapping display class of the
-	* portlet.
-	*
-	* @return the name of the dynamic data mapping display class of the portlet
-	*/
-	@Override
-	public java.lang.String getDDMDisplayClass() {
-		return _portlet.getDDMDisplayClass();
 	}
 
 	/**
@@ -675,7 +664,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return the indexer instances of the portlet
 	*/
 	@Override
-	public java.util.List<com.liferay.portal.kernel.search.Indexer> getIndexerInstances() {
+	public java.util.List<com.liferay.portal.kernel.search.Indexer<?>> getIndexerInstances() {
 		return _portlet.getIndexerInstances();
 	}
 
@@ -685,7 +674,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return init parameters of the portlet
 	*/
 	@Override
-	public java.util.Map<java.lang.String, java.lang.String> getInitParams() {
+	public Map<java.lang.String, java.lang.String> getInitParams() {
 		return _portlet.getInitParams();
 	}
 
@@ -924,7 +913,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return the portlet data handler instance of the portlet
 	*/
 	@Override
-	public com.liferay.portal.kernel.lar.PortletDataHandler getPortletDataHandlerInstance() {
+	public com.liferay.portlet.exportimport.lar.PortletDataHandler getPortletDataHandlerInstance() {
 		return _portlet.getPortletDataHandlerInstance();
 	}
 
@@ -934,7 +923,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return filters of the portlet
 	*/
 	@Override
-	public java.util.Map<java.lang.String, com.liferay.portal.model.PortletFilter> getPortletFilters() {
+	public Map<java.lang.String, com.liferay.portal.model.PortletFilter> getPortletFilters() {
 		return _portlet.getPortletFilters();
 	}
 
@@ -984,7 +973,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return portlet modes of the portlet
 	*/
 	@Override
-	public java.util.Map<java.lang.String, java.util.Set<java.lang.String>> getPortletModes() {
+	public Map<java.lang.String, java.util.Set<java.lang.String>> getPortletModes() {
 		return _portlet.getPortletModes();
 	}
 
@@ -1233,7 +1222,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return role mappers of the portlet
 	*/
 	@Override
-	public java.util.Map<java.lang.String, java.lang.String> getRoleMappers() {
+	public Map<java.lang.String, java.lang.String> getRoleMappers() {
 		return _portlet.getRoleMappers();
 	}
 
@@ -1404,7 +1393,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return the staged model data handler instances of the portlet
 	*/
 	@Override
-	public java.util.List<com.liferay.portal.kernel.lar.StagedModelDataHandler<?>> getStagedModelDataHandlerInstances() {
+	public java.util.List<com.liferay.portlet.exportimport.lar.StagedModelDataHandler<?>> getStagedModelDataHandlerInstances() {
 		return _portlet.getStagedModelDataHandlerInstances();
 	}
 
@@ -1690,7 +1679,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return window states of the portlet
 	*/
 	@Override
-	public java.util.Map<java.lang.String, java.util.Set<java.lang.String>> getWindowStates() {
+	public Map<java.lang.String, java.util.Set<java.lang.String>> getWindowStates() {
 		return _portlet.getWindowStates();
 	}
 
@@ -1900,6 +1889,11 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean isEscapedModel() {
 		return _portlet.isEscapedModel();
+	}
+
+	@Override
+	public boolean isFullPageDisplayable() {
+		return _portlet.isFullPageDisplayable();
 	}
 
 	/**
@@ -2406,17 +2400,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Sets the name of the dynamic data mapping display class of the portlet.
-	*
-	* @param ddmDisplayClass the name of dynamic data mapping display class of
-	the portlet
-	*/
-	@Override
-	public void setDDMDisplayClass(java.lang.String ddmDisplayClass) {
-		_portlet.setDDMDisplayClass(ddmDisplayClass);
-	}
-
-	/**
 	* Sets the default plugin settings of the portlet.
 	*
 	* @param pluginSetting the plugin setting
@@ -2458,8 +2441,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_portlet.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -2574,6 +2556,11 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 		_portlet.setFriendlyURLRoutes(friendlyURLRoutes);
 	}
 
+	@Override
+	public void setFullPageDisplayable(boolean fullPageDisplayable) {
+		_portlet.setFullPageDisplayable(fullPageDisplayable);
+	}
+
 	/**
 	* Sets a list of CSS files that will be referenced from the page's header
 	* relative to the portal's context path.
@@ -2680,7 +2667,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*/
 	@Override
 	public void setInitParams(
-		java.util.Map<java.lang.String, java.lang.String> initParams) {
+		Map<java.lang.String, java.lang.String> initParams) {
 		_portlet.setInitParams(initParams);
 	}
 
@@ -2861,7 +2848,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*/
 	@Override
 	public void setPortletFilters(
-		java.util.Map<java.lang.String, com.liferay.portal.model.PortletFilter> portletFilters) {
+		Map<java.lang.String, com.liferay.portal.model.PortletFilter> portletFilters) {
 		_portlet.setPortletFilters(portletFilters);
 	}
 
@@ -2904,7 +2891,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*/
 	@Override
 	public void setPortletModes(
-		java.util.Map<java.lang.String, java.util.Set<java.lang.String>> portletModes) {
+		Map<java.lang.String, java.util.Set<java.lang.String>> portletModes) {
 		_portlet.setPortletModes(portletModes);
 	}
 
@@ -3134,7 +3121,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*/
 	@Override
 	public void setRoleMappers(
-		java.util.Map<java.lang.String, java.lang.String> roleMappers) {
+		Map<java.lang.String, java.lang.String> roleMappers) {
 		_portlet.setRoleMappers(roleMappers);
 	}
 
@@ -3456,7 +3443,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*/
 	@Override
 	public void setWindowStates(
-		java.util.Map<java.lang.String, java.util.Set<java.lang.String>> windowStates) {
+		Map<java.lang.String, java.util.Set<java.lang.String>> windowStates) {
 		_portlet.setWindowStates(windowStates);
 	}
 
@@ -3485,7 +3472,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Portlet> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Portlet> toCacheModel() {
 		return _portlet.toCacheModel();
 	}
 
@@ -3507,6 +3494,11 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public java.lang.String toXmlString() {
 		return _portlet.toXmlString();
+	}
+
+	@Override
+	public void unsetReady() {
+		_portlet.unsetReady();
 	}
 
 	@Override

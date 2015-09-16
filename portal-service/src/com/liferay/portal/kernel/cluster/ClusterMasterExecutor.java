@@ -25,19 +25,19 @@ import com.liferay.portal.kernel.util.MethodHandler;
 @ProviderType
 public interface ClusterMasterExecutor {
 
-	public <T> NoticeableFuture<T> executeOnMaster(MethodHandler methodHandler);
+	public void addClusterMasterTokenTransitionListener(
+		ClusterMasterTokenTransitionListener
+			clusterMasterTokenAcquisitionListener);
 
-	public void initialize();
+	public <T> NoticeableFuture<T> executeOnMaster(MethodHandler methodHandler);
 
 	public boolean isEnabled();
 
 	public boolean isMaster();
 
-	public void registerClusterMasterTokenTransitionListener(
-		ClusterMasterTokenTransitionListener
-			clusterMasterTokenAcquisitionListener);
+	public void notifyMasterTokenTransitionListeners();
 
-	public void unregisterClusterMasterTokenTransitionListener(
+	public void removeClusterMasterTokenTransitionListener(
 		ClusterMasterTokenTransitionListener
 			clusterMasterTokenAcquisitionListener);
 

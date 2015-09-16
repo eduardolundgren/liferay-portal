@@ -14,13 +14,13 @@
 
 package com.liferay.portal.zip;
 
+import com.liferay.portal.kernel.test.util.DependenciesTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.util.test.DependenciesTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.File;
 import java.io.InputStream;
@@ -348,6 +348,13 @@ public class ZipWriterImplTest {
 		file.delete();
 	}
 
+	/**
+	 * Tests that {@link ZipWriter#finish()} can execute without error on a ZIP
+	 * writer that's been created by the default constructor and that has no
+	 * entries.
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testFinishIfZipFileIsNotSet() throws Exception {
 		ZipWriter zipWriter = new ZipWriterImpl();
@@ -359,6 +366,13 @@ public class ZipWriterImplTest {
 		file.delete();
 	}
 
+	/**
+	 * Tests that {@link ZipWriter#finish()} can execute without error on a ZIP
+	 * writer that's been created for an existing ZIP file and that has no
+	 * entries.
+	 *
+	 * @throws Exception if an exception occurred
+	 */
 	@Test
 	public void testFinishIfZipFileIsSet() throws Exception {
 		File tempZipFile = new File(_tempZipFilePath);

@@ -19,7 +19,8 @@ import com.liferay.portal.model.Team;
 /**
  * @author Brian Wing Shun Chan
  */
-public class TeamVerifiableModel implements VerifiableResourcedModel {
+public class TeamVerifiableModel
+	implements VerifiableResourcedModel, VerifiableUUIDModel {
 
 	@Override
 	public String getModelName() {
@@ -34,6 +35,11 @@ public class TeamVerifiableModel implements VerifiableResourcedModel {
 	@Override
 	public String getTableName() {
 		return "Team";
+	}
+
+	@Override
+	public String getUserIdColumnName() {
+		return "userId";
 	}
 
 }

@@ -69,7 +69,6 @@ public class BookmarksFolderLocalServiceImpl
 		User user = userPersistence.findByPrimaryKey(userId);
 		long groupId = serviceContext.getScopeGroupId();
 		parentFolderId = getParentFolderId(groupId, parentFolderId);
-		Date now = new Date();
 
 		validate(name);
 
@@ -82,8 +81,6 @@ public class BookmarksFolderLocalServiceImpl
 		folder.setCompanyId(user.getCompanyId());
 		folder.setUserId(user.getUserId());
 		folder.setUserName(user.getFullName());
-		folder.setCreateDate(serviceContext.getCreateDate(now));
-		folder.setModifiedDate(serviceContext.getModifiedDate(now));
 		folder.setParentFolderId(parentFolderId);
 		folder.setTreePath(folder.buildTreePath());
 		folder.setName(name);
@@ -110,7 +107,8 @@ public class BookmarksFolderLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public BookmarksFolder deleteFolder(BookmarksFolder folder)
 		throws PortalException {
 
@@ -121,7 +119,8 @@ public class BookmarksFolderLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public BookmarksFolder deleteFolder(
 			BookmarksFolder folder, boolean includeTrashedEntries)
 		throws PortalException {
@@ -159,6 +158,11 @@ public class BookmarksFolderLocalServiceImpl
 		// Expando
 
 		expandoRowLocalService.deleteRows(folder.getFolderId());
+
+		// Ratings
+
+		ratingsStatsLocalService.deleteStats(
+			BookmarksFolder.class.getName(), folder.getFolderId());
 
 		// Subscriptions
 
@@ -267,8 +271,7 @@ public class BookmarksFolderLocalServiceImpl
 	public List<Object> getFoldersAndEntries(
 		long groupId, long folderId, int status) {
 
-		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>(
-			status);
+		QueryDefinition<?> queryDefinition = new QueryDefinition<>(status);
 
 		return bookmarksFolderFinder.findF_E_ByG_F(
 			groupId, folderId, queryDefinition);
@@ -278,7 +281,7 @@ public class BookmarksFolderLocalServiceImpl
 	public List<Object> getFoldersAndEntries(
 		long groupId, long folderId, int status, int start, int end) {
 
-		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>(
+		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
 			status, start, end, null);
 
 		return bookmarksFolderFinder.findF_E_ByG_F(
@@ -289,8 +292,7 @@ public class BookmarksFolderLocalServiceImpl
 	public int getFoldersAndEntriesCount(
 		long groupId, long folderId, int status) {
 
-		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>(
-			status);
+		QueryDefinition<?> queryDefinition = new QueryDefinition<>(status);
 
 		return bookmarksFolderFinder.countF_E_ByG_F(
 			groupId, folderId, queryDefinition);
@@ -328,6 +330,20 @@ public class BookmarksFolderLocalServiceImpl
 		}
 	}
 
+	@Override
+	public void mergeFolders(long folderId, long parentFolderId)
+		throws PortalException {
+
+		BookmarksFolder folder = bookmarksFolderPersistence.findByPrimaryKey(
+			folderId);
+
+		parentFolderId = getParentFolderId(folder, parentFolderId);
+
+		if (folderId != parentFolderId) {
+			mergeFolders(folder, parentFolderId);
+		}
+	}
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BookmarksFolder moveFolder(long folderId, long parentFolderId)
@@ -335,6 +351,10 @@ public class BookmarksFolderLocalServiceImpl
 
 		BookmarksFolder folder = bookmarksFolderPersistence.findByPrimaryKey(
 			folderId);
+
+		if (folder.getParentFolderId() == parentFolderId) {
+			return folder;
+		}
 
 		folder.setParentFolderId(parentFolderId);
 		folder.setTreePath(folder.buildTreePath());
@@ -481,11 +501,15 @@ public class BookmarksFolderLocalServiceImpl
 						return;
 					}
 
-					Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-						BookmarksFolder.class);
+					Indexer<BookmarksFolder> indexer =
+						IndexerRegistryUtil.nullSafeGetIndexer(
+							BookmarksFolder.class);
 
 					for (TreeModel treeModel : treeModels) {
-						indexer.reindex(treeModel);
+						BookmarksFolder bookmarkFolder =
+							(BookmarksFolder)treeModel;
+
+						indexer.reindex(bookmarkFolder);
 					}
 				}
 
@@ -495,7 +519,7 @@ public class BookmarksFolderLocalServiceImpl
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public void restoreFolderFromTrash(long userId, long folderId)
+	public BookmarksFolder restoreFolderFromTrash(long userId, long folderId)
 		throws PortalException {
 
 		// Folder
@@ -532,6 +556,8 @@ public class BookmarksFolderLocalServiceImpl
 			folder.getFolderId(),
 			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
 			extraDataJSONObject.toString(), 0);
+
+		return folder;
 	}
 
 	@Override
@@ -570,13 +596,19 @@ public class BookmarksFolderLocalServiceImpl
 			folder.getFolderId(), folder.getUuid(), 0, assetCategoryIds,
 			assetTagNames, true, null, null, null, ContentTypes.TEXT_PLAIN,
 			folder.getName(), folder.getDescription(), null, null, null, 0, 0,
-			null, false);
+			null);
 
 		assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
 			AssetLinkConstants.TYPE_RELATED);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #updateFolder(long, long,
+	 *             long, String, String, ServiceContext)} and {@link
+	 *             #mergeFolders(long, long)}
+	 */
+	@Deprecated
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BookmarksFolder updateFolder(
@@ -600,11 +632,32 @@ public class BookmarksFolderLocalServiceImpl
 
 		// Folder
 
+		return updateFolder(
+			userId, folderId, parentFolderId, name, description,
+			serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public BookmarksFolder updateFolder(
+			long userId, long folderId, long parentFolderId, String name,
+			String description, ServiceContext serviceContext)
+		throws PortalException {
+
+		BookmarksFolder folder = bookmarksFolderPersistence.findByPrimaryKey(
+			folderId);
+
+		parentFolderId = getParentFolderId(folder, parentFolderId);
+
 		validate(name);
 
-		folder.setModifiedDate(serviceContext.getModifiedDate(null));
-		folder.setParentFolderId(parentFolderId);
-		folder.setTreePath(folder.buildTreePath());
+		long oldParentFolderId = folder.getParentFolderId();
+
+		if (oldParentFolderId != parentFolderId) {
+			folder.setParentFolderId(parentFolderId);
+			folder.setTreePath(folder.buildTreePath());
+		}
+
 		folder.setName(name);
 		folder.setDescription(description);
 		folder.setExpandoBridgeAttributes(serviceContext);
@@ -617,6 +670,11 @@ public class BookmarksFolderLocalServiceImpl
 			userId, folder, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
+
+		if (oldParentFolderId != parentFolderId) {
+			rebuildTree(
+				folder.getCompanyId(), folderId, folder.getTreePath(), true);
+		}
 
 		return folder;
 	}
@@ -650,8 +708,8 @@ public class BookmarksFolderLocalServiceImpl
 
 		// Index
 
-		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			BookmarksFolder.class);
+		Indexer<BookmarksFolder> indexer =
+			IndexerRegistryUtil.nullSafeGetIndexer(BookmarksFolder.class);
 
 		indexer.reindex(folder);
 
@@ -680,7 +738,7 @@ public class BookmarksFolderLocalServiceImpl
 			return folder.getParentFolderId();
 		}
 
-		List<Long> subfolderIds = new ArrayList<Long>();
+		List<Long> subfolderIds = new ArrayList<>();
 
 		getSubfolderIds(
 			subfolderIds, folder.getGroupId(), folder.getFolderId());
@@ -725,11 +783,12 @@ public class BookmarksFolderLocalServiceImpl
 
 		for (BookmarksEntry entry : entries) {
 			entry.setFolderId(toFolderId);
+			entry.setTreePath(entry.buildTreePath());
 
 			bookmarksEntryPersistence.update(entry);
 
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				BookmarksEntry.class);
+			Indexer<BookmarksEntry> indexer =
+				IndexerRegistryUtil.nullSafeGetIndexer(BookmarksEntry.class);
 
 			indexer.reindex(entry);
 		}
@@ -779,8 +838,9 @@ public class BookmarksFolderLocalServiceImpl
 
 				// Indexer
 
-				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-					BookmarksEntry.class);
+				Indexer<BookmarksEntry> indexer =
+					IndexerRegistryUtil.nullSafeGetIndexer(
+						BookmarksEntry.class);
 
 				indexer.reindex(entry);
 			}
@@ -823,8 +883,9 @@ public class BookmarksFolderLocalServiceImpl
 
 				// Index
 
-				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-					BookmarksFolder.class);
+				Indexer<BookmarksFolder> indexer =
+					IndexerRegistryUtil.nullSafeGetIndexer(
+						BookmarksFolder.class);
 
 				indexer.reindex(folder);
 			}
@@ -875,8 +936,9 @@ public class BookmarksFolderLocalServiceImpl
 
 				// Indexer
 
-				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-					BookmarksEntry.class);
+				Indexer<BookmarksEntry> indexer =
+					IndexerRegistryUtil.nullSafeGetIndexer(
+						BookmarksEntry.class);
 
 				indexer.reindex(entry);
 			}
@@ -926,8 +988,9 @@ public class BookmarksFolderLocalServiceImpl
 
 				// Index
 
-				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-					BookmarksFolder.class);
+				Indexer<BookmarksFolder> indexer =
+					IndexerRegistryUtil.nullSafeGetIndexer(
+						BookmarksFolder.class);
 
 				indexer.reindex(folder);
 			}

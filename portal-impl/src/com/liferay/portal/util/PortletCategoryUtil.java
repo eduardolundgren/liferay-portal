@@ -65,7 +65,7 @@ public class PortletCategoryUtil {
 		for (PortletCategory curPortletCategory :
 				portletCategory.getCategories()) {
 
-			Set<String> portletIds = new HashSet<String>();
+			Set<String> portletIds = new HashSet<>();
 
 			if (curPortletCategory.isHidden()) {
 				continue;
@@ -83,13 +83,13 @@ public class PortletCategoryUtil {
 					}
 					else if (layout.isTypePanel() &&
 							 panelSelectedPortletIds.contains(
-									portlet.getRootPortletId())) {
+								 portlet.getRootPortletId())) {
 
 						portletIds.add(portlet.getPortletId());
 					}
 					else if (layout.isTypePanel() &&
 							 !panelSelectedPortletIds.contains(
-									portlet.getRootPortletId())) {
+								 portlet.getRootPortletId())) {
 					}
 					else if (!PortletPermissionUtil.contains(
 								permissionChecker, layout, portlet,
@@ -97,7 +97,7 @@ public class PortletCategoryUtil {
 					}
 					else if (!portlet.isInstanceable() &&
 							 layoutTypePortlet.hasPortletId(
-									portlet.getPortletId())) {
+								 portlet.getPortletId())) {
 
 						portletIds.add(portlet.getPortletId());
 					}

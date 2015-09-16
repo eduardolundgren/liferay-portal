@@ -273,7 +273,7 @@ public class LDAPUtil {
 				 (date.indexOf(CharPool.PLUS) != -1)) {
 
 			if (date.indexOf(CharPool.PERIOD) != -1) {
-				format = "yyyyMMddHHmmss.SZ";
+				format = "yyyyMMddHHmmss.SSSZ";
 			}
 			else {
 				format = "yyyyMMddHHmmssZ";
@@ -305,9 +305,11 @@ public class LDAPUtil {
 		}
 	}
 
-	private static Pattern _pattern1 = Pattern.compile(".*[~<>]*=[~<>]*=.*");
-	private static Pattern _pattern2 = Pattern.compile("\\([~<>]*=.*");
-	private static Pattern _pattern3 = Pattern.compile("\\([^~<>=]*\\)");
-	private static Pattern _pattern4 = Pattern.compile(".*[^~<>=]*[~<>]*=\\)");
+	private static final Pattern _pattern1 = Pattern.compile(
+		".*[~<>]*=[~<>]*=.*");
+	private static final Pattern _pattern2 = Pattern.compile("\\([~<>]*=.*");
+	private static final Pattern _pattern3 = Pattern.compile("\\([^~<>=]*\\)");
+	private static final Pattern _pattern4 = Pattern.compile(
+		".*[^~<>=]*[~<>]*=\\)");
 
 }

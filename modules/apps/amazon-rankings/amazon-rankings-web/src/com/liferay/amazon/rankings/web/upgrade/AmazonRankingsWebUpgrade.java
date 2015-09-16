@@ -14,14 +14,14 @@
 
 package com.liferay.amazon.rankings.web.upgrade;
 
+import com.liferay.amazon.rankings.web.constants.AmazonRankingsPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
 
 import java.util.Collections;
-
-import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -34,15 +34,16 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = AmazonRankingsWebUpgrade.class)
 public class AmazonRankingsWebUpgrade {
 
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	@Reference(unbind = "-")
 	protected void setReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
 
 		_releaseLocalService = releaseLocalService;
-	}
-
-	@Reference(target = "(original.bean=*)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
 	}
 
 	@Activate
@@ -53,9 +54,7 @@ public class AmazonRankingsWebUpgrade {
 			protected String[][] getRenamePortletIdsArray() {
 				return new String[][] {
 					new String[] {
-						"67",
-						"com_liferay_amazon_rankings_web_portlet_" +
-							"AmazonRankingsPortlet"
+						"67", AmazonRankingsPortletKeys.AMAZON_RANKINGS
 					}
 				};
 			}
@@ -64,7 +63,7 @@ public class AmazonRankingsWebUpgrade {
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.amazon.rankings.web",
-			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 0,
+			Collections.<UpgradeProcess>singletonList(upgradePortletId), 1, 1,
 			false);
 	}
 

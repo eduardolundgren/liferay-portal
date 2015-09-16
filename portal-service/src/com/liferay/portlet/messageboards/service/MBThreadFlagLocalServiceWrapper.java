@@ -46,11 +46,12 @@ public class MBThreadFlagLocalServiceWrapper implements MBThreadFlagLocalService
 	}
 
 	@Override
-	public void addThreadFlag(long userId,
-		com.liferay.portlet.messageboards.model.MBThread thread,
+	public com.liferay.portlet.messageboards.model.MBThreadFlag addThreadFlag(
+		long userId, com.liferay.portlet.messageboards.model.MBThread thread,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_mbThreadFlagLocalService.addThreadFlag(userId, thread, serviceContext);
+		return _mbThreadFlagLocalService.addThreadFlag(userId, thread,
+			serviceContext);
 	}
 
 	/**
@@ -245,7 +246,7 @@ public class MBThreadFlagLocalServiceWrapper implements MBThreadFlagLocalService
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _mbThreadFlagLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 

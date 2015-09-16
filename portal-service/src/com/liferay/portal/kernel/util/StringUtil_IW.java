@@ -572,6 +572,10 @@ public class StringUtil_IW {
 		return StringUtil.strip(s, remove);
 	}
 
+	public java.lang.String strip(java.lang.String s, char[] remove) {
+		return StringUtil.strip(s, remove);
+	}
+
 	public java.lang.String stripBetween(java.lang.String s,
 		java.lang.String begin, java.lang.String end) {
 		return StringUtil.stripBetween(s, begin, end);
@@ -579,6 +583,10 @@ public class StringUtil_IW {
 
 	public java.lang.String stripCDATA(java.lang.String s) {
 		return StringUtil.stripCDATA(s);
+	}
+
+	public java.lang.String stripParentheticalSuffix(java.lang.String s) {
+		return StringUtil.stripParentheticalSuffix(s);
 	}
 
 	public java.lang.String toCharCode(java.lang.String s) {

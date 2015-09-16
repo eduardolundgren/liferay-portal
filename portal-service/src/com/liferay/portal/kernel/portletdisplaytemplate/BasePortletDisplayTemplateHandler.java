@@ -16,9 +16,7 @@ package com.liferay.portal.kernel.portletdisplaytemplate;
 
 import com.liferay.portal.kernel.template.BaseTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
-import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,16 +26,18 @@ import java.util.Map;
 public abstract class BasePortletDisplayTemplateHandler
 	extends BaseTemplateHandler {
 
-	public Map<String, Object> getCustomContextObjects() {
-		return Collections.emptyMap();
-	}
-
 	@Override
 	public Map<String, TemplateVariableGroup> getTemplateVariableGroups(
 			long classPK, String language, Locale locale)
 		throws Exception {
 
-		return PortletDisplayTemplateUtil.getTemplateVariableGroups(language);
+		return PortletDisplayTemplateManagerUtil.getTemplateVariableGroups(
+			language);
+	}
+
+	@Override
+	public boolean isDisplayTemplateHandler() {
+		return true;
 	}
 
 }

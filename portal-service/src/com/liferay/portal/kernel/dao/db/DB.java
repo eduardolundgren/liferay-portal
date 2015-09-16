@@ -36,8 +36,6 @@ public interface DB {
 
 	public static final int DEFAULT = 1;
 
-	public static final int SHARDED = 2;
-
 	public static final String[] TYPE_ALL = {
 		DB.TYPE_DB2, DB.TYPE_DERBY, DB.TYPE_FIREBIRD, DB.TYPE_HYPERSONIC,
 		DB.TYPE_INFORMIX, DB.TYPE_INGRES, DB.TYPE_INTERBASE, DB.TYPE_JDATASTORE,
@@ -130,6 +128,11 @@ public interface DB {
 		throws IOException, NamingException, SQLException;
 
 	public void runSQLTemplate(String path, boolean failOnError)
+		throws IOException, NamingException, SQLException;
+
+	public void runSQLTemplateString(
+			Connection connection, String template, boolean evaluate,
+			boolean failOnError)
 		throws IOException, NamingException, SQLException;
 
 	public void runSQLTemplateString(

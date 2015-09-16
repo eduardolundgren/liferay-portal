@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 
 import java.io.InputStream;
 
@@ -36,6 +36,48 @@ import java.util.List;
  * @author Shuyang Zhou
  */
 public class UpgradeMVCC extends UpgradeProcess {
+
+	public void upgradeMVCC(DatabaseMetaData databaseMetaData, String tableName)
+		throws Exception {
+
+		tableName = normalizeName(tableName, databaseMetaData);
+
+		ResultSet tableResultSet = databaseMetaData.getTables(
+			null, null, tableName, null);
+
+		try {
+			if (!tableResultSet.next()) {
+				_log.error("Table " + tableName + " does not exist");
+
+				return;
+			}
+
+			ResultSet columnResultSet = databaseMetaData.getColumns(
+				null, null, tableName,
+				normalizeName("mvccVersion", databaseMetaData));
+
+			try {
+				if (columnResultSet.next()) {
+					return;
+				}
+
+				runSQL(
+					"alter table " + tableName +
+						" add mvccVersion LONG default 0");
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Added column mvccVersion to table " + tableName);
+				}
+			}
+			finally {
+				DataAccess.cleanUp(columnResultSet);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(tableResultSet);
+		}
+	}
 
 	@Override
 	protected void doUpgrade() throws Exception {
@@ -69,7 +111,7 @@ public class UpgradeMVCC extends UpgradeProcess {
 		InputStream inputStream = classLoader.getResourceAsStream(
 			"META-INF/portal-hbm.xml");
 
-		Document document = SAXReaderUtil.read(inputStream);
+		Document document = UnsecureSAXReaderUtil.read(inputStream);
 
 		Element rootElement = document.getRootElement();
 
@@ -95,43 +137,9 @@ public class UpgradeMVCC extends UpgradeProcess {
 			DatabaseMetaData databaseMetaData, Element classElement)
 		throws Exception {
 
-		String table = classElement.attributeValue("table");
+		String tableName = classElement.attributeValue("table");
 
-		table = normalizeName(table, databaseMetaData);
-
-		ResultSet tableResultSet = databaseMetaData.getTables(
-			null, null, table, null);
-
-		try {
-			if (!tableResultSet.next()) {
-				_log.error("Table " + table + " does not exist");
-
-				return;
-			}
-
-			ResultSet columnResultSet = databaseMetaData.getColumns(
-				null, null, table,
-				normalizeName("mvccVersion", databaseMetaData));
-
-			try {
-				if (columnResultSet.next()) {
-					return;
-				}
-
-				runSQL(
-					"alter table " + table + " add mvccVersion LONG default 0");
-
-				if (_log.isDebugEnabled()) {
-					_log.debug("Added column mvccVersion to table " + table);
-				}
-			}
-			finally {
-				DataAccess.cleanUp(columnResultSet);
-			}
-		}
-		finally {
-			DataAccess.cleanUp(tableResultSet);
-		}
+		upgradeMVCC(databaseMetaData, tableName);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(UpgradeMVCC.class);

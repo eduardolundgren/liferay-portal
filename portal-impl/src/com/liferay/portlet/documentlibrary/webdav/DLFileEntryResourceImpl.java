@@ -14,12 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.webdav;
 
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.webdav.BaseResourceImpl;
 import com.liferay.portal.kernel.webdav.WebDAVException;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
-import com.liferay.portal.model.Lock;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 
 import java.io.InputStream;
@@ -34,8 +34,9 @@ public class DLFileEntryResourceImpl extends BaseResourceImpl {
 		String name) {
 
 		super(
-			parentPath, name, fileEntry.getTitle(), fileEntry.getCreateDate(),
-			fileEntry.getModifiedDate(), fileEntry.getSize());
+			parentPath, name, fileEntry.getFileName(),
+			fileEntry.getCreateDate(), fileEntry.getModifiedDate(),
+			fileEntry.getSize());
 
 		setModel(fileEntry);
 		setClassName(DLFileEntry.class.getName());

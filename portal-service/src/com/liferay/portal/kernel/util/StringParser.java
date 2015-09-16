@@ -128,8 +128,6 @@ public class StringParser {
 	 * @param pattern the pattern string
 	 */
 	public StringParser(String pattern) {
-		_builder = pattern;
-
 		String regex = escapeRegex(pattern);
 
 		Matcher matcher = _fragmentPattern.matcher(pattern);
@@ -142,7 +140,7 @@ public class StringParser {
 
 			_stringParserFragments.add(stringParserFragment);
 
-			_builder = _builder.replace(chunk, stringParserFragment.getToken());
+			pattern = pattern.replace(chunk, stringParserFragment.getToken());
 
 			regex = regex.replace(
 				escapeRegex(chunk),
@@ -150,6 +148,8 @@ public class StringParser {
 					stringParserFragment.getPattern().concat(
 						StringPool.CLOSE_PARENTHESIS)));
 		}
+
+		_builder = pattern;
 
 		_pattern = Pattern.compile(regex);
 	}
@@ -253,14 +253,15 @@ public class StringParser {
 		_stringEncoder = stringEncoder;
 	}
 
-	private static Pattern _escapeRegexPattern = Pattern.compile(
+	private static final Pattern _escapeRegexPattern = Pattern.compile(
 		"[\\{\\}\\(\\)\\[\\]\\*\\+\\?\\$\\^\\.\\#\\\\]");
-	private static Pattern _fragmentPattern = Pattern.compile("\\{.+?\\}");
+	private static final Pattern _fragmentPattern = Pattern.compile(
+		"\\{.+?\\}");
 
-	private String _builder;
-	private Pattern _pattern;
+	private final String _builder;
+	private final Pattern _pattern;
 	private StringEncoder _stringEncoder;
-	private List<StringParserFragment> _stringParserFragments =
-		new ArrayList<StringParserFragment>();
+	private final List<StringParserFragment> _stringParserFragments =
+		new ArrayList<>();
 
 }

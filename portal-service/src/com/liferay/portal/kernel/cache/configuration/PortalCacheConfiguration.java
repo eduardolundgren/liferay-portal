@@ -14,11 +14,10 @@
 
 package com.liferay.portal.kernel.cache.configuration;
 
-import com.liferay.portal.kernel.cache.CacheListenerScope;
-
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Tina Tian
@@ -28,11 +27,13 @@ public class PortalCacheConfiguration {
 	public static final String DEFAULT_PORTAL_CACHE_NAME =
 		"DEFAULT_PORTAL_CACHE_NAME";
 
+	public static final String PORTAL_CACHE_LISTENER_SCOPE =
+		"PORTAL_CACHE_LISTENER_SCOPE";
+
 	public PortalCacheConfiguration(
 		String portalCacheName,
-		Map<CallbackConfiguration, CacheListenerScope>
-			cacheListenerConfigurations,
-		CallbackConfiguration bootstrapLoaderConfiguration) {
+		Set<Properties> portalCacheListenerPropertiesSet,
+		Properties portalCacheBootstrapLoaderProperties) {
 
 		if (portalCacheName == null) {
 			throw new NullPointerException("Portal cache name is null");
@@ -40,35 +41,40 @@ public class PortalCacheConfiguration {
 
 		_portalCacheName = portalCacheName;
 
-		if (cacheListenerConfigurations == null) {
-			_cacheListenerConfigurations = Collections.emptyMap();
+		if (portalCacheListenerPropertiesSet == null) {
+			_portalCacheListenerPropertiesSet = Collections.emptySet();
 		}
 		else {
-			_cacheListenerConfigurations =
-				new HashMap<CallbackConfiguration, CacheListenerScope>(
-					cacheListenerConfigurations);
+			_portalCacheListenerPropertiesSet = new HashSet<>(
+				portalCacheListenerPropertiesSet);
 		}
 
-		_bootstrapLoaderConfiguration = bootstrapLoaderConfiguration;
+		_portalCacheBootstrapLoaderProperties =
+			portalCacheBootstrapLoaderProperties;
 	}
 
-	public CallbackConfiguration getBootstrapLoaderConfiguration() {
-		return _bootstrapLoaderConfiguration;
+	public Properties getPortalCacheBootstrapLoaderProperties() {
+		return _portalCacheBootstrapLoaderProperties;
 	}
 
-	public Map<CallbackConfiguration, CacheListenerScope>
-		getCacheListenerConfigurations() {
-
-		return Collections.unmodifiableMap(_cacheListenerConfigurations);
+	public Set<Properties> getPortalCacheListenerPropertiesSet() {
+		return Collections.unmodifiableSet(_portalCacheListenerPropertiesSet);
 	}
 
 	public String getPortalCacheName() {
 		return _portalCacheName;
 	}
 
-	private final CallbackConfiguration _bootstrapLoaderConfiguration;
-	private final Map<CallbackConfiguration, CacheListenerScope>
-		_cacheListenerConfigurations;
+	public PortalCacheConfiguration newPortalCacheConfiguration(
+		String portalCacheName) {
+
+		return new PortalCacheConfiguration(
+			portalCacheName, _portalCacheListenerPropertiesSet,
+			_portalCacheBootstrapLoaderProperties);
+	}
+
+	private final Properties _portalCacheBootstrapLoaderProperties;
+	private final Set<Properties> _portalCacheListenerPropertiesSet;
 	private final String _portalCacheName;
 
 }

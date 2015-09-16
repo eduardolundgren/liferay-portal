@@ -30,6 +30,9 @@ import java.util.Map;
  */
 public class FooService {
 
+	public static void addFile(String fileName) {
+	}
+
 	public static BarData bar() {
 		return new BarData();
 	}
@@ -101,7 +104,7 @@ public class FooService {
 	}
 
 	public static List<FooData> getFooDatas() {
-		List<FooData> fooDataList = new ArrayList<FooData>();
+		List<FooData> fooDataList = new ArrayList<>();
 
 		fooDataList.add(getFooData(1));
 		fooDataList.add(getFooData(2));

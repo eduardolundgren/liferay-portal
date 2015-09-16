@@ -77,7 +77,7 @@ public abstract class TranslatedList<E, F> extends ListWrapper<E> {
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		List<F> tempList = new ArrayList<F>();
+		List<F> tempList = new ArrayList<>();
 
 		for (Object o : c) {
 			tempList.add(toOldObject((E)o));
@@ -90,7 +90,7 @@ public abstract class TranslatedList<E, F> extends ListWrapper<E> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		List<F> tempList = new ArrayList<F>();
+		List<F> tempList = new ArrayList<>();
 
 		for (Object o : c) {
 			tempList.add(toOldObject((E)o));
@@ -121,6 +121,6 @@ public abstract class TranslatedList<E, F> extends ListWrapper<E> {
 
 	protected abstract F toOldObject(E o);
 
-	private List<F> _oldList;
+	private final List<F> _oldList;
 
 }

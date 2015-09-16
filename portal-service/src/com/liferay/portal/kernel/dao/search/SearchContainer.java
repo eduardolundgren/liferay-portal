@@ -93,6 +93,17 @@ public class SearchContainer<R> {
 		PortletURL iteratorURL, List<String> headerNames,
 		String emptyResultsMessage) {
 
+		this (
+			portletRequest, displayTerms, searchTerms, curParam, cur, delta,
+			iteratorURL, headerNames, emptyResultsMessage, StringPool.BLANK);
+	}
+
+	public SearchContainer(
+		PortletRequest portletRequest, DisplayTerms displayTerms,
+		DisplayTerms searchTerms, String curParam, int cur, int delta,
+		PortletURL iteratorURL, List<String> headerNames,
+		String emptyResultsMessage, String cssClass) {
+
 		_portletRequest = portletRequest;
 		_displayTerms = displayTerms;
 		_searchTerms = searchTerms;
@@ -146,7 +157,7 @@ public class SearchContainer<R> {
 					portletRequest, DisplayTerms.AND_OPERATOR, true)));
 
 		if (headerNames != null) {
-			_headerNames = new ArrayList<String>(headerNames.size());
+			_headerNames = new ArrayList<>(headerNames.size());
 
 			_headerNames.addAll(headerNames);
 
@@ -161,6 +172,10 @@ public class SearchContainer<R> {
 
 		if (searchContainerReference != null) {
 			searchContainerReference.register(this);
+		}
+
+		if (Validator.isNotNull(cssClass)) {
+			_cssClass = cssClass;
 		}
 	}
 
@@ -186,6 +201,10 @@ public class SearchContainer<R> {
 
 	public String getClassName() {
 		return _className;
+	}
+
+	public String getCssClass() {
+		return _cssClass;
 	}
 
 	public int getCur() {
@@ -352,6 +371,10 @@ public class SearchContainer<R> {
 		return _totalVar;
 	}
 
+	public boolean hasResults() {
+		return !_results.isEmpty();
+	}
+
 	public boolean isDeltaConfigurable() {
 		return _deltaConfigurable;
 	}
@@ -374,6 +397,10 @@ public class SearchContainer<R> {
 
 	public void setClassName(String className) {
 		_className = className;
+	}
+
+	public void setCssClass(String cssClass) {
+		_cssClass = cssClass;
 	}
 
 	public void setDelta(int delta) {
@@ -484,7 +511,7 @@ public class SearchContainer<R> {
 			return;
 		}
 
-		_normalizedHeaderNames = new ArrayList<String>(headerNames.size());
+		_normalizedHeaderNames = new ArrayList<>(headerNames.size());
 
 		for (String headerName : headerNames) {
 			_normalizedHeaderNames.add(
@@ -524,6 +551,7 @@ public class SearchContainer<R> {
 	}
 
 	private String _className;
+	private String _cssClass = StringPool.BLANK;
 	private int _cur;
 	private final String _curParam;
 	private int _delta = DEFAULT_DELTA;
@@ -553,8 +581,8 @@ public class SearchContainer<R> {
 	private String _orderByTypeParam = DEFAULT_ORDER_BY_TYPE_PARAM;
 	private final PortletRequest _portletRequest;
 	private int _resultEnd;
-	private final List<ResultRow> _resultRows = new ArrayList<ResultRow>();
-	private List<R> _results = new ArrayList<R>();
+	private final List<ResultRow> _resultRows = new ArrayList<>();
+	private List<R> _results = new ArrayList<>();
 	private RowChecker _rowChecker;
 	private final DisplayTerms _searchTerms;
 	private int _start;

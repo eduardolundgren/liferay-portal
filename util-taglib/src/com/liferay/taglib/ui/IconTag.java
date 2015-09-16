@@ -108,6 +108,10 @@ public class IconTag extends IncludeTag {
 		_localizeMessage = localizeMessage;
 	}
 
+	public void setMarkupView(String markupView) {
+		_markupView = markupView;
+	}
+
 	public void setMessage(String message) {
 		_message = message;
 	}
@@ -158,6 +162,7 @@ public class IconTag extends IncludeTag {
 		_lang = null;
 		_linkCssClass = null;
 		_localizeMessage = true;
+		_markupView = null;
 		_message = null;
 		_method = null;
 		_onClick = null;
@@ -173,10 +178,10 @@ public class IconTag extends IncludeTag {
 		Map<String, Object> data = null;
 
 		if (_data != null) {
-			data = new HashMap<String, Object>(_data);
+			data = new HashMap<>(_data);
 		}
 		else {
-			data = new HashMap<String, Object>(1);
+			data = new HashMap<>(1);
 		}
 
 		if (_useDialog && Validator.isNull(data.get("title"))) {
@@ -423,7 +428,7 @@ public class IconTag extends IncludeTag {
 
 	@Override
 	protected String getPage() {
-		return _PAGE;
+		return "/html/taglib/ui/icon/page.jsp";
 	}
 
 	protected String getProcessedMessage() {
@@ -432,13 +437,8 @@ public class IconTag extends IncludeTag {
 		}
 
 		return StringUtil.replace(
-			_image,
-			new String[] {
-				StringPool.UNDERLINE, _AUI_PATH
-			},
-			new String[] {
-				StringPool.DASH, StringPool.BLANK
-			});
+			_image, new String[] {StringPool.UNDERLINE, _AUI_PATH},
+			new String[] {StringPool.DASH, StringPool.BLANK});
 	}
 
 	protected String getProcessedUrl() {
@@ -582,6 +582,7 @@ public class IconTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:icon:localizeMessage",
 			String.valueOf(_localizeMessage));
+		request.setAttribute("liferay-ui:icon:markupView", _markupView);
 		request.setAttribute("liferay-ui:icon:message", getProcessedMessage());
 		request.setAttribute("liferay-ui:icon:method", getMethod());
 		request.setAttribute("liferay-ui:icon:onClick", getOnClick());
@@ -599,8 +600,6 @@ public class IconTag extends IncludeTag {
 
 	private static final boolean _CLEAN_UP_SET_ATTRIBUTES = true;
 
-	private static final String _PAGE = "/html/taglib/ui/icon/page.jsp";
-
 	private String _alt;
 	private String _ariaRole;
 	private String _cssClass;
@@ -613,6 +612,7 @@ public class IconTag extends IncludeTag {
 	private String _lang;
 	private String _linkCssClass;
 	private boolean _localizeMessage = true;
+	private String _markupView;
 	private String _message;
 	private String _method;
 	private String _onClick;

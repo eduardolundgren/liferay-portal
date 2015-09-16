@@ -17,11 +17,11 @@ package com.liferay.portlet;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portal.util.ClassLoaderUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +40,7 @@ import javax.servlet.ServletContext;
 public class PortletInstanceFactoryImpl implements PortletInstanceFactory {
 
 	public PortletInstanceFactoryImpl() {
-		_pool = new ConcurrentHashMap<String, Map<String, InvokerPortlet>>();
+		_pool = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -101,8 +101,7 @@ public class PortletInstanceFactoryImpl implements PortletInstanceFactory {
 			portletInstances = _pool.get(rootPortletId);
 
 			if (portletInstances == null) {
-				portletInstances =
-					new ConcurrentHashMap<String, InvokerPortlet>();
+				portletInstances = new ConcurrentHashMap<>();
 
 				_pool.put(rootPortletId, portletInstances);
 			}

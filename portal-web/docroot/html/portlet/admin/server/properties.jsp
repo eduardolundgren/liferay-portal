@@ -21,7 +21,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 PortletURL serverURL = renderResponse.createRenderURL();
 
-serverURL.setParameter("struts_action", "/admin/view");
+serverURL.setParameter("mvcRenderCommandName", "/admin/view");
 serverURL.setParameter("tabs1", tabs1);
 serverURL.setParameter("tabs2", tabs2);
 serverURL.setParameter("tabs3", tabs3);
@@ -34,7 +34,7 @@ serverURL.setParameter("tabs3", tabs3);
 />
 
 <div class="form-search">
-	<liferay-ui:input-search placeholder='<%= LanguageUtil.get(locale, "keywords") %>' />
+	<liferay-ui:input-search placeholder='<%= LanguageUtil.get(request, "keywords") %>' />
 </div>
 
 <%
@@ -122,7 +122,7 @@ Map<String, String[]> companyPortletPreferencesMap = companyPortletPreferences.g
 			<c:if test="<%= Validator.isNotNull(value) %>">
 				<c:choose>
 					<c:when test="<%= value.length() > 80 %>">
-						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= HtmlUtil.escape(value) %>');">
+						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= HtmlUtil.escapeJS(value) %>');">
 							<%= HtmlUtil.escape(StringUtil.shorten(value, 80)) %>
 						</span>
 					</c:when>

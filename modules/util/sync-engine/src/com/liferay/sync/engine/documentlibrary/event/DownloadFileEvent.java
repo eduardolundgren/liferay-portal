@@ -16,8 +16,16 @@ package com.liferay.sync.engine.documentlibrary.event;
 
 import com.liferay.sync.engine.documentlibrary.handler.DownloadFileHandler;
 import com.liferay.sync.engine.documentlibrary.handler.Handler;
+import com.liferay.sync.engine.documentlibrary.util.BatchDownloadEvent;
+import com.liferay.sync.engine.documentlibrary.util.BatchEventManager;
+import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.util.FileUtil;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.Map;
 
@@ -43,12 +51,30 @@ public class DownloadFileEvent extends BaseEvent {
 	protected void processRequest() throws Exception {
 		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
+		Path filePath = Paths.get(syncFile.getFilePathName());
+
+		syncFile.setPreviousModifiedTime(
+			FileUtil.getLastModifiedTime(filePath));
 		syncFile.setState(SyncFile.STATE_IN_PROGRESS);
 		syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADING);
 
 		SyncFileService.update(syncFile);
 
+		if ((boolean)getParameterValue("batch")) {
+			BatchDownloadEvent batchDownloadEvent =
+				BatchEventManager.getBatchDownloadEvent(getSyncAccountId());
+
+			if (batchDownloadEvent.addEvent(this)) {
+				return;
+			}
+		}
+
 		StringBuilder sb = new StringBuilder();
+
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			getSyncAccountId());
+
+		sb.append(syncAccount.getUrl());
 
 		sb.append(_URL_PATH);
 		sb.append("/");
@@ -57,10 +83,10 @@ public class DownloadFileEvent extends BaseEvent {
 		sb.append(syncFile.getTypeUuid());
 
 		if ((Boolean)getParameterValue("patch")) {
-			sb.append("?patch=true&sourceVersion=");
-			sb.append(getParameterValue("sourceVersion"));
-			sb.append("&targetVersion=");
-			sb.append(getParameterValue("targetVersion"));
+			sb.append("?patch=true&sourceVersionId=");
+			sb.append(getParameterValue("sourceVersionId"));
+			sb.append("&targetVersionId=");
+			sb.append(getParameterValue("targetVersionId"));
 		}
 		else {
 			sb.append("?version=");

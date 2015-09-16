@@ -18,12 +18,13 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants;
+import com.liferay.portlet.display.template.PortletDisplayTemplateConstants;
 import com.liferay.rss.web.configuration.RSSWebConfigurationValues;
 import com.liferay.rss.web.constants.RSSPortletKeys;
+import com.liferay.rss.web.display.context.RSSDisplayContext;
 import com.liferay.rss.web.util.RSSFeed;
 
 import java.util.List;
@@ -31,18 +32,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleReference;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
-	immediate = true,
-	property = {
-		"javax.portlet.name=com_liferay_rss_web_portlet_RSSPortlet"
-	},
+	immediate = true, property = {"javax.portlet.name=" + RSSPortletKeys.RSS},
 	service = TemplateHandler.class
 )
 public class RSSPortletDisplayTemplateHandler
@@ -55,8 +51,8 @@ public class RSSPortletDisplayTemplateHandler
 
 	@Override
 	public String getName(Locale locale) {
-		ResourceBundle resourceBundle = ResourceBundle.getBundle(
-			"content.Language");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
 
 		String portletTitle = PortalUtil.getPortletTitle(
 			RSSPortletKeys.RSS, resourceBundle);
@@ -67,19 +63,7 @@ public class RSSPortletDisplayTemplateHandler
 
 	@Override
 	public String getResourceName() {
-		Class<?> clazz = getClass();
-
-		BundleReference bundleReference =
-			(BundleReference)clazz.getClassLoader();
-
-		Bundle bundle = bundleReference.getBundle();
-
-		String symbolicName = bundle.getSymbolicName();
-
-		symbolicName = symbolicName.replaceAll("[^a-zA-Z0-9]", "");
-
-		return RSSPortletKeys.RSS.concat(PortletConstants.WAR_SEPARATOR).concat(
-			String.valueOf(symbolicName));
+		return RSSPortletKeys.RSS;
 	}
 
 	@Override
@@ -95,6 +79,9 @@ public class RSSPortletDisplayTemplateHandler
 
 		templateVariableGroup.empty();
 
+		templateVariableGroup.addVariable(
+			"rss-display-context", RSSDisplayContext.class,
+			"rssDisplayContext");
 		templateVariableGroup.addCollectionVariable(
 			"rss-feeds", List.class, PortletDisplayTemplateConstants.ENTRIES,
 			"rss-feed", RSSFeed.class, "curEntry", "getSyndFeed().getTitle()");

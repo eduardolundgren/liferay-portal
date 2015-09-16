@@ -26,8 +26,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 	<div class="hide lfr-message-response" id="<portlet:namespace />login-status-messages"></div>
 
 	<div class="anonymous-account">
-		<portlet:actionURL var="updateIncompleteUserURL">
-			<portlet:param name="struts_action" value="/login/create_anonymous_account" />
+		<portlet:actionURL name="/login/create_anonymous_account" var="updateIncompleteUserURL">
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
 			<portlet:param name="emailAddress" value="<%= emailAddress %>" />
 		</portlet:actionURL>
@@ -51,7 +50,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 		var form = $(document.<portlet:namespace />fm);
 
 		function onError() {
-			message = '<%= UnicodeLanguageUtil.get(request, "your-request-failed-to-complete") %>';
+			var message = '<%= UnicodeLanguageUtil.get(request, "your-request-failed-to-complete") %>';
 
 			<portlet:namespace />showStatusMessage('danger', message);
 
@@ -116,13 +115,17 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 </aui:script>
 
 <aui:script sandbox="<%= true %>">
+	var afterLogin;
+	var namespace;
+	var randomNamespace;
+
 	if (window.opener) {
-		var namespace = window.opener.parent.namespace;
-		var randomNamespace = window.opener.parent.randomNamespace;
+		namespace = window.opener.parent.namespace;
+		randomNamespace = window.opener.parent.randomNamespace;
 
-		var afterLogin = window.opener.parent[randomNamespace + 'afterLogin'];
+		afterLogin = window.opener.parent[randomNamespace + 'afterLogin'];
 
-		if (typeof(afterLogin) == 'function') {
+		if (typeof afterLogin == 'function') {
 			afterLogin('<%= HtmlUtil.escape(emailAddress) %>', <%= anonymousAccount %>);
 
 			if (<%= !anonymousAccount %>) {
@@ -143,10 +146,10 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 		}
 	}
 	else {
-		var namespace = window.parent.namespace;
-		var randomNamespace = window.parent.randomNamespace;
+		namespace = window.parent.namespace;
+		randomNamespace = window.parent.randomNamespace;
 
-		var afterLogin = window.parent[randomNamespace + 'afterLogin'];
+		afterLogin = window.parent[randomNamespace + 'afterLogin'];
 
 		afterLogin('<%= HtmlUtil.escape(emailAddress) %>', <%= anonymousAccount %>);
 

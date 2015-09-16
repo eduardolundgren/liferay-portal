@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ObjectGraphUtil.AnnotatedFieldMappingVisitor;
 import com.liferay.portal.kernel.util.ObjectGraphUtil.Visitor;
 
@@ -435,7 +435,7 @@ public class ObjectGraphUtilTest {
 		}
 
 		private List<ObjectValuePair<Field, Object>> _objectValuePairs =
-			new ArrayList<ObjectValuePair<Field, Object>>();
+			new ArrayList<>();
 
 	}
 
@@ -450,7 +450,7 @@ public class ObjectGraphUtilTest {
 		}
 
 		private final List<ObjectValuePair<Field, Object>> _objectValuePairs =
-			new ArrayList<ObjectValuePair<Field, Object>>();
+			new ArrayList<>();
 
 	}
 

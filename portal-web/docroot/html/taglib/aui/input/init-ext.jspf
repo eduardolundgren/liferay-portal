@@ -23,15 +23,7 @@ String baseType = GetterUtil.getString((String)request.getAttribute("aui:input:b
 String forLabel = namespace + GetterUtil.getString((String)request.getAttribute("aui:input:forLabel"));
 
 if (Validator.isNull(label) && changesContext) {
-	StringBundler sb = new StringBundler(5);
-
-	sb.append(LanguageUtil.get(request, title));
-	sb.append(StringPool.SPACE);
-	sb.append(StringPool.OPEN_PARENTHESIS);
-	sb.append(LanguageUtil.get(request, "changing-the-value-of-this-field-will-reload-the-page"));
-	sb.append(StringPool.CLOSE_PARENTHESIS);
-
-	title = sb.toString();
+	title = StringUtil.appendParentheticalSuffix(LanguageUtil.get(request, title), LanguageUtil.get(request, "changing-the-value-of-this-field-reloads-the-page"));
 }
 else if (Validator.isNotNull(title)) {
 	title = LanguageUtil.get(request, title);
@@ -63,6 +55,14 @@ String fieldCssClass = AUIUtil.buildCss(AUIUtil.FIELD_PREFIX, disabled, first, l
 
 if (baseType.equals("email") || baseType.equals("password") || baseType.equals("text") || baseType.equals("textarea")) {
 	fieldCssClass += " form-control";
+}
+
+if (type.equals("toggle-card")) {
+	fieldCssClass += " toggle-card";
+}
+
+if (type.equals("toggle-switch")) {
+	fieldCssClass += " toggle-switch";
 }
 
 boolean useInputWrapper = true;

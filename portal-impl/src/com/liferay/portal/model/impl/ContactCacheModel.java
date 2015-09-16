@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -39,6 +40,33 @@ import java.util.Date;
 @ProviderType
 public class ContactCacheModel implements CacheModel<Contact>, Externalizable,
 	MVCCModel {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof ContactCacheModel)) {
+			return false;
+		}
+
+		ContactCacheModel contactCacheModel = (ContactCacheModel)obj;
+
+		if ((contactId == contactCacheModel.contactId) &&
+				(mvccVersion == contactCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, contactId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
 	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
@@ -327,8 +355,8 @@ public class ContactCacheModel implements CacheModel<Contact>, Externalizable,
 		firstName = objectInput.readUTF();
 		middleName = objectInput.readUTF();
 		lastName = objectInput.readUTF();
-		prefixId = objectInput.readInt();
-		suffixId = objectInput.readInt();
+		prefixId = objectInput.readLong();
+		suffixId = objectInput.readLong();
 		male = objectInput.readBoolean();
 		birthday = objectInput.readLong();
 		smsSn = objectInput.readUTF();
@@ -398,8 +426,8 @@ public class ContactCacheModel implements CacheModel<Contact>, Externalizable,
 			objectOutput.writeUTF(lastName);
 		}
 
-		objectOutput.writeInt(prefixId);
-		objectOutput.writeInt(suffixId);
+		objectOutput.writeLong(prefixId);
+		objectOutput.writeLong(suffixId);
 		objectOutput.writeBoolean(male);
 		objectOutput.writeLong(birthday);
 
@@ -524,8 +552,8 @@ public class ContactCacheModel implements CacheModel<Contact>, Externalizable,
 	public String firstName;
 	public String middleName;
 	public String lastName;
-	public int prefixId;
-	public int suffixId;
+	public long prefixId;
+	public long suffixId;
 	public boolean male;
 	public long birthday;
 	public String smsSn;

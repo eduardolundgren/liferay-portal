@@ -16,7 +16,6 @@ package com.liferay.portlet.softwarecatalog.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -58,7 +57,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SCProductScreenshotPersistence
- * @see SCProductScreenshotUtil
+ * @see com.liferay.portlet.softwarecatalog.service.persistence.SCProductScreenshotUtil
  * @generated
  */
 @ProviderType
@@ -125,7 +124,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * Returns a range of all the s c product screenshots where productEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.softwarecatalog.model.impl.SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param productEntryId the product entry ID
@@ -143,7 +142,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * Returns an ordered range of all the s c product screenshots where productEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.softwarecatalog.model.impl.SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param productEntryId the product entry ID
@@ -261,7 +260,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * @param productEntryId the product entry ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a matching s c product screenshot could not be found
+	 * @throws NoSuchProductScreenshotException if a matching s c product screenshot could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByProductEntryId_First(long productEntryId,
@@ -313,7 +312,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * @param productEntryId the product entry ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a matching s c product screenshot could not be found
+	 * @throws NoSuchProductScreenshotException if a matching s c product screenshot could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByProductEntryId_Last(long productEntryId,
@@ -371,7 +370,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * @param productEntryId the product entry ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
+	 * @throws NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
 	 */
 	@Override
 	public SCProductScreenshot[] findByProductEntryId_PrevAndNext(
@@ -590,11 +589,11 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 			new String[] { Long.class.getName() });
 
 	/**
-	 * Returns the s c product screenshot where thumbnailId = &#63; or throws a {@link com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException} if it could not be found.
+	 * Returns the s c product screenshot where thumbnailId = &#63; or throws a {@link NoSuchProductScreenshotException} if it could not be found.
 	 *
 	 * @param thumbnailId the thumbnail ID
 	 * @return the matching s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a matching s c product screenshot could not be found
+	 * @throws NoSuchProductScreenshotException if a matching s c product screenshot could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByThumbnailId(long thumbnailId)
@@ -802,11 +801,11 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 			new String[] { Long.class.getName() });
 
 	/**
-	 * Returns the s c product screenshot where fullImageId = &#63; or throws a {@link com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException} if it could not be found.
+	 * Returns the s c product screenshot where fullImageId = &#63; or throws a {@link NoSuchProductScreenshotException} if it could not be found.
 	 *
 	 * @param fullImageId the full image ID
 	 * @return the matching s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a matching s c product screenshot could not be found
+	 * @throws NoSuchProductScreenshotException if a matching s c product screenshot could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByFullImageId(long fullImageId)
@@ -1016,12 +1015,12 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 			new String[] { Long.class.getName(), Integer.class.getName() });
 
 	/**
-	 * Returns the s c product screenshot where productEntryId = &#63; and priority = &#63; or throws a {@link com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException} if it could not be found.
+	 * Returns the s c product screenshot where productEntryId = &#63; and priority = &#63; or throws a {@link NoSuchProductScreenshotException} if it could not be found.
 	 *
 	 * @param productEntryId the product entry ID
 	 * @param priority the priority
 	 * @return the matching s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a matching s c product screenshot could not be found
+	 * @throws NoSuchProductScreenshotException if a matching s c product screenshot could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByP_P(long productEntryId, int priority)
@@ -1300,10 +1299,6 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(SCProductScreenshotImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(SCProductScreenshotImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -1326,7 +1321,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache(scProductScreenshot);
+		clearUniqueFindersCache((SCProductScreenshotModelImpl)scProductScreenshot);
 	}
 
 	@Override
@@ -1339,84 +1334,84 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 				SCProductScreenshotImpl.class,
 				scProductScreenshot.getPrimaryKey());
 
-			clearUniqueFindersCache(scProductScreenshot);
+			clearUniqueFindersCache((SCProductScreenshotModelImpl)scProductScreenshot);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
-		SCProductScreenshot scProductScreenshot) {
-		if (scProductScreenshot.isNew()) {
-			Object[] args = new Object[] { scProductScreenshot.getThumbnailId() };
+		SCProductScreenshotModelImpl scProductScreenshotModelImpl, boolean isNew) {
+		if (isNew) {
+			Object[] args = new Object[] {
+					scProductScreenshotModelImpl.getThumbnailId()
+				};
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_THUMBNAILID, args,
 				Long.valueOf(1));
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_THUMBNAILID, args,
-				scProductScreenshot);
+				scProductScreenshotModelImpl);
 
-			args = new Object[] { scProductScreenshot.getFullImageId() };
+			args = new Object[] { scProductScreenshotModelImpl.getFullImageId() };
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_FULLIMAGEID, args,
 				Long.valueOf(1));
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_FULLIMAGEID, args,
-				scProductScreenshot);
+				scProductScreenshotModelImpl);
 
 			args = new Object[] {
-					scProductScreenshot.getProductEntryId(),
-					scProductScreenshot.getPriority()
+					scProductScreenshotModelImpl.getProductEntryId(),
+					scProductScreenshotModelImpl.getPriority()
 				};
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_P_P, args,
 				Long.valueOf(1));
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_P_P, args,
-				scProductScreenshot);
+				scProductScreenshotModelImpl);
 		}
 		else {
-			SCProductScreenshotModelImpl scProductScreenshotModelImpl = (SCProductScreenshotModelImpl)scProductScreenshot;
-
 			if ((scProductScreenshotModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_THUMBNAILID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						scProductScreenshot.getThumbnailId()
+						scProductScreenshotModelImpl.getThumbnailId()
 					};
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_THUMBNAILID,
 					args, Long.valueOf(1));
 				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_THUMBNAILID,
-					args, scProductScreenshot);
+					args, scProductScreenshotModelImpl);
 			}
 
 			if ((scProductScreenshotModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_FULLIMAGEID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						scProductScreenshot.getFullImageId()
+						scProductScreenshotModelImpl.getFullImageId()
 					};
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_FULLIMAGEID,
 					args, Long.valueOf(1));
 				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_FULLIMAGEID,
-					args, scProductScreenshot);
+					args, scProductScreenshotModelImpl);
 			}
 
 			if ((scProductScreenshotModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_P_P.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						scProductScreenshot.getProductEntryId(),
-						scProductScreenshot.getPriority()
+						scProductScreenshotModelImpl.getProductEntryId(),
+						scProductScreenshotModelImpl.getPriority()
 					};
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_P_P, args,
 					Long.valueOf(1));
 				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_P_P, args,
-					scProductScreenshot);
+					scProductScreenshotModelImpl);
 			}
 		}
 	}
 
 	protected void clearUniqueFindersCache(
-		SCProductScreenshot scProductScreenshot) {
-		SCProductScreenshotModelImpl scProductScreenshotModelImpl = (SCProductScreenshotModelImpl)scProductScreenshot;
-
-		Object[] args = new Object[] { scProductScreenshot.getThumbnailId() };
+		SCProductScreenshotModelImpl scProductScreenshotModelImpl) {
+		Object[] args = new Object[] {
+				scProductScreenshotModelImpl.getThumbnailId()
+			};
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_THUMBNAILID, args);
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_THUMBNAILID, args);
@@ -1431,7 +1426,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_THUMBNAILID, args);
 		}
 
-		args = new Object[] { scProductScreenshot.getFullImageId() };
+		args = new Object[] { scProductScreenshotModelImpl.getFullImageId() };
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_FULLIMAGEID, args);
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_FULLIMAGEID, args);
@@ -1447,8 +1442,8 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 		}
 
 		args = new Object[] {
-				scProductScreenshot.getProductEntryId(),
-				scProductScreenshot.getPriority()
+				scProductScreenshotModelImpl.getProductEntryId(),
+				scProductScreenshotModelImpl.getPriority()
 			};
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_P_P, args);
@@ -1487,7 +1482,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 *
 	 * @param productScreenshotId the primary key of the s c product screenshot
 	 * @return the s c product screenshot that was removed
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
+	 * @throws NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
 	 */
 	@Override
 	public SCProductScreenshot remove(long productScreenshotId)
@@ -1500,7 +1495,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 *
 	 * @param primaryKey the primary key of the s c product screenshot
 	 * @return the s c product screenshot that was removed
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
+	 * @throws NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
 	 */
 	@Override
 	public SCProductScreenshot remove(Serializable primaryKey)
@@ -1570,7 +1565,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 
 	@Override
 	public SCProductScreenshot updateImpl(
-		com.liferay.portlet.softwarecatalog.model.SCProductScreenshot scProductScreenshot) {
+		SCProductScreenshot scProductScreenshot) {
 		scProductScreenshot = toUnwrappedModel(scProductScreenshot);
 
 		boolean isNew = scProductScreenshot.isNew();
@@ -1588,7 +1583,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 				scProductScreenshot.setNew(false);
 			}
 			else {
-				session.merge(scProductScreenshot);
+				scProductScreenshot = (SCProductScreenshot)session.merge(scProductScreenshot);
 			}
 		}
 		catch (Exception e) {
@@ -1631,8 +1626,8 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 			SCProductScreenshotImpl.class, scProductScreenshot.getPrimaryKey(),
 			scProductScreenshot, false);
 
-		clearUniqueFindersCache(scProductScreenshot);
-		cacheUniqueFindersCache(scProductScreenshot);
+		clearUniqueFindersCache(scProductScreenshotModelImpl);
+		cacheUniqueFindersCache(scProductScreenshotModelImpl, isNew);
 
 		scProductScreenshot.resetOriginalValues();
 
@@ -1666,7 +1661,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 *
 	 * @param primaryKey the primary key of the s c product screenshot
 	 * @return the s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
+	 * @throws NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByPrimaryKey(Serializable primaryKey)
@@ -1686,11 +1681,11 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	}
 
 	/**
-	 * Returns the s c product screenshot with the primary key or throws a {@link com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException} if it could not be found.
+	 * Returns the s c product screenshot with the primary key or throws a {@link NoSuchProductScreenshotException} if it could not be found.
 	 *
 	 * @param productScreenshotId the primary key of the s c product screenshot
 	 * @return the s c product screenshot
-	 * @throws com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
+	 * @throws NoSuchProductScreenshotException if a s c product screenshot with the primary key could not be found
 	 */
 	@Override
 	public SCProductScreenshot findByPrimaryKey(long productScreenshotId)
@@ -1864,7 +1859,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * Returns a range of all the s c product screenshots.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.softwarecatalog.model.impl.SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of s c product screenshots
@@ -1880,7 +1875,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	 * Returns an ordered range of all the s c product screenshots.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.softwarecatalog.model.impl.SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SCProductScreenshotModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of s c product screenshots
@@ -2017,6 +2012,11 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 		return count.intValue();
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return SCProductScreenshotModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the s c product screenshot persistence.
 	 */
@@ -2038,7 +2038,6 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 	private static final String _ORDER_BY_ENTITY_ALIAS = "scProductScreenshot.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SCProductScreenshot exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SCProductScreenshot exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(SCProductScreenshotPersistenceImpl.class);
 	private static final SCProductScreenshot _nullSCProductScreenshot = new SCProductScreenshotImpl() {
 			@Override

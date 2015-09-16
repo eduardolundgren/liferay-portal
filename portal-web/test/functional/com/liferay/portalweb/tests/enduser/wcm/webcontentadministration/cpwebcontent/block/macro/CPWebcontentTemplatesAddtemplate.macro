@@ -1,0 +1,10 @@
+<definition>
+	<command name="showDetails">
+		<if>
+			<condition function="IsElementNotPresent#isNotVisible" locator1="TextArea#DESCRIPTION" />
+			<then>
+				<execute function="Click" locator1="DDMEditTemplate#DETAILS" />
+			</then>
+		</if>
+	</command>
+</definition>

@@ -29,9 +29,7 @@ int numHits = userTracker.getHits();
 userTracker = userTracker.toEscapedModel();
 %>
 
-<portlet:actionURL var="editSessionURL">
-	<portlet:param name="struts_action" value="/monitoring/edit_session" />
-</portlet:actionURL>
+<portlet:actionURL name="/monitoring/edit_session" var="editSessionURL" />
 
 <aui:form action="<%= editSessionURL %>" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
@@ -44,7 +42,7 @@ userTracker = userTracker.toEscapedModel();
 
 	<c:choose>
 		<c:when test="<%= userTracker == null %>">
-			<liferay-ui:message key="session-id-not-found" />
+			<liferay-ui:message key="session-id-could-not-be-found" />
 
 			<aui:button href="<%= redirect %>" type="cancel" />
 		</c:when>

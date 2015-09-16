@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.messaging.proxy.MessagingProxy;
 import com.liferay.portal.kernel.messaging.proxy.ProxyMode;
+import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 
 /**
  * @author Bruno Farache
@@ -23,6 +24,9 @@ import com.liferay.portal.kernel.messaging.proxy.ProxyMode;
  */
 @MessagingProxy(mode = ProxyMode.SYNC)
 public interface IndexSearcher extends QuerySuggester {
+
+	public String getQueryString(SearchContext searchContext, Query query)
+		throws ParseException;
 
 	public Hits search(SearchContext searchContext, Query query)
 		throws SearchException;
@@ -35,6 +39,9 @@ public interface IndexSearcher extends QuerySuggester {
 	public Hits search(
 			String searchEngineId, long companyId, Query query, Sort[] sort,
 			int start, int end)
+		throws SearchException;
+
+	public long searchCount(SearchContext searchContext, Query query)
 		throws SearchException;
 
 }

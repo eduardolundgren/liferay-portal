@@ -45,11 +45,24 @@ public class SessionManager {
 
 			URL url = new URL(syncAccount.getUrl());
 
-			session = new Session(
-				url, syncAccount.getLogin(),
-				Encryptor.decrypt(syncAccount.getPassword()),
-				syncAccount.isTrustSelfSigned(),
-				syncAccount.getMaxConnections());
+			if (syncAccount.isOAuthEnabled()) {
+				session = new Session(
+					url, syncAccount.getOAuthConsumerKey(),
+					syncAccount.getOAuthConsumerSecret(),
+					syncAccount.getLogin(),
+					Encryptor.decrypt(syncAccount.getPassword()),
+					syncAccount.isTrustSelfSigned(),
+					syncAccount.getMaxConnections());
+			}
+			else {
+				session = new Session(
+					url, syncAccount.getLogin(),
+					Encryptor.decrypt(syncAccount.getPassword()),
+					syncAccount.isTrustSelfSigned(),
+					syncAccount.getMaxConnections());
+			}
+
+			session.startTrackTransferRate();
 
 			_sessions.put(syncAccountId, session);
 
@@ -69,6 +82,8 @@ public class SessionManager {
 			return;
 		}
 
+		session.stopTrackTransferRate();
+
 		ExecutorService executorService = session.getExecutorService();
 
 		executorService.shutdownNow();
@@ -77,7 +92,6 @@ public class SessionManager {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SessionManager.class);
 
-	private static final Map<Long, Session> _sessions =
-		new HashMap<Long, Session>();
+	private static final Map<Long, Session> _sessions = new HashMap<>();
 
 }

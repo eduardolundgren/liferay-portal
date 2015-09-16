@@ -1,0 +1,66 @@
+import com.liferay.gradle.util.FileUtil
+
+import org.dm.gradle.plugins.bundle.JarBuilder
+
+dependencies {
+	compile project(":core:jaxws-osgi-bridge")
+	compile project(":core:osgi-service-tracker-map")
+	compile project(":core:registry-impl")
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/core")
+}
+
+File systemPackagesExtraBndFile = file("system.packages.extra.bnd")
+File systemPackagesExtraManifestFile = file("system.packages.extra.mf")
+
+task buildSystemPackagesExtraManifest
+task copySystemPackagesExtraManifest(type: Copy)
+
+buildSystemPackagesExtraManifest {
+	dependsOn classes
+	dependsOn copyLibs
+
+	doLast {
+		JarBuilder jarBuilder = bundle.jarBuilderFactory.create()
+
+		jarBuilder.withBase projectDir
+
+		Map<String, String> properties = liferay.bundleDefaultInstructions
+
+		properties["-include"] = relativePath(systemPackagesExtraBndFile)
+
+		jarBuilder.withProperties properties
+		jarBuilder.withSourcepath sourceSets.main.allSource.srcDirs
+
+		systemPackagesExtraManifestFile.withOutputStream {
+			jarBuilder.writeManifestTo it
+		}
+	}
+}
+
+deploy {
+	from("lib") {
+		include "com.liferay.osgi.servicetrackermap.jar"
+		include "org.eclipse.osgi.jar"
+		include "registry-impl.jar"
+	}
+}
+
+copySystemPackagesExtraManifest {
+	if (!FileUtil.isUpToDate(project, systemPackagesExtraBndFile, systemPackagesExtraManifestFile)) {
+		dependsOn buildSystemPackagesExtraManifest
+	}
+
+	from systemPackagesExtraManifestFile
+	into "tmp/META-INF"
+
+	rename {
+		"MANIFEST.MF"
+	}
+}
+
+jar {
+	dependsOn copySystemPackagesExtraManifest
+}

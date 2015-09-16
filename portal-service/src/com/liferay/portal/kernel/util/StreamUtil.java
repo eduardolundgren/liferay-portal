@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 
 import java.nio.channels.FileChannel;
 
@@ -76,6 +77,21 @@ public class StreamUtil {
 
 	public static void cleanUp(Closeable... closeables) {
 		cleanUp(true, closeables);
+	}
+
+	public static void runWithSwappedSystemOut(
+		OutputStream outputStream, Runnable runnable) {
+
+		PrintStream printStream = System.out;
+
+		System.setOut(new PrintStream(outputStream));
+
+		try {
+			runnable.run();
+		}
+		finally {
+			System.setOut(printStream);
+		}
 	}
 
 	public static void transfer(
@@ -228,10 +244,11 @@ public class StreamUtil {
 
 		while (count < length) {
 			count += inputFileChannel.transferTo(
-				inputFileChannel.position(), length - count, outputFileChannel);
+				inputFileChannel.position() + count, length - count,
+				outputFileChannel);
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(StreamUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(StreamUtil.class);
 
 }

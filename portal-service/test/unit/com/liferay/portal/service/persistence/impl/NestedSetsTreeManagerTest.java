@@ -14,7 +14,7 @@
 
 package com.liferay.portal.service.persistence.impl;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.NestedSetsTreeNodeModel;
@@ -343,8 +343,7 @@ public class NestedSetsTreeManagerTest {
 		SimpleNestedSetsTreeNode... ancestorSimpleNestedSetsTreeNodes) {
 
 		List<SimpleNestedSetsTreeNode> simpleNestedSetsTreeNodes =
-			new ArrayList<SimpleNestedSetsTreeNode>(
-				Arrays.asList(ancestorSimpleNestedSetsTreeNodes));
+			new ArrayList<>(Arrays.asList(ancestorSimpleNestedSetsTreeNodes));
 
 		simpleNestedSetsTreeNodes.add(simpleNestedSetsTreeNode);
 
@@ -360,8 +359,7 @@ public class NestedSetsTreeManagerTest {
 		SimpleNestedSetsTreeNode... childSimpleNestedSetsTreeNodes) {
 
 		List<SimpleNestedSetsTreeNode> simpleNestedSetsTreeNodes =
-			new ArrayList<SimpleNestedSetsTreeNode>(
-				Arrays.asList(childSimpleNestedSetsTreeNodes));
+			new ArrayList<>(Arrays.asList(childSimpleNestedSetsTreeNodes));
 
 		simpleNestedSetsTreeNodes.add(simpleNestedSetsTreeNode);
 
@@ -372,9 +370,9 @@ public class NestedSetsTreeManagerTest {
 			_nestedSetsTreeManager.getDescendants(simpleNestedSetsTreeNode));
 	}
 
-	private NestedSetsTreeManager<SimpleNestedSetsTreeNode>
+	private final NestedSetsTreeManager<SimpleNestedSetsTreeNode>
 		_nestedSetsTreeManager = new MemoryNestedSetsTreeManager();
-	private SimpleNestedSetsTreeNode[] _simpleNestedSetsTreeNodes =
+	private final SimpleNestedSetsTreeNode[] _simpleNestedSetsTreeNodes =
 		new SimpleNestedSetsTreeNode[] {
 			new SimpleNestedSetsTreeNode(0), new SimpleNestedSetsTreeNode(1),
 			new SimpleNestedSetsTreeNode(2), new SimpleNestedSetsTreeNode(3),
@@ -516,8 +514,7 @@ public class NestedSetsTreeManagerTest {
 
 			Collections.sort(_simpleNestedSetsTreeNodeList);
 
-			Deque<SimpleNestedSetsTreeNode> deque =
-				new LinkedList<SimpleNestedSetsTreeNode>();
+			Deque<SimpleNestedSetsTreeNode> deque = new LinkedList<>();
 
 			for (SimpleNestedSetsTreeNode simpleNestedSetsTreeNode :
 					_simpleNestedSetsTreeNodeList) {
@@ -548,8 +545,8 @@ public class NestedSetsTreeManagerTest {
 				while (((previousSimpleNestedSetsTreeNode = deque.peek()) !=
 							null) &&
 					   ((nestedSetsTreeNodeRight + 1) ==
-							previousSimpleNestedSetsTreeNode.
-								getNestedSetsTreeNodeRight())) {
+						   previousSimpleNestedSetsTreeNode.
+							   getNestedSetsTreeNodeRight())) {
 
 					sb.append(StringPool.COMMA_AND_SPACE);
 					sb.append(
@@ -618,7 +615,7 @@ public class NestedSetsTreeManagerTest {
 			long nestedSetsTreeNodeRight) {
 
 			List<SimpleNestedSetsTreeNode> simpleNestedSetsTreeNodes =
-				new ArrayList<SimpleNestedSetsTreeNode>();
+				new ArrayList<>();
 
 			for (SimpleNestedSetsTreeNode simpleNestedSetsTreeNode :
 					_simpleNestedSetsTreeNodeList) {
@@ -643,7 +640,7 @@ public class NestedSetsTreeManagerTest {
 			long nestedSetsTreeNodeRight) {
 
 			List<SimpleNestedSetsTreeNode> simpleNestedSetsTreeNodes =
-				new ArrayList<SimpleNestedSetsTreeNode>();
+				new ArrayList<>();
 
 			for (SimpleNestedSetsTreeNode simpleNestedSetsTreeNode :
 					_simpleNestedSetsTreeNodeList) {
@@ -833,8 +830,8 @@ public class NestedSetsTreeManagerTest {
 			}
 		}
 
-		private List<SimpleNestedSetsTreeNode> _simpleNestedSetsTreeNodeList =
-			new ArrayList<SimpleNestedSetsTreeNode>();
+		private final List<SimpleNestedSetsTreeNode>
+			_simpleNestedSetsTreeNodeList = new ArrayList<>();
 
 	}
 

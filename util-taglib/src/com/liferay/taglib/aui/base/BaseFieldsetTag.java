@@ -95,17 +95,14 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_column = false;
 		_cssClass = null;
 		_helpMessage = null;
 		_id = null;
 		_label = null;
 		_localizeLabel = true;
-	}
-
-	@Override
-	protected String getEndPage() {
-		return _END_PAGE;
 	}
 
 	@Override
@@ -124,9 +121,6 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:fieldset:";
-
-	private static final String _END_PAGE =
-		"/html/taglib/aui/fieldset/end.jsp";
 
 	private static final String _START_PAGE =
 		"/html/taglib/aui/fieldset/start.jsp";

@@ -16,7 +16,6 @@ package com.liferay.portlet.announcements.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
 
@@ -257,7 +256,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @return the create date of this announcements entry
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _announcementsEntry.getCreateDate();
 	}
 
@@ -267,7 +266,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @return the display date of this announcements entry
 	*/
 	@Override
-	public java.util.Date getDisplayDate() {
+	public Date getDisplayDate() {
 		return _announcementsEntry.getDisplayDate();
 	}
 
@@ -292,7 +291,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @return the expiration date of this announcements entry
 	*/
 	@Override
-	public java.util.Date getExpirationDate() {
+	public Date getExpirationDate() {
 		return _announcementsEntry.getExpirationDate();
 	}
 
@@ -308,7 +307,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @return the modified date of this announcements entry
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _announcementsEntry.getModifiedDate();
 	}
 
@@ -508,7 +507,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @param createDate the create date of this announcements entry
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_announcementsEntry.setCreateDate(createDate);
 	}
 
@@ -518,7 +517,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @param displayDate the display date of this announcements entry
 	*/
 	@Override
-	public void setDisplayDate(java.util.Date displayDate) {
+	public void setDisplayDate(Date displayDate) {
 		_announcementsEntry.setDisplayDate(displayDate);
 	}
 
@@ -556,7 +555,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @param expirationDate the expiration date of this announcements entry
 	*/
 	@Override
-	public void setExpirationDate(java.util.Date expirationDate) {
+	public void setExpirationDate(Date expirationDate) {
 		_announcementsEntry.setExpirationDate(expirationDate);
 	}
 
@@ -566,7 +565,7 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 	* @param modifiedDate the modified date of this announcements entry
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_announcementsEntry.setModifiedDate(modifiedDate);
 	}
 
@@ -713,11 +712,6 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 		}
 
 		return false;
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return _announcementsEntry.getStagedModelType();
 	}
 
 	/**

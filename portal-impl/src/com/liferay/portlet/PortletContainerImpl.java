@@ -19,18 +19,16 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.ActionResult;
-import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.LiferayPortletMode;
 import com.liferay.portal.kernel.portlet.PortletContainer;
 import com.liferay.portal.kernel.portlet.PortletContainerException;
 import com.liferay.portal.kernel.portlet.PortletModeFactory;
 import com.liferay.portal.kernel.portlet.WindowStateFactory;
+import com.liferay.portal.kernel.portlet.toolbar.PortletToolbar;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -153,6 +151,10 @@ public class PortletContainerImpl implements PortletContainer {
 		catch (Exception e) {
 			throw new PortletContainerException(e);
 		}
+	}
+
+	public void setPortletToolbar(PortletToolbar portletToolbar) {
+		_portletToolbar = portletToolbar;
 	}
 
 	protected long getScopeGroupId(
@@ -369,26 +371,7 @@ public class PortletContainerImpl implements PortletContainer {
 			_log.debug("Content type " + contentType);
 		}
 
-		UploadServletRequest uploadServletRequest = null;
-
 		try {
-			if ((contentType != null) &&
-				contentType.startsWith(ContentTypes.MULTIPART_FORM_DATA)) {
-
-				LiferayPortletConfig liferayPortletConfig =
-					(LiferayPortletConfig)invokerPortlet.getPortletConfig();
-
-				if (invokerPortlet.isStrutsPortlet() ||
-					liferayPortletConfig.isCopyRequestParameters() ||
-					!liferayPortletConfig.isWARFile()) {
-
-					uploadServletRequest = PortalUtil.getUploadServletRequest(
-						request);
-
-					request = uploadServletRequest;
-				}
-			}
-
 			ActionRequestImpl actionRequestImpl = ActionRequestFactory.create(
 				request, portlet, invokerPortlet, portletContext, windowState,
 				portletMode, portletPreferences, layout.getPlid());
@@ -444,10 +427,6 @@ public class PortletContainerImpl implements PortletContainer {
 			return new ActionResult(events, redirectLocation);
 		}
 		finally {
-			if (uploadServletRequest != null) {
-				uploadServletRequest.cleanUp();
-			}
-
 			ServiceContextThreadLocal.popServiceContext();
 		}
 	}
@@ -555,8 +534,7 @@ public class PortletContainerImpl implements PortletContainer {
 			invokerPortlet.processEvent(eventRequestImpl, eventResponseImpl);
 
 			if (eventResponseImpl.isCalledSetRenderParameter()) {
-				Map<String, String[]> renderParameterMap =
-					new HashMap<String, String[]>();
+				Map<String, String[]> renderParameterMap = new HashMap<>();
 
 				renderParameterMap.putAll(
 					eventResponseImpl.getRenderParameterMap());
@@ -609,6 +587,8 @@ public class PortletContainerImpl implements PortletContainer {
 			themeDisplay, portlet);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		portletDisplay.setPortletToolbar(_portletToolbar);
 
 		PortletDisplay portletDisplayClone = PortletDisplayFactory.create();
 
@@ -809,5 +789,7 @@ public class PortletContainerImpl implements PortletContainer {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortletContainerImpl.class);
+
+	private PortletToolbar _portletToolbar;
 
 }

@@ -14,8 +14,10 @@
 
 package com.liferay.portal.kernel.portlet;
 
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.Portlet;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -24,10 +26,10 @@ import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.StringServiceRegistrationMap;
+import com.liferay.registry.collections.StringServiceRegistrationMapImpl;
 
 import java.io.Closeable;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,14 +42,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ResourceBundleTracker implements Closeable {
 
-	public ResourceBundleTracker(String portletId) {
-		_portletId = portletId;
+	public ResourceBundleTracker(ClassLoader classLoader, Portlet portlet) {
+		_classLoader = classLoader;
+		_portlet = portlet;
 
 		Registry registry = RegistryUtil.getRegistry();
 
 		Filter filter = registry.getFilter(
-			"(&(javax.portlet.name=" + _portletId + ")(objectClass=" +
-				ResourceBundle.class.getName() + "))");
+			"(&(javax.portlet.name=" + portlet.getPortletId() +
+				")(language.id=*)(objectClass=" +
+					ResourceBundle.class.getName() + "))");
 
 		_serviceTracker = registry.trackServices(
 			filter, new ResourceBundleServiceTrackerCustomizer());
@@ -82,44 +86,28 @@ public class ResourceBundleTracker implements Closeable {
 		_serviceTracker.close();
 	}
 
-	public ResourceBundle getResouceBundle(String languageId) {
+	public ResourceBundle getResourceBundle(String languageId) {
 		if (languageId == null) {
 			languageId = StringPool.BLANK;
 		}
 
-		return _resourceBundles.get(languageId);
-	}
+		ResourceBundle resourceBundle = _resourceBundles.get(languageId);
 
-	public void register(String languageId, ResourceBundle resourceBundle) {
-		Registry registry = RegistryUtil.getRegistry();
-
-		Map<String, Object> properties = new HashMap<String, Object>();
-
-		properties.put("javax.portlet.name", _portletId);
-		properties.put("language.id", languageId);
-
-		ServiceRegistration<ResourceBundle> serviceRegistration =
-			registry.registerService(
-				ResourceBundle.class, resourceBundle, properties);
-
-		_serviceRegistrations.put(languageId, serviceRegistration);
-	}
-
-	public void unregister(String languageId) {
-		ServiceRegistration<ResourceBundle> serviceRegistration =
-			_serviceRegistrations.remove(languageId);
-
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
+		if (resourceBundle != null) {
+			return resourceBundle;
 		}
+
+		return ResourceBundleUtil.getBundle(
+			_portlet.getResourceBundle(), LocaleUtil.fromLanguageId(languageId),
+			_classLoader);
 	}
 
-	private final String _portletId;
+	private final ClassLoader _classLoader;
+	private final Portlet _portlet;
 	private final Map<String, ResourceBundle> _resourceBundles =
-		new ConcurrentHashMap<String, ResourceBundle>();
+		new ConcurrentHashMap<>();
 	private final StringServiceRegistrationMap<ResourceBundle>
-		_serviceRegistrations =
-			new StringServiceRegistrationMap<ResourceBundle>();
+		_serviceRegistrations = new StringServiceRegistrationMapImpl<>();
 	private final ServiceTracker<ResourceBundle, ResourceBundle>
 		_serviceTracker;
 
@@ -135,10 +123,9 @@ public class ResourceBundleTracker implements Closeable {
 			ResourceBundle resourceBundle = registry.getService(
 				serviceReference);
 
-			String languageId = GetterUtil.getString(
-				(String)serviceReference.getProperty("language.id"));
-
-			_resourceBundles.put(languageId, resourceBundle);
+			_resourceBundles.put(
+				(String)serviceReference.getProperty("language.id"),
+				resourceBundle);
 
 			return resourceBundle;
 		}
@@ -158,10 +145,8 @@ public class ResourceBundleTracker implements Closeable {
 
 			registry.ungetService(serviceReference);
 
-			String languageId = GetterUtil.getString(
-				(String)serviceReference.getProperty("language.id"));
-
-			_resourceBundles.remove(languageId);
+			_resourceBundles.remove(
+				serviceReference.getProperty("language.id"));
 		}
 
 	}

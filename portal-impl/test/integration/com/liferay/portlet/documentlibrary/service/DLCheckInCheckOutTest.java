@@ -18,7 +18,13 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -31,16 +37,10 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RoleTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portal.service.test.ServiceTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
@@ -233,7 +233,7 @@ public class DLCheckInCheckOutTest {
 
 		FileEntry fileEntry = updateFileEntry(_fileEntry.getFileEntryId());
 
-		Assert.assertEquals("1.0" , fileEntry.getVersion());
+		Assert.assertEquals("1.0", fileEntry.getVersion());
 
 		FileVersion fileVersion = fileEntry.getLatestFileVersion();
 
@@ -356,14 +356,14 @@ public class DLCheckInCheckOutTest {
 			try {
 				DLAppServiceUtil.cancelCheckOut(fileEntryId);
 
-				if (!expectOverride) {
-					Assert.fail("Should not have succeeded cancel check out");
-				}
+				Assert.assertTrue(
+					"Should not have succeeded cancel check out",
+					expectOverride);
 			}
 			catch (Exception e) {
-				if (expectOverride) {
-					Assert.fail("Should not have failed cancel check out " + e);
-				}
+				Assert.assertFalse(
+					"Should not have failed cancel check out " + e,
+					expectOverride);
 			}
 
 			if (expectOverride) {
@@ -381,9 +381,8 @@ public class DLCheckInCheckOutTest {
 				DLAppServiceUtil.checkInFileEntry(
 					fileEntryId, false, StringPool.NULL, _serviceContext);
 
-				if (!expectOverride) {
-					Assert.fail("Should not have succeeded check in");
-				}
+				Assert.assertTrue(
+					"Should not have succeeded check in", expectOverride);
 
 				folder = DLAppServiceUtil.getFolder(_folder.getFolderId());
 
@@ -395,9 +394,8 @@ public class DLCheckInCheckOutTest {
 				Assert.assertEquals("1.1", fileEntry.getVersion());
 			}
 			catch (Exception e) {
-				if (expectOverride) {
-					Assert.fail("Should not have failed check in " + e);
-				}
+				Assert.assertFalse(
+					"Should not have failed check in " + e, expectOverride);
 			}
 		}
 		finally {

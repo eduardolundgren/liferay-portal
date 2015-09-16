@@ -25,8 +25,6 @@ public interface SchedulerEntry extends Serializable {
 
 	public String getEventListenerClass();
 
-	public String getPropertyKey();
-
 	public TimeUnit getTimeUnit();
 
 	public Trigger getTrigger() throws SchedulerException;
@@ -39,15 +37,11 @@ public interface SchedulerEntry extends Serializable {
 
 	public void setEventListenerClass(String eventListenerClass);
 
-	public void setPropertyKey(String propertyKey);
-
 	public void setTimeUnit(TimeUnit timeUnit);
 
 	public void setTriggerType(TriggerType triggerType);
 
 	public void setTriggerValue(int triggerValue);
-
-	public void setTriggerValue(long triggerValue);
 
 	public void setTriggerValue(String triggerValue);
 

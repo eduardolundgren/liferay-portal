@@ -17,13 +17,13 @@
 <%@ include file="/html/portlet/init.jsp" %>
 
 <%
-BookmarksSettings bookmarksSettings = BookmarksSettings.getInstance(scopeGroupId);
+BookmarksGroupServiceOverriddenConfiguration bookmarksGroupServiceOverriddenConfiguration = ConfigurationFactoryUtil.getConfiguration(BookmarksGroupServiceOverriddenConfiguration.class, new GroupServiceSettingsLocator(scopeGroupId, BookmarksConstants.SERVICE_NAME));
 
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
 
 String portletResource = ParamUtil.getString(request, "portletResource");
 
-long rootFolderId = bookmarksSettings.getRootFolderId();
+long rootFolderId = bookmarksGroupServiceOverriddenConfiguration.rootFolderId();
 String rootFolderName = StringPool.BLANK;
 
 if (rootFolderId != BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -44,7 +44,7 @@ if (rootFolderId != BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
 String portletId = portletDisplay.getId();
 
-if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
+if (Validator.isNotNull(portletResource)) {
 	portletId = portletResource;
 }
 
@@ -54,7 +54,7 @@ if (portletId.equals(BookmarksPortletKeys.BOOKMARKS) || portletId.equals(Bookmar
 	allFolderColumns += ",action";
 }
 
-String[] folderColumns = bookmarksSettings.getFolderColumns();
+String[] folderColumns = bookmarksGroupServiceOverriddenConfiguration.folderColumns();
 
 if (!portletId.equals(BookmarksPortletKeys.BOOKMARKS) && !portletId.equals(BookmarksPortletKeys.BOOKMARKS_ADMIN)) {
 	folderColumns = ArrayUtil.remove(folderColumns, "action");
@@ -66,7 +66,7 @@ if (portletId.equals(BookmarksPortletKeys.BOOKMARKS) || portletId.equals(Bookmar
 	allEntryColumns += ",action";
 }
 
-String[] entryColumns = bookmarksSettings.getEntryColumns();
+String[] entryColumns = bookmarksGroupServiceOverriddenConfiguration.entryColumns();
 
 if (!portletId.equals(BookmarksPortletKeys.BOOKMARKS) && !portletId.equals(BookmarksPortletKeys.BOOKMARKS_ADMIN)) {
 	entryColumns = ArrayUtil.remove(entryColumns, "action");

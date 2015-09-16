@@ -16,9 +16,10 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("questionId", getQuestionId());
 		attributes.put("choiceId", getChoiceId());
+		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("voteDate", getVoteDate());
 
 		return attributes;
@@ -130,6 +132,12 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 			setChoiceId(choiceId);
 		}
 
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
+
 		Date voteDate = (Date)attributes.get("voteDate");
 
 		if (voteDate != null) {
@@ -179,7 +187,7 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	* @return the create date of this polls vote
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _pollsVote.getCreateDate();
 	}
 
@@ -199,12 +207,22 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
+	* Returns the last publish date of this polls vote.
+	*
+	* @return the last publish date of this polls vote
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _pollsVote.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this polls vote.
 	*
 	* @return the modified date of this polls vote
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _pollsVote.getModifiedDate();
 	}
 
@@ -279,7 +297,7 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	* @return the vote date of this polls vote
 	*/
 	@Override
-	public java.util.Date getVoteDate() {
+	public Date getVoteDate() {
 		return _pollsVote.getVoteDate();
 	}
 
@@ -349,7 +367,7 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	* @param createDate the create date of this polls vote
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_pollsVote.setCreateDate(createDate);
 	}
 
@@ -382,12 +400,22 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
+	* Sets the last publish date of this polls vote.
+	*
+	* @param lastPublishDate the last publish date of this polls vote
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_pollsVote.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this polls vote.
 	*
 	* @param modifiedDate the modified date of this polls vote
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_pollsVote.setModifiedDate(modifiedDate);
 	}
 
@@ -467,7 +495,7 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	* @param voteDate the vote date of this polls vote
 	*/
 	@Override
-	public void setVoteDate(java.util.Date voteDate) {
+	public void setVoteDate(Date voteDate) {
 		_pollsVote.setVoteDate(voteDate);
 	}
 

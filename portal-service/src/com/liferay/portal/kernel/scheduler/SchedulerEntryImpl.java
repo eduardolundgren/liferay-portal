@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.scheduler;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Time;
 
 /**
  * @author Shuyang Zhou
@@ -32,11 +31,6 @@ public class SchedulerEntryImpl implements SchedulerEntry {
 	@Override
 	public String getEventListenerClass() {
 		return _eventListenerClass;
-	}
-
-	@Override
-	public String getPropertyKey() {
-		return _propertyKey;
 	}
 
 	@Override
@@ -55,26 +49,10 @@ public class SchedulerEntryImpl implements SchedulerEntry {
 				_eventListenerClass, _eventListenerClass, _triggerValue);
 		}
 		else if (_triggerType.equals(TriggerType.SIMPLE)) {
-			long intervalTime = GetterUtil.getLong(_triggerValue);
-
-			if (_timeUnit.equals(TimeUnit.DAY)) {
-				intervalTime = intervalTime * Time.DAY;
-			}
-			else if (_timeUnit.equals(TimeUnit.HOUR)) {
-				intervalTime = intervalTime * Time.HOUR;
-			}
-			else if (_timeUnit.equals(TimeUnit.MINUTE)) {
-				intervalTime = intervalTime * Time.MINUTE;
-			}
-			else if (_timeUnit.equals(TimeUnit.WEEK)) {
-				intervalTime = intervalTime * Time.WEEK;
-			}
-			else {
-				intervalTime = intervalTime * Time.SECOND;
-			}
+			int interval = GetterUtil.getInteger(_triggerValue);
 
 			_trigger = new IntervalTrigger(
-				_eventListenerClass, _eventListenerClass, intervalTime);
+				_eventListenerClass, _eventListenerClass, interval, _timeUnit);
 		}
 		else {
 			throw new SchedulerException(
@@ -105,11 +83,6 @@ public class SchedulerEntryImpl implements SchedulerEntry {
 	}
 
 	@Override
-	public void setPropertyKey(String propertyKey) {
-		_propertyKey = propertyKey;
-	}
-
-	@Override
 	public void setTimeUnit(TimeUnit timeUnit) {
 		_timeUnit = timeUnit;
 	}
@@ -125,25 +98,18 @@ public class SchedulerEntryImpl implements SchedulerEntry {
 	}
 
 	@Override
-	public void setTriggerValue(long triggerValue) {
-		_triggerValue = String.valueOf(triggerValue);
-	}
-
-	@Override
 	public void setTriggerValue(String triggerValue) {
 		_triggerValue = triggerValue;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append(", description=");
 		sb.append(_description);
 		sb.append(", eventListenerClass=");
 		sb.append(_eventListenerClass);
-		sb.append(", propertyKey=");
-		sb.append(_propertyKey);
 		sb.append(", timeUnit=");
 		sb.append(_timeUnit);
 		sb.append(", trigger=");
@@ -159,7 +125,6 @@ public class SchedulerEntryImpl implements SchedulerEntry {
 
 	private String _description = StringPool.BLANK;
 	private String _eventListenerClass = StringPool.BLANK;
-	private String _propertyKey = StringPool.BLANK;
 	private TimeUnit _timeUnit;
 	private Trigger _trigger;
 	private TriggerType _triggerType;

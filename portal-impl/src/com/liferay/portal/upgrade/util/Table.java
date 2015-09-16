@@ -14,6 +14,7 @@
 
 package com.liferay.portal.upgrade.util;
 
+import com.liferay.portal.dao.jdbc.postgresql.PostgreSQLJDBCUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedWriter;
@@ -361,6 +362,18 @@ public class Table {
 		else if (t == Types.BIT) {
 			value = GetterUtil.getBoolean(rs.getBoolean(name));
 		}
+		else if ((t == Types.BLOB) || (t == Types.LONGVARBINARY)) {
+			if (PostgreSQLJDBCUtil.isPGStatement(rs.getStatement())) {
+				value = PostgreSQLJDBCUtil.getLargeObject(rs, name);
+			}
+			else {
+				value = rs.getBytes(name);
+			}
+
+			if (value == null) {
+				value = new byte[0];
+			}
+		}
 		else if (t == Types.BOOLEAN) {
 			value = GetterUtil.getBoolean(rs.getBoolean(name));
 		}
@@ -406,9 +419,6 @@ public class Table {
 		}
 		else if (t == Types.INTEGER) {
 			value = GetterUtil.getInteger(rs.getInt(name));
-		}
-		else if (t == Types.LONGVARBINARY) {
-			value = rs.getBytes(name);
 		}
 		else if (t == Types.LONGVARCHAR) {
 			value = GetterUtil.getString(rs.getString(name));
@@ -565,6 +575,15 @@ public class Table {
 		if (t == Types.BIGINT) {
 			ps.setLong(paramIndex, GetterUtil.getLong(value));
 		}
+		else if ((t == Types.BLOB) || (t == Types.LONGVARBINARY)) {
+			if (PostgreSQLJDBCUtil.isPGStatement(ps)) {
+				PostgreSQLJDBCUtil.setLargeObject(
+					ps, paramIndex, Base64.decode(value));
+			}
+			else {
+				ps.setBytes(paramIndex, Base64.decode(value));
+			}
+		}
 		else if (t == Types.BOOLEAN) {
 			ps.setBoolean(paramIndex, GetterUtil.getBoolean(value));
 		}
@@ -584,9 +603,6 @@ public class Table {
 		}
 		else if (t == Types.INTEGER) {
 			ps.setInt(paramIndex, GetterUtil.getInteger(value));
-		}
-		else if (t == Types.LONGVARBINARY) {
-			ps.setBytes(paramIndex, Base64.decode(value));
 		}
 		else if (t == Types.SMALLINT) {
 			ps.setShort(paramIndex, GetterUtil.getShort(value));
@@ -646,6 +662,46 @@ public class Table {
 		_selectSQL = selectSQL;
 	}
 
+	public void updateColumnValue(
+		String columnName, String oldValue, String newValue) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		StringBundler sb = new StringBundler(7);
+
+		sb.append("update ");
+		sb.append(_tableName);
+		sb.append(" set ");
+		sb.append(columnName);
+		sb.append(" = ? where ");
+		sb.append(columnName);
+		sb.append(" = ?");
+
+		String sql = sb.toString();
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(sql);
+
+			ps.setString(1, newValue);
+			ps.setString(2, oldValue);
+
+			ps.executeUpdate();
+		}
+		catch (SQLException sqle) {
+			if (_log.isErrorEnabled()) {
+				_log.error(sqle, sqle);
+			}
+
+			throw new RuntimeException("Unable to execute " + sql, sqle);
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
+	}
+
 	private static final int _BATCH_SIZE = GetterUtil.getInteger(
 		PropsUtil.get("hibernate.jdbc.batch_size"));
 
@@ -667,13 +723,13 @@ public class Table {
 	private static final String _SAFE_TABLE_RETURN_CHARACTER =
 		"_SAFE_TABLE_RETURN_CHARACTER_";
 
-	private static Log _log = LogFactoryUtil.getLog(Table.class);
+	private static final Log _log = LogFactoryUtil.getLog(Table.class);
 
 	private Object[][] _columns;
 	private String _createSQL;
 	private int[] _order;
 	private String _selectSQL;
-	private String _tableName;
+	private final String _tableName;
 	private String _tempFileName;
 	private long _totalRows;
 

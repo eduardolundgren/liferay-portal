@@ -31,7 +31,6 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.AddressLocalServiceBaseImpl;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,7 +49,7 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 	public Address addAddress(
 			long userId, String className, long classPK, String street1,
 			String street2, String street3, String city, String zip,
-			long regionId, long countryId, int typeId, boolean mailing,
+			long regionId, long countryId, long typeId, boolean mailing,
 			boolean primary)
 		throws PortalException {
 
@@ -64,13 +63,12 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 	public Address addAddress(
 			long userId, String className, long classPK, String street1,
 			String street2, String street3, String city, String zip,
-			long regionId, long countryId, int typeId, boolean mailing,
+			long regionId, long countryId, long typeId, boolean mailing,
 			boolean primary, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long classNameId = classNameLocalService.getClassNameId(className);
-		Date now = new Date();
 
 		validate(
 			0, user.getCompanyId(), classNameId, classPK, street1, city, zip,
@@ -84,8 +82,6 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 		address.setCompanyId(user.getCompanyId());
 		address.setUserId(user.getUserId());
 		address.setUserName(user.getFullName());
-		address.setCreateDate(serviceContext.getCreateDate(now));
-		address.setModifiedDate(serviceContext.getModifiedDate(now));
 		address.setClassNameId(classNameId);
 		address.setClassPK(classPK);
 		address.setStreet1(street1);
@@ -107,7 +103,8 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public Address deleteAddress(Address address) {
 		addressPersistence.remove(address);
 
@@ -152,7 +149,7 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 	@Override
 	public Address updateAddress(
 			long addressId, String street1, String street2, String street3,
-			String city, String zip, long regionId, long countryId, int typeId,
+			String city, String zip, long regionId, long countryId, long typeId,
 			boolean mailing, boolean primary)
 		throws PortalException {
 
@@ -162,7 +159,6 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 
 		Address address = addressPersistence.findByPrimaryKey(addressId);
 
-		address.setModifiedDate(new Date());
 		address.setStreet1(street1);
 		address.setStreet2(street2);
 		address.setStreet3(street3);
@@ -219,7 +215,7 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 	protected void validate(
 			long addressId, long companyId, long classNameId, long classPK,
 			String street1, String city, String zip, long regionId,
-			long countryId, int typeId, boolean mailing, boolean primary)
+			long countryId, long typeId, boolean mailing, boolean primary)
 		throws PortalException {
 
 		if (Validator.isNull(street1)) {

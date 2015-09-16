@@ -14,8 +14,7 @@
 
 package com.liferay.portal.spring.hibernate;
 
-import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
-import com.liferay.portal.util.ClassLoaderUtil;
+import javax.sql.DataSource;
 
 import org.hibernate.dialect.Dialect;
 
@@ -26,18 +25,22 @@ import org.hibernate.dialect.Dialect;
 public class PortletHibernateConfiguration
 	extends PortalHibernateConfiguration {
 
+	public PortletHibernateConfiguration() {
+		this(null, null);
+	}
+
+	public PortletHibernateConfiguration(
+		ClassLoader classLoader, DataSource dataSource) {
+
+		_classLoader = classLoader;
+
+		setDataSource(dataSource);
+		setMvccEnabled(false);
+	}
+
 	@Override
 	protected ClassLoader getConfigurationClassLoader() {
-		ClassLoader classLoader = PortletClassLoaderUtil.getClassLoader();
-
-		if (classLoader == null) {
-
-			// This should not be null except in cases where sharding is enabled
-
-			classLoader = ClassLoaderUtil.getContextClassLoader();
-		}
-
-		return classLoader;
+		return _classLoader;
 	}
 
 	@Override
@@ -51,5 +54,7 @@ public class PortletHibernateConfiguration
 		// Plugins should not update the default DB reference
 
 	}
+
+	private final ClassLoader _classLoader;
 
 }

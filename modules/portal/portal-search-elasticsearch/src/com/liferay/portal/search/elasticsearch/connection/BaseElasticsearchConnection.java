@@ -14,10 +14,17 @@
 
 package com.liferay.portal.search.elasticsearch.connection;
 
-import com.liferay.portal.kernel.util.PortalRunMode;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
+import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Future;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder;
@@ -36,9 +43,41 @@ public abstract class BaseElasticsearchConnection
 
 	@Override
 	public void close() {
-		if (_client != null) {
-			_client.close();
+		if (_client == null) {
+			return;
 		}
+
+		_client.close();
+
+		_client = null;
+	}
+
+	@Override
+	public void connect() {
+		ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder();
+
+		loadOptionalDefaultConfigurations(builder);
+
+		String[] additionalConfigurations =
+			elasticsearchConfiguration.additionalConfigurations();
+
+		if (ArrayUtil.isNotEmpty(additionalConfigurations)) {
+			StringBundler sb = new StringBundler(
+				additionalConfigurations.length * 2);
+
+			for (String additionalConfiguration : additionalConfigurations) {
+				sb.append(additionalConfiguration);
+				sb.append(StringPool.NEW_LINE);
+			}
+
+			builder.loadFromSource(sb.toString());
+		}
+
+		loadRequiredDefaultConfigurations(builder);
+
+		loadSettingsContributors(builder);
+
+		_client = createClient(builder);
 	}
 
 	@Override
@@ -50,7 +89,9 @@ public abstract class BaseElasticsearchConnection
 	public ClusterHealthResponse getClusterHealthResponse(
 		long timeout, int nodesCount) {
 
-		AdminClient adminClient = _client.admin();
+		Client client = getClient();
+
+		AdminClient adminClient = client.admin();
 
 		ClusterAdminClient clusterAdminClient = adminClient.cluster();
 
@@ -74,47 +115,22 @@ public abstract class BaseElasticsearchConnection
 		}
 	}
 
-	public String getClusterName() {
-		if (Validator.isNull(_clusterName)) {
-			_clusterName = CLUSTER_NAME;
-		}
-
-		return _clusterName;
-	}
-
-	public String getConfigFileName() {
-		if (PortalRunMode.isTestMode()) {
-			return _testConfigFileName;
-		}
-
-		return _configFileName;
-	}
-
-	@Override
-	public synchronized void initialize() {
+	public boolean isConnected() {
 		if (_client != null) {
-			return;
+			return true;
 		}
 
-		ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder();
-
-		_client = createClient(builder);
-	}
-
-	public void setClusterName(String clusterName) {
-		_clusterName = clusterName;
-	}
-
-	public void setConfigFileName(String configFileName) {
-		_configFileName = configFileName;
+		return false;
 	}
 
 	public void setIndexFactory(IndexFactory indexFactory) {
 		_indexFactory = indexFactory;
 	}
 
-	public void setTestConfigFileName(String testConfigFileName) {
-		_testConfigFileName = testConfigFileName;
+	protected void addSettingsContributor(
+		SettingsContributor settingsContributor) {
+
+		_settingsContributors.add(settingsContributor);
 	}
 
 	protected abstract Client createClient(ImmutableSettings.Builder builder);
@@ -123,14 +139,47 @@ public abstract class BaseElasticsearchConnection
 		return _indexFactory;
 	}
 
-	protected void setClient(Client client) {
-		_client = client;
+	protected void loadOptionalDefaultConfigurations(
+		ImmutableSettings.Builder builder) {
+
+		try {
+			Class<?> clazz = getClass();
+
+			builder.classLoader(clazz.getClassLoader());
+
+			builder.loadFromClasspath(
+				"/META-INF/elasticsearch-optional-defaults.yml");
+		}
+		catch (Exception e) {
+			if (_log.isInfoEnabled()) {
+				_log.info("Unable to load optional default configurations", e);
+			}
+		}
 	}
 
+	protected abstract void loadRequiredDefaultConfigurations(
+		ImmutableSettings.Builder builder);
+
+	protected void loadSettingsContributors(ImmutableSettings.Builder builder) {
+		for (SettingsContributor settingsContributor : _settingsContributors) {
+			settingsContributor.populate(builder);
+		}
+	}
+
+	protected void removeSettingsContributor(
+		SettingsContributor settingsContributor) {
+
+		_settingsContributors.remove(settingsContributor);
+	}
+
+	protected volatile ElasticsearchConfiguration elasticsearchConfiguration;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseElasticsearchConnection.class);
+
 	private Client _client;
-	private String _clusterName;
-	private String _configFileName;
 	private IndexFactory _indexFactory;
-	private String _testConfigFileName;
+	private final Set<SettingsContributor> _settingsContributors =
+		new ConcurrentSkipListSet<>();
 
 }

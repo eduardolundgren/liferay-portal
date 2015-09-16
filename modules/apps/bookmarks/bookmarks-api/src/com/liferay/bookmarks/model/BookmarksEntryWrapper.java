@@ -16,9 +16,10 @@ package com.liferay.bookmarks.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -70,6 +71,7 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 		attributes.put("description", getDescription());
 		attributes.put("visits", getVisits());
 		attributes.put("priority", getPriority());
+		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -176,6 +178,12 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 			setPriority(priority);
 		}
 
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
+
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
@@ -243,7 +251,7 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 	* @return the create date of this bookmarks entry
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _bookmarksEntry.getCreateDate();
 	}
 
@@ -299,12 +307,22 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 	}
 
 	/**
+	* Returns the last publish date of this bookmarks entry.
+	*
+	* @return the last publish date of this bookmarks entry
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _bookmarksEntry.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this bookmarks entry.
 	*
 	* @return the modified date of this bookmarks entry
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _bookmarksEntry.getModifiedDate();
 	}
 
@@ -399,7 +417,7 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 	* @return the status date of this bookmarks entry
 	*/
 	@Override
-	public java.util.Date getStatusDate() {
+	public Date getStatusDate() {
 		return _bookmarksEntry.getStatusDate();
 	}
 
@@ -660,7 +678,7 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 	* @param createDate the create date of this bookmarks entry
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_bookmarksEntry.setCreateDate(createDate);
 	}
 
@@ -723,12 +741,22 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 	}
 
 	/**
+	* Sets the last publish date of this bookmarks entry.
+	*
+	* @param lastPublishDate the last publish date of this bookmarks entry
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_bookmarksEntry.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this bookmarks entry.
 	*
 	* @param modifiedDate the modified date of this bookmarks entry
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_bookmarksEntry.setModifiedDate(modifiedDate);
 	}
 
@@ -828,7 +856,7 @@ public class BookmarksEntryWrapper implements BookmarksEntry,
 	* @param statusDate the status date of this bookmarks entry
 	*/
 	@Override
-	public void setStatusDate(java.util.Date statusDate) {
+	public void setStatusDate(Date statusDate) {
 		_bookmarksEntry.setStatusDate(statusDate);
 	}
 

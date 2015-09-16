@@ -54,6 +54,7 @@ public class AddressSoap implements Serializable {
 		soapModel.setTypeId(model.getTypeId());
 		soapModel.setMailing(model.getMailing());
 		soapModel.setPrimary(model.getPrimary());
+		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
 	}
@@ -242,11 +243,11 @@ public class AddressSoap implements Serializable {
 		_countryId = countryId;
 	}
 
-	public int getTypeId() {
+	public long getTypeId() {
 		return _typeId;
 	}
 
-	public void setTypeId(int typeId) {
+	public void setTypeId(long typeId) {
 		_typeId = typeId;
 	}
 
@@ -274,6 +275,14 @@ public class AddressSoap implements Serializable {
 		_primary = primary;
 	}
 
+	public Date getLastPublishDate() {
+		return _lastPublishDate;
+	}
+
+	public void setLastPublishDate(Date lastPublishDate) {
+		_lastPublishDate = lastPublishDate;
+	}
+
 	private long _mvccVersion;
 	private String _uuid;
 	private long _addressId;
@@ -291,7 +300,8 @@ public class AddressSoap implements Serializable {
 	private String _zip;
 	private long _regionId;
 	private long _countryId;
-	private int _typeId;
+	private long _typeId;
 	private boolean _mailing;
 	private boolean _primary;
+	private Date _lastPublishDate;
 }

@@ -15,8 +15,11 @@
 package com.liferay.portal.kernel.search;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author     Brian Wing Shun Chan
+ * @deprecated As of 7.0.0 , replaced by {@link
+ *             com.liferay.portal.kernel.search.generic.BooleanQueryImpl}
  */
+@Deprecated
 public interface BooleanQueryFactory {
 
 	public BooleanQuery create();

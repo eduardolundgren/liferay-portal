@@ -14,7 +14,7 @@
 
 package com.liferay.portal.model;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 
@@ -29,6 +29,8 @@ public interface StagedModel extends ClassedModel {
 
 	public Date getCreateDate();
 
+	public Date getLastPublishDate();
+
 	public Date getModifiedDate();
 
 	public StagedModelType getStagedModelType();
@@ -38,6 +40,8 @@ public interface StagedModel extends ClassedModel {
 	public void setCompanyId(long companyId);
 
 	public void setCreateDate(Date date);
+
+	public void setLastPublishDate(Date date);
 
 	public void setModifiedDate(Date date);
 

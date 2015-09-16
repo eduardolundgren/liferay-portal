@@ -29,7 +29,7 @@ if (userId > 0) {
 	selUser = UserLocalServiceUtil.getUser(userId);
 
 	if (selUser.getStatus() != WorkflowConstants.STATUS_INCOMPLETE) {
-		throw new PrincipalException();
+		throw new PrincipalException.MustBeAuthenticated(userId);
 	}
 
 	selContact = selUser.getContact();
@@ -64,9 +64,7 @@ String jobTitle = BeanParamUtil.getString(selUser, request, "jobTitle");
 %>
 
 <div class="anonymous-account">
-	<portlet:actionURL var="createAccountURL">
-		<portlet:param name="struts_action" value="/login/create_account" />
-	</portlet:actionURL>
+	<portlet:actionURL name="/login/create_account" var="createAccountURL" />
 
 	<aui:form action="<%= createAccountURL %>" method="post" name="fm">
 		<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />

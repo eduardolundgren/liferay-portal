@@ -110,14 +110,15 @@ public class DB2DB extends BaseDB {
 
 		String suffix = getSuffix(population);
 
-		StringBundler sb = new StringBundler(14);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("drop database ");
 		sb.append(databaseName);
 		sb.append(";\n");
 		sb.append("create database ");
 		sb.append(databaseName);
-		sb.append(" pagesize 8192;\n");
+		sb.append(" pagesize 32768 temporary tablespace managed by automatic ");
+		sb.append("storage;\n");
 
 		if (population != BARE) {
 			sb.append("connect to ");
@@ -200,7 +201,7 @@ public class DB2DB extends BaseDB {
 	}
 
 	protected void reorgTables(String[] templates) throws SQLException {
-		Set<String> tableNames = new HashSet<String>();
+		Set<String> tableNames = new HashSet<>();
 
 		for (String template : templates) {
 			if (template.startsWith("alter table")) {
@@ -276,7 +277,7 @@ public class DB2DB extends BaseDB {
 	private static final String[] _DB2 = {
 		"--", "1", "0", "'1970-01-01-00.00.00.000000'", "current timestamp",
 		" blob", " blob", " smallint", " timestamp", " double", " integer",
-		" bigint", " varchar(750)", " clob", " varchar",
+		" bigint", " varchar(4000)", " clob", " varchar",
 		" generated always as identity", "commit"
 	};
 
