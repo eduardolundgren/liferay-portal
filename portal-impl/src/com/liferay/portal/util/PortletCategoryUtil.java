@@ -17,6 +17,7 @@ package com.liferay.portal.util;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Portlet;
@@ -33,6 +34,36 @@ import java.util.Set;
  * @author Eudaldo Alonso
  */
 public class PortletCategoryUtil {
+
+	public static String getPortletCategoryKey(
+		String legacyPortletCategoryKey) {
+
+		if (Validator.equals(legacyPortletCategoryKey, "apps") ||
+			Validator.equals(legacyPortletCategoryKey, "marketplace")) {
+
+			return PortletCategoryKeys.CONTROL_PANEL_APPS;
+		}
+		else if (Validator.equals(legacyPortletCategoryKey, "configuration") ||
+				 Validator.equals(legacyPortletCategoryKey, "portal") ||
+				 Validator.equals(legacyPortletCategoryKey, "server")) {
+
+			return PortletCategoryKeys.CONTROL_PANEL_CONFIGURATION;
+		}
+		else if (Validator.equals(legacyPortletCategoryKey, "content")) {
+			return PortletCategoryKeys.SITE_ADMINISTRATION_CONTENT;
+		}
+		else if (Validator.equals(legacyPortletCategoryKey, "my")) {
+			return PortletCategoryKeys.USER_MY_ACCOUNT;
+		}
+		else if (Validator.equals(legacyPortletCategoryKey, "sites")) {
+			return PortletCategoryKeys.CONTROL_PANEL_SITES;
+		}
+		else if (Validator.equals(legacyPortletCategoryKey, "users")) {
+			return PortletCategoryKeys.CONTROL_PANEL_USERS;
+		}
+
+		return legacyPortletCategoryKey;
+	}
 
 	public static PortletCategory getRelevantPortletCategory(
 			PermissionChecker permissionChecker, long companyId, Layout layout,
@@ -65,7 +96,7 @@ public class PortletCategoryUtil {
 		for (PortletCategory curPortletCategory :
 				portletCategory.getCategories()) {
 
-			Set<String> portletIds = new HashSet<String>();
+			Set<String> portletIds = new HashSet<>();
 
 			if (curPortletCategory.isHidden()) {
 				continue;
@@ -83,13 +114,13 @@ public class PortletCategoryUtil {
 					}
 					else if (layout.isTypePanel() &&
 							 panelSelectedPortletIds.contains(
-									portlet.getRootPortletId())) {
+								 portlet.getRootPortletId())) {
 
 						portletIds.add(portlet.getPortletId());
 					}
 					else if (layout.isTypePanel() &&
 							 !panelSelectedPortletIds.contains(
-									portlet.getRootPortletId())) {
+								 portlet.getRootPortletId())) {
 					}
 					else if (!PortletPermissionUtil.contains(
 								permissionChecker, layout, portlet,
@@ -97,7 +128,7 @@ public class PortletCategoryUtil {
 					}
 					else if (!portlet.isInstanceable() &&
 							 layoutTypePortlet.hasPortletId(
-									portlet.getPortletId())) {
+								 portlet.getPortletId())) {
 
 						portletIds.add(portlet.getPortletId());
 					}

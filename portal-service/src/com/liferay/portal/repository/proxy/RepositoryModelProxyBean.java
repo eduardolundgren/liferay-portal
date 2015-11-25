@@ -17,8 +17,10 @@ package com.liferay.portal.repository.proxy;
 import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 
@@ -44,6 +46,19 @@ public abstract class RepositoryModelProxyBean {
 			fileEntry, FileEntry.class);
 
 		return new FileEntryProxyBean(fileEntryProxy, _classLoader);
+	}
+
+	protected FileShortcutProxyBean newFileShortcutProxyBean(
+		FileShortcut fileShortcut) {
+
+		if (fileShortcut == null) {
+			return null;
+		}
+
+		FileShortcut fileShortcutProxy = (FileShortcut)newProxyInstance(
+			fileShortcut, FileShortcut.class);
+
+		return new FileShortcutProxyBean(fileShortcutProxy, _classLoader);
 	}
 
 	protected FileVersionProxyBean newFileVersionProxyBean(
@@ -111,7 +126,7 @@ public abstract class RepositoryModelProxyBean {
 			return fileEntries;
 		}
 
-		List<FileEntry> fileEntryProxyBeans = new ArrayList<FileEntry>(
+		List<FileEntry> fileEntryProxyBeans = new ArrayList<>(
 			fileEntries.size());
 
 		for (FileEntry fileEntry : fileEntries) {
@@ -132,7 +147,7 @@ public abstract class RepositoryModelProxyBean {
 			return fileVersions;
 		}
 
-		List<FileVersion> fileVersionProxyBeans = new ArrayList<FileVersion>(
+		List<FileVersion> fileVersionProxyBeans = new ArrayList<>(
 			fileVersions.size());
 
 		for (FileVersion fileVersion : fileVersions) {
@@ -151,7 +166,7 @@ public abstract class RepositoryModelProxyBean {
 			return folders;
 		}
 
-		List<Folder> folderProxyBeans = new ArrayList<Folder>(folders.size());
+		List<Folder> folderProxyBeans = new ArrayList<>(folders.size());
 
 		for (Folder folder : folders) {
 			folderProxyBeans.add(newFolderProxyBean(folder));
@@ -164,18 +179,21 @@ public abstract class RepositoryModelProxyBean {
 		return folderProxyBeans;
 	}
 
-	protected List<Object> toObjectProxyBeans(List<Object> objects) {
-		if ((objects == null) || objects.isEmpty()) {
-			return objects;
+	protected List<RepositoryEntry> toObjectProxyBeans(
+		List<RepositoryEntry> repositoryEntries) {
+
+		if ((repositoryEntries == null) || repositoryEntries.isEmpty()) {
+			return repositoryEntries;
 		}
 
-		List<Object> objectProxyBeans = new ArrayList<Object>();
+		List<RepositoryEntry> objectProxyBeans = new ArrayList<>();
 
-		for (Object object : objects) {
-			objectProxyBeans.add(newProxyBean(object));
+		for (RepositoryEntry repositoryEntry : repositoryEntries) {
+			objectProxyBeans.add(
+				(RepositoryEntry)newProxyBean(repositoryEntry));
 		}
 
-		if (ListUtil.isUnmodifiableList(objects)) {
+		if (ListUtil.isUnmodifiableList(repositoryEntries)) {
 			return Collections.unmodifiableList(objectProxyBeans);
 		}
 

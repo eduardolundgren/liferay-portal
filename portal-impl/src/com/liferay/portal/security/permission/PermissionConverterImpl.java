@@ -68,7 +68,8 @@ public class PermissionConverterImpl implements PermissionConverter {
 
 		if (role.getType() == RoleConstants.TYPE_REGULAR) {
 			scopes = new int[] {
-				ResourceConstants.SCOPE_COMPANY, ResourceConstants.SCOPE_GROUP};
+				ResourceConstants.SCOPE_COMPANY, ResourceConstants.SCOPE_GROUP
+			};
 		}
 		else if ((role.getType() == RoleConstants.TYPE_ORGANIZATION) ||
 				 (role.getType() == RoleConstants.TYPE_PROVIDER) ||
@@ -77,7 +78,7 @@ public class PermissionConverterImpl implements PermissionConverter {
 			scopes = new int[] {ResourceConstants.SCOPE_GROUP_TEMPLATE};
 		}
 
-		List<Permission> permissions = new ArrayList<Permission>();
+		List<Permission> permissions = new ArrayList<>();
 
 		List<ResourcePermission> resourcePermissions =
 			ResourcePermissionLocalServiceUtil.getRoleResourcePermissions(

@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -167,7 +168,7 @@ public class OrganizationWrapper implements Organization,
 			setCountryId(countryId);
 		}
 
-		Integer statusId = (Integer)attributes.get("statusId");
+		Long statusId = (Long)attributes.get("statusId");
 
 		if (statusId != null) {
 			setStatusId(statusId);
@@ -265,7 +266,7 @@ public class OrganizationWrapper implements Organization,
 	* @return the create date of this organization
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _organization.getCreateDate();
 	}
 
@@ -305,7 +306,7 @@ public class OrganizationWrapper implements Organization,
 	* @return the modified date of this organization
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _organization.getModifiedDate();
 	}
 
@@ -428,7 +429,7 @@ public class OrganizationWrapper implements Organization,
 	* @return the status ID of this organization
 	*/
 	@Override
-	public int getStatusId() {
+	public long getStatusId() {
 		return _organization.getStatusId();
 	}
 
@@ -608,13 +609,12 @@ public class OrganizationWrapper implements Organization,
 	* @param createDate the create date of this organization
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_organization.setCreateDate(createDate);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_organization.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -646,7 +646,7 @@ public class OrganizationWrapper implements Organization,
 	* @param modifiedDate the modified date of this organization
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_organization.setModifiedDate(modifiedDate);
 	}
 
@@ -736,7 +736,7 @@ public class OrganizationWrapper implements Organization,
 	* @param statusId the status ID of this organization
 	*/
 	@Override
-	public void setStatusId(int statusId) {
+	public void setStatusId(long statusId) {
 		_organization.setStatusId(statusId);
 	}
 
@@ -801,7 +801,7 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Organization> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Organization> toCacheModel() {
 		return _organization.toCacheModel();
 	}
 

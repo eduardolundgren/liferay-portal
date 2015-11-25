@@ -16,6 +16,7 @@ package com.liferay.portal;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ClassUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
@@ -55,28 +56,6 @@ public class UserScreenNameException extends PortalException {
 	@Deprecated
 	public UserScreenNameException(Throwable cause) {
 		super(cause);
-	}
-
-	public static class MustBeAlphaNumeric extends UserScreenNameException {
-
-		public MustBeAlphaNumeric(
-			long userId, String screenName, char ... validSpecialChars) {
-
-			super(
-				String.format(
-					"Screen name %s for user %s must be alphanumeric or one " +
-						"of the following special characters: %s",
-					screenName, userId, new String(validSpecialChars)));
-
-			this.userId = userId;
-			this.screenName = screenName;
-			this.validSpecialChars = validSpecialChars;
-		}
-
-		public final String screenName;
-		public final long userId;
-		public final char[] validSpecialChars;
-
 	}
 
 	public static class MustNotBeDuplicate extends UserScreenNameException {
@@ -132,6 +111,28 @@ public class UserScreenNameException extends PortalException {
 			this.screenName = screenName;
 		}
 
+		public final String screenName;
+		public final long userId;
+
+	}
+
+	public static class MustNotBeReserved extends UserScreenNameException {
+
+		public MustNotBeReserved(
+			long userId, String screenName, String[] reservedScreenNames) {
+
+			super(
+				String.format(
+					"Screen name %s for user %s must not be a reserved name " +
+						"such as: %s",
+					screenName, userId, StringUtil.merge(reservedScreenNames)));
+
+			this.userId = userId;
+			this.screenName = screenName;
+			this.reservedScreenNames = reservedScreenNames;
+		}
+
+		public final String[] reservedScreenNames;
 		public final String screenName;
 		public final long userId;
 
@@ -213,9 +214,11 @@ public class UserScreenNameException extends PortalException {
 
 			super(
 				String.format(
-					"Screen name %s for user %s must validate with %s",
+					"Screen name %s for user %s must validate with %s: %s",
 					screenName, userId,
-					ClassUtil.getClassName(screenNameValidator)));
+					ClassUtil.getClassName(screenNameValidator),
+					screenNameValidator.getDescription(
+						LocaleUtil.getDefault())));
 
 			this.userId = userId;
 			this.screenName = screenName;

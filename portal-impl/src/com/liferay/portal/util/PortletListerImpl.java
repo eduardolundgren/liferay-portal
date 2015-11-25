@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.TreeNodeView;
 import com.liferay.portal.kernel.util.TreeView;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
@@ -53,7 +54,7 @@ public class PortletListerImpl implements PortletLister {
 	public TreeView getTreeView() throws PortalException {
 		_nodeId = 1;
 
-		_list = new ArrayList<TreeNodeView>();
+		_list = new ArrayList<>();
 
 		TreeNodeView rootNodeView = null;
 
@@ -192,11 +193,10 @@ public class PortletListerImpl implements PortletLister {
 	}
 
 	protected void iteratePortlets(
-			TreeNodeView parentNodeView, PortletCategory portletCategory,
-			Set<String> portletIds, int parentNodeId, int depth)
-		throws PortalException {
+		TreeNodeView parentNodeView, PortletCategory portletCategory,
+		Set<String> portletIds, int parentNodeId, int depth) {
 
-		List<Portlet> portlets = new ArrayList<Portlet>();
+		List<Portlet> portlets = new ArrayList<>();
 
 		String externalPortletCategory = null;
 
@@ -214,7 +214,7 @@ public class PortletListerImpl implements PortletLister {
 				}
 				else if (!portlet.isInstanceable() &&
 						 _layoutTypePortlet.hasPortletId(
-							portlet.getPortletId())) {
+							 portlet.getPortletId())) {
 
 					portlets.add(portlet);
 				}

@@ -16,14 +16,15 @@ package com.liferay.portal.kernel.nio.intraband.welder.fifo;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvTestRule;
 import com.liferay.portal.kernel.test.SwappableSecurityManager;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.util.OSDetector;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,7 +141,7 @@ public class FIFOUtilTest {
 								checkFlag.set(false);
 							}
 							catch (IOException ioe) {
-								Assert.fail(ioe.getMessage());
+								ReflectionUtil.throwException(ioe);
 							}
 						}
 					}
@@ -161,10 +162,10 @@ public class FIFOUtilTest {
 			return;
 		}
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			FIFOUtil.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					FIFOUtil.class.getName(), Level.WARNING)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			File newTmpDir = new File("newTmpDir");
@@ -200,9 +201,6 @@ public class FIFOUtilTest {
 					"Unable to create FIFO with command \"mkfifo\", " +
 						"external process returned "));
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
@@ -211,10 +209,10 @@ public class FIFOUtilTest {
 			return;
 		}
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			FIFOUtil.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					FIFOUtil.class.getName(), Level.OFF)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			File newTmpDir = new File("newTmpDir");
@@ -233,9 +231,6 @@ public class FIFOUtilTest {
 			}
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

@@ -57,6 +57,11 @@ public class ReleaseLocalServiceUtil {
 		return getService().addRelease(servletContextName, buildNumber);
 	}
 
+	public static com.liferay.portal.model.Release addRelease(
+		java.lang.String servletContextName, java.lang.String schemaVersion) {
+		return getService().addRelease(servletContextName, schemaVersion);
+	}
+
 	/**
 	* Creates a new release with the primary key. Does not add the release to the database.
 	*
@@ -194,18 +199,22 @@ public class ReleaseLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
 	public static int getBuildNumberOrCreate()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getBuildNumberOrCreate();
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
@@ -252,15 +261,6 @@ public class ReleaseLocalServiceUtil {
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
-	}
-
-	/**
 	* Updates the release in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param release the release
@@ -277,6 +277,13 @@ public class ReleaseLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateRelease(releaseId, buildNumber, buildDate, verified);
+	}
+
+	public static void updateRelease(java.lang.String servletContextName,
+		java.lang.String schemaVersion, java.lang.String previousSchemaVersion) {
+		getService()
+			.updateRelease(servletContextName, schemaVersion,
+			previousSchemaVersion);
 	}
 
 	public static void updateRelease(java.lang.String servletContextName,

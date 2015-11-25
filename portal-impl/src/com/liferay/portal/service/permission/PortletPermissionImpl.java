@@ -17,13 +17,13 @@ package com.liferay.portal.service.permission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.impl.VirtualLayout;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -32,9 +32,11 @@ import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.service.ResourceLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.util.PortletCategoryKeys;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.ControlPanelEntry;
+import com.liferay.portlet.exportimport.staging.permission.StagingPermissionUtil;
 import com.liferay.portlet.sites.util.SitesUtil;
 
 import java.util.Collection;
@@ -48,8 +50,6 @@ import javax.portlet.PortletMode;
  */
 public class PortletPermissionImpl implements PortletPermission {
 
-	public static final boolean DEFAULT_STRICT = false;
-
 	@Override
 	public void check(
 			PermissionChecker permissionChecker, Layout layout,
@@ -58,9 +58,11 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		if (!contains(
 				permissionChecker, 0, layout, portletId, actionId,
-				DEFAULT_STRICT)) {
+				_STRICT_DEFAULT)) {
 
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -73,7 +75,9 @@ public class PortletPermissionImpl implements PortletPermission {
 		if (!contains(
 				permissionChecker, 0, layout, portletId, actionId, strict)) {
 
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -85,9 +89,11 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		if (!contains(
 				permissionChecker, groupId, layout, portletId, actionId,
-				DEFAULT_STRICT)) {
+				_STRICT_DEFAULT)) {
 
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -97,11 +103,25 @@ public class PortletPermissionImpl implements PortletPermission {
 			String portletId, String actionId, boolean strict)
 		throws PortalException {
 
-		if (!contains(
-				permissionChecker, groupId, layout, portletId, actionId,
-				strict)) {
+		check(
+			permissionChecker, groupId, layout, portletId, actionId, strict,
+			_CHECK_STAGING_PERMISSION_DEFAULT);
+	}
 
-			throw new PrincipalException();
+	@Override
+	public void check(
+			PermissionChecker permissionChecker, long groupId, Layout layout,
+			String portletId, String actionId, boolean strict,
+			boolean checkStagingPermission)
+		throws PortalException {
+
+		if (!contains(
+				permissionChecker, groupId, layout, portletId, actionId, strict,
+				checkStagingPermission)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -113,7 +133,7 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		check(
 			permissionChecker, groupId, plid, portletId, actionId,
-			DEFAULT_STRICT);
+			_STRICT_DEFAULT);
 	}
 
 	@Override
@@ -126,7 +146,9 @@ public class PortletPermissionImpl implements PortletPermission {
 				permissionChecker, groupId, plid, portletId, actionId,
 				strict)) {
 
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -136,7 +158,7 @@ public class PortletPermissionImpl implements PortletPermission {
 			String actionId)
 		throws PortalException {
 
-		check(permissionChecker, plid, portletId, actionId, DEFAULT_STRICT);
+		check(permissionChecker, plid, portletId, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -146,7 +168,9 @@ public class PortletPermissionImpl implements PortletPermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, plid, portletId, actionId, strict)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -157,7 +181,9 @@ public class PortletPermissionImpl implements PortletPermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, portletId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Portlet.class.getName(), portletId,
+				actionId);
 		}
 	}
 
@@ -168,7 +194,7 @@ public class PortletPermissionImpl implements PortletPermission {
 		throws PortalException {
 
 		return contains(
-			permissionChecker, layout, portlet, actionId, DEFAULT_STRICT);
+			permissionChecker, layout, portlet, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -188,7 +214,7 @@ public class PortletPermissionImpl implements PortletPermission {
 		throws PortalException {
 
 		return contains(
-			permissionChecker, layout, portletId, actionId, DEFAULT_STRICT);
+			permissionChecker, layout, portletId, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -209,7 +235,7 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		return contains(
 			permissionChecker, groupId, layout, portlet, actionId,
-			DEFAULT_STRICT);
+			_STRICT_DEFAULT);
 	}
 
 	@Override
@@ -235,13 +261,25 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		return contains(
 			permissionChecker, groupId, layout, portletId, actionId,
-			DEFAULT_STRICT);
+			_STRICT_DEFAULT);
 	}
 
 	@Override
 	public boolean contains(
 			PermissionChecker permissionChecker, long groupId, Layout layout,
 			String portletId, String actionId, boolean strict)
+		throws PortalException {
+
+		return contains(
+			permissionChecker, groupId, layout, portletId, actionId, strict,
+			_CHECK_STAGING_PERMISSION_DEFAULT);
+	}
+
+	@Override
+	public boolean contains(
+			PermissionChecker permissionChecker, long groupId, Layout layout,
+			String portletId, String actionId, boolean strict,
+			boolean checkStagingPermission)
 		throws PortalException {
 
 		String name = null;
@@ -255,8 +293,19 @@ public class PortletPermissionImpl implements PortletPermission {
 				groupId, name, primKey, actionId);
 		}
 
+		if ((layout instanceof VirtualLayout) && layout.isTypeControlPanel()) {
+			VirtualLayout virtualLayout = (VirtualLayout)layout;
+
+			layout = virtualLayout.getSourceLayout();
+		}
+
 		if (!actionId.equals(ActionKeys.VIEW) &&
 			(layout instanceof VirtualLayout)) {
+
+			if (actionId.equals(ActionKeys.ADD_TO_PAGE)) {
+				return hasAddToPagePermission(
+					permissionChecker, layout, portletId, actionId);
+			}
 
 			return hasCustomizePermission(
 				permissionChecker, layout, portletId, actionId);
@@ -275,11 +324,13 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		name = PortletConstants.getRootPortletId(portletId);
 
-		Boolean hasPermission = StagingPermissionUtil.hasPermission(
-			permissionChecker, groupId, name, groupId, name, actionId);
+		if (checkStagingPermission) {
+			Boolean hasPermission = StagingPermissionUtil.hasPermission(
+				permissionChecker, groupId, name, groupId, name, actionId);
 
-		if (hasPermission != null) {
-			return hasPermission.booleanValue();
+			if (hasPermission != null) {
+				return hasPermission.booleanValue();
+			}
 		}
 
 		if (group.isControlPanel() && actionId.equals(ActionKeys.VIEW)) {
@@ -301,6 +352,12 @@ public class PortletPermissionImpl implements PortletPermission {
 			return true;
 		}
 
+		if (!hasIndividualResource(permissionChecker, name, primKey)) {
+			ResourceLocalServiceUtil.addResources(
+				permissionChecker.getCompanyId(), groupId,
+				permissionChecker.getUserId(), name, primKey, true, true, true);
+		}
+
 		return permissionChecker.hasPermission(
 			groupId, name, primKey, actionId);
 	}
@@ -314,7 +371,7 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		return contains(
 			permissionChecker, groupId, layout, portlet, actionId,
-			DEFAULT_STRICT);
+			_STRICT_DEFAULT);
 	}
 
 	@Override
@@ -338,7 +395,7 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		return contains(
 			permissionChecker, groupId, layout, portletId, actionId,
-			DEFAULT_STRICT);
+			_STRICT_DEFAULT);
 	}
 
 	@Override
@@ -362,7 +419,7 @@ public class PortletPermissionImpl implements PortletPermission {
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
 
 		return contains(
-			permissionChecker, layout, portlet, actionId, DEFAULT_STRICT);
+			permissionChecker, layout, portlet, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -386,7 +443,7 @@ public class PortletPermissionImpl implements PortletPermission {
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
 
 		return contains(
-			permissionChecker, layout, portletId, actionId, DEFAULT_STRICT);
+			permissionChecker, layout, portletId, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -435,9 +492,7 @@ public class PortletPermissionImpl implements PortletPermission {
 		boolean access = contains(
 			permissionChecker, scopeGroupId, layout, portlet, ActionKeys.VIEW);
 
-		if (access && !PropsValues.TCK_URL &&
-			portletMode.equals(PortletMode.EDIT)) {
-
+		if (access && portletMode.equals(PortletMode.EDIT)) {
 			access = contains(
 				permissionChecker, scopeGroupId, layout, portlet,
 				ActionKeys.PREFERENCES);
@@ -547,6 +602,21 @@ public class PortletPermissionImpl implements PortletPermission {
 		}
 	}
 
+	protected boolean hasAddToPagePermission(
+			PermissionChecker permissionChecker, Layout layout,
+			String portletId, String actionId)
+		throws PortalException {
+
+		if (LayoutPermissionUtil.contains(
+				permissionChecker, layout, ActionKeys.CUSTOMIZE)) {
+
+			return contains(
+				permissionChecker, portletId, ActionKeys.ADD_TO_PAGE);
+		}
+
+		return false;
+	}
+
 	protected boolean hasConfigurePermission(
 			PermissionChecker permissionChecker, Layout layout,
 			String portletId, String actionId)
@@ -602,6 +672,25 @@ public class PortletPermissionImpl implements PortletPermission {
 
 		return false;
 	}
+
+	protected boolean hasIndividualResource(
+		PermissionChecker permissionChecker, String name, String primKey) {
+
+		int count =
+			ResourcePermissionLocalServiceUtil.getResourcePermissionsCount(
+				permissionChecker.getCompanyId(), name,
+				ResourceConstants.SCOPE_INDIVIDUAL, primKey);
+
+		if (count == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private static final boolean _CHECK_STAGING_PERMISSION_DEFAULT = true;
+
+	private static final boolean _STRICT_DEFAULT = false;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortletPermissionImpl.class);

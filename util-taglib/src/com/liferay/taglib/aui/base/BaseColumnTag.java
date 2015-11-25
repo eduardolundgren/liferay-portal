@@ -85,16 +85,13 @@ public abstract class BaseColumnTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_columnWidth = 0;
 		_cssClass = null;
 		_first = false;
 		_id = null;
 		_last = false;
-	}
-
-	@Override
-	protected String getEndPage() {
-		return _END_PAGE;
 	}
 
 	@Override
@@ -112,9 +109,6 @@ public abstract class BaseColumnTag extends com.liferay.taglib.util.IncludeTag {
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:column:";
-
-	private static final String _END_PAGE =
-		"/html/taglib/aui/column/end.jsp";
 
 	private static final String _START_PAGE =
 		"/html/taglib/aui/column/start.jsp";

@@ -48,8 +48,7 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	 * Never modify or reference this interface directly. Always use {@link SocialActivitySetLocalServiceUtil} to access the social activity set local service. Add custom service methods to {@link com.liferay.portlet.social.service.impl.SocialActivitySetLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public com.liferay.portlet.social.model.SocialActivitySet addActivitySet(
-		long activityId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activityId) throws PortalException;
 
 	/**
 	* Adds the social activity set to the database. Also notifies the appropriate model listeners.
@@ -71,10 +70,10 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 		long activitySetId);
 
 	public void decrementActivityCount(long activitySetId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void decrementActivityCount(long classNameId, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @throws PortalException
@@ -82,7 +81,7 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the social activity set with the primary key from the database. Also notifies the appropriate model listeners.
@@ -93,8 +92,7 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.social.model.SocialActivitySet deleteSocialActivitySet(
-		long activitySetId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activitySetId) throws PortalException;
 
 	/**
 	* Deletes the social activity set from the database. Also notifies the appropriate model listeners.
@@ -178,13 +176,6 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.social.model.SocialActivitySet getClassActivitySet(
 		long classNameId, long classPK, int type);
@@ -200,11 +191,20 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupActivitySetsCount(long groupId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.social.model.SocialActivitySet> getRelationActivitySets(
@@ -229,8 +229,7 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.social.model.SocialActivitySet getSocialActivitySet(
-		long activitySetId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activitySetId) throws PortalException;
 
 	/**
 	* Returns a range of all the social activity sets.
@@ -285,14 +284,7 @@ public interface SocialActivitySetLocalService extends BaseLocalService,
 	public int getUserViewableActivitySetsCount(long userId);
 
 	public void incrementActivityCount(long activitySetId, long activityId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+		throws PortalException;
 
 	/**
 	* Updates the social activity set in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

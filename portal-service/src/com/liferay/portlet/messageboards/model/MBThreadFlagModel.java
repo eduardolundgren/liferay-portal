@@ -19,6 +19,7 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.ShardedModel;
 import com.liferay.portal.model.StagedGroupedModel;
 import com.liferay.portal.service.ServiceContext;
 
@@ -42,7 +43,7 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface MBThreadFlagModel extends BaseModel<MBThreadFlag>,
+public interface MBThreadFlagModel extends BaseModel<MBThreadFlag>, ShardedModel,
 	StagedGroupedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -221,6 +222,22 @@ public interface MBThreadFlagModel extends BaseModel<MBThreadFlag>,
 	 * @param threadId the thread ID of this message boards thread flag
 	 */
 	public void setThreadId(long threadId);
+
+	/**
+	 * Returns the last publish date of this message boards thread flag.
+	 *
+	 * @return the last publish date of this message boards thread flag
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this message boards thread flag.
+	 *
+	 * @param lastPublishDate the last publish date of this message boards thread flag
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
 
 	@Override
 	public boolean isNew();

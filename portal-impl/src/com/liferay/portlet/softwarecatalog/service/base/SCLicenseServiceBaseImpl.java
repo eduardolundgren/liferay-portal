@@ -15,12 +15,12 @@
 package com.liferay.portlet.softwarecatalog.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.util.PortalUtil;
 
@@ -44,7 +44,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class SCLicenseServiceBaseImpl extends BaseServiceImpl
-	implements SCLicenseService, IdentifiableBean {
+	implements SCLicenseService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -75,7 +75,7 @@ public abstract class SCLicenseServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the s c license remote service
 	 */
-	public com.liferay.portlet.softwarecatalog.service.SCLicenseService getSCLicenseService() {
+	public SCLicenseService getSCLicenseService() {
 		return scLicenseService;
 	}
 
@@ -84,8 +84,7 @@ public abstract class SCLicenseServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param scLicenseService the s c license remote service
 	 */
-	public void setSCLicenseService(
-		com.liferay.portlet.softwarecatalog.service.SCLicenseService scLicenseService) {
+	public void setSCLicenseService(SCLicenseService scLicenseService) {
 		this.scLicenseService = scLicenseService;
 	}
 
@@ -191,23 +190,13 @@ public abstract class SCLicenseServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return SCLicenseService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -245,7 +234,7 @@ public abstract class SCLicenseServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portlet.softwarecatalog.service.SCLicenseLocalService.class)
 	protected com.liferay.portlet.softwarecatalog.service.SCLicenseLocalService scLicenseLocalService;
 	@BeanReference(type = com.liferay.portlet.softwarecatalog.service.SCLicenseService.class)
-	protected com.liferay.portlet.softwarecatalog.service.SCLicenseService scLicenseService;
+	protected SCLicenseService scLicenseService;
 	@BeanReference(type = SCLicensePersistence.class)
 	protected SCLicensePersistence scLicensePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -256,5 +245,4 @@ public abstract class SCLicenseServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portlet.softwarecatalog.service.SCProductEntryService scProductEntryService;
 	@BeanReference(type = SCProductEntryPersistence.class)
 	protected SCProductEntryPersistence scProductEntryPersistence;
-	private String _beanIdentifier;
 }

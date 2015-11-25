@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>Form</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Form</td></tr>
+</thead>
+<tbody>
+<tr>
+	<td>SAVE_BUTTON</td>
+	<td>//div[@class='button-holder ddl-form-builder-buttons']/button[contains(.,'Save')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NAME_FIELD</td>
+	<td>//div[contains(@id,'nameEditorContainer')]/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DESCRIPTION_FIELD</td>
+	<td>//div[contains(@id,'descriptionEditorContainer')]/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TITLE_FIELD</td>
+	<td>//input[contains(@class,'form-builder-page-header-title')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_DESCRIPTION_FIELD</td>
+	<td>//input[contains(@class,'form-builder-page-header-description')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PAGE_CONTROLS-->
+<tr>
+	<td>PAGE_CONTROLS_ELLIPSIS_ICON</td>
+	<td>//a[@class='form-builder-controls-trigger']/span[contains(@class,'icon-ellipsis-vertical')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_CONTROLS_ADD_NEW_PAGE</td>
+	<td>//li[@class='form-builder-page-manager-add-last-position' and contains(text(),'Add new page')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--ADD_COLUMN-->
+<tr>
+	<td>ADD_COLUMN_LEFT</td>
+	<td>xpath=(//div[@class='layout-builder-resize-col-draggable-handle expand-left'])[${key_rowNumber}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_COLUMN_RIGHT</td>
+	<td>xpath=(//div[@class='layout-builder-resize-col-draggable-handle expand-right'])[${key_rowNumber}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_COLUMN_LINE</td>
+	<td>xpath=(//div[@class='layout-row-container-row'][${key_rowNumber}]//div[contains(@class,'layout-builder-resize-col') and contains(@class,'dd-drop')])[${key_columnLineNumber}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--ADD_FIELD-->
+<tr>
+	<td>ADD_ADDITIONAL_FIELD</td>
+	<td>//div[contains(@class,'col col-md-${key_columnSize}')]//div[contains(@data-fieldname,'${key_previousFieldName}')]/../following-sibling::div//label[@class='form-builder-field-list-add-button-label']/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_FIRST_FIELD</td>
+	<td>//div[contains(@class,'col col-md-${key_columnSize}')]//div[contains(@class,'add-button-icon')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_FIELD_TYPE</td>
+	<td>//div[@class='field-type']/div[contains(.,'${key_fieldType}')]</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

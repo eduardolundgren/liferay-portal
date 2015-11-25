@@ -25,7 +25,6 @@ import com.liferay.portal.model.Website;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.WebsiteLocalServiceBaseImpl;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,8 +39,8 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 	@Deprecated
 	@Override
 	public Website addWebsite(
-			long userId, String className, long classPK, String url, int typeId,
-			boolean primary)
+			long userId, String className, long classPK, String url,
+			long typeId, boolean primary)
 		throws PortalException {
 
 		return addWebsite(
@@ -51,13 +50,12 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 
 	@Override
 	public Website addWebsite(
-			long userId, String className, long classPK, String url, int typeId,
-			boolean primary, ServiceContext serviceContext)
+			long userId, String className, long classPK, String url,
+			long typeId, boolean primary, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long classNameId = classNameLocalService.getClassNameId(className);
-		Date now = new Date();
 
 		validate(
 			0, user.getCompanyId(), classNameId, classPK, url, typeId, primary);
@@ -70,9 +68,6 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 		website.setCompanyId(user.getCompanyId());
 		website.setUserId(user.getUserId());
 		website.setUserName(user.getFullName());
-		website.setCreateDate(now);
-		website.setCreateDate(serviceContext.getCreateDate(now));
-		website.setModifiedDate(serviceContext.getModifiedDate(now));
 		website.setClassNameId(classNameId);
 		website.setClassPK(classPK);
 		website.setUrl(url);
@@ -94,7 +89,8 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public Website deleteWebsite(Website website) {
 		websitePersistence.remove(website);
 
@@ -129,14 +125,13 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 
 	@Override
 	public Website updateWebsite(
-			long websiteId, String url, int typeId, boolean primary)
+			long websiteId, String url, long typeId, boolean primary)
 		throws PortalException {
 
 		validate(websiteId, 0, 0, 0, url, typeId, primary);
 
 		Website website = websitePersistence.findByPrimaryKey(websiteId);
 
-		website.setModifiedDate(new Date());
 		website.setUrl(url);
 		website.setTypeId(typeId);
 		website.setPrimary(primary);
@@ -169,7 +164,7 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 
 	protected void validate(
 			long websiteId, long companyId, long classNameId, long classPK,
-			String url, int typeId, boolean primary)
+			String url, long typeId, boolean primary)
 		throws PortalException {
 
 		if (!Validator.isUrl(url)) {

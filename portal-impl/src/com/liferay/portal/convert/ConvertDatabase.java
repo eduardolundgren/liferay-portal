@@ -14,17 +14,15 @@
 
 package com.liferay.portal.convert;
 
-import com.liferay.mail.model.CyrusUser;
-import com.liferay.mail.model.CyrusVirtual;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
@@ -33,7 +31,6 @@ import com.liferay.portal.model.ServiceComponent;
 import com.liferay.portal.service.ServiceComponentLocalServiceUtil;
 import com.liferay.portal.spring.hibernate.DialectDetector;
 import com.liferay.portal.upgrade.util.Table;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.ShutdownUtil;
 
@@ -87,11 +84,11 @@ public class ConvertDatabase extends BaseConvertProcess {
 
 		Dialect dialect = DialectDetector.getDialect(dataSource);
 
-		DB db = DBFactoryUtil.getDB(dialect);
+		DB db = DBFactoryUtil.getDB(dialect, dataSource);
 
 		List<String> modelNames = ModelHintsUtil.getModels();
 
-		Map<String, Tuple> tableDetails = new LinkedHashMap<String, Tuple>();
+		Map<String, Tuple> tableDetails = new LinkedHashMap<>();
 
 		Connection connection = dataSource.getConnection();
 
@@ -141,12 +138,6 @@ public class ConvertDatabase extends BaseConvertProcess {
 				}
 			}
 
-			for (Tuple tuple : _UNMAPPED_TABLES) {
-				String table = (String)tuple.getObject(0);
-
-				tableDetails.put(table, tuple);
-			}
-
 			if (_log.isDebugEnabled()) {
 				_log.debug("Migrating database tables");
 			}
@@ -175,10 +166,9 @@ public class ConvertDatabase extends BaseConvertProcess {
 			StartupHelperUtil.updateIndexes(db, connection, false);
 
 			List<ServiceComponent> serviceComponents =
-				ServiceComponentLocalServiceUtil.getServiceComponents(
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				ServiceComponentLocalServiceUtil.getLatestServiceComponents();
 
-			Set<String> validIndexNames = new HashSet<String>();
+			Set<String> validIndexNames = new HashSet<>();
 
 			for (ServiceComponent serviceComponent : serviceComponents) {
 				String indexesSQL = serviceComponent.getIndexesSQL();
@@ -279,15 +269,7 @@ public class ConvertDatabase extends BaseConvertProcess {
 		}
 	}
 
-	private static final Tuple[] _UNMAPPED_TABLES = new Tuple[] {
-		new Tuple(
-			CyrusUser.TABLE_NAME, CyrusUser.TABLE_COLUMNS,
-			CyrusUser.TABLE_SQL_CREATE),
-		new Tuple(
-			CyrusVirtual.TABLE_NAME, CyrusVirtual.TABLE_COLUMNS,
-			CyrusVirtual.TABLE_SQL_CREATE)
-	};
-
-	private static Log _log = LogFactoryUtil.getLog(ConvertDatabase.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ConvertDatabase.class);
 
 }

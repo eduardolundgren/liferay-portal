@@ -18,8 +18,9 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
+import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.util.Accessor;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 import java.io.InputStream;
@@ -32,8 +33,7 @@ import java.util.List;
  */
 @JSON
 @ProviderType
-public interface FileEntry extends RepositoryModel<FileEntry> {
-
+public interface FileEntry extends RepositoryEntry, RepositoryModel<FileEntry> {
 	public static final Accessor<FileEntry, Long> FILE_ENTRY_ID_ACCESSOR =
 
 		new Accessor<FileEntry, Long>() {
@@ -69,7 +69,6 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * workflow state.
 	 *
 	 * @return the content stream of the current file version
-	 * @throws PortalException if a portal exception occurred
 	 * @see    #getFileVersion()
 	 */
 	@JSON(include = false)
@@ -88,6 +87,8 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 
 	public String getFileName();
 
+	public List<FileShortcut> getFileShortcuts();
+
 	/**
 	 * Returns the current file version. The workflow state of the latest file
 	 * version may affect the file version that is returned. In a Liferay
@@ -97,7 +98,6 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * may function identically.
 	 *
 	 * @return the current file version
-	 * @throws PortalException if a portal exception occurred
 	 */
 	public FileVersion getFileVersion() throws PortalException;
 
@@ -123,7 +123,6 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * #getFileVersion()} may be identical.
 	 *
 	 * @return the latest file version
-	 * @throws PortalException if a portal exception occurred
 	 */
 	public FileVersion getLatestFileVersion() throws PortalException;
 
@@ -136,7 +135,6 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * @param  trusted whether to bypass permission checks. In third-party
 	 *         repositories, this parameter may be ignored.
 	 * @return the latest file version
-	 * @throws PortalException if a portal exception occurred
 	 */
 	public FileVersion getLatestFileVersion(boolean trusted)
 		throws PortalException;
@@ -151,6 +149,9 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	public Date getModifiedDate();
 
 	public int getReadCount();
+
+	public <T extends Capability> T getRepositoryCapability(
+		Class<T> capabilityClass);
 
 	public long getRepositoryId();
 
@@ -189,6 +190,9 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	public boolean isInTrashContainer();
 
 	public boolean isManualCheckInRequired();
+
+	public <T extends Capability> boolean isRepositoryCapabilityProvided(
+		Class<T> capabilityClass);
 
 	public boolean isSupportsLocking();
 

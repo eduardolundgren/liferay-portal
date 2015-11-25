@@ -40,7 +40,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface LayoutFriendlyURLModel extends BaseModel<LayoutFriendlyURL>,
-	MVCCModel, StagedGroupedModel {
+	MVCCModel, ShardedModel, StagedGroupedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -285,6 +285,22 @@ public interface LayoutFriendlyURLModel extends BaseModel<LayoutFriendlyURL>,
 	 * @param languageId the language ID of this layout friendly u r l
 	 */
 	public void setLanguageId(String languageId);
+
+	/**
+	 * Returns the last publish date of this layout friendly u r l.
+	 *
+	 * @return the last publish date of this layout friendly u r l
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this layout friendly u r l.
+	 *
+	 * @param lastPublishDate the last publish date of this layout friendly u r l
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
 
 	@Override
 	public boolean isNew();

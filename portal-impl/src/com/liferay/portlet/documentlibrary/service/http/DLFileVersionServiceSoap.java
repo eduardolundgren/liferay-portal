@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portlet.documentlibrary.service.DLFileVersionServiceUtil} service utility. The
+ * {@link DLFileVersionServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -60,7 +60,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see DLFileVersionServiceHttp
  * @see com.liferay.portlet.documentlibrary.model.DLFileVersionSoap
- * @see com.liferay.portlet.documentlibrary.service.DLFileVersionServiceUtil
+ * @see DLFileVersionServiceUtil
  * @generated
  */
 @ProviderType
@@ -113,6 +113,21 @@ public class DLFileVersionServiceSoap {
 		long fileEntryId) throws RemoteException {
 		try {
 			com.liferay.portlet.documentlibrary.model.DLFileVersion returnValue = DLFileVersionServiceUtil.getLatestFileVersion(fileEntryId);
+
+			return com.liferay.portlet.documentlibrary.model.DLFileVersionSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileVersionSoap getLatestFileVersion(
+		long fileEntryId, boolean excludeWorkingCopy) throws RemoteException {
+		try {
+			com.liferay.portlet.documentlibrary.model.DLFileVersion returnValue = DLFileVersionServiceUtil.getLatestFileVersion(fileEntryId,
+					excludeWorkingCopy);
 
 			return com.liferay.portlet.documentlibrary.model.DLFileVersionSoap.toSoapModel(returnValue);
 		}

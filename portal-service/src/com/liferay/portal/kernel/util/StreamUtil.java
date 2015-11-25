@@ -228,10 +228,11 @@ public class StreamUtil {
 
 		while (count < length) {
 			count += inputFileChannel.transferTo(
-				inputFileChannel.position(), length - count, outputFileChannel);
+				inputFileChannel.position() + count, length - count,
+				outputFileChannel);
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(StreamUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(StreamUtil.class);
 
 }

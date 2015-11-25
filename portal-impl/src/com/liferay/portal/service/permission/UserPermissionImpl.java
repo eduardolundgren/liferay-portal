@@ -68,7 +68,8 @@ public class UserPermissionImpl
 		throws PrincipalException {
 
 		if (!contains(permissionChecker, userId, organizationIds, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, User.class.getName(), userId, actionId);
 		}
 	}
 
@@ -78,7 +79,8 @@ public class UserPermissionImpl
 		throws PrincipalException {
 
 		if (!contains(permissionChecker, userId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, User.class.getName(), userId, actionId);
 		}
 	}
 
@@ -196,7 +198,7 @@ public class UserPermissionImpl
 								RoleConstants.ORGANIZATION_ADMINISTRATOR,
 								true) &&
 							 !UserGroupRoleLocalServiceUtil.hasUserGroupRole(
-								permissionChecker.getUserId(),
+								 permissionChecker.getUserId(),
 								organizationGroup.getGroupId(),
 								RoleConstants.ORGANIZATION_OWNER, true)) {
 
@@ -221,6 +223,7 @@ public class UserPermissionImpl
 		return contains(permissionChecker, userId, null, actionId);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(UserPermissionImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserPermissionImpl.class);
 
 }

@@ -23,6 +23,7 @@ import com.liferay.portal.model.Layout;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,10 +49,14 @@ public class SearchContext implements Serializable {
 
 	public void addFullQueryEntryClassName(String entryClassName) {
 		if (_fullQueryEntryClassNames == null) {
-			_fullQueryEntryClassNames = new HashSet<String>();
+			_fullQueryEntryClassNames = new HashSet<>();
 		}
 
 		_fullQueryEntryClassNames.add(entryClassName);
+	}
+
+	public void addStats(Stats stats) {
+		_stats.put(stats.getField(), stats);
 	}
 
 	public void clearFullQueryEntryClassNames() {
@@ -76,13 +81,13 @@ public class SearchContext implements Serializable {
 
 	public Map<String, Serializable> getAttributes() {
 		if (_attributes == null) {
-			_attributes = new HashMap<String, Serializable>();
+			_attributes = new HashMap<>();
 		}
 
 		return _attributes;
 	}
 
-	public BooleanClause[] getBooleanClauses() {
+	public BooleanClause<Query>[] getBooleanClauses() {
 		return _booleanClauses;
 	}
 
@@ -129,6 +134,10 @@ public class SearchContext implements Serializable {
 
 		return _fullQueryEntryClassNames.toArray(
 			new String[_fullQueryEntryClassNames.size()]);
+	}
+
+	public GroupBy getGroupBy() {
+		return _groupBy;
 	}
 
 	public long[] getGroupIds() {
@@ -189,6 +198,14 @@ public class SearchContext implements Serializable {
 
 	public int getStart() {
 		return _start;
+	}
+
+	public Map<String, Stats> getStats() {
+		return Collections.unmodifiableMap(_stats);
+	}
+
+	public Stats getStats(String fieldName) {
+		return _stats.get(fieldName);
 	}
 
 	public TimeZone getTimeZone() {
@@ -259,7 +276,7 @@ public class SearchContext implements Serializable {
 
 	public void setAttribute(String name, Serializable value) {
 		if (_attributes == null) {
-			_attributes = new HashMap<String, Serializable>();
+			_attributes = new HashMap<>();
 		}
 
 		_attributes.put(name, value);
@@ -269,7 +286,7 @@ public class SearchContext implements Serializable {
 		_attributes = attributes;
 	}
 
-	public void setBooleanClauses(BooleanClause[] booleanClauses) {
+	public void setBooleanClauses(BooleanClause<Query>[] booleanClauses) {
 		_booleanClauses = booleanClauses;
 	}
 
@@ -310,6 +327,10 @@ public class SearchContext implements Serializable {
 
 	public void setFolderIds(long[] folderIds) {
 		_folderIds = folderIds;
+	}
+
+	public void setGroupBy(GroupBy groupBy) {
+		_groupBy = groupBy;
 	}
 
 	public void setGroupIds(long[] groupIds) {
@@ -404,17 +425,17 @@ public class SearchContext implements Serializable {
 	private long[] _assetCategoryIds;
 	private String[] _assetTagNames;
 	private Map<String, Serializable> _attributes;
-	private BooleanClause[] _booleanClauses;
+	private BooleanClause<Query>[] _booleanClauses;
 	private long[] _categoryIds;
 	private long[] _classTypeIds;
 	private boolean _commitImmediately;
 	private long _companyId;
 	private int _end = QueryUtil.ALL_POS;
 	private String[] _entryClassNames;
-	private final Map<String, Facet> _facets =
-		new ConcurrentHashMap<String, Facet>();
+	private final Map<String, Facet> _facets = new ConcurrentHashMap<>();
 	private long[] _folderIds;
 	private Set<String> _fullQueryEntryClassNames;
+	private GroupBy _groupBy;
 	private long[] _groupIds;
 	private boolean _includeAttachments;
 	private boolean _includeDiscussions;
@@ -435,6 +456,7 @@ public class SearchContext implements Serializable {
 	private String _searchEngineId;
 	private Sort[] _sorts;
 	private int _start = QueryUtil.ALL_POS;
+	private final Map<String, Stats> _stats = new ConcurrentHashMap<>();
 	private TimeZone _timeZone;
 	private long _userId;
 

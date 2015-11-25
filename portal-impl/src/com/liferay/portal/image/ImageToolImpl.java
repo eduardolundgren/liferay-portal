@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Image;
@@ -60,11 +59,15 @@ import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
 import net.jmge.gif.Gif89Encoder;
 
 import org.im4java.core.IMOperation;
+
+import org.monte.media.jpeg.CMYKJPEGImageReaderSpi;
 
 /**
  * @author Brian Wing Shun Chan
@@ -271,21 +274,16 @@ public class ImageToolImpl implements ImageTool {
 	public void encodeGIF(RenderedImage renderedImage, OutputStream os)
 		throws IOException {
 
-		if (JavaDetector.isJDK6()) {
-			ImageIO.write(renderedImage, TYPE_GIF, os);
+		BufferedImage bufferedImage = getBufferedImage(renderedImage);
+
+		if (!(bufferedImage.getColorModel() instanceof IndexColorModel)) {
+			bufferedImage = convertImageType(
+				bufferedImage, BufferedImage.TYPE_BYTE_INDEXED);
 		}
-		else {
-			BufferedImage bufferedImage = getBufferedImage(renderedImage);
 
-			if (!(bufferedImage.getColorModel() instanceof IndexColorModel)) {
-				bufferedImage = convertImageType(
-					bufferedImage, BufferedImage.TYPE_BYTE_INDEXED);
-			}
+		Gif89Encoder encoder = new Gif89Encoder(bufferedImage);
 
-			Gif89Encoder encoder = new Gif89Encoder(bufferedImage);
-
-			encoder.encode(os);
-		}
+		encoder.encode(os);
 	}
 
 	@Override
@@ -345,7 +343,7 @@ public class ImageToolImpl implements ImageTool {
 			colorModel.createCompatibleWritableRaster(
 				renderedImage.getWidth(), renderedImage.getHeight());
 
-		Hashtable<String, Object> properties = new Hashtable<String, Object>();
+		Hashtable<String, Object> properties = new Hashtable<>();
 
 		String[] keys = renderedImage.getPropertyNames();
 
@@ -470,32 +468,36 @@ public class ImageToolImpl implements ImageTool {
 	public ImageBag read(byte[] bytes) throws IOException {
 		String formatName = null;
 		ImageInputStream imageInputStream = null;
-		Queue<ImageReader> imageReaders = new LinkedList<ImageReader>();
+		Queue<ImageReader> imageReaders = new LinkedList<>();
 		RenderedImage renderedImage = null;
 
 		try {
-			boolean firstImageReader = true;
-
 			imageInputStream = ImageIO.createImageInputStream(
 				new ByteArrayInputStream(bytes));
 
 			Iterator<ImageReader> iterator = ImageIO.getImageReaders(
 				imageInputStream);
 
-			while (iterator.hasNext()) {
+			while ((renderedImage == null) && iterator.hasNext()) {
 				ImageReader imageReader = iterator.next();
 
 				imageReaders.offer(imageReader);
 
-				if (firstImageReader) {
+				try {
 					imageReader.setInput(imageInputStream);
 
 					renderedImage = imageReader.read(0);
-
-					formatName = imageReader.getFormatName();
-
-					firstImageReader = false;
 				}
+				catch (IOException ioe) {
+					continue;
+				}
+
+				formatName = StringUtil.toLowerCase(
+					imageReader.getFormatName());
+			}
+
+			if (renderedImage == null) {
+				throw new IOException("Unsupported image type");
 			}
 		}
 		finally {
@@ -510,8 +512,6 @@ public class ImageToolImpl implements ImageTool {
 			}
 		}
 
-		formatName = StringUtil.toLowerCase(formatName);
-
 		String type = TYPE_JPEG;
 
 		if (formatName.contains(TYPE_BMP)) {
@@ -520,7 +520,9 @@ public class ImageToolImpl implements ImageTool {
 		else if (formatName.contains(TYPE_GIF)) {
 			type = TYPE_GIF;
 		}
-		else if (formatName.contains("jpeg") || type.equals("jpeg")) {
+		else if (formatName.contains("jpeg") ||
+				 StringUtil.equalsIgnoreCase(type, "jpeg")) {
+
 			type = TYPE_JPEG;
 		}
 		else if (formatName.contains(TYPE_PNG)) {
@@ -662,6 +664,39 @@ public class ImageToolImpl implements ImageTool {
 		return _imageMagick;
 	}
 
+	protected void orderImageReaderSpis() {
+		IIORegistry defaultIIORegistry = IIORegistry.getDefaultInstance();
+
+		ImageReaderSpi firstImageReaderSpi = null;
+		ImageReaderSpi secondImageReaderSpi = null;
+
+		Iterator<ImageReaderSpi> imageReaderSpis =
+			defaultIIORegistry.getServiceProviders(ImageReaderSpi.class, true);
+
+		while (imageReaderSpis.hasNext()) {
+			ImageReaderSpi imageReaderSpi = imageReaderSpis.next();
+
+			if (imageReaderSpi instanceof CMYKJPEGImageReaderSpi) {
+				secondImageReaderSpi = imageReaderSpi;
+			}
+			else {
+				String[] formatNames = imageReaderSpi.getFormatNames();
+
+				if (ArrayUtil.contains(formatNames, TYPE_JPEG, true) ||
+					ArrayUtil.contains(formatNames, "jpeg", true)) {
+
+					firstImageReaderSpi = imageReaderSpi;
+				}
+			}
+		}
+
+		if ((firstImageReaderSpi != null) && (secondImageReaderSpi != null)) {
+			defaultIIORegistry.setOrdering(
+				ImageReaderSpi.class, firstImageReaderSpi,
+				secondImageReaderSpi);
+		}
+	}
+
 	protected byte[] toMultiByte(int intValue) {
 		int numBits = 32;
 		int mask = 0x80000000;
@@ -689,13 +724,15 @@ public class ImageToolImpl implements ImageTool {
 
 	private ImageToolImpl() {
 		ImageIO.setUseCache(PropsValues.IMAGE_IO_USE_DISK_CACHE);
+
+		orderImageReaderSpis();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ImageToolImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(ImageToolImpl.class);
 
-	private static ImageTool _instance = new ImageToolImpl();
+	private static final ImageTool _instance = new ImageToolImpl();
 
-	private static FileImpl _fileUtil = FileImpl.getInstance();
+	private static final FileImpl _fileUtil = FileImpl.getInstance();
 	private static ImageMagick _imageMagick;
 
 	private Image _defaultCompanyLogo;

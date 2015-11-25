@@ -322,12 +322,6 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	@Override
-	public java.lang.String getShardName()
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _company.getShardName();
-	}
-
-	@Override
 	public java.lang.String getShortName()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _company.getShortName();
@@ -485,8 +479,7 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_company.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -613,7 +606,7 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Company> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Company> toCacheModel() {
 		return _company.toCacheModel();
 	}
 

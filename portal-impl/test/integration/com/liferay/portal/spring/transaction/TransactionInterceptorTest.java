@@ -16,15 +16,16 @@ package com.liferay.portal.spring.transaction;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
-import com.liferay.portal.log.CaptureAppender;
-import com.liferay.portal.log.Log4JLoggerTestUtil;
 import com.liferay.portal.model.ClassName;
 import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.persistence.ClassNameUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.List;
 
@@ -53,58 +54,60 @@ public class TransactionInterceptorTest {
 
 	@Test
 	public void testFailOnCommit() {
-		CaptureAppender captureAppender =
-			Log4JLoggerTestUtil.configureLog4JLogger(
-				DefaultTransactionExecutor.class.getName(), Level.ERROR);
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					DefaultTransactionExecutor.class.getName(), Level.ERROR)) {
 
-		long classNameId = CounterLocalServiceUtil.increment();
+			CacheRegistryUtil.clear();
 
-		ClassName className = ClassNameUtil.create(classNameId);
+			long classNameId = CounterLocalServiceUtil.increment();
 
-		PlatformTransactionManager platformTransactionManager =
-			(PlatformTransactionManager)
-				InfrastructureUtil.getTransactionManager();
+			ClassName className = ClassNameUtil.create(classNameId);
 
-		MockPlatformTransactionManager platformTransactionManagerWrapper =
-			new MockPlatformTransactionManager(platformTransactionManager);
+			PlatformTransactionManager platformTransactionManager =
+				(PlatformTransactionManager)
+					InfrastructureUtil.getTransactionManager();
 
-		TransactionInterceptor transactionInterceptor =
-			(TransactionInterceptor)PortalBeanLocatorUtil.locate(
-				"transactionAdvice");
+			MockPlatformTransactionManager platformTransactionManagerWrapper =
+				new MockPlatformTransactionManager(platformTransactionManager);
 
-		transactionInterceptor.setPlatformTransactionManager(
-			platformTransactionManagerWrapper);
+			TransactionInterceptor transactionInterceptor =
+				(TransactionInterceptor)PortalBeanLocatorUtil.locate(
+					"transactionAdvice");
 
-		try {
-			ClassNameLocalServiceUtil.addClassName(className);
-
-			Assert.fail();
-		}
-		catch (RuntimeException re) {
-			Assert.assertEquals(
-				"MockPlatformTransactionManager", re.getMessage());
-		}
-		finally {
 			transactionInterceptor.setPlatformTransactionManager(
-				platformTransactionManager);
+				platformTransactionManagerWrapper);
 
-			captureAppender.close();
+			try {
+				ClassNameLocalServiceUtil.addClassName(className);
+
+				Assert.fail();
+			}
+			catch (RuntimeException re) {
+				Assert.assertEquals(
+					"MockPlatformTransactionManager", re.getMessage());
+			}
+			finally {
+				transactionInterceptor.setPlatformTransactionManager(
+					platformTransactionManager);
+			}
+
+			List<LoggingEvent> loggingEvents =
+				captureAppender.getLoggingEvents();
+
+			Assert.assertEquals(1, loggingEvents.size());
+
+			LoggingEvent loggingEvent = loggingEvents.get(0);
+
+			Assert.assertEquals(
+				"Application exception overridden by commit exception",
+				loggingEvent.getMessage());
+
+			ClassName cachedClassName = (ClassName)EntityCacheUtil.getResult(
+				true, ClassNameImpl.class, classNameId);
+
+			Assert.assertNull(cachedClassName);
 		}
-
-		List<LoggingEvent> loggingEvents = captureAppender.getLoggingEvents();
-
-		Assert.assertEquals(1, loggingEvents.size());
-
-		LoggingEvent loggingEvent = loggingEvents.get(0);
-
-		Assert.assertEquals(
-			"Application exception overridden by commit exception",
-			loggingEvent.getMessage());
-
-		ClassName cachedClassName = (ClassName)EntityCacheUtil.getResult(
-			true, ClassNameImpl.class, classNameId);
-
-		Assert.assertNull(cachedClassName);
 	}
 
 	private class MockPlatformTransactionManager

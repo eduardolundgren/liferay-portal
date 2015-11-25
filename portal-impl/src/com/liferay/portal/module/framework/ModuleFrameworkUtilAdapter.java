@@ -15,14 +15,9 @@
 package com.liferay.portal.module.framework;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 
 import java.io.InputStream;
-
-import java.net.URL;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class is a simple wrapper in order to make the framework module running
@@ -34,18 +29,14 @@ import java.util.Map;
  */
 public class ModuleFrameworkUtilAdapter {
 
-	public static Object addBundle(String location) throws PortalException {
+	public static long addBundle(String location) throws PortalException {
 		return _moduleFramework.addBundle(location);
 	}
 
-	public static Object addBundle(String location, InputStream inputStream)
+	public static long addBundle(String location, InputStream inputStream)
 		throws PortalException {
 
 		return _moduleFramework.addBundle(location, inputStream);
-	}
-
-	public static Map<String, List<URL>> getExtraPackageMap() {
-		return _moduleFramework.getExtraPackageMap();
 	}
 
 	public static Object getFramework() {
@@ -56,12 +47,22 @@ public class ModuleFrameworkUtilAdapter {
 		return _moduleFramework.getState(bundleId);
 	}
 
-	public static void registerContext(Object context) {
-		_moduleFramework.registerContext(context);
+	public static void initFramework() throws Exception {
+		ClassLoader classLoader = ClassLoaderUtil.getContextClassLoader();
+
+		ClassLoaderUtil.setContextClassLoader(
+			ModuleFrameworkAdapterHelper.getClassLoader());
+
+		try {
+			_moduleFramework.initFramework();
+		}
+		finally {
+			ClassLoaderUtil.setContextClassLoader(classLoader);
+		}
 	}
 
-	public static void registerExtraPackages() {
-		_moduleFramework.registerExtraPackages();
+	public static void registerContext(Object context) {
+		_moduleFramework.registerContext(context);
 	}
 
 	public static void setBundleStartLevel(long bundleId, int startLevel)
@@ -89,17 +90,7 @@ public class ModuleFrameworkUtilAdapter {
 	}
 
 	public static void startFramework() throws Exception {
-		ClassLoader classLoader = ClassLoaderUtil.getContextClassLoader();
-
-		ClassLoaderUtil.setContextClassLoader(
-			ModuleFrameworkAdapterHelper.getClassLoader());
-
-		try {
-			_moduleFramework.startFramework();
-		}
-		finally {
-			ClassLoaderUtil.setContextClassLoader(classLoader);
-		}
+		_moduleFramework.startFramework();
 	}
 
 	public static void startRuntime() throws Exception {
@@ -116,8 +107,8 @@ public class ModuleFrameworkUtilAdapter {
 		_moduleFramework.stopBundle(bundleId, options);
 	}
 
-	public static void stopFramework() throws Exception {
-		_moduleFramework.stopFramework();
+	public static void stopFramework(long timeout) throws Exception {
+		_moduleFramework.stopFramework(timeout);
 	}
 
 	public static void stopRuntime() throws Exception {

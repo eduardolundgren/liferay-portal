@@ -15,11 +15,11 @@
 package com.liferay.portlet.social.service;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
@@ -49,17 +49,16 @@ public class SocialActivityLocalServiceTest extends BaseSocialActivityTestCase {
 	@Test
 	public void testActivityHierarchy() throws Exception {
 		AssetEntry parentAssetEntry = SocialActivityTestUtil.addAssetEntry(
-			_creatorUser, _group);
+			creatorUser, group);
 
 		SocialActivityHierarchyEntryThreadLocal.push(
 			parentAssetEntry.getClassNameId(), parentAssetEntry.getClassPK());
 
-		SocialActivityTestUtil.addActivity(
-			_creatorUser, _group, _assetEntry, 1);
+		SocialActivityTestUtil.addActivity(creatorUser, group, assetEntry, 1);
 
 		List<SocialActivity> activities =
 			SocialActivityLocalServiceUtil.getGroupActivities(
-				_group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(1, activities.size());
 
@@ -71,13 +70,13 @@ public class SocialActivityLocalServiceTest extends BaseSocialActivityTestCase {
 			parentAssetEntry.getClassPK(), activity.getParentClassPK());
 
 		SocialActivityTestUtil.addActivity(
-			_creatorUser, _group, _assetEntry,
+			creatorUser, group, assetEntry,
 			SocialActivityConstants.TYPE_DELETE);
 
 		Assert.assertEquals(
 			1,
 			SocialActivityLocalServiceUtil.getGroupActivitiesCount(
-				_group.getGroupId()));
+				group.getGroupId()));
 	}
 
 }

@@ -19,6 +19,7 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.ShardedModel;
 import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -39,7 +40,8 @@ import java.io.Serializable;
  * @generated
  */
 @ProviderType
-public interface DLFileEntryMetadataModel extends BaseModel<DLFileEntryMetadata> {
+public interface DLFileEntryMetadataModel extends BaseModel<DLFileEntryMetadata>,
+	ShardedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -90,6 +92,22 @@ public interface DLFileEntryMetadataModel extends BaseModel<DLFileEntryMetadata>
 	public void setFileEntryMetadataId(long fileEntryMetadataId);
 
 	/**
+	 * Returns the company ID of this document library file entry metadata.
+	 *
+	 * @return the company ID of this document library file entry metadata
+	 */
+	@Override
+	public long getCompanyId();
+
+	/**
+	 * Sets the company ID of this document library file entry metadata.
+	 *
+	 * @param companyId the company ID of this document library file entry metadata
+	 */
+	@Override
+	public void setCompanyId(long companyId);
+
+	/**
 	 * Returns the d d m storage ID of this document library file entry metadata.
 	 *
 	 * @return the d d m storage ID of this document library file entry metadata
@@ -116,20 +134,6 @@ public interface DLFileEntryMetadataModel extends BaseModel<DLFileEntryMetadata>
 	 * @param DDMStructureId the d d m structure ID of this document library file entry metadata
 	 */
 	public void setDDMStructureId(long DDMStructureId);
-
-	/**
-	 * Returns the file entry type ID of this document library file entry metadata.
-	 *
-	 * @return the file entry type ID of this document library file entry metadata
-	 */
-	public long getFileEntryTypeId();
-
-	/**
-	 * Sets the file entry type ID of this document library file entry metadata.
-	 *
-	 * @param fileEntryTypeId the file entry type ID of this document library file entry metadata
-	 */
-	public void setFileEntryTypeId(long fileEntryTypeId);
 
 	/**
 	 * Returns the file entry ID of this document library file entry metadata.

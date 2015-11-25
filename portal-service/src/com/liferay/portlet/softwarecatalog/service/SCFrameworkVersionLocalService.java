@@ -51,25 +51,25 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 		long userId, java.lang.String name, java.lang.String url,
 		boolean active, int priority,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void addFrameworkVersionResources(
 		com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion frameworkVersion,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void addFrameworkVersionResources(
 		com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion frameworkVersion,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws PortalException;
 
 	public void addFrameworkVersionResources(long frameworkVersionId,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void addFrameworkVersionResources(long frameworkVersionId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws PortalException;
 
 	/**
 	* Adds the s c framework version to the database. Also notifies the appropriate model listeners.
@@ -108,7 +108,7 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 		com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion frameworkVersion);
 
 	public void deleteFrameworkVersion(long frameworkVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void deleteFrameworkVersions(long groupId);
 
@@ -118,7 +118,7 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the s c framework version with the primary key from the database. Also notifies the appropriate model listeners.
@@ -129,8 +129,7 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion deleteSCFrameworkVersion(
-		long frameworkVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long frameworkVersionId) throws PortalException;
 
 	/**
 	* Deletes the s c framework version from the database. Also notifies the appropriate model listeners.
@@ -228,17 +227,9 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion getFrameworkVersion(
-		long frameworkVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long frameworkVersionId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion> getFrameworkVersions(
@@ -258,11 +249,20 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFrameworkVersionsCount(long groupId, boolean active);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion> getProductVersionFrameworkVersions(
@@ -277,8 +277,7 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion getSCFrameworkVersion(
-		long frameworkVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long frameworkVersionId) throws PortalException;
 
 	/**
 	* Returns a range of all the s c framework versions.
@@ -336,20 +335,12 @@ public interface SCFrameworkVersionLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasSCProductVersionSCFrameworkVersions(long productVersionId);
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
 	public void setSCProductVersionSCFrameworkVersions(long productVersionId,
 		long[] frameworkVersionIds);
 
 	public com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion updateFrameworkVersion(
 		long frameworkVersionId, java.lang.String name, java.lang.String url,
-		boolean active, int priority)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean active, int priority) throws PortalException;
 
 	/**
 	* Updates the s c framework version in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

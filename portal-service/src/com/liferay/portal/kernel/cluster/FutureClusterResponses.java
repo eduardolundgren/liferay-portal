@@ -16,8 +16,6 @@ package com.liferay.portal.kernel.cluster;
 
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -31,31 +29,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FutureClusterResponses
 	extends DefaultNoticeableFuture<ClusterNodeResponses> {
 
-	public FutureClusterResponses(List<Address> addresses) {
-		_clusterNodeResponses = new ClusterNodeResponses();
+	public FutureClusterResponses(Set<String> clusterNodeIds) {
+		_clusterNodeResponses = new ClusterNodeResponses(clusterNodeIds);
 
-		int size = addresses.size();
+		int size = clusterNodeIds.size();
 
 		if (size == 0) {
 			set(_clusterNodeResponses);
 		}
 
 		_counter = new AtomicInteger(size);
-		_expectedReplyAddress = new HashSet<Address>(addresses);
 	}
 
-	public void addClusterNodeResponse(
+	public boolean addClusterNodeResponse(
 		ClusterNodeResponse clusterNodeResponse) {
 
-		_clusterNodeResponses.addClusterResponse(clusterNodeResponse);
+		if (_clusterNodeResponses.addClusterResponse(clusterNodeResponse)) {
+			if (_counter.decrementAndGet() == 0) {
+				set(_clusterNodeResponses);
+			}
 
-		if (_counter.decrementAndGet() == 0) {
-			set(_clusterNodeResponses);
+			return true;
 		}
-	}
 
-	public boolean expectsReply(Address address) {
-		return _expectedReplyAddress.contains(address);
+		return false;
 	}
 
 	@Override
@@ -86,6 +83,5 @@ public class FutureClusterResponses
 
 	private final ClusterNodeResponses _clusterNodeResponses;
 	private final AtomicInteger _counter;
-	private final Set<Address> _expectedReplyAddress;
 
 }

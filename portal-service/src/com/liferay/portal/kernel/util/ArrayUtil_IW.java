@@ -227,6 +227,11 @@ public class ArrayUtil_IW {
 		return ArrayUtil.contains(array, value);
 	}
 
+	public boolean contains(java.lang.String[] array, java.lang.String value,
+		boolean ignoreCase) {
+		return ArrayUtil.contains(array, value, ignoreCase);
+	}
+
 	public boolean containsAll(boolean[] array1, boolean[] array2) {
 		return ArrayUtil.containsAll(array1, array2);
 	}
@@ -479,7 +484,7 @@ public class ArrayUtil_IW {
 		ArrayUtil.reverse(array);
 	}
 
-	public void reverse(java.lang.String[] array) {
+	public <T> void reverse(T[] array) {
 		ArrayUtil.reverse(array);
 	}
 
@@ -580,6 +585,10 @@ public class ArrayUtil_IW {
 	}
 
 	public short[] toArray(java.lang.Short[] array) {
+		return ArrayUtil.toArray(array);
+	}
+
+	public java.lang.String[] toArray(java.lang.String[] array) {
 		return ArrayUtil.toArray(array);
 	}
 
@@ -728,6 +737,10 @@ public class ArrayUtil_IW {
 	}
 
 	public short[] unique(short[] array) {
+		return ArrayUtil.unique(array);
+	}
+
+	public java.lang.String[] unique(java.lang.String[] array) {
 		return ArrayUtil.unique(array);
 	}
 

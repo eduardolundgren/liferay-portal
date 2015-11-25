@@ -20,7 +20,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.jaas.PortalPrincipal;
 import com.liferay.portal.kernel.security.jaas.PortalRole;
 import com.liferay.portal.kernel.servlet.HttpMethods;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -30,11 +31,11 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.jaas.JAASHelper;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.servlet.MainServlet;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.mock.AutoDeployMockServletContext;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portal.test.rule.callback.MainServletTestCallback;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.TestPropsValues;
 
 import java.lang.reflect.Field;
 
@@ -57,7 +58,6 @@ import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -68,11 +68,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockServletConfig;
-import org.springframework.mock.web.MockServletContext;
 
 /**
  * @author Raymond Augé
@@ -113,18 +110,65 @@ public class JAASTest {
 	}
 
 	@Test
+	public void testGetUser() throws Exception {
+		_jaasAuthTypeField.set(null, "screenName");
+
+		final IntegerWrapper counter = new IntegerWrapper();
+
+		JAASHelper jaasHelper = JAASHelper.getInstance();
+
+		JAASHelper.setInstance(
+			new JAASHelper() {
+
+				@Override
+				protected long doGetJaasUserId(long companyId, String name)
+					throws PortalException {
+
+					try {
+						return super.doGetJaasUserId(companyId, name);
+					}
+					finally {
+						counter.increment();
+					}
+				}
+
+			}
+		);
+
+		MainServlet mainServlet = MainServletTestCallback.getMainServlet();
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest(
+				mainServlet.getServletContext(), HttpMethods.GET,
+				StringPool.SLASH);
+
+		mockHttpServletRequest.setRemoteUser(
+			String.valueOf(_user.getScreenName()));
+
+		try {
+			User user = PortalUtil.getUser(mockHttpServletRequest);
+
+			Assert.assertEquals(1, counter.getValue());
+			Assert.assertEquals(_user.getUserId(), user.getUserId());
+
+			user = PortalUtil.getUser(mockHttpServletRequest);
+
+			Assert.assertEquals(1, counter.getValue());
+			Assert.assertEquals(_user.getUserId(), user.getUserId());
+		}
+		finally {
+			JAASHelper.setInstance(jaasHelper);
+		}
+	}
+
+	@Test
 	public void testLoginEmailAddressWithEmailAddress() throws Exception {
 		_jaasAuthTypeField.set(null, "emailAddress");
 
 		LoginContext loginContext = getLoginContext(
 			_user.getEmailAddress(), _user.getPassword());
 
-		try {
-			loginContext.login();
-		}
-		catch (Exception e) {
-			Assert.fail();
-		}
+		loginContext.login();
 
 		validateSubject(loginContext.getSubject(), _user.getEmailAddress());
 	}
@@ -136,12 +180,7 @@ public class JAASTest {
 		LoginContext loginContext = getLoginContext(
 			_user.getEmailAddress(), _user.getPassword());
 
-		try {
-			loginContext.login();
-		}
-		catch (Exception e) {
-			Assert.fail();
-		}
+		loginContext.login();
 
 		validateSubject(loginContext.getSubject(), _user.getEmailAddress());
 	}
@@ -217,12 +256,7 @@ public class JAASTest {
 		LoginContext loginContext = getLoginContext(
 			_user.getScreenName(), _user.getPassword());
 
-		try {
-			loginContext.login();
-		}
-		catch (Exception e) {
-			Assert.fail();
-		}
+		loginContext.login();
 
 		validateSubject(loginContext.getSubject(), _user.getScreenName());
 	}
@@ -298,12 +332,7 @@ public class JAASTest {
 		LoginContext loginContext = getLoginContext(
 			String.valueOf(_user.getUserId()), _user.getPassword());
 
-		try {
-			loginContext.login();
-		}
-		catch (Exception e) {
-			Assert.fail();
-		}
+		loginContext.login();
 
 		validateSubject(
 			loginContext.getSubject(), String.valueOf(_user.getUserId()));
@@ -311,43 +340,7 @@ public class JAASTest {
 
 	@Test
 	public void testProcessLoginEvents() throws Exception {
-		final IntegerWrapper counter = new IntegerWrapper();
-
-		JAASHelper jaasHelper = JAASHelper.getInstance();
-
-		JAASHelper.setInstance(
-			new JAASHelper() {
-
-				@Override
-				protected long doGetJaasUserId(long companyId, String name)
-					throws PortalException {
-
-					try {
-						return super.doGetJaasUserId(companyId, name);
-					}
-					finally {
-						counter.increment();
-					}
-				}
-
-			}
-		);
-
-		MainServlet mainServlet = new MainServlet();
-
-		MockServletContext mockServletContext =
-			new AutoDeployMockServletContext(new FileSystemResourceLoader());
-
-		MockServletConfig mockServletConfig = new MockServletConfig(
-			mockServletContext);
-
-		try {
-			mainServlet.init(mockServletConfig);
-		}
-		catch (ServletException se) {
-			throw new RuntimeException(
-				"The main servlet could not be initialized");
-		}
+		MainServlet mainServlet = MainServletTestCallback.getMainServlet();
 
 		Date lastLoginDate = _user.getLastLoginDate();
 
@@ -370,7 +363,6 @@ public class JAASTest {
 			mainServlet.service(
 				mockHttpServletRequest, new MockHttpServletResponse());
 
-			Assert.assertEquals(2, counter.getValue());
 			Assert.assertTrue(preJAASAction.isRan());
 			Assert.assertTrue(postJAASAction.isRan());
 
@@ -383,8 +375,6 @@ public class JAASTest {
 				PropsKeys.LOGIN_EVENTS_PRE, postJAASAction);
 			EventsProcessorUtil.unregisterEvent(
 				PropsKeys.LOGIN_EVENTS_POST, postJAASAction);
-
-			JAASHelper.setInstance(jaasHelper);
 		}
 	}
 
@@ -488,7 +478,7 @@ public class JAASTest {
 			AppConfigurationEntry[] appConfigurationEntries =
 				new AppConfigurationEntry[1];
 
-			Map<String, Object> options = new HashMap<String, Object>();
+			Map<String, Object> options = new HashMap<>();
 
 			options.put("debug", Boolean.TRUE);
 

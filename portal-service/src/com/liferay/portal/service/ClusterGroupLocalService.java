@@ -90,8 +90,7 @@ public interface ClusterGroupLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portal.model.ClusterGroup deleteClusterGroup(
-		long clusterGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long clusterGroupId) throws PortalException;
 
 	/**
 	* @throws PortalException
@@ -99,7 +98,7 @@ public interface ClusterGroupLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -174,13 +173,6 @@ public interface ClusterGroupLocalService extends BaseLocalService,
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
 
 	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
-
-	/**
 	* Returns the cluster group with the primary key.
 	*
 	* @param clusterGroupId the primary key of the cluster group
@@ -189,8 +181,7 @@ public interface ClusterGroupLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.ClusterGroup getClusterGroup(
-		long clusterGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long clusterGroupId) throws PortalException;
 
 	/**
 	* Returns a range of all the cluster groups.
@@ -215,18 +206,20 @@ public interface ClusterGroupLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getClusterGroupsCount();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Updates the cluster group in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

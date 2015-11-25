@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.portal.kernel.cluster.Priority;
-
 /**
  * @author Michael C. Han
  */
@@ -37,19 +35,22 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 		return _searchEngine.backup(companyId, backupName);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public BooleanClauseFactory getBooleanClauseFactory() {
 		return _searchEngine.getBooleanClauseFactory();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public BooleanQueryFactory getBooleanQueryFactory() {
 		return _searchEngine.getBooleanQueryFactory();
-	}
-
-	@Override
-	public Priority getClusteredWritePriority() {
-		return _searchEngine.getClusteredWritePriority();
 	}
 
 	@Override
@@ -66,11 +67,19 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 		return _searchEngine;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public TermQueryFactory getTermQueryFactory() {
 		return _searchEngine.getTermQueryFactory();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public TermRangeQueryFactory getTermRangeQueryFactory() {
 		return _searchEngine.getTermRangeQueryFactory();
@@ -84,16 +93,6 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 	@Override
 	public void initialize(long companyId) {
 		_searchEngine.initialize(companyId);
-	}
-
-	@Override
-	public boolean isClusteredWrite() {
-		return _searchEngine.isClusteredWrite();
-	}
-
-	@Override
-	public boolean isLuceneBased() {
-		return _searchEngine.isLuceneBased();
 	}
 
 	@Override

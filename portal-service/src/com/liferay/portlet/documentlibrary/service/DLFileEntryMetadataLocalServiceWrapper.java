@@ -91,6 +91,13 @@ public class DLFileEntryMetadataLocalServiceWrapper
 	}
 
 	@Override
+	public void deleteFileEntryMetadata(
+		com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fileEntryMetadata)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_dlFileEntryMetadataLocalService.deleteFileEntryMetadata(fileEntryMetadata);
+	}
+
+	@Override
 	public void deleteFileVersionFileEntryMetadata(long fileVersionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileEntryMetadataLocalService.deleteFileVersionFileEntryMetadata(fileVersionId);
@@ -198,6 +205,20 @@ public class DLFileEntryMetadataLocalServiceWrapper
 		return _dlFileEntryMetadataLocalService.fetchDLFileEntryMetadata(fileEntryMetadataId);
 	}
 
+	/**
+	* Returns the document library file entry metadata with the matching UUID and company.
+	*
+	* @param uuid the document library file entry metadata's UUID
+	* @param companyId the primary key of the company
+	* @return the matching document library file entry metadata, or <code>null</code> if a matching document library file entry metadata could not be found
+	*/
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fetchDLFileEntryMetadataByUuidAndCompanyId(
+		java.lang.String uuid, long companyId) {
+		return _dlFileEntryMetadataLocalService.fetchDLFileEntryMetadataByUuidAndCompanyId(uuid,
+			companyId);
+	}
+
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fetchFileEntryMetadata(
 		long ddmStructureId, long fileVersionId) {
@@ -217,16 +238,6 @@ public class DLFileEntryMetadataLocalServiceWrapper
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _dlFileEntryMetadataLocalService.getBeanIdentifier();
-	}
-
-	/**
 	* Returns the document library file entry metadata with the primary key.
 	*
 	* @param fileEntryMetadataId the primary key of the document library file entry metadata
@@ -238,6 +249,22 @@ public class DLFileEntryMetadataLocalServiceWrapper
 		long fileEntryMetadataId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntryMetadataLocalService.getDLFileEntryMetadata(fileEntryMetadataId);
+	}
+
+	/**
+	* Returns the document library file entry metadata with the matching UUID and company.
+	*
+	* @param uuid the document library file entry metadata's UUID
+	* @param companyId the primary key of the company
+	* @return the matching document library file entry metadata
+	* @throws PortalException if a matching document library file entry metadata could not be found
+	*/
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata getDLFileEntryMetadataByUuidAndCompanyId(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlFileEntryMetadataLocalService.getDLFileEntryMetadataByUuidAndCompanyId(uuid,
+			companyId);
 	}
 
 	/**
@@ -306,6 +333,11 @@ public class DLFileEntryMetadataLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFileEntryMetadataLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata> getMismatchedCompanyIdFileEntryMetadatas() {
 		return _dlFileEntryMetadataLocalService.getMismatchedCompanyIdFileEntryMetadatas();
 	}
@@ -315,21 +347,21 @@ public class DLFileEntryMetadataLocalServiceWrapper
 		return _dlFileEntryMetadataLocalService.getNoStructuresFileEntryMetadatas();
 	}
 
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _dlFileEntryMetadataLocalService.getOSGiServiceIdentifier();
+	}
+
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntryMetadataLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_dlFileEntryMetadataLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -346,24 +378,24 @@ public class DLFileEntryMetadataLocalServiceWrapper
 
 	@Override
 	public void updateFileEntryMetadata(long companyId,
-		java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> ddmStructures,
-		long fileEntryTypeId, long fileEntryId, long fileVersionId,
-		java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.Fields> fieldsMap,
+		java.util.List<com.liferay.portlet.dynamicdatamapping.DDMStructure> ddmStructures,
+		long fileEntryId, long fileVersionId,
+		java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.DDMFormValues> ddmFormValuesMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileEntryMetadataLocalService.updateFileEntryMetadata(companyId,
-			ddmStructures, fileEntryTypeId, fileEntryId, fileVersionId,
-			fieldsMap, serviceContext);
+			ddmStructures, fileEntryId, fileVersionId, ddmFormValuesMap,
+			serviceContext);
 	}
 
 	@Override
 	public void updateFileEntryMetadata(long fileEntryTypeId, long fileEntryId,
 		long fileVersionId,
-		java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.Fields> fieldsMap,
+		java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.DDMFormValues> ddmFormValuesMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileEntryMetadataLocalService.updateFileEntryMetadata(fileEntryTypeId,
-			fileEntryId, fileVersionId, fieldsMap, serviceContext);
+			fileEntryId, fileVersionId, ddmFormValuesMap, serviceContext);
 	}
 
 	/**

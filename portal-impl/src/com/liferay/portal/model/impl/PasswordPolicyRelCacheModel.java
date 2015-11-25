@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
@@ -37,6 +38,33 @@ import java.io.ObjectOutput;
 public class PasswordPolicyRelCacheModel implements CacheModel<PasswordPolicyRel>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof PasswordPolicyRelCacheModel)) {
+			return false;
+		}
+
+		PasswordPolicyRelCacheModel passwordPolicyRelCacheModel = (PasswordPolicyRelCacheModel)obj;
+
+		if ((passwordPolicyRelId == passwordPolicyRelCacheModel.passwordPolicyRelId) &&
+				(mvccVersion == passwordPolicyRelCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, passwordPolicyRelId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -48,12 +76,14 @@ public class PasswordPolicyRelCacheModel implements CacheModel<PasswordPolicyRel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(11);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", passwordPolicyRelId=");
 		sb.append(passwordPolicyRelId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 		sb.append(", passwordPolicyId=");
 		sb.append(passwordPolicyId);
 		sb.append(", classNameId=");
@@ -71,6 +101,7 @@ public class PasswordPolicyRelCacheModel implements CacheModel<PasswordPolicyRel
 
 		passwordPolicyRelImpl.setMvccVersion(mvccVersion);
 		passwordPolicyRelImpl.setPasswordPolicyRelId(passwordPolicyRelId);
+		passwordPolicyRelImpl.setCompanyId(companyId);
 		passwordPolicyRelImpl.setPasswordPolicyId(passwordPolicyId);
 		passwordPolicyRelImpl.setClassNameId(classNameId);
 		passwordPolicyRelImpl.setClassPK(classPK);
@@ -84,6 +115,7 @@ public class PasswordPolicyRelCacheModel implements CacheModel<PasswordPolicyRel
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 		passwordPolicyRelId = objectInput.readLong();
+		companyId = objectInput.readLong();
 		passwordPolicyId = objectInput.readLong();
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
@@ -94,6 +126,7 @@ public class PasswordPolicyRelCacheModel implements CacheModel<PasswordPolicyRel
 		throws IOException {
 		objectOutput.writeLong(mvccVersion);
 		objectOutput.writeLong(passwordPolicyRelId);
+		objectOutput.writeLong(companyId);
 		objectOutput.writeLong(passwordPolicyId);
 		objectOutput.writeLong(classNameId);
 		objectOutput.writeLong(classPK);
@@ -101,6 +134,7 @@ public class PasswordPolicyRelCacheModel implements CacheModel<PasswordPolicyRel
 
 	public long mvccVersion;
 	public long passwordPolicyRelId;
+	public long companyId;
 	public long passwordPolicyId;
 	public long classNameId;
 	public long classPK;

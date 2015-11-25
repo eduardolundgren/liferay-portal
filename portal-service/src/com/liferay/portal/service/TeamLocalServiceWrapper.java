@@ -42,11 +42,25 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 		return _teamLocalService.addTeam(team);
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #addTeam(long, long, String,
+	String, ServiceContext)}
+	*/
+	@Deprecated
 	@Override
 	public com.liferay.portal.model.Team addTeam(long userId, long groupId,
 		java.lang.String name, java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _teamLocalService.addTeam(userId, groupId, name, description);
+	}
+
+	@Override
+	public com.liferay.portal.model.Team addTeam(long userId, long groupId,
+		java.lang.String name, java.lang.String description,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _teamLocalService.addTeam(userId, groupId, name, description,
+			serviceContext);
 	}
 
 	@Override
@@ -284,8 +298,27 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.model.Team fetchTeam(long groupId,
+		java.lang.String name) {
+		return _teamLocalService.fetchTeam(groupId, name);
+	}
+
+	@Override
 	public com.liferay.portal.model.Team fetchTeam(long teamId) {
 		return _teamLocalService.fetchTeam(teamId);
+	}
+
+	/**
+	* Returns the team matching the UUID and group.
+	*
+	* @param uuid the team's UUID
+	* @param groupId the primary key of the group
+	* @return the matching team, or <code>null</code> if a matching team could not be found
+	*/
+	@Override
+	public com.liferay.portal.model.Team fetchTeamByUuidAndGroupId(
+		java.lang.String uuid, long groupId) {
+		return _teamLocalService.fetchTeamByUuidAndGroupId(uuid, groupId);
 	}
 
 	@Override
@@ -293,20 +326,31 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 		return _teamLocalService.getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _teamLocalService.getBeanIdentifier();
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
+		return _teamLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Team> getGroupTeams(
 		long groupId) {
 		return _teamLocalService.getGroupTeams(groupId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _teamLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _teamLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -337,6 +381,21 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 	}
 
 	/**
+	* Returns the team matching the UUID and group.
+	*
+	* @param uuid the team's UUID
+	* @param groupId the primary key of the group
+	* @return the matching team
+	* @throws PortalException if a matching team could not be found
+	*/
+	@Override
+	public com.liferay.portal.model.Team getTeamByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _teamLocalService.getTeamByUuidAndGroupId(uuid, groupId);
+	}
+
+	/**
 	* Returns a range of all the teams.
 	*
 	* <p>
@@ -351,6 +410,37 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 	public java.util.List<com.liferay.portal.model.Team> getTeams(int start,
 		int end) {
 		return _teamLocalService.getTeams(start, end);
+	}
+
+	/**
+	* Returns all the teams matching the UUID and company.
+	*
+	* @param uuid the UUID of the teams
+	* @param companyId the primary key of the company
+	* @return the matching teams, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.model.Team> getTeamsByUuidAndCompanyId(
+		java.lang.String uuid, long companyId) {
+		return _teamLocalService.getTeamsByUuidAndCompanyId(uuid, companyId);
+	}
+
+	/**
+	* Returns a range of teams matching the UUID and company.
+	*
+	* @param uuid the UUID of the teams
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of teams
+	* @param end the upper bound of the range of teams (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching teams, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.model.Team> getTeamsByUuidAndCompanyId(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Team> orderByComparator) {
+		return _teamLocalService.getTeamsByUuidAndCompanyId(uuid, companyId,
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -397,6 +487,12 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 	@Override
 	public int getUserGroupTeamsCount(long userGroupId) {
 		return _teamLocalService.getUserGroupTeamsCount(userGroupId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Team> getUserOrUserGroupTeams(
+		long groupId, long userId) {
+		return _teamLocalService.getUserOrUserGroupTeams(groupId, userId);
 	}
 
 	/**
@@ -476,16 +572,6 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 		java.lang.String description,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params) {
 		return _teamLocalService.searchCount(groupId, name, description, params);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_teamLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	@Override

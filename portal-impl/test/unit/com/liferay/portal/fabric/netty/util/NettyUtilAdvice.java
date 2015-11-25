@@ -42,7 +42,8 @@ public class NettyUtilAdvice {
 			"util.NettyUtil.scheduleCancellation(io.netty.channel." +
 				"Channel, com.liferay.portal.kernel.concurrent." +
 					"NoticeableFuture, long)) && args(channel, " +
-						"noticeableFuture, timeout)")
+						"noticeableFuture, timeout)"
+	)
 	public <T> void scheduleCancellation(
 		Channel channel, final NoticeableFuture<T> noticeableFuture,
 		long timeout) {
@@ -53,17 +54,16 @@ public class NettyUtilAdvice {
 			return;
 		}
 
-		final Future<?> cancellationFuture =
-			_scheduledExecutorService.schedule(
-				new Runnable() {
+		final Future<?> cancellationFuture = _scheduledExecutorService.schedule(
+			new Runnable() {
 
-					@Override
-					public void run() {
-						noticeableFuture.cancel(true);
-					}
+				@Override
+				public void run() {
+					noticeableFuture.cancel(true);
+				}
 
-				},
-				timeout, TimeUnit.MILLISECONDS);
+			},
+			timeout, TimeUnit.MILLISECONDS);
 
 		noticeableFuture.addFutureListener(
 			new FutureListener<T>() {

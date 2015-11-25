@@ -133,7 +133,7 @@ if (Validator.isNotNull(languageId)) {
 				<c:if test="<%= diffVersionsCount >= 5 %>">
 					<div class="search-panels">
 						<div class="search-panels-bar">
-							<aui:input cssClass="col-md-12 search-panels-input search-query" label="" name="searchPanel" type="text" />
+							<aui:input cssClass="col-md-12 search-panels-input search-query" label="" name="searchPanel" type="text" wrapperCssClass="row" />
 
 							<i class="search-panel-icon"></i>
 						</div>
@@ -181,7 +181,9 @@ if (Validator.isNotNull(languageId)) {
 							</span>
 
 							<div class="pull-left version-avatar">
-								<img alt="<%= HtmlUtil.escapeAttribute(userDisplay.getFullName()) %>" class="avatar img-circle" src="<%= HtmlUtil.escape(userDisplay.getPortraitURL(themeDisplay)) %>" />
+								<liferay-ui:user-portrait
+									userId="<%= userDisplay.getUserId() %>"
+								/>
 							</div>
 
 							<div class="version-info">
@@ -205,12 +207,9 @@ if (Validator.isNotNull(languageId)) {
 				</div>
 
 				<div class="diff-container">
-
-					<%
-					request.setAttribute(WebKeys.DIFF_HTML_RESULTS, diffHtmlResults);
-					%>
-
-					<liferay-util:include page="/html/taglib/ui/diff_version_comparator/diff_html.jsp" />
+					<liferay-ui:diff-html
+						diffHtmlResults="<%= diffHtmlResults %>"
+					/>
 				</div>
 
 				<div class="legend-info">

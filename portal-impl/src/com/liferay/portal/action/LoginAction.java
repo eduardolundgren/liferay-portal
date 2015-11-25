@@ -15,6 +15,7 @@
 package com.liferay.portal.action;
 
 import com.liferay.portal.kernel.portlet.WindowStateFactory;
+import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManagerUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -22,14 +23,13 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.sso.SSOUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletURLFactoryUtil;
-import com.liferay.portlet.login.util.LoginUtil;
 
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
@@ -89,7 +89,7 @@ public class LoginAction extends Action {
 		String authType = ParamUtil.getString(request, "authType");
 
 		if (Validator.isNotNull(login) && Validator.isNotNull(password)) {
-			LoginUtil.login(
+			AuthenticatedSessionManagerUtil.login(
 				request, response, login, password, rememberMe, authType);
 		}
 
@@ -136,7 +136,7 @@ public class LoginAction extends Action {
 				PortletRequest.RENDER_PHASE);
 
 			portletURL.setParameter("saveLastPath", Boolean.FALSE.toString());
-			portletURL.setParameter("struts_action", "/login/login");
+			portletURL.setParameter("mvcRenderCommandName", "/login/login");
 			portletURL.setPortletMode(PortletMode.VIEW);
 			portletURL.setWindowState(getWindowState(request));
 

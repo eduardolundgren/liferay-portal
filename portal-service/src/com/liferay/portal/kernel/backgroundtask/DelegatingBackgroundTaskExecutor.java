@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.backgroundtask;
 
-import com.liferay.portal.model.BackgroundTask;
-
 /**
  * @author Michael C. Han
  */
@@ -26,6 +24,14 @@ public class DelegatingBackgroundTaskExecutor
 		BackgroundTaskExecutor backgroundTaskExecutor) {
 
 		_backgroundTaskExecutor = backgroundTaskExecutor;
+	}
+
+	@Override
+	public BackgroundTaskExecutor clone() {
+		BackgroundTaskExecutor backgroundTaskExecutor =
+			new DelegatingBackgroundTaskExecutor(getBackgroundTaskExecutor());
+
+		return backgroundTaskExecutor;
 	}
 
 	@Override
@@ -41,6 +47,11 @@ public class DelegatingBackgroundTaskExecutor
 
 		return _backgroundTaskExecutor.
 			getBackgroundTaskStatusMessageTranslator();
+	}
+
+	@Override
+	public int getIsolationLevel() {
+		return _backgroundTaskExecutor.getIsolationLevel();
 	}
 
 	@Override

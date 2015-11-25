@@ -16,6 +16,7 @@ package com.liferay.portlet.messageboards.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MBDiscussionCacheModel)) {
+			return false;
+		}
+
+		MBDiscussionCacheModel mbDiscussionCacheModel = (MBDiscussionCacheModel)obj;
+
+		if (discussionId == mbDiscussionCacheModel.discussionId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, discussionId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -65,6 +90,8 @@ public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
 		sb.append(classPK);
 		sb.append(", threadId=");
 		sb.append(threadId);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -111,6 +138,13 @@ public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
 		mbDiscussionImpl.setClassPK(classPK);
 		mbDiscussionImpl.setThreadId(threadId);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			mbDiscussionImpl.setLastPublishDate(null);
+		}
+		else {
+			mbDiscussionImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		mbDiscussionImpl.resetOriginalValues();
 
 		return mbDiscussionImpl;
@@ -129,6 +163,7 @@ public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
 		threadId = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -158,6 +193,7 @@ public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
 		objectOutput.writeLong(classNameId);
 		objectOutput.writeLong(classPK);
 		objectOutput.writeLong(threadId);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public String uuid;
@@ -171,4 +207,5 @@ public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
 	public long classNameId;
 	public long classPK;
 	public long threadId;
+	public long lastPublishDate;
 }

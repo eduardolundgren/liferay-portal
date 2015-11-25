@@ -36,23 +36,19 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param webId the company's web domain
 	* @param virtualHost the company's virtual host name
 	* @param mx the company's mail domain
-	* @param shardName the company's shard
 	* @param system whether the company is the very first company (i.e., the
 	* @param maxUsers the max number of company users (optionally
 	<code>0</code>)
 	* @param active whether the company is active
 	* @return the company
-	* @throws PortalException if the web domain, virtual host name, or mail
-	domain was invalid or if the user was not a universal
-	administrator
 	*/
 	@Override
 	public com.liferay.portal.model.Company addCompany(java.lang.String webId,
-		java.lang.String virtualHost, java.lang.String mx,
-		java.lang.String shardName, boolean system, int maxUsers, boolean active)
+		java.lang.String virtualHost, java.lang.String mx, boolean system,
+		int maxUsers, boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _companyService.addCompany(webId, virtualHost, mx, shardName,
-			system, maxUsers, active);
+		return _companyService.addCompany(webId, virtualHost, mx, system,
+			maxUsers, active);
 	}
 
 	@Override
@@ -65,9 +61,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* Deletes the company's logo.
 	*
 	* @param companyId the primary key of the company
-	* @throws PortalException if the company with the primary key could not be
-	found or if the company's logo could not be found or if the user
-	was not an administrator
 	*/
 	@Override
 	public void deleteLogo(long companyId)
@@ -76,22 +69,10 @@ public class CompanyServiceWrapper implements CompanyService,
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _companyService.getBeanIdentifier();
-	}
-
-	/**
 	* Returns the company with the primary key.
 	*
 	* @param companyId the primary key of the company
 	* @return Returns the company with the primary key
-	* @throws PortalException if a company with the primary key could not be
-	found
 	*/
 	@Override
 	public com.liferay.portal.model.Company getCompanyById(long companyId)
@@ -104,7 +85,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	*
 	* @param logoId the ID of the company's logo
 	* @return Returns the company with the logo
-	* @throws PortalException if the company with the logo could not be found
 	*/
 	@Override
 	public com.liferay.portal.model.Company getCompanyByLogoId(long logoId)
@@ -117,8 +97,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	*
 	* @param mx the company's mail domain
 	* @return Returns the company with the mail domain
-	* @throws PortalException if the company with the mail domain could not be
-	found
 	*/
 	@Override
 	public com.liferay.portal.model.Company getCompanyByMx(java.lang.String mx)
@@ -131,9 +109,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	*
 	* @param virtualHost the company's virtual host name
 	* @return Returns the company with the virtual host name
-	* @throws PortalException if the company with the virtual host name could
-	not be found or if the virtual host was not associated with a
-	company
 	*/
 	@Override
 	public com.liferay.portal.model.Company getCompanyByVirtualHost(
@@ -147,14 +122,22 @@ public class CompanyServiceWrapper implements CompanyService,
 	*
 	* @param webId the company's web domain
 	* @return Returns the company with the web domain
-	* @throws PortalException if the company with the web domain could not be
-	found
 	*/
 	@Override
 	public com.liferay.portal.model.Company getCompanyByWebId(
 		java.lang.String webId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _companyService.getCompanyByWebId(webId);
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _companyService.getOSGiServiceIdentifier();
 	}
 
 	/**
@@ -166,22 +149,11 @@ public class CompanyServiceWrapper implements CompanyService,
 	*
 	* @param companyId the primary key of the company
 	* @param keys the company's preferences keys to be remove
-	* @throws PortalException if the user was not an administrator
 	*/
 	@Override
 	public void removePreferences(long companyId, java.lang.String[] keys)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_companyService.removePreferences(companyId, keys);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_companyService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -209,9 +181,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param type the company's account type (optionally <code>null</code>)
 	* @param size the company's account size (optionally <code>null</code>)
 	* @return the the company with the primary key
-	* @throws PortalException if a company with the primary key could not be
-	found or if the new information was invalid or if the user was
-	not an administrator
 	*/
 	@Override
 	public com.liferay.portal.model.Company updateCompany(long companyId,
@@ -259,9 +228,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param websites the company's websites
 	* @param properties the company's properties
 	* @return the company with the primary key
-	* @throws PortalException the company with the primary key could not be
-	found or if the new information was invalid or if the user was
-	not an administrator
 	*/
 	@Override
 	public com.liferay.portal.model.Company updateCompany(long companyId,
@@ -311,9 +277,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param size the company's account size (optionally
 	<code>null</code>)
 	* @return the the company with the primary key
-	* @throws PortalException if a company with the primary key could not
-	be found or if the new information was invalid or if the user
-	was not an administrator
 	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
 	String, String, boolean, byte[], String, String, String,
 	String, String, String, String, String, String)}
@@ -366,14 +329,10 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param websites the company's websites
 	* @param properties the company's properties
 	* @return the company with the primary key
-	* @throws PortalException the company with the primary key could not be
-	found or if the new information was invalid or if the user
-	was not an administrator
 	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
 	String, String, boolean, byte[], String, String, String,
 	String, String, String, String, String, String, String,
-	String, java.util.List, java.util.List, java.util.List,
-	java.util.List, UnicodeProperties)}
+	String, List, List, List, List, UnicodeProperties)}
 	*/
 	@Deprecated
 	@Override
@@ -407,9 +366,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	<code>0</code>)
 	* @param active whether the company is active
 	* @return the company with the primary key
-	* @throws PortalException if a company with the primary key could not be
-	found or if the new information was invalid or if the user was
-	not a universal administrator
 	*/
 	@Override
 	public com.liferay.portal.model.Company updateCompany(long companyId,
@@ -426,8 +382,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param companyId the primary key of the company
 	* @param languageId the ID of the company's default user's language
 	* @param timeZoneId the ID of the company's default user's time zone
-	* @throws PortalException if the company's default user could not be found
-	or if the user was not an administrator
 	*/
 	@Override
 	public void updateDisplay(long companyId, java.lang.String languageId,
@@ -442,9 +396,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param companyId the primary key of the company
 	* @param bytes the bytes of the company's logo image
 	* @return the company with the primary key
-	* @throws PortalException if the company's logo ID could not be found or if
-	the logo's image was corrupted or if the user was an
-	administrator
 	*/
 	@Override
 	public com.liferay.portal.model.Company updateLogo(long companyId,
@@ -459,9 +410,6 @@ public class CompanyServiceWrapper implements CompanyService,
 	* @param companyId the primary key of the company
 	* @param inputStream the input stream of the company's logo image
 	* @return the company with the primary key
-	* @throws PortalException if the company's logo ID could not be found or if
-	the logo's image was corrupted or if the user was an
-	administrator
 	*/
 	@Override
 	public com.liferay.portal.model.Company updateLogo(long companyId,
@@ -475,9 +423,7 @@ public class CompanyServiceWrapper implements CompanyService,
 	* found in portal.properties.
 	*
 	* @param companyId the primary key of the company
-	* @param properties the company's properties. See {@link
-	com.liferay.portal.kernel.util.UnicodeProperties}
-	* @throws PortalException if the user was not an administrator
+	* @param properties the company's properties. See {@link UnicodeProperties}
 	*/
 	@Override
 	public void updatePreferences(long companyId,
@@ -497,13 +443,12 @@ public class CompanyServiceWrapper implements CompanyService,
 	their passwords
 	* @param strangers whether to allow strangers to create accounts to
 	register themselves in the company
-	* @param strangersWithMx whether to allow strangers to create accounts
-	with email addresses that match the company mail suffix
+	* @param strangersWithMx whether to allow strangers to create accounts with
+	email addresses that match the company mail suffix
 	* @param strangersVerify whether to require strangers who create accounts
 	to be verified via email
 	* @param siteLogo whether to to allow site administrators to use their own
 	logo instead of the enterprise logo
-	* @throws PortalException if the user was not an administrator
 	*/
 	@Override
 	public void updateSecurity(long companyId, java.lang.String authType,

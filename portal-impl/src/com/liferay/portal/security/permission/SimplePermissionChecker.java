@@ -25,6 +25,11 @@ public class SimplePermissionChecker extends BasePermissionChecker {
 	}
 
 	@Override
+	public UserBag getUserBag() {
+		return null;
+	}
+
+	@Override
 	public boolean hasOwnerPermission(
 		long companyId, String name, String primKey, long ownerId,
 		String actionId) {

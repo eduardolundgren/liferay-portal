@@ -32,7 +32,7 @@ public class OrgLaborServiceWrapper implements OrgLaborService,
 
 	@Override
 	public com.liferay.portal.model.OrgLabor addOrgLabor(long organizationId,
-		int typeId, int sunOpen, int sunClose, int monOpen, int monClose,
+		long typeId, int sunOpen, int sunClose, int monOpen, int monClose,
 		int tueOpen, int tueClose, int wedOpen, int wedClose, int thuOpen,
 		int thuClose, int friOpen, int friClose, int satOpen, int satClose)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -48,13 +48,13 @@ public class OrgLaborServiceWrapper implements OrgLaborService,
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _orgLaborService.getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _orgLaborService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -70,19 +70,9 @@ public class OrgLaborServiceWrapper implements OrgLaborService,
 		return _orgLaborService.getOrgLabors(organizationId);
 	}
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_orgLaborService.setBeanIdentifier(beanIdentifier);
-	}
-
 	@Override
 	public com.liferay.portal.model.OrgLabor updateOrgLabor(long orgLaborId,
-		int typeId, int sunOpen, int sunClose, int monOpen, int monClose,
+		long typeId, int sunOpen, int sunClose, int monOpen, int monClose,
 		int tueOpen, int tueClose, int wedOpen, int wedClose, int thuOpen,
 		int thuClose, int friOpen, int friClose, int satOpen, int satClose)
 		throws com.liferay.portal.kernel.exception.PortalException {

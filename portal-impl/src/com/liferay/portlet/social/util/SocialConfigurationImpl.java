@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.DocumentType;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.util.JavaFieldsParser;
 import com.liferay.portlet.social.model.SocialAchievement;
 import com.liferay.portlet.social.model.SocialActivityCounterConstants;
@@ -67,7 +67,7 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 	public List<String> getActivityCounterNames(
 		int ownerType, boolean transientCounter) {
 
-		Set<String> activityCounterNames = new LinkedHashSet<String>();
+		Set<String> activityCounterNames = new LinkedHashSet<>();
 
 		for (Map<Integer, SocialActivityDefinition> activityDefinitions :
 				_activityDefinitions.values()) {
@@ -83,7 +83,7 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 						((ownerType ==
 							SocialActivityCounterConstants.TYPE_ALL) ||
 						 (ownerType ==
-							activityCounterDefinition.getOwnerType()))) {
+							 activityCounterDefinition.getOwnerType()))) {
 
 						activityCounterNames.add(
 							activityCounterDefinition.getName());
@@ -92,7 +92,7 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 			}
 		}
 
-		return new ArrayList<String>(activityCounterNames);
+		return new ArrayList<>(activityCounterNames);
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 	public List<Object> read(ClassLoader classLoader, String[] xmls)
 		throws Exception {
 
-		List<Object> objects = new ArrayList<Object>();
+		List<Object> objects = new ArrayList<>();
 
 		for (String xml : xmls) {
 			_read(classLoader, xml, objects);
@@ -166,7 +166,7 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 
 		xml = JavaFieldsParser.parse(classLoader, xml);
 
-		Document document = SAXReaderUtil.read(xml);
+		Document document = UnsecureSAXReaderUtil.read(xml);
 
 		DocumentType documentType = document.getDocumentType();
 
@@ -293,8 +293,7 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 			_activityDefinitions.get(modelName);
 
 		if (activityDefinitions == null) {
-			activityDefinitions =
-				new HashMap<Integer, SocialActivityDefinition>();
+			activityDefinitions = new HashMap<>();
 
 			_activityDefinitions.put(modelName, activityDefinitions);
 		}
@@ -510,7 +509,6 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 		SocialConfigurationImpl.class);
 
 	private final Map<String, Map<Integer, SocialActivityDefinition>>
-		_activityDefinitions =
-			new HashMap<String, Map<Integer, SocialActivityDefinition>>();
+		_activityDefinitions = new HashMap<>();
 
 }

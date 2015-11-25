@@ -36,16 +36,15 @@ public enum Isolation {
 		return _isolations.get(value);
 	}
 
-	Isolation(int value) {
-		_value = value;
-	}
-
 	public int value() {
 		return _value;
 	}
 
-	private static final Map<Integer, Isolation> _isolations =
-		new HashMap<Integer, Isolation>();
+	private Isolation(int value) {
+		_value = value;
+	}
+
+	private static final Map<Integer, Isolation> _isolations = new HashMap<>();
 
 	static {
 		for (Isolation isolation : EnumSet.allOf(Isolation.class)) {

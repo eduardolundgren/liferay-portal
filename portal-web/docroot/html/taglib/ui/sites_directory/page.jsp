@@ -105,33 +105,23 @@
 										className="com.liferay.portal.model.Group"
 										modelVar="childGroup"
 									>
-
-										<%
-										LayoutSet layoutSet = null;
-
-										if (childGroup.hasPublicLayouts()) {
-											layoutSet = childGroup.getPublicLayoutSet();
-										}
-										else {
-											layoutSet = childGroup.getPrivateLayoutSet();
-										}
-										%>
-
-										<liferay-ui:app-view-entry
-											assetCategoryClassName="<%= Group.class.getName() %>"
-											assetCategoryClassPK="<%= childGroup.getGroupId() %>"
-											assetTagClassName="<%= Group.class.getName() %>"
-											assetTagClassPK="<%= childGroup.getGroupId() %>"
-											description="<%= HtmlUtil.escape(childGroup.getDescription()) %>"
-											displayStyle="<%= displayStyle %>"
-											showCheckbox="<%= false %>"
-											thumbnailSrc='<%= themeDisplay.getPathImage() + "/layout_set_logo?img_id=" + layoutSet.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(layoutSet.getLogoId()) %>'
-											title="<%= HtmlUtil.escape(childGroup.getDescriptiveName(locale)) %>"
-											url="<%= (childGroup.getGroupId() != scopeGroupId) ? childGroup.getDisplayURL(themeDisplay) : null %>"
-										/>
+										<liferay-ui:search-container-column-text>
+											<liferay-ui:app-view-entry
+												assetCategoryClassName="<%= Group.class.getName() %>"
+												assetCategoryClassPK="<%= childGroup.getGroupId() %>"
+												assetTagClassName="<%= Group.class.getName() %>"
+												assetTagClassPK="<%= childGroup.getGroupId() %>"
+												description="<%= HtmlUtil.escape(childGroup.getDescription(locale)) %>"
+												displayStyle="<%= displayStyle %>"
+												showCheckbox="<%= false %>"
+												thumbnailSrc="<%= childGroup.getLogoURL(themeDisplay, true) %>"
+												title="<%= childGroup.getDescriptiveName(locale) %>"
+												url="<%= (childGroup.getGroupId() != scopeGroupId) ? childGroup.getDisplayURL(themeDisplay) : null %>"
+											/>
+										</liferay-ui:search-container-column-text>
 									</liferay-ui:search-container-row>
 
-									<liferay-ui:search-paginator searchContainer="<%= searchContainer %>" />
+									<liferay-ui:search-iterator />
 								</liferay-ui:search-container>
 							</c:otherwise>
 						</c:choose>
@@ -228,7 +218,7 @@ private void _buildSitesList(Group rootGroup, Group curGroup, List<Group> branch
 
 		if (childGroup.getGroupId() != themeDisplay.getScopeGroupId()) {
 			sb.append("href=\"");
-			sb.append(HtmlUtil.escapeHREF(childGroup.getDisplayURL(themeDisplay, childGroup.hasPublicLayouts())));
+			sb.append(HtmlUtil.escapeHREF(childGroup.getDisplayURL(themeDisplay, !childGroup.hasPublicLayouts())));
 			sb.append("\"");
 		}
 

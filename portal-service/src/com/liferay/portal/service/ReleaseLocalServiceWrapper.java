@@ -48,6 +48,12 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService,
 		return _releaseLocalService.addRelease(servletContextName, buildNumber);
 	}
 
+	@Override
+	public com.liferay.portal.model.Release addRelease(
+		java.lang.String servletContextName, java.lang.String schemaVersion) {
+		return _releaseLocalService.addRelease(servletContextName, schemaVersion);
+	}
+
 	/**
 	* Creates a new release with the primary key. Does not add the release to the database.
 	*
@@ -199,20 +205,25 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService,
 		return _releaseLocalService.getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _releaseLocalService.getBeanIdentifier();
-	}
-
 	@Override
 	public int getBuildNumberOrCreate()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _releaseLocalService.getBuildNumberOrCreate();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _releaseLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _releaseLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -263,16 +274,6 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService,
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_releaseLocalService.setBeanIdentifier(beanIdentifier);
-	}
-
-	/**
 	* Updates the release in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param release the release
@@ -290,6 +291,13 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _releaseLocalService.updateRelease(releaseId, buildNumber,
 			buildDate, verified);
+	}
+
+	@Override
+	public void updateRelease(java.lang.String servletContextName,
+		java.lang.String schemaVersion, java.lang.String previousSchemaVersion) {
+		_releaseLocalService.updateRelease(servletContextName, schemaVersion,
+			previousSchemaVersion);
 	}
 
 	@Override

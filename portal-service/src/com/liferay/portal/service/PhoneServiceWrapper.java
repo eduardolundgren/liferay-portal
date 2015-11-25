@@ -38,7 +38,7 @@ public class PhoneServiceWrapper implements PhoneService,
 	@Override
 	public com.liferay.portal.model.Phone addPhone(java.lang.String className,
 		long classPK, java.lang.String number, java.lang.String extension,
-		int typeId, boolean primary)
+		long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _phoneService.addPhone(className, classPK, number, extension,
 			typeId, primary);
@@ -47,7 +47,7 @@ public class PhoneServiceWrapper implements PhoneService,
 	@Override
 	public com.liferay.portal.model.Phone addPhone(java.lang.String className,
 		long classPK, java.lang.String number, java.lang.String extension,
-		int typeId, boolean primary,
+		long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _phoneService.addPhone(className, classPK, number, extension,
@@ -61,13 +61,13 @@ public class PhoneServiceWrapper implements PhoneService,
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _phoneService.getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _phoneService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -83,19 +83,9 @@ public class PhoneServiceWrapper implements PhoneService,
 		return _phoneService.getPhones(className, classPK);
 	}
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_phoneService.setBeanIdentifier(beanIdentifier);
-	}
-
 	@Override
 	public com.liferay.portal.model.Phone updatePhone(long phoneId,
-		java.lang.String number, java.lang.String extension, int typeId,
+		java.lang.String number, java.lang.String extension, long typeId,
 		boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _phoneService.updatePhone(phoneId, number, extension, typeId,

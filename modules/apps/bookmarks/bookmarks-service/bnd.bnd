@@ -4,7 +4,6 @@ Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.bookmarks.asset,\
 	com.liferay.bookmarks.customattributes,\
-	com.liferay.bookmarks.indexer,\
 	com.liferay.bookmarks.lar,\
 	com.liferay.bookmarks.notifications,\
 	com.liferay.bookmarks.opensearch,\
@@ -12,15 +11,10 @@ Export-Package:\
 	com.liferay.bookmarks.search,\
 	com.liferay.bookmarks.service.configuration.configurator,\
 	com.liferay.bookmarks.service.permission,\
-	com.liferay.bookmarks.settings,\
 	com.liferay.bookmarks.social,\
 	com.liferay.bookmarks.trash,\
-	com.liferay.bookmarks.util
-Import-Package:\
-	!aQute.bnd.ant,\
-	!aQute.bnd.differ,\
-	!org.incava.util.diff,\
-	*
+	com.liferay.bookmarks.util,\
+	com.liferay.bookmarks.verify
 Include-Resource:\
 	classes,\
 	custom-sql/default.xml=classes/META-INF/custom-sql/default.xml,\
@@ -29,5 +23,7 @@ Include-Resource:\
 Liferay-Service: true
 Require-Capability:\
 	liferay.extender;\
-	filter:="(&(liferay.extender=spring.extender)(version=1.0))"
-Spring-Context: META-INF/*-spring.xml
+	filter:="(&(liferay.extender=spring.extender)(version>=1.0)(!(version>=2.0)))"
+Require-SchemaVersion: 1.0.0
+Spring-Context: META-INF/spring
+-spring-dependency: com.liferay.portal.spring.extender.service.ServiceReference

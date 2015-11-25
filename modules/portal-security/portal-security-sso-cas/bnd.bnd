@@ -1,0 +1,13 @@
+Bundle-Name: Liferay Portal SSO CAS
+Bundle-SymbolicName: com.liferay.portal.security.sso.cas
+Bundle-Version: 1.0.0
+Import-Package:\
+	!javax.microedition.*,\
+	!junit.*,\
+	*
+Include-Resource:\
+	classes,\
+	META-INF/resources=src/main/resources/META-INF/resources,\
+	@lib/cas-client-core.jar,\
+	@lib/opensaml.jar
+Web-ContextPath: /portal-security-sso-cas

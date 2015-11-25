@@ -54,6 +54,7 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("flagId", getFlagId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("entryId", getEntryId());
@@ -68,6 +69,12 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 
 		if (flagId != null) {
 			setFlagId(flagId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long userId = (Long)attributes.get("userId");
@@ -107,12 +114,22 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
+	* Returns the company ID of this announcements flag.
+	*
+	* @return the company ID of this announcements flag
+	*/
+	@Override
+	public long getCompanyId() {
+		return _announcementsFlag.getCompanyId();
+	}
+
+	/**
 	* Returns the create date of this announcements flag.
 	*
 	* @return the create date of this announcements flag
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _announcementsFlag.getCreateDate();
 	}
 
@@ -217,12 +234,22 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
+	* Sets the company ID of this announcements flag.
+	*
+	* @param companyId the company ID of this announcements flag
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_announcementsFlag.setCompanyId(companyId);
+	}
+
+	/**
 	* Sets the create date of this announcements flag.
 	*
 	* @param createDate the create date of this announcements flag
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_announcementsFlag.setCreateDate(createDate);
 	}
 

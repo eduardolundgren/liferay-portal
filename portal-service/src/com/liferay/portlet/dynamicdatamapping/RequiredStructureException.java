@@ -17,24 +17,23 @@ package com.liferay.portlet.dynamicdatamapping;
 import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Rafael Praxedes
  */
 public class RequiredStructureException extends PortalException {
 
-	public static final int REFERENCED_STRUCTURE = 1;
-
-	public static final int REFERENCED_STRUCTURE_LINK = 2;
-
-	public static final int REFERENCED_TEMPLATE = 3;
-
-	public RequiredStructureException(int type) {
-		_type = type;
+	public RequiredStructureException() {
 	}
 
-	public int getType() {
-		return _type;
+	public RequiredStructureException(String msg) {
+		super(msg);
 	}
 
-	private final int _type;
+	public RequiredStructureException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+
+	public RequiredStructureException(Throwable cause) {
+		super(cause);
+	}
 
 }

@@ -20,10 +20,10 @@ import com.liferay.portal.kernel.portlet.WindowStateFactory;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletURLImpl;
 
 import java.util.Map;
@@ -135,8 +135,7 @@ public class PortletURLAction extends Action {
 				request, "portletResource");
 			String previewWidth = ParamUtil.getString(request, "previewWidth");
 
-			portletURL.setParameter(
-				"struts_action", "/portlet_configuration/edit_configuration");
+			portletURL.setParameter("mvcPath", "/edit_configuration.jsp");
 			portletURL.setParameter("returnToFullPageURL", returnToFullPageURL);
 			portletURL.setParameter("portletResource", portletResource);
 			portletURL.setParameter("previewWidth", previewWidth);

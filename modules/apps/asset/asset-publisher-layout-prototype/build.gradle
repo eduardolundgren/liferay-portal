@@ -1,0 +1,10 @@
+dependencies {
+	compile project(":apps:asset:asset-categories-navigation-web")
+	compile project(":apps:asset:asset-publisher-web")
+	compile project(":apps:asset:asset-tags-navigation-web")
+	compile project(":apps:search:search-web")
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/modules")
+}

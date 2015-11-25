@@ -53,6 +53,7 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("passwordPolicyRelId", getPasswordPolicyRelId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("passwordPolicyId", getPasswordPolicyId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
@@ -72,6 +73,12 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 
 		if (passwordPolicyRelId != null) {
 			setPasswordPolicyRelId(passwordPolicyRelId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long passwordPolicyId = (Long)attributes.get("passwordPolicyId");
@@ -132,6 +139,16 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	@Override
 	public long getClassPK() {
 		return _passwordPolicyRel.getClassPK();
+	}
+
+	/**
+	* Returns the company ID of this password policy rel.
+	*
+	* @return the company ID of this password policy rel
+	*/
+	@Override
+	public long getCompanyId() {
+		return _passwordPolicyRel.getCompanyId();
 	}
 
 	@Override
@@ -239,9 +256,18 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 		_passwordPolicyRel.setClassPK(classPK);
 	}
 
+	/**
+	* Sets the company ID of this password policy rel.
+	*
+	* @param companyId the company ID of this password policy rel
+	*/
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setCompanyId(long companyId) {
+		_passwordPolicyRel.setCompanyId(companyId);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_passwordPolicyRel.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -308,7 +334,7 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.PasswordPolicyRel> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.PasswordPolicyRel> toCacheModel() {
 		return _passwordPolicyRel.toCacheModel();
 	}
 

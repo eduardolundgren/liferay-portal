@@ -36,7 +36,7 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  */
 public class LayoutFinderImpl
-	extends BasePersistenceImpl<Layout> implements LayoutFinder {
+	extends LayoutFinderBaseImpl implements LayoutFinder {
 
 	public static final String FIND_BY_NO_PERMISSIONS =
 		LayoutFinder.class.getName() + ".findByNoPermissions";
@@ -157,8 +157,7 @@ public class LayoutFinderImpl
 			qPos.add(portletId.concat("_INSTANCE_%"));
 			qPos.add(preferences);
 
-			List<LayoutReference> layoutReferences =
-				new ArrayList<LayoutReference>();
+			List<LayoutReference> layoutReferences = new ArrayList<>();
 
 			Iterator<Object[]> itr = q.iterate();
 

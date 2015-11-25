@@ -28,10 +28,12 @@ import com.liferay.portal.kernel.process.ProcessExecutorUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.FileComparator;
 import com.liferay.portal.kernel.util.PwdGenerator;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -85,6 +87,29 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
+	public String appendParentheticalSuffix(String fileName, String suffix) {
+		String fileNameWithoutExtension = stripExtension(fileName);
+
+		String fileNameWithParentheticalSuffix =
+			StringUtil.appendParentheticalSuffix(
+				fileNameWithoutExtension, suffix);
+
+		String extension = getExtension(fileName);
+
+		if (Validator.isNull(extension)) {
+			return fileNameWithParentheticalSuffix;
+		}
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(fileNameWithParentheticalSuffix);
+		sb.append(StringPool.PERIOD);
+		sb.append(extension);
+
+		return sb.toString();
+	}
+
+	@Override
 	public void copyDirectory(File source, File destination)
 		throws IOException {
 
@@ -92,9 +117,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return;
 		}
 
-		if (!destination.exists()) {
-			destination.mkdirs();
-		}
+		mkdirs(destination);
 
 		File[] fileArray = source.listFiles();
 
@@ -244,10 +267,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
-	public File createTempFolder() {
+	public File createTempFolder() throws IOException {
 		File file = new File(createTempFileName());
 
-		file.mkdirs();
+		mkdirs(file);
 
 		return file;
 	}
@@ -337,6 +360,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	@Override
 	public String extractText(
 		InputStream is, String fileName, int maxStringLength) {
+
+		if (maxStringLength == 0) {
+			return StringPool.BLANK;
+		}
 
 		String text = null;
 
@@ -669,7 +696,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 	@Override
 	public String[] listDirs(File file) {
-		List<String> dirs = new ArrayList<String>();
+		List<String> dirs = new ArrayList<>();
 
 		File[] fileArray = file.listFiles();
 
@@ -689,7 +716,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 	@Override
 	public String[] listFiles(File file) {
-		List<String> files = new ArrayList<String>();
+		List<String> files = new ArrayList<>();
 
 		File[] fileArray = file.listFiles();
 
@@ -712,10 +739,28 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
+	public void mkdirs(File file) throws IOException {
+		FileUtils.forceMkdir(file);
+	}
+
+	@Override
 	public void mkdirs(String pathName) {
 		File file = new File(pathName);
 
-		file.mkdirs();
+		if (file.exists() && file.isDirectory()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Directory " + pathName + " already exists");
+			}
+
+			return;
+		}
+
+		try {
+			mkdirs(file);
+		}
+		catch (IOException ioe) {
+			ReflectionUtil.throwException(ioe);
+		}
 	}
 
 	@Override
@@ -789,8 +834,8 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 		Arrays.sort(files, new FileComparator());
 
-		List<File> directoryList = new ArrayList<File>();
-		List<File> fileList = new ArrayList<File>();
+		List<File> directoryList = new ArrayList<>();
+		List<File> fileList = new ArrayList<>();
 
 		for (int i = 0; i < files.length; i++) {
 			if (files[i].isDirectory()) {
@@ -823,8 +868,26 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
+	public String stripParentheticalSuffix(String fileName) {
+		StringBundler sb = new StringBundler(3);
+
+		String fileNameWithoutExtension = stripExtension(fileName);
+
+		sb.append(
+			StringUtil.stripParentheticalSuffix(fileNameWithoutExtension));
+
+		sb.append(StringPool.PERIOD);
+
+		String extension = getExtension(fileName);
+
+		sb.append(extension);
+
+		return sb.toString();
+	}
+
+	@Override
 	public List<String> toList(Reader reader) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(reader)) {
@@ -847,7 +910,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return toList(new FileReader(fileName));
 		}
 		catch (IOException ioe) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -1016,7 +1079,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		write(new File(pathName, fileName), s, lazy, append);
 	}
 
-	protected void mkdirsParentFile(File file) {
+	protected void mkdirsParentFile(File file) throws IOException {
 		File parentFile = file.getParentFile();
 
 		if (parentFile == null) {
@@ -1024,9 +1087,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		}
 
 		try {
-			if (!parentFile.exists()) {
-				parentFile.mkdirs();
-			}
+			mkdirs(parentFile);
 		}
 		catch (SecurityException se) {
 
@@ -1045,9 +1106,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		"_AMP_", "_CP_", "_OP_", "_SEM_"
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(FileImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(FileImpl.class);
 
-	private static FileImpl _instance = new FileImpl();
+	private static final FileImpl _instance = new FileImpl();
 
 	private static class ExtractTextProcessCallable
 		implements ProcessCallable<String> {
@@ -1071,7 +1132,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 		private static final long serialVersionUID = 1L;
 
-		private byte[] _data;
+		private final byte[] _data;
 
 	}
 

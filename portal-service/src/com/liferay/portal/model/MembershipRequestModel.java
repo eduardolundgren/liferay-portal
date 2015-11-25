@@ -40,7 +40,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface MembershipRequestModel extends BaseModel<MembershipRequest>,
-	MVCCModel {
+	MVCCModel, ShardedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -110,6 +110,7 @@ public interface MembershipRequestModel extends BaseModel<MembershipRequest>,
 	 *
 	 * @return the company ID of this membership request
 	 */
+	@Override
 	public long getCompanyId();
 
 	/**
@@ -117,6 +118,7 @@ public interface MembershipRequestModel extends BaseModel<MembershipRequest>,
 	 *
 	 * @param companyId the company ID of this membership request
 	 */
+	@Override
 	public void setCompanyId(long companyId);
 
 	/**
@@ -238,14 +240,14 @@ public interface MembershipRequestModel extends BaseModel<MembershipRequest>,
 	 *
 	 * @return the status ID of this membership request
 	 */
-	public int getStatusId();
+	public long getStatusId();
 
 	/**
 	 * Sets the status ID of this membership request.
 	 *
 	 * @param statusId the status ID of this membership request
 	 */
-	public void setStatusId(int statusId);
+	public void setStatusId(long statusId);
 
 	@Override
 	public boolean isNew();

@@ -1,0 +1,14 @@
+buildService {
+	apiDir = "../portal-background-task-api/src/main/java"
+	testDir = "../portal-background-task-test/src/testIntegration/java"
+}
+
+dependencies {
+	compile group: "com.liferay", name: "com.liferay.portal.spring.extender", version: "1.0.2"
+	compile group: "com.liferay.portal", name: "portal-impl", version: liferay.portalVersion
+	compile project(":portal:portal-background-task-api")
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/portal")
+}

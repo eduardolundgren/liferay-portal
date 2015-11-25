@@ -16,27 +16,30 @@ package com.liferay.portal.kernel.scheduler.config;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
+import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Shuyang Zhou
  * @author Tina Tian
  */
-public class PluginSchedulingConfigurator
-	extends AbstractSchedulingConfigurator {
+public class PluginSchedulingConfigurator {
 
-	@Override
-	public void configure() {
+	public void afterPropertiesSet() {
 		Thread currentThread = Thread.currentThread();
 
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-
-		String servletContextName =
-			PortletClassLoaderUtil.getServletContextName();
 
 		boolean forceSync = ProxyModeThreadLocal.isForceSync();
 
@@ -48,11 +51,20 @@ public class PluginSchedulingConfigurator
 
 			currentThread.setContextClassLoader(portalClassLoader);
 
-			for (SchedulerEntry schedulerEntry : schedulerEntries) {
+			for (SchedulerEntry schedulerEntry : _schedulerEntries) {
 				try {
-					SchedulerEngineHelperUtil.schedule(
-						schedulerEntry, storageType, servletContextName,
-						exceptionsMaxSize);
+					MessageListener messageListener =
+						(MessageListener)InstanceFactory.newInstance(
+							PortletClassLoaderUtil.getClassLoader(),
+							schedulerEntry.getEventListenerClass());
+
+					SchedulerEngineHelperUtil.register(
+						messageListener, schedulerEntry,
+						DestinationNames.SCHEDULER_DISPATCH);
+
+					_messageListeners.put(
+						schedulerEntry.getEventListenerClass(),
+						messageListener);
 				}
 				catch (Exception e) {
 					_log.error("Unable to schedule " + schedulerEntry, e);
@@ -67,19 +79,23 @@ public class PluginSchedulingConfigurator
 	}
 
 	public void destroy() {
-		for (SchedulerEntry schedulerEntry : schedulerEntries) {
-			try {
-				SchedulerEngineHelperUtil.delete(schedulerEntry, storageType);
-			}
-			catch (Exception e) {
-				_log.error("Unable to unschedule " + schedulerEntry, e);
-			}
+		for (MessageListener messageListener : _messageListeners.values()) {
+			SchedulerEngineHelperUtil.unregister(messageListener);
 		}
 
-		schedulerEntries.clear();
+		_messageListeners.clear();
+		_schedulerEntries.clear();
+	}
+
+	public void setSchedulerEntries(List<SchedulerEntry> schedulerEntries) {
+		_schedulerEntries = schedulerEntries;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PluginSchedulingConfigurator.class);
+
+	private final Map<String, MessageListener> _messageListeners =
+		new HashMap<>();
+	private List<SchedulerEntry> _schedulerEntries = Collections.emptyList();
 
 }

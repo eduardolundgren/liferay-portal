@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.dao.db;
 
 import java.io.IOException;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.naming.NamingException;
@@ -26,6 +27,9 @@ import javax.naming.NamingException;
  */
 public interface DBProcess {
 
+	public void runSQL(Connection connection, String template)
+		throws IOException, SQLException;
+
 	public void runSQL(String template) throws IOException, SQLException;
 
 	public void runSQL(String[] templates) throws IOException, SQLException;
@@ -34,6 +38,10 @@ public interface DBProcess {
 		throws IOException, NamingException, SQLException;
 
 	public void runSQLTemplate(String path, boolean failOnError)
+		throws IOException, NamingException, SQLException;
+
+	public void runSQLTemplateString(
+			String template, boolean evaluate, boolean failOnError)
 		throws IOException, NamingException, SQLException;
 
 }

@@ -17,8 +17,6 @@ package com.liferay.portlet;
 import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
-import com.liferay.portal.kernel.lar.PortletDataHandler;
-import com.liferay.portal.kernel.lar.StagedModelDataHandler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
@@ -34,21 +32,19 @@ import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.ResourceBundleTracker;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.servlet.URLEncoder;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -56,10 +52,8 @@ import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.kernel.xmlrpc.Method;
-import com.liferay.portal.language.LanguageResources;
-import com.liferay.portal.language.LiferayResourceBundle;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.notifications.UserNotificationHandlerImpl;
 import com.liferay.portal.security.permission.PermissionPropagator;
@@ -68,8 +62,9 @@ import com.liferay.portal.util.JavaFieldsParser;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
+import com.liferay.portlet.exportimport.lar.PortletDataHandler;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
 import com.liferay.portlet.social.model.SocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialRequestInterpreter;
 import com.liferay.portlet.social.model.impl.SocialActivityInterpreterImpl;
@@ -77,14 +72,9 @@ import com.liferay.portlet.social.model.impl.SocialRequestInterpreterImpl;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerList;
 
-import java.io.InputStream;
-
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.portlet.PreferencesValidator;
 
@@ -106,12 +96,12 @@ public class PortletBagFactory {
 		List<ConfigurationAction> configurationActionInstances =
 			newConfigurationActions(portlet);
 
-		List<Indexer> indexerInstances = newIndexers(portlet);
+		List<Indexer<?>> indexerInstances = newIndexers(portlet);
 
 		List<OpenSearch> openSearchInstances = newOpenSearches(portlet);
 
-		List<SchedulerEntry> schedulerEntryInstances =
-			newSchedulerEntryInstances(portlet);
+		List<SchedulerEventMessageListener> schedulerEventMessageListeners =
+			newSchedulerEventMessageListeners(portlet);
 
 		FriendlyURLMapperTracker friendlyURLMapperTracker =
 			newFriendlyURLMappers(portlet);
@@ -156,7 +146,7 @@ public class PortletBagFactory {
 		List<ControlPanelEntry> controlPanelEntryInstances =
 			newControlPanelEntryInstances(portlet);
 
-		List<AssetRendererFactory> assetRendererFactoryInstances =
+		List<AssetRendererFactory<?>> assetRendererFactoryInstances =
 			newAssetRendererFactoryInstances(portlet);
 
 		List<AtomCollectionAdapter<?>> atomCollectionAdapterInstances =
@@ -164,8 +154,6 @@ public class PortletBagFactory {
 
 		List<CustomAttributesDisplay> customAttributesDisplayInstances =
 			newCustomAttributesDisplayInstances(portlet);
-
-		List<DDMDisplay> ddmDisplayInstances = newDDMDisplayInstances(portlet);
 
 		List<PermissionPropagator> permissionPropagatorInstances =
 			newPermissionPropagators(portlet);
@@ -180,47 +168,25 @@ public class PortletBagFactory {
 			newPreferencesValidatorInstances(portlet);
 
 		ResourceBundleTracker resourceBundleTracker = new ResourceBundleTracker(
-			portlet.getPortletId());
-
-		String resourceBundle = portlet.getResourceBundle();
-
-		if (Validator.isNotNull(resourceBundle) &&
-			!resourceBundle.equals(StrutsResourceBundle.class.getName())) {
-
-			initResourceBundle(resourceBundleTracker, portlet, null);
-			initResourceBundle(
-				resourceBundleTracker, portlet, LocaleUtil.getDefault());
-
-			Set<String> supportedLanguageIds = portlet.getSupportedLocales();
-
-			if (supportedLanguageIds.isEmpty()) {
-				supportedLanguageIds = SetUtil.fromArray(PropsValues.LOCALES);
-			}
-
-			for (String supportedLanguageId : supportedLanguageIds) {
-				Locale locale = LocaleUtil.fromLanguageId(supportedLanguageId);
-
-				initResourceBundle(resourceBundleTracker, portlet, locale);
-			}
-		}
+			_classLoader, portlet);
 
 		PortletBag portletBag = new PortletBagImpl(
 			portlet.getPortletId(), _servletContext, portletInstance,
 			resourceBundleTracker, configurationActionInstances,
-			indexerInstances, openSearchInstances, schedulerEntryInstances,
-			friendlyURLMapperTracker, urlEncoderInstances,
-			portletDataHandlerInstances, stagedModelDataHandlerInstances,
-			templateHandlerInstances, portletLayoutListenerInstances,
-			pollerProcessorInstances, popMessageListenerInstances,
-			socialActivityInterpreterInstances,
+			indexerInstances, openSearchInstances,
+			schedulerEventMessageListeners, friendlyURLMapperTracker,
+			urlEncoderInstances, portletDataHandlerInstances,
+			stagedModelDataHandlerInstances, templateHandlerInstances,
+			portletLayoutListenerInstances, pollerProcessorInstances,
+			popMessageListenerInstances, socialActivityInterpreterInstances,
 			socialRequestInterpreterInstances,
 			userNotificationDefinitionInstances,
 			userNotificationHandlerInstances, webDAVStorageInstances,
 			xmlRpcMethodInstances, controlPanelEntryInstances,
 			assetRendererFactoryInstances, atomCollectionAdapterInstances,
-			customAttributesDisplayInstances, ddmDisplayInstances,
-			permissionPropagatorInstances, trashHandlerInstances,
-			workflowHandlerInstances, preferencesValidatorInstances);
+			customAttributesDisplayInstances, permissionPropagatorInstances,
+			trashHandlerInstances, workflowHandlerInstances,
+			preferencesValidatorInstances);
 
 		PortletBagPool.put(portlet.getRootPortletId(), portletBag);
 
@@ -310,117 +276,29 @@ public class PortletBagFactory {
 		return (javax.portlet.Portlet)portletClass.newInstance();
 	}
 
-	protected InputStream getResourceBundleInputStream(
-		String resourceBundleName, Locale locale) {
-
-		resourceBundleName = resourceBundleName.replace(
-			StringPool.PERIOD, StringPool.SLASH);
-
-		Locale newLocale = locale;
-
-		InputStream inputStream = null;
-
-		while (inputStream == null) {
-			locale = newLocale;
-
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(resourceBundleName);
-
-			if (locale != null) {
-				String localeName = locale.toString();
-
-				if (localeName.length() > 0) {
-					sb.append(StringPool.UNDERLINE);
-					sb.append(localeName);
-				}
-			}
-
-			if (!resourceBundleName.endsWith(".properties")) {
-				sb.append(".properties");
-			}
-
-			String localizedResourceBundleName = sb.toString();
-
-			if (_log.isInfoEnabled()) {
-				_log.info("Attempting to load " + localizedResourceBundleName);
-			}
-
-			inputStream = _classLoader.getResourceAsStream(
-				localizedResourceBundleName);
-
-			if (locale == null) {
-				break;
-			}
-
-			newLocale = LanguageResources.getSuperLocale(locale);
-
-			if (newLocale == null) {
-				break;
-			}
-
-			if (newLocale.equals(locale)) {
-				break;
-			}
-		}
-
-		return inputStream;
-	}
-
 	protected <S> ServiceTrackerList<S> getServiceTrackerList(
 		Class<S> clazz, Portlet portlet) {
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("javax.portlet.name", portlet.getPortletId());
 
-		return ServiceTrackerCollections.list(
-			clazz, "(javax.portlet.name=" + portlet.getPortletId() + ")",
+		return ServiceTrackerCollections.openList(
+			clazz,
+			"(|(javax.portlet.name=" + portlet.getPortletId() +
+				")(javax.portlet.name=ALL))",
 			properties);
 	}
 
-	protected void initResourceBundle(
-		ResourceBundleTracker resourceBundleTracker, Portlet portlet,
-		Locale locale) {
-
-		try {
-			InputStream inputStream = getResourceBundleInputStream(
-				portlet.getResourceBundle(), locale);
-
-			if (inputStream != null) {
-				ResourceBundle parentResourceBundle = null;
-
-				if (locale != null) {
-					parentResourceBundle =
-						resourceBundleTracker.getResouceBundle(
-							StringPool.BLANK);
-				}
-
-				ResourceBundle resourceBundle = new LiferayResourceBundle(
-					parentResourceBundle, inputStream, StringPool.UTF8);
-
-				String languageId = null;
-
-				if (locale != null) {
-					languageId = LocaleUtil.toLanguageId(locale);
-				}
-
-				resourceBundleTracker.register(languageId, resourceBundle);
-			}
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e.getMessage());
-			}
-		}
-	}
-
-	protected List<AssetRendererFactory> newAssetRendererFactoryInstances(
+	protected List<AssetRendererFactory<?>> newAssetRendererFactoryInstances(
 			Portlet portlet)
 		throws Exception {
 
-		ServiceTrackerList<AssetRendererFactory> assetRendererFactoryInstances =
-			getServiceTrackerList(AssetRendererFactory.class, portlet);
+		ServiceTrackerList<AssetRendererFactory<?>>
+			assetRendererFactoryInstances = getServiceTrackerList(
+				(Class<AssetRendererFactory<?>>)(Class<?>)
+					AssetRendererFactory.class,
+				portlet);
 
 		for (String assetRendererFactoryClass :
 				portlet.getAssetRendererFactoryClasses()) {
@@ -443,8 +321,8 @@ public class PortletBagFactory {
 				assetRendererEnabledPropertyValue, true);
 
 			if (assetRendererEnabledValue) {
-				AssetRendererFactory assetRendererFactoryInstance =
-					(AssetRendererFactory)newInstance(
+				AssetRendererFactory<?> assetRendererFactoryInstance =
+					(AssetRendererFactory<?>)newInstance(
 						AssetRendererFactory.class, assetRendererFactoryClass);
 
 				assetRendererFactoryInstance.setClassName(
@@ -547,22 +425,6 @@ public class PortletBagFactory {
 		return customAttributesDisplayInstances;
 	}
 
-	protected List<DDMDisplay> newDDMDisplayInstances(Portlet portlet)
-		throws Exception {
-
-		ServiceTrackerList<DDMDisplay> ddmDisplayInstances =
-			getServiceTrackerList(DDMDisplay.class, portlet);
-
-		if (Validator.isNotNull(portlet.getDDMDisplayClass())) {
-			DDMDisplay ddmDisplayInstance = (DDMDisplay)newInstance(
-				DDMDisplay.class, portlet.getDDMDisplayClass());
-
-			ddmDisplayInstances.add(ddmDisplayInstance);
-		}
-
-		return ddmDisplayInstances;
-	}
-
 	protected FriendlyURLMapperTracker newFriendlyURLMappers(Portlet portlet)
 		throws Exception {
 
@@ -581,25 +443,17 @@ public class PortletBagFactory {
 		return friendlyURLMapperTracker;
 	}
 
-	protected List<Indexer> newIndexers(Portlet portlet) throws Exception {
-		ServiceTrackerList<Indexer> indexerInstances = getServiceTrackerList(
-			Indexer.class, portlet);
+	protected List<Indexer<?>> newIndexers(Portlet portlet) throws Exception {
+		ServiceTrackerList<Indexer<?>> indexerInstances = getServiceTrackerList(
+			(Class<Indexer<?>>)(Class<?>)Indexer.class, portlet);
 
 		List<String> indexerClasses = portlet.getIndexerClasses();
 
 		for (String indexerClass : indexerClasses) {
-			Indexer indexerInstance = (Indexer)newInstance(
+			Indexer<?> indexerInstance = (Indexer<?>)newInstance(
 				Indexer.class, indexerClass);
 
-			Map<String, Object> properties = new HashMap<String, Object>();
-
-			String[] classNames = ArrayUtil.append(
-				indexerInstance.getClassNames(),
-				ClassUtil.getClassName(indexerInstance));
-
-			properties.put("indexer.classNames", classNames);
-
-			indexerInstances.add(indexerInstance, properties);
+			indexerInstances.add(indexerInstance);
 		}
 
 		return indexerInstances;
@@ -771,15 +625,39 @@ public class PortletBagFactory {
 		return preferencesValidatorInstances;
 	}
 
-	protected List<SchedulerEntry> newSchedulerEntryInstances(Portlet portlet) {
-		ServiceTrackerList<SchedulerEntry> schedulerEntries =
-			getServiceTrackerList(SchedulerEntry.class, portlet);
+	protected List<SchedulerEventMessageListener>
+			newSchedulerEventMessageListeners(Portlet portlet)
+		throws Exception {
 
-		if (PropsValues.SCHEDULER_ENABLED) {
-			schedulerEntries.addAll(portlet.getSchedulerEntries());
+		ServiceTrackerList<SchedulerEventMessageListener>
+			schedulerEventMessageListeners = getServiceTrackerList(
+				SchedulerEventMessageListener.class, portlet);
+
+		List<SchedulerEntry> schedulerEntries = portlet.getSchedulerEntries();
+
+		for (SchedulerEntry schedulerEntry : schedulerEntries) {
+			SchedulerEventMessageListenerWrapper
+				schedulerEventMessageListenerWrapper =
+					new SchedulerEventMessageListenerWrapper();
+
+			com.liferay.portal.kernel.messaging.MessageListener
+				messageListener =
+					(com.liferay.portal.kernel.messaging.MessageListener)
+						InstanceFactory.newInstance(
+							_classLoader,
+							schedulerEntry.getEventListenerClass());
+
+			schedulerEventMessageListenerWrapper.setMessageListener(
+				messageListener);
+
+			schedulerEventMessageListenerWrapper.setSchedulerEntry(
+				schedulerEntry);
+
+			schedulerEventMessageListeners.add(
+				schedulerEventMessageListenerWrapper);
 		}
 
-		return schedulerEntries;
+		return schedulerEventMessageListeners;
 	}
 
 	protected List<SocialActivityInterpreter>
@@ -838,10 +716,9 @@ public class PortletBagFactory {
 		throws Exception {
 
 		ServiceTrackerList<StagedModelDataHandler<?>>
-			stagedModelDataHandlerInstances =
-				getServiceTrackerList(
-					(Class<StagedModelDataHandler<?>>)(Class<?>)
-						StagedModelDataHandler.class, portlet);
+			stagedModelDataHandlerInstances = getServiceTrackerList(
+				(Class<StagedModelDataHandler<?>>)(Class<?>)
+					StagedModelDataHandler.class, portlet);
 
 		List<String> stagedModelDataHandlerClasses =
 			portlet.getStagedModelDataHandlerClasses();
@@ -923,7 +800,7 @@ public class PortletBagFactory {
 
 		xml = JavaFieldsParser.parse(_classLoader, xml);
 
-		Document document = SAXReaderUtil.read(xml);
+		Document document = UnsecureSAXReaderUtil.read(xml);
 
 		Element rootElement = document.getRootElement();
 
@@ -1005,9 +882,13 @@ public class PortletBagFactory {
 			WebDAVStorage webDAVStorageInstance = (WebDAVStorage)newInstance(
 				WebDAVStorage.class, portlet.getWebDAVStorageClass());
 
-			webDAVStorageInstance.setToken(portlet.getWebDAVStorageToken());
+			Map<String, Object> properties = new HashMap<>();
 
-			webDAVStorageInstances.add(webDAVStorageInstance);
+			properties.put("javax.portlet.name", portlet.getPortletId());
+			properties.put(
+				"webdav.storage.token", portlet.getWebDAVStorageToken());
+
+			webDAVStorageInstances.add(webDAVStorageInstance, properties);
 		}
 
 		return webDAVStorageInstances;

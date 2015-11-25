@@ -15,9 +15,11 @@
 package com.liferay.portal.kernel.search;
 
 /**
- * @author Raymond Augé
- * @author Brian Wing Shun Chan
+ * @author     Raymond Augé
+ * @author     Brian Wing Shun Chan
+ * @deprecated As of 7.0.0
  */
+@Deprecated
 public interface StringQueryFactory {
 
 	public Query create(String query);

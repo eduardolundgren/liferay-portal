@@ -49,7 +49,7 @@ public class InvokerFilterChain implements FilterChain {
 
 	public void addFilter(Filter filter) {
 		if (_filters == null) {
-			_filters = new ArrayList<Filter>();
+			_filters = new ArrayList<>();
 		}
 
 		_filters.add(filter);
@@ -97,6 +97,9 @@ public class InvokerFilterChain implements FilterChain {
 					}
 					catch (IOException ioe) {
 						throw ioe;
+					}
+					catch (RuntimeException re) {
+						throw re;
 					}
 					catch (ServletException se) {
 						throw se;
@@ -208,10 +211,11 @@ public class InvokerFilterChain implements FilterChain {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(InvokerFilterChain.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		InvokerFilterChain.class);
 
 	private ClassLoader _contextClassLoader;
-	private FilterChain _filterChain;
+	private final FilterChain _filterChain;
 	private List<Filter> _filters;
 	private int _index;
 

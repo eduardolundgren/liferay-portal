@@ -316,7 +316,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			return list;
 		}
 
-		List<Object> newList = new ArrayList<Object>(list.size());
+		List<Object> newList = new ArrayList<>(list.size());
 
 		for (Object entry : list) {
 			if (entry != null) {
@@ -338,7 +338,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			return map;
 		}
 
-		Map<Object, Object> newMap = new HashMap<Object, Object>(map.size());
+		Map<Object, Object> newMap = new HashMap<>(map.size());
 
 		for (Map.Entry<?, ?> entry : map.entrySet()) {
 			Object key = _convertType(entry.getKey(), types[0]);
@@ -477,11 +477,12 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 		return parameters;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		JSONWebServiceActionImpl.class);
 
-	private JSONWebServiceActionConfig _jsonWebServiceActionConfig;
-	private JSONWebServiceActionParameters _jsonWebServiceActionParameters;
-	private JSONWebServiceNaming _jsonWebServiceNaming;
+	private final JSONWebServiceActionConfig _jsonWebServiceActionConfig;
+	private final JSONWebServiceActionParameters
+		_jsonWebServiceActionParameters;
+	private final JSONWebServiceNaming _jsonWebServiceNaming;
 
 }

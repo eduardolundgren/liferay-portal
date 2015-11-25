@@ -19,12 +19,9 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletPreferences;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.journal.model.JournalFolder;
 
 import javax.portlet.PortletPreferences;
 
@@ -35,7 +32,7 @@ public class UpgradeSearch extends BaseUpgradePortletPreferences {
 
 	@Override
 	protected String[] getPortletIds() {
-		return new String[] {PortletKeys.SEARCH};
+		return new String[] {"3"};
 	}
 
 	protected JSONObject upgradeDataJSONObject(JSONObject dataJSONObject)
@@ -60,7 +57,9 @@ public class UpgradeSearch extends BaseUpgradePortletPreferences {
 				hasDLFileEntry = true;
 			}
 
-			if (value.equals(JournalArticle.class.getName())) {
+			if (value.equals(
+					"com.liferay.portlet.journal.model.JournalArticle")) {
+
 				hasJournalArticle = true;
 			}
 		}
@@ -79,7 +78,8 @@ public class UpgradeSearch extends BaseUpgradePortletPreferences {
 		}
 
 		if (hasJournalArticle) {
-			valuesJSONArray.put(JournalFolder.class.getName());
+			valuesJSONArray.put(
+				"com.liferay.portlet.journal.model.JournalFolder");
 		}
 
 		dataJSONObject.put("values", valuesJSONArray);

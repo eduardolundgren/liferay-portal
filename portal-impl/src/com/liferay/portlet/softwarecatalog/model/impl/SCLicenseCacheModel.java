@@ -16,6 +16,7 @@ package com.liferay.portlet.softwarecatalog.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -38,11 +39,37 @@ import java.io.ObjectOutput;
 public class SCLicenseCacheModel implements CacheModel<SCLicense>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof SCLicenseCacheModel)) {
+			return false;
+		}
+
+		SCLicenseCacheModel scLicenseCacheModel = (SCLicenseCacheModel)obj;
+
+		if (licenseId == scLicenseCacheModel.licenseId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, licenseId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{licenseId=");
 		sb.append(licenseId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", url=");
@@ -63,6 +90,7 @@ public class SCLicenseCacheModel implements CacheModel<SCLicense>,
 		SCLicenseImpl scLicenseImpl = new SCLicenseImpl();
 
 		scLicenseImpl.setLicenseId(licenseId);
+		scLicenseImpl.setCompanyId(companyId);
 
 		if (name == null) {
 			scLicenseImpl.setName(StringPool.BLANK);
@@ -90,6 +118,7 @@ public class SCLicenseCacheModel implements CacheModel<SCLicense>,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		licenseId = objectInput.readLong();
+		companyId = objectInput.readLong();
 		name = objectInput.readUTF();
 		url = objectInput.readUTF();
 		openSource = objectInput.readBoolean();
@@ -101,6 +130,7 @@ public class SCLicenseCacheModel implements CacheModel<SCLicense>,
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
 		objectOutput.writeLong(licenseId);
+		objectOutput.writeLong(companyId);
 
 		if (name == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -122,6 +152,7 @@ public class SCLicenseCacheModel implements CacheModel<SCLicense>,
 	}
 
 	public long licenseId;
+	public long companyId;
 	public String name;
 	public String url;
 	public boolean openSource;

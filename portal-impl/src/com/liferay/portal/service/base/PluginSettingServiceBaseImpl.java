@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.PluginSetting;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.PluginSettingService;
@@ -46,7 +46,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class PluginSettingServiceBaseImpl extends BaseServiceImpl
-	implements PluginSettingService, IdentifiableBean {
+	implements PluginSettingService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -77,7 +77,7 @@ public abstract class PluginSettingServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the plugin setting remote service
 	 */
-	public com.liferay.portal.service.PluginSettingService getPluginSettingService() {
+	public PluginSettingService getPluginSettingService() {
 		return pluginSettingService;
 	}
 
@@ -87,7 +87,7 @@ public abstract class PluginSettingServiceBaseImpl extends BaseServiceImpl
 	 * @param pluginSettingService the plugin setting remote service
 	 */
 	public void setPluginSettingService(
-		com.liferay.portal.service.PluginSettingService pluginSettingService) {
+		PluginSettingService pluginSettingService) {
 		this.pluginSettingService = pluginSettingService;
 	}
 
@@ -341,23 +341,13 @@ public abstract class PluginSettingServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return PluginSettingService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -395,7 +385,7 @@ public abstract class PluginSettingServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.PluginSettingLocalService.class)
 	protected com.liferay.portal.service.PluginSettingLocalService pluginSettingLocalService;
 	@BeanReference(type = com.liferay.portal.service.PluginSettingService.class)
-	protected com.liferay.portal.service.PluginSettingService pluginSettingService;
+	protected PluginSettingService pluginSettingService;
 	@BeanReference(type = PluginSettingPersistence.class)
 	protected PluginSettingPersistence pluginSettingPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -422,5 +412,4 @@ public abstract class PluginSettingServiceBaseImpl extends BaseServiceImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-	private String _beanIdentifier;
 }

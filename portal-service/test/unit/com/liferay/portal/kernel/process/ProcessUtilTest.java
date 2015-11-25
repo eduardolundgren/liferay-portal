@@ -16,8 +16,9 @@ package com.liferay.portal.kernel.process;
 
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.SyncThrowableThread;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.io.IOException;
@@ -73,36 +74,35 @@ public class ProcessUtilTest {
 	@Test
 	public void testConcurrentCreateExecutorService() throws Exception {
 		final AtomicReference<ExecutorService> atomicReference =
-			new AtomicReference<ExecutorService>();
+			new AtomicReference<>();
 
-		Thread thread = new Thread() {
+		SyncThrowableThread<Void> syncThrowableThread =
+			new SyncThrowableThread<>(
+				new Callable<Void>() {
 
-			@Override
-			public void run() {
-				try {
-					ExecutorService executorService =
-						_invokeGetThreadPoolExecutor();
+					@Override
+					public Void call() throws Exception {
+						ExecutorService executorService =
+							_invokeGetThreadPoolExecutor();
 
-					atomicReference.set(executorService);
-				}
-				catch (Exception e) {
-					Assert.fail();
-				}
-			}
+						atomicReference.set(executorService);
 
-		};
+						return null;
+					}
+
+				});
 
 		ExecutorService executorService = null;
 
 		synchronized (ProcessUtil.class) {
-			thread.start();
+			syncThrowableThread.start();
 
-			while (thread.getState() != Thread.State.BLOCKED);
+			while (syncThrowableThread.getState() != Thread.State.BLOCKED);
 
 			executorService = _invokeGetThreadPoolExecutor();
 		}
 
-		thread.join();
+		syncThrowableThread.sync();
 
 		Assert.assertSame(executorService, atomicReference.get());
 
@@ -200,10 +200,10 @@ public class ProcessUtilTest {
 
 		// Logging
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LoggingOutputProcessor.class.getName(), Level.INFO);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LoggingOutputProcessor.class.getName(), Level.INFO)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Future<ObjectValuePair<Void, Void>> loggingFuture =
@@ -215,7 +215,7 @@ public class ProcessUtilTest {
 
 			loggingFuture.cancel(true);
 
-			List<String> messageRecords = new ArrayList<String>();
+			List<String> messageRecords = new ArrayList<>();
 
 			for (LogRecord logRecord : logRecords) {
 				messageRecords.add(logRecord.getMessage());
@@ -229,9 +229,6 @@ public class ProcessUtilTest {
 				messageRecords.contains(Echo.buildMessage(true, 0)));
 			Assert.assertTrue(
 				messageRecords.contains(Echo.buildMessage(true, 1)));
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Collector
@@ -410,27 +407,26 @@ public class ProcessUtilTest {
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
 		final Thread mainThread = Thread.currentThread();
 
-		Thread interruptThread = new Thread() {
+		SyncThrowableThread<Void> syncThrowableThread =
+			new SyncThrowableThread<>(
+				new Callable<Void>() {
 
-			@Override
-			public void run() {
-				try {
-					countDownLatch.await();
+					@Override
+					public Void call() throws Exception {
+						countDownLatch.await();
 
-					while (mainThread.getState() != State.WAITING);
+						while (mainThread.getState() != Thread.State.WAITING);
 
-					ExecutorService executorService = _getExecutorService();
+						ExecutorService executorService = _getExecutorService();
 
-					executorService.shutdownNow();
-				}
-				catch (Exception e) {
-					Assert.fail();
-				}
-			}
+						executorService.shutdownNow();
 
-		};
+						return null;
+					}
 
-		interruptThread.start();
+				});
+
+		syncThrowableThread.start();
 
 		final Future<?> future = ProcessUtil.execute(
 			new OutputProcessor<Void, Void>() {
@@ -461,6 +457,9 @@ public class ProcessUtilTest {
 			Assert.assertEquals(
 				"Forcibly killed subprocess on interruption",
 				throwable.getMessage());
+		}
+		finally {
+			syncThrowableThread.sync();
 		}
 	}
 
@@ -501,7 +500,7 @@ public class ProcessUtilTest {
 	private static String[] _buildArguments(
 		Class<?> clazz, String... arguments) {
 
-		List<String> argumentsList = new ArrayList<String>();
+		List<String> argumentsList = new ArrayList<>();
 
 		argumentsList.add("java");
 		argumentsList.add("-cp");
@@ -578,7 +577,7 @@ public class ProcessUtilTest {
 			_countDownLatch.await();
 		}
 
-		private CountDownLatch _countDownLatch;
+		private final CountDownLatch _countDownLatch;
 
 	}
 

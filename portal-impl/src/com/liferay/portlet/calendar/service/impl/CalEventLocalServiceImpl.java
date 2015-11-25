@@ -14,10 +14,6 @@
 
 package com.liferay.portlet.calendar.service.impl;
 
-import com.liferay.portal.im.AIMConnector;
-import com.liferay.portal.im.ICQConnector;
-import com.liferay.portal.im.MSNConnector;
-import com.liferay.portal.im.YMConnector;
 import com.liferay.portal.kernel.cal.DayAndPosition;
 import com.liferay.portal.kernel.cal.Recurrence;
 import com.liferay.portal.kernel.cal.TZSRecurrence;
@@ -41,6 +37,7 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -54,6 +51,7 @@ import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
@@ -122,13 +120,15 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 
 /**
- * @author Brian Wing Shun Chan
- * @author Bruno Farache
- * @author Samuel Kong
- * @author Ganesh Ram
- * @author Brett Swaim
- * @author Mate Thurzo
+ * @author     Brian Wing Shun Chan
+ * @author     Bruno Farache
+ * @author     Samuel Kong
+ * @author     Ganesh Ram
+ * @author     Brett Swaim
+ * @author     Mate Thurzo
+ * @deprecated As of 7.0.0, with no direct replacement
  */
+@Deprecated
 public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -147,7 +147,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long groupId = serviceContext.getScopeGroupId();
-		Date now = new Date();
 
 		Locale locale = null;
 		TimeZone timeZone = null;
@@ -192,8 +191,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		event.setCompanyId(user.getCompanyId());
 		event.setUserId(user.getUserId());
 		event.setUserName(user.getFullName());
-		event.setCreateDate(serviceContext.getCreateDate(now));
-		event.setModifiedDate(serviceContext.getModifiedDate(now));
 		event.setTitle(title);
 		event.setDescription(description);
 		event.setLocation(location);
@@ -223,9 +220,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 				serviceContext.isAddGuestPermissions());
 		}
 		else {
-			addEventResources(
-				event, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
+			addEventResources(event, serviceContext.getModelPermissions());
 		}
 
 		// Asset
@@ -292,14 +287,12 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 	@Override
 	public void addEventResources(
-			CalEvent event, String[] groupPermissions,
-			String[] guestPermissions)
+			CalEvent event, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		resourceLocalService.addModelResources(
 			event.getCompanyId(), event.getGroupId(), event.getUserId(),
-			CalEvent.class.getName(), event.getEventId(), groupPermissions,
-			guestPermissions);
+			CalEvent.class.getName(), event.getEventId(), modelPermissions);
 	}
 
 	@Override
@@ -315,12 +308,12 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 	@Override
 	public void addEventResources(
-			long eventId, String[] groupPermissions, String[] guestPermissions)
+			long eventId, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
-		addEventResources(event, groupPermissions, guestPermissions);
+		addEventResources(event, modelPermissions);
 	}
 
 	@Override
@@ -444,7 +437,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 	@Override
 	public File exportEvent(long userId, long eventId) throws PortalException {
-		List<CalEvent> events = new ArrayList<CalEvent>();
+		List<CalEvent> events = new ArrayList<>();
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
@@ -518,10 +511,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		// Time zone sensitive
 
-		List<CalEvent> timeZoneSensitiveEvents =
-			calEventFinder.findByG_SD_T(
-				groupId, CalendarUtil.getGTDate(cal),
-				CalendarUtil.getLTDate(cal), true, types);
+		List<CalEvent> timeZoneSensitiveEvents = calEventFinder.findByG_SD_T(
+			groupId, CalendarUtil.getGTDate(cal), CalendarUtil.getLTDate(cal),
+			true, types);
 
 		// Time zone insensitive
 
@@ -532,14 +524,13 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 			cal.get(Calendar.DATE));
 
-		List<CalEvent> timeZoneInsensitiveEvents =
-			calEventFinder.findByG_SD_T(
-				groupId, CalendarUtil.getGTDate(tzICal),
-				CalendarUtil.getLTDate(tzICal), false, types);
+		List<CalEvent> timeZoneInsensitiveEvents = calEventFinder.findByG_SD_T(
+			groupId, CalendarUtil.getGTDate(tzICal),
+			CalendarUtil.getLTDate(tzICal), false, types);
 
 		// Create new list
 
-		events = new ArrayList<CalEvent>();
+		events = new ArrayList<>();
 
 		events.addAll(timeZoneSensitiveEvents);
 		events.addAll(timeZoneInsensitiveEvents);
@@ -640,7 +631,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 				cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 				cal.get(Calendar.DATE));
 
-			List<CalEvent> repeatingEvents = new ArrayList<CalEvent>();
+			List<CalEvent> repeatingEvents = new ArrayList<>();
 
 			for (CalEvent event : events) {
 				TZSRecurrence recurrence = event.getRecurrenceObj();
@@ -737,7 +728,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			event.getEventId(), event.getUuid(), 0, assetCategoryIds,
 			assetTagNames, true, null, null, null, ContentTypes.TEXT_HTML,
 			event.getTitle(), event.getDescription(), null, null, null, 0, 0,
-			null, false);
+			null);
 
 		assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
@@ -796,7 +787,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
-		event.setModifiedDate(serviceContext.getModifiedDate(null));
 		event.setTitle(title);
 		event.setDescription(description);
 		event.setLocation(location);
@@ -1257,7 +1247,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					dateFormatDateTime.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
-					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName)
 				});
 
 			body = StringUtil.replace(
@@ -1273,7 +1263,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					dateFormatDateTime.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
-					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName)
 				});
 
 			if ((remindBy == CalEventConstants.REMIND_BY_EMAIL) ||
@@ -1288,26 +1278,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					from, to, subject, body, true);
 
 				mailService.sendEmail(message);
-			}
-			else if ((remindBy == CalEventConstants.REMIND_BY_AIM) &&
-					 Validator.isNotNull(contact.getAimSn())) {
-
-				AIMConnector.send(contact.getAimSn(), body);
-			}
-			else if ((remindBy == CalEventConstants.REMIND_BY_ICQ) &&
-					 Validator.isNotNull(contact.getIcqSn())) {
-
-				ICQConnector.send(contact.getIcqSn(), body);
-			}
-			else if ((remindBy == CalEventConstants.REMIND_BY_MSN) &&
-					 Validator.isNotNull(contact.getMsnSn())) {
-
-				MSNConnector.send(contact.getMsnSn(), body);
-			}
-			else if ((remindBy == CalEventConstants.REMIND_BY_YM) &&
-					 Validator.isNotNull(contact.getYmSn())) {
-
-				YMConnector.send(contact.getYmSn(), body);
 			}
 		}
 		catch (Exception e) {
@@ -1469,7 +1439,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			int[] byMonthDay = recurrence.getByMonthDay();
 
 			if (byMonthDay != null) {
-				Integer monthDay = new Integer(byMonthDay[0]);
+				Integer monthDay = Integer.valueOf(byMonthDay[0]);
 
 				recur.getMonthDayList().add(monthDay);
 			}
@@ -1480,7 +1450,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 				recur.getDayList().add(weekDay);
 
-				Integer position = new Integer(byDay[0].getDayPosition());
+				Integer position = Integer.valueOf(byDay[0].getDayPosition());
 
 				recur.getSetPosList().add(position);
 			}
@@ -1679,7 +1649,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		if (Recur.DAILY.equals(frequency)) {
 			recurrence.setFrequency(Recurrence.DAILY);
 
-			List<DayAndPosition> dayPosList = new ArrayList<DayAndPosition>();
+			List<DayAndPosition> dayPosList = new ArrayList<>();
 
 			List<WeekDay> weekDays = recur.getDayList();
 
@@ -1696,7 +1666,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		else if (Recur.WEEKLY.equals(frequency)) {
 			recurrence.setFrequency(Recurrence.WEEKLY);
 
-			List<DayAndPosition> dayPosList = new ArrayList<DayAndPosition>();
+			List<DayAndPosition> dayPosList = new ArrayList<>();
 
 			List<WeekDay> weekDays = recur.getDayList();
 
@@ -1749,15 +1719,37 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		throws PortalException {
 
 		if (Validator.isNull(title)) {
-			throw new EventTitleException();
+			throw new EventTitleException("Title is null");
 		}
 
 		if (!Validator.isDate(startDateMonth, startDateDay, startDateYear)) {
-			throw new EventStartDateException();
+			StringBundler sb = new StringBundler(9);
+
+			sb.append("Invalid date for {startDateDay=");
+			sb.append(startDateDay);
+			sb.append(", startDateMonth=");
+			sb.append(startDateMonth);
+			sb.append(", startDateYear=");
+			sb.append(startDateYear);
+			sb.append(", title=");
+			sb.append(title);
+			sb.append(StringPool.CLOSE_BRACKET);
+
+			throw new EventStartDateException(sb.toString());
 		}
 
 		if (!allDay && (durationHour <= 0) && (durationMinute <= 0)) {
-			throw new EventDurationException();
+			StringBundler sb = new StringBundler(7);
+
+			sb.append("Invalid date for {durationHour=");
+			sb.append(durationHour);
+			sb.append(", durationMinute=");
+			sb.append(durationMinute);
+			sb.append(", title=");
+			sb.append(title);
+			sb.append(StringPool.CLOSE_BRACKET);
+
+			throw new EventDurationException(sb.toString());
 		}
 
 		Calendar startDate = CalendarFactoryUtil.getCalendar(
@@ -1767,7 +1759,14 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			Calendar until = recurrence.getUntil();
 
 			if ((until != null) && startDate.after(until)) {
-				throw new EventEndDateException();
+				StringBundler sb = new StringBundler(4);
+
+				sb.append("Start date time ");
+				sb.append(startDate.getTimeInMillis());
+				sb.append(" must be before recurrence end date time ");
+				sb.append(until.getTimeInMillis());
+
+				throw new EventEndDateException(sb.toString());
 			}
 		}
 	}
@@ -1775,7 +1774,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 	private static final long _CALENDAR_EVENT_CHECK_INTERVAL =
 		PropsValues.CALENDAR_EVENT_CHECK_INTERVAL * Time.MINUTE;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		CalEventLocalServiceImpl.class);
 
 }

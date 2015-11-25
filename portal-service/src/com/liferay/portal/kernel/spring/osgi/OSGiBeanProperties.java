@@ -27,9 +27,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Provides the OSGi service properties used when publishing Spring beans as
@@ -74,6 +77,13 @@ public @interface OSGiBeanProperties {
 	public String[] property() default {};
 
 	/**
+	 * Returns the types under which the bean is published as a service.
+	 *
+	 * @return the service types
+	 */
+	public Class<?>[] service() default {};
+
+	/**
 	 * Converts OSGi bean properties from the {@link OSGiBeanProperties}
 	 * annotation into a properties map. This is a helper class.
 	 */
@@ -116,7 +126,7 @@ public @interface OSGiBeanProperties {
 		public static Map<String, Object> toMap(
 			OSGiBeanProperties osgiBeanProperties) {
 
-			Map<String, Object> properties = new HashMap<String, Object>();
+			Map<String, Object> properties = new HashMap<>();
 
 			for (String property : osgiBeanProperties.property()) {
 				String[] parts = property.split(StringPool.EQUAL, 2);
@@ -163,6 +173,63 @@ public @interface OSGiBeanProperties {
 			Object previousValue = properties.get(key);
 
 			properties.put(key, type._convert(value, previousValue));
+		}
+
+	}
+
+	/**
+	 * Obtains types under which the bean is published as a service.
+	 */
+	public static class Service {
+
+		/**
+		 * Returns the types under which the bean is published as a service.
+		 * If no types are specified, they are calculated through class
+		 * introspection. If the bean is not assignable to a specified service
+		 * type, a {@link ClassCastException} is thrown.
+		 *
+		 * @param  object the object (bean)
+		 * @return the service types
+		 */
+		public static Set<Class<?>> interfaces(Object object) {
+			Class<? extends Object> clazz = object.getClass();
+
+			OSGiBeanProperties osgiBeanProperties = clazz.getAnnotation(
+				OSGiBeanProperties.class);
+
+			if (osgiBeanProperties == null) {
+				return _getInterfaceClasses(clazz, new HashSet<Class<?>>());
+			}
+
+			Class<?>[] serviceClasses = osgiBeanProperties.service();
+
+			if (serviceClasses.length == 0) {
+				return _getInterfaceClasses(clazz, new HashSet<Class<?>>());
+			}
+
+			for (Class<?> serviceClazz : serviceClasses) {
+				serviceClazz.cast(object);
+			}
+
+			return new HashSet<>(Arrays.asList(osgiBeanProperties.service()));
+		}
+
+		private static Set<Class<?>> _getInterfaceClasses(
+			Class<?> clazz, Set<Class<?>> interfaceClasses) {
+
+			if (clazz.isInterface()) {
+				interfaceClasses.add(clazz);
+			}
+
+			for (Class<?> interfaceClass : clazz.getInterfaces()) {
+				_getInterfaceClasses(interfaceClass, interfaceClasses);
+			}
+
+			if ((clazz = clazz.getSuperclass()) != null) {
+				_getInterfaceClasses(clazz, interfaceClasses);
+			}
+
+			return interfaceClasses;
 		}
 
 	}

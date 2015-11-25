@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
@@ -34,10 +33,18 @@ public abstract class BaseBackgroundTaskExecutor
 	implements BackgroundTaskExecutor {
 
 	@Override
+	public abstract BackgroundTaskExecutor clone();
+
+	@Override
 	public BackgroundTaskStatusMessageTranslator
 		getBackgroundTaskStatusMessageTranslator() {
 
 		return _backgroundTaskStatusMessageTranslator;
+	}
+
+	@Override
+	public int getIsolationLevel() {
+		return _isolationLevel;
 	}
 
 	@Override
@@ -47,7 +54,13 @@ public abstract class BaseBackgroundTaskExecutor
 
 	@Override
 	public boolean isSerial() {
-		return _serial;
+		if (_isolationLevel ==
+				BackgroundTaskConstants.ISOLATION_LEVEL_NOT_ISOLATED) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	protected Locale getLocale(BackgroundTask backgroundTask) {
@@ -82,8 +95,8 @@ public abstract class BaseBackgroundTaskExecutor
 			backgroundTaskStatusMessageTranslator;
 	}
 
-	protected void setSerial(boolean serial) {
-		_serial = serial;
+	protected void setIsolationLevel(int isolationLevel) {
+		_isolationLevel = isolationLevel;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -91,6 +104,7 @@ public abstract class BaseBackgroundTaskExecutor
 
 	private BackgroundTaskStatusMessageTranslator
 		_backgroundTaskStatusMessageTranslator;
-	private boolean _serial;
+	private int _isolationLevel =
+		BackgroundTaskConstants.ISOLATION_LEVEL_NOT_ISOLATED;
 
 }

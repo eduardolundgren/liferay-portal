@@ -72,7 +72,7 @@ public class QueryUtil {
 				return Collections.emptyList();
 			}
 			else {
-				return new ArrayList<Object>();
+				return new ArrayList<>();
 			}
 		}
 
@@ -83,7 +83,7 @@ public class QueryUtil {
 			return query.list(unmodifiable);
 		}
 
-		List<Object> list = new ArrayList<Object>();
+		List<Object> list = new ArrayList<>();
 
 		DB db = DBFactoryUtil.getDB();
 
@@ -133,7 +133,7 @@ public class QueryUtil {
 		boolean unmodifiable) {
 
 		if ((total == 0) || (num == 0)) {
-			return new ArrayList<Object>();
+			return new ArrayList<>();
 		}
 
 		if (num >= total) {
@@ -142,7 +142,7 @@ public class QueryUtil {
 
 		int[] scrollIds = RandomUtil.nextInts(total, num);
 
-		List<Object> list = new ArrayList<Object>();
+		List<Object> list = new ArrayList<>();
 
 		DB db = DBFactoryUtil.getDB();
 
@@ -179,6 +179,6 @@ public class QueryUtil {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(QueryUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(QueryUtil.class);
 
 }

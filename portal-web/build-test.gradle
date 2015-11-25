@@ -1,0 +1,92 @@
+import com.liferay.gradle.util.GradleUtil
+
+buildscript {
+	repositories {
+		if (!Boolean.getBoolean("maven.local.ignore")) {
+			mavenLocal()
+		}
+
+		maven {
+			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+		}
+	}
+
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.poshi.runner", version: "1.0.8"
+	}
+}
+
+apply plugin: "com.liferay.poshi.runner"
+
+configurations {
+	sikuliComplete
+}
+
+dependencies {
+	["x86", "x86_64"].each {
+		sikuliComplete classifier: "linux-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+		sikuliComplete classifier: "windows-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+	}
+
+	sikuliComplete classifier: "macosx-x86_64", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+}
+
+poshiRunner {
+	if (project.hasProperty("poshiRunnerExtProperties")) {
+		File poshiRunnerExtProperties = new File(project.properties["poshiRunnerExtProperties"])
+
+		if (poshiRunnerExtProperties.exists()) {
+			project.ext.testProperties = new Properties()
+
+			testProperties.load(new FileInputStream(project.properties["poshiRunnerExtProperties"]))
+
+			setPoshiProperties testProperties
+		}
+	}
+
+	version = "1.0.25"
+}
+
+repositories {
+	if (!Boolean.getBoolean("maven.local.ignore")) {
+		mavenLocal()
+	}
+
+	maven {
+		url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+	}
+}
+
+File localPoshiDir = new File(buildDir, "poshi")
+
+task copyLocalPoshi(type: GradleBuild)
+task updateGradleCache
+
+copyLocalPoshi {
+	configure(startParameter) {
+		configureOnDemand = true
+		gradleUserHomeDir = file("../.gradle")
+		projectProperties = ["destinationDir": localPoshiDir]
+	}
+
+	dir = file("../modules/test/poshi-runner")
+	tasks = ["deployWithDependencies"]
+}
+
+runPoshi {
+	jvmArgs "-Dfile.encoding=UTF-8"
+}
+
+updateGradleCache << {
+	configurations.poshiRunner.resolve()
+	configurations.sikuliComplete.resolve()
+}
+
+if (GradleUtil.getProperty(project, "local", false)) {
+	dependencies {
+		poshiRunner fileTree(localPoshiDir) {
+			builtBy copyLocalPoshi
+			include "*.jar"
+		}
+	}
+}

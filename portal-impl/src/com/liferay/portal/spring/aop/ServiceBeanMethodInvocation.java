@@ -114,6 +114,10 @@ public class ServiceBeanMethodInvocation
 		return _hashCode;
 	}
 
+	public void mark() {
+		_markIndex = _index;
+	}
+
 	@Override
 	public Object proceed() throws Throwable {
 		if (_index < _methodInterceptors.size()) {
@@ -151,6 +155,10 @@ public class ServiceBeanMethodInvocation
 		catch (InvocationTargetException ite) {
 			throw ite.getTargetException();
 		}
+	}
+
+	public void reset() {
+		_index = _markIndex;
 	}
 
 	public void setMethodInterceptors(
@@ -209,14 +217,15 @@ public class ServiceBeanMethodInvocation
 		return _toString;
 	}
 
-	private Object[] _arguments;
+	private final Object[] _arguments;
 	private boolean _equalsMethod;
 	private int _hashCode;
 	private int _index;
-	private Method _method;
+	private int _markIndex;
+	private final Method _method;
 	private List<MethodInterceptor> _methodInterceptors;
-	private Object _target;
-	private Class<?> _targetClass;
+	private final Object _target;
+	private final Class<?> _targetClass;
 	private String _toString;
 
 }

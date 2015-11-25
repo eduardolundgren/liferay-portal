@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class DBBuilder {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		ToolDependencies.wireBasic();
 
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
@@ -51,63 +51,61 @@ public class DBBuilder {
 
 		String sqlDir = arguments.get("db.sql.dir");
 
-		new DBBuilder(databaseName, databaseTypes, sqlDir);
+		try {
+			new DBBuilder(databaseName, databaseTypes, sqlDir);
+		}
+		catch (Exception e) {
+			ArgumentsUtil.processMainException(arguments, e);
+		}
 	}
 
-	public DBBuilder(
-		String databaseName, String[] databaseTypes, String sqlDir) {
+	public DBBuilder(String databaseName, String[] databaseTypes, String sqlDir)
+		throws Exception {
 
 		_databaseName = databaseName;
 		_databaseTypes = databaseTypes;
 
-		try {
-			if (!sqlDir.endsWith("/WEB-INF/sql")) {
-				_buildSQLFile(sqlDir, "portal");
-				_buildSQLFile(sqlDir, "portal-tables");
-			}
-			else {
-				_buildSQLFile(sqlDir, "tables");
-			}
+		if (!sqlDir.endsWith("/META-INF/sql") &&
+			!sqlDir.endsWith("/WEB-INF/sql")) {
 
-			_buildSQLFile(sqlDir, "indexes");
-			_buildSQLFile(sqlDir, "sequences");
-			_buildSQLFile(sqlDir, "update-5.0.1-5.1.0");
-			_buildSQLFile(sqlDir, "update-5.1.1-5.1.2");
-			_buildSQLFile(sqlDir, "update-5.1.2-5.2.0");
-			_buildSQLFile(sqlDir, "update-5.2.0-5.2.1");
-			_buildSQLFile(sqlDir, "update-5.2.2-5.2.3");
-			_buildSQLFile(sqlDir, "update-5.2.3-6.0.0");
-			_buildSQLFile(sqlDir, "update-5.2.5-6.0.0");
-			_buildSQLFile(sqlDir, "update-5.2.7-6.0.0");
-			_buildSQLFile(sqlDir, "update-5.2.8-6.0.5");
-			_buildSQLFile(sqlDir, "update-6.0.0-6.0.1");
-			_buildSQLFile(sqlDir, "update-6.0.1-6.0.2");
-			_buildSQLFile(sqlDir, "update-6.0.2-6.0.3");
-			_buildSQLFile(sqlDir, "update-6.0.4-6.0.5");
-			_buildSQLFile(sqlDir, "update-6.0.5-6.0.6");
-			_buildSQLFile(sqlDir, "update-6.0.6-6.1.0");
-			_buildSQLFile(sqlDir, "update-6.0.12-6.1.0");
-			_buildSQLFile(sqlDir, "update-6.1.0-6.1.1");
-			_buildSQLFile(sqlDir, "update-6.1.1-6.2.0");
+			_buildSQLFile(sqlDir, "portal");
+			_buildSQLFile(sqlDir, "portal-tables");
+		}
+		else {
+			_buildSQLFile(sqlDir, "tables");
+		}
 
-			_buildCreateFile(sqlDir);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		_buildSQLFile(sqlDir, "indexes");
+		_buildSQLFile(sqlDir, "sequences");
+		_buildSQLFile(sqlDir, "update-5.0.1-5.1.0");
+		_buildSQLFile(sqlDir, "update-5.1.1-5.1.2");
+		_buildSQLFile(sqlDir, "update-5.1.2-5.2.0");
+		_buildSQLFile(sqlDir, "update-5.2.0-5.2.1");
+		_buildSQLFile(sqlDir, "update-5.2.2-5.2.3");
+		_buildSQLFile(sqlDir, "update-5.2.3-6.0.0");
+		_buildSQLFile(sqlDir, "update-5.2.5-6.0.0");
+		_buildSQLFile(sqlDir, "update-5.2.7-6.0.0");
+		_buildSQLFile(sqlDir, "update-5.2.8-6.0.5");
+		_buildSQLFile(sqlDir, "update-6.0.0-6.0.1");
+		_buildSQLFile(sqlDir, "update-6.0.1-6.0.2");
+		_buildSQLFile(sqlDir, "update-6.0.2-6.0.3");
+		_buildSQLFile(sqlDir, "update-6.0.4-6.0.5");
+		_buildSQLFile(sqlDir, "update-6.0.5-6.0.6");
+		_buildSQLFile(sqlDir, "update-6.0.6-6.1.0");
+		_buildSQLFile(sqlDir, "update-6.0.12-6.1.0");
+		_buildSQLFile(sqlDir, "update-6.1.0-6.1.1");
+		_buildSQLFile(sqlDir, "update-6.1.1-6.2.0");
+
+		_buildCreateFile(sqlDir);
 	}
 
 	private void _buildCreateFile(String sqlDir) throws IOException {
 		for (String databaseType : _databaseTypes) {
-			if (databaseType.equals(DB.TYPE_HYPERSONIC) ||
-				databaseType.equals(DB.TYPE_INTERBASE) ||
-				databaseType.equals(DB.TYPE_JDATASTORE) ||
-				databaseType.equals(DB.TYPE_SAP)) {
-
+			if (databaseType.equals(DB.TYPE_HYPERSONIC)) {
 				continue;
 			}
 
-			DB db = DBFactoryUtil.getDB(databaseType);
+			DB db = DBFactoryUtil.getDB(databaseType, null);
 
 			if (db != null) {
 				if (!sqlDir.endsWith("/WEB-INF/sql")) {
@@ -128,7 +126,7 @@ public class DBBuilder {
 		}
 
 		for (String _databaseType : _databaseTypes) {
-			DB db = DBFactoryUtil.getDB(_databaseType);
+			DB db = DBFactoryUtil.getDB(_databaseType, null);
 
 			if (db != null) {
 				db.buildSQLFile(sqlDir, fileName);

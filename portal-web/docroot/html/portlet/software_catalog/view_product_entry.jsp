@@ -31,7 +31,7 @@ SCProductVersion latestProductVersion = productEntry.getLatestVersion();
 
 PortletURL addProductVersionURL = renderResponse.createRenderURL();
 
-addProductVersionURL.setParameter("struts_action", "/software_catalog/edit_product_version");
+addProductVersionURL.setParameter("mvcRenderCommandName", "/software_catalog/edit_product_version");
 addProductVersionURL.setParameter(Constants.CMD, Constants.ADD);
 addProductVersionURL.setParameter("tabs2", tabs2);
 addProductVersionURL.setParameter("redirect", currentURL);
@@ -39,14 +39,14 @@ addProductVersionURL.setParameter("productEntryId", String.valueOf(productEntryI
 
 PortletURL editProductEntryURL = renderResponse.createRenderURL();
 
-editProductEntryURL.setParameter("struts_action", "/software_catalog/edit_product_entry");
+editProductEntryURL.setParameter("mvcRenderCommandName", "/software_catalog/edit_product_entry");
 editProductEntryURL.setParameter("tabs2", tabs2);
 editProductEntryURL.setParameter("redirect", currentURL);
 editProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId));
 
 PortletURL viewProductEntryURL = renderResponse.createRenderURL();
 
-viewProductEntryURL.setParameter("struts_action", "/software_catalog/view_product_entry");
+viewProductEntryURL.setParameter("mvcRenderCommandName", "/software_catalog/view_product_entry");
 viewProductEntryURL.setParameter("tabs2", tabs2);
 viewProductEntryURL.setParameter("redirect", redirect);
 viewProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId));
@@ -177,6 +177,7 @@ viewProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId
 					<liferay-ui:icon
 						iconCssClass="icon-download"
 						message="download-page"
+						method="get"
 						url="<%= latestProductVersion.getDownloadPageURL() %>"
 					/>
 				</c:if>
@@ -185,6 +186,7 @@ viewProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId
 					<liferay-ui:icon
 						iconCssClass="icon-download"
 						message="direct-download"
+						method="get"
 						url="<%= latestProductVersion.getDirectDownloadURL() %>"
 					/>
 				</c:if>
@@ -253,14 +255,9 @@ List productScreenshots = SCProductScreenshotLocalServiceUtil.getProductScreensh
 
 <c:choose>
 	<c:when test='<%= PropsValues.SC_PRODUCT_COMMENTS_ENABLED && tabs2.equals("comments") %>'>
-		<portlet:actionURL var="discussionURL">
-			<portlet:param name="struts_action" value="/software_catalog/edit_product_entry_discussion" />
-		</portlet:actionURL>
-
 		<liferay-ui:discussion
 			className="<%= SCProductEntry.class.getName() %>"
 			classPK="<%= productEntry.getProductEntryId() %>"
-			formAction="<%= discussionURL %>"
 			redirect="<%= currentURL %>"
 			userId="<%= productEntry.getUserId() %>"
 		/>
@@ -270,7 +267,7 @@ List productScreenshots = SCProductScreenshotLocalServiceUtil.getProductScreensh
 		<%
 		PortletURL viewProductVersionURL = renderResponse.createRenderURL();
 
-		viewProductVersionURL.setParameter("struts_action", "/software_catalog/view_product_entry");
+		viewProductVersionURL.setParameter("mvcRenderCommandName", "/software_catalog/view_product_entry");
 		viewProductVersionURL.setParameter("productEntryId", String.valueOf(productEntryId));
 
 		List<String> headerNames = new ArrayList<String>();
@@ -342,7 +339,7 @@ SCProductEntry unescapedProductEntry = productEntry.toUnescapedModel();
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/software_catalog/view_product");
+portletURL.setParameter("mvcRenderCommandName", "/software_catalog/view_product");
 portletURL.setParameter("redirect", currentURL);
 portletURL.setParameter("productEntryId", String.valueOf(productEntry.getProductEntryId()));
 

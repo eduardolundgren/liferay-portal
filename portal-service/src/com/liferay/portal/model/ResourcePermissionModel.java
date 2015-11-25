@@ -38,7 +38,7 @@ import java.io.Serializable;
  */
 @ProviderType
 public interface ResourcePermissionModel extends BaseModel<ResourcePermission>,
-	MVCCModel {
+	MVCCModel, ShardedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -94,6 +94,7 @@ public interface ResourcePermissionModel extends BaseModel<ResourcePermission>,
 	 *
 	 * @return the company ID of this resource permission
 	 */
+	@Override
 	public long getCompanyId();
 
 	/**
@@ -101,6 +102,7 @@ public interface ResourcePermissionModel extends BaseModel<ResourcePermission>,
 	 *
 	 * @param companyId the company ID of this resource permission
 	 */
+	@Override
 	public void setCompanyId(long companyId);
 
 	/**
@@ -148,6 +150,20 @@ public interface ResourcePermissionModel extends BaseModel<ResourcePermission>,
 	public void setPrimKey(String primKey);
 
 	/**
+	 * Returns the prim key ID of this resource permission.
+	 *
+	 * @return the prim key ID of this resource permission
+	 */
+	public long getPrimKeyId();
+
+	/**
+	 * Sets the prim key ID of this resource permission.
+	 *
+	 * @param primKeyId the prim key ID of this resource permission
+	 */
+	public void setPrimKeyId(long primKeyId);
+
+	/**
 	 * Returns the role ID of this resource permission.
 	 *
 	 * @return the role ID of this resource permission
@@ -188,6 +204,27 @@ public interface ResourcePermissionModel extends BaseModel<ResourcePermission>,
 	 * @param actionIds the action IDs of this resource permission
 	 */
 	public void setActionIds(long actionIds);
+
+	/**
+	 * Returns the view action ID of this resource permission.
+	 *
+	 * @return the view action ID of this resource permission
+	 */
+	public boolean getViewActionId();
+
+	/**
+	 * Returns <code>true</code> if this resource permission is view action ID.
+	 *
+	 * @return <code>true</code> if this resource permission is view action ID; <code>false</code> otherwise
+	 */
+	public boolean isViewActionId();
+
+	/**
+	 * Sets whether this resource permission is view action ID.
+	 *
+	 * @param viewActionId the view action ID of this resource permission
+	 */
+	public void setViewActionId(boolean viewActionId);
 
 	@Override
 	public boolean isNew();

@@ -49,9 +49,13 @@ public class DynamicServletRequest extends HttpServletRequestWrapper {
 		HttpServletRequest request, Map<String, String[]> parameterMap,
 		String queryString, boolean inherit) {
 
-		parameterMap = new HashMap<String, String[]>(parameterMap);
-
 		String[] parameters = StringUtil.split(queryString, CharPool.AMPERSAND);
+
+		if (parameters.length == 0) {
+			return request;
+		}
+
+		parameterMap = new HashMap<>(parameterMap);
 
 		for (String parameter : parameters) {
 			String[] parameterParts = StringUtil.split(
@@ -121,7 +125,7 @@ public class DynamicServletRequest extends HttpServletRequestWrapper {
 
 		super(request);
 
-		_params = new HashMap<String, String[]>();
+		_params = new HashMap<>();
 		_inherit = inherit;
 
 		if (params != null) {
@@ -195,7 +199,7 @@ public class DynamicServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public Map<String, String[]> getParameterMap() {
-		Map<String, String[]> map = new HashMap<String, String[]>();
+		Map<String, String[]> map = new HashMap<>();
 
 		if (_inherit) {
 			map.putAll(super.getParameterMap());
@@ -208,7 +212,7 @@ public class DynamicServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public Enumeration<String> getParameterNames() {
-		Set<String> names = new LinkedHashSet<String>();
+		Set<String> names = new LinkedHashSet<>();
 
 		if (_inherit) {
 			Enumeration<String> enu = super.getParameterNames();

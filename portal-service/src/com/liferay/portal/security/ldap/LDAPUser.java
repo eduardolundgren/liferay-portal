@@ -31,10 +31,6 @@ import java.util.Map;
  */
 public class LDAPUser {
 
-	public String getAimSn() {
-		return _contact.getAimSn();
-	}
-
 	public Date getBirthday() {
 		return _contact.getBirthday();
 	}
@@ -79,10 +75,6 @@ public class LDAPUser {
 		return _groupIds;
 	}
 
-	public String getIcqSn() {
-		return _contact.getIcqSn();
-	}
-
 	public String getJabberSn() {
 		return _contact.getJabberSn();
 	}
@@ -107,14 +99,6 @@ public class LDAPUser {
 		return _user.getMiddleName();
 	}
 
-	public String getMsnSn() {
-		return _contact.getMsnSn();
-	}
-
-	public String getMySpaceSn() {
-		return _contact.getMySpaceSn();
-	}
-
 	public String getOpenId() {
 		return _user.getOpenId();
 	}
@@ -131,7 +115,7 @@ public class LDAPUser {
 		return _user.getPortraitId();
 	}
 
-	public int getPrefixId() {
+	public long getPrefixId() {
 		return _contact.getPrefixId();
 	}
 
@@ -167,7 +151,7 @@ public class LDAPUser {
 		return _user.getStatus();
 	}
 
-	public int getSuffixId() {
+	public long getSuffixId() {
 		return _contact.getSuffixId();
 	}
 
@@ -193,10 +177,6 @@ public class LDAPUser {
 
 	public List<UserGroupRole> getUserGroupRoles() {
 		return _userGroupRoles;
-	}
-
-	public String getYmSn() {
-		return _contact.getYmSn();
 	}
 
 	public boolean isAutoPassword() {
@@ -233,10 +213,6 @@ public class LDAPUser {
 
 	public boolean isUpdatePortrait() {
 		return _updatePortrait;
-	}
-
-	public void setAimSn(String aimSn) {
-		_contact.setAimSn(aimSn);
 	}
 
 	public void setAutoPassword(boolean autoPassword) {
@@ -293,10 +269,6 @@ public class LDAPUser {
 		_groupIds = groupIds;
 	}
 
-	public void setIcqSn(String icqSn) {
-		_contact.setIcqSn(icqSn);
-	}
-
 	public void setJabberSn(String jabberSn) {
 		_contact.setJabberSn(jabberSn);
 	}
@@ -325,14 +297,6 @@ public class LDAPUser {
 		_user.setMiddleName(middleName);
 	}
 
-	public void setMsnSn(String msnSn) {
-		_contact.setMsnSn(msnSn);
-	}
-
-	public void setMySpaceSn(String mySpaceSn) {
-		_contact.setMySpaceSn(mySpaceSn);
-	}
-
 	public void setOpenId(String openId) {
 		_user.setOpenId(openId);
 	}
@@ -349,7 +313,7 @@ public class LDAPUser {
 		_portraitBytes = portraitBytes;
 	}
 
-	public void setPrefixId(int prefixId) {
+	public void setPrefixId(long prefixId) {
 		_contact.setPrefixId(prefixId);
 	}
 
@@ -389,7 +353,7 @@ public class LDAPUser {
 		_user.setStatus(status);
 	}
 
-	public void setSuffixId(int suffixId) {
+	public void setSuffixId(long suffixId) {
 		_contact.setSuffixId(suffixId);
 	}
 
@@ -425,10 +389,6 @@ public class LDAPUser {
 
 	public void setUserGroupRoles(List<UserGroupRole> userGroupRoles) {
 		_userGroupRoles = userGroupRoles;
-	}
-
-	public void setYmSn(String ymSn) {
-		_contact.setYmSn(ymSn);
 	}
 
 	private boolean _autoPassword;

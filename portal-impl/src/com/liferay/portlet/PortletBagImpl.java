@@ -15,8 +15,6 @@
 package com.liferay.portlet;
 
 import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
-import com.liferay.portal.kernel.lar.PortletDataHandler;
-import com.liferay.portal.kernel.lar.StagedModelDataHandler;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
 import com.liferay.portal.kernel.poller.PollerProcessor;
@@ -26,7 +24,7 @@ import com.liferay.portal.kernel.portlet.FriendlyURLMapperTracker;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.ResourceBundleTracker;
-import com.liferay.portal.kernel.scheduler.SchedulerEntry;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.servlet.URLEncoder;
@@ -39,8 +37,9 @@ import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xmlrpc.Method;
 import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
+import com.liferay.portlet.exportimport.lar.PortletDataHandler;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
 import com.liferay.portlet.social.model.SocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialRequestInterpreter;
 
@@ -65,8 +64,8 @@ public class PortletBagImpl implements PortletBag {
 		String portletName, ServletContext servletContext,
 		Portlet portletInstance, ResourceBundleTracker resourceBundleTracker,
 		List<ConfigurationAction> configurationActionInstances,
-		List<Indexer> indexerInstances, List<OpenSearch> openSearchInstances,
-		List<SchedulerEntry> schedulerEntryInstances,
+		List<Indexer<?>> indexerInstances, List<OpenSearch> openSearchInstances,
+		List<SchedulerEventMessageListener> schedulerEventMessageListeners,
 		FriendlyURLMapperTracker friendlyURLMapperTracker,
 		List<URLEncoder> urlEncoderInstances,
 		List<PortletDataHandler> portletDataHandlerInstances,
@@ -82,10 +81,9 @@ public class PortletBagImpl implements PortletBag {
 		List<WebDAVStorage> webDAVStorageInstances,
 		List<Method> xmlRpcMethodInstances,
 		List<ControlPanelEntry> controlPanelEntryInstances,
-		List<AssetRendererFactory> assetRendererFactoryInstances,
+		List<AssetRendererFactory<?>> assetRendererFactoryInstances,
 		List<AtomCollectionAdapter<?>> atomCollectionAdapters,
 		List<CustomAttributesDisplay> customAttributesDisplayInstances,
-		List<DDMDisplay> ddmDisplayInstances,
 		List<PermissionPropagator> permissionPropagatorInstances,
 		List<TrashHandler> trashHandlerInstances,
 		List<WorkflowHandler<?>> workflowHandlerInstances,
@@ -98,7 +96,7 @@ public class PortletBagImpl implements PortletBag {
 		_configurationActionInstances = configurationActionInstances;
 		_indexerInstances = indexerInstances;
 		_openSearchInstances = openSearchInstances;
-		_schedulerEntryInstances = schedulerEntryInstances;
+		_schedulerEventMessageListeners = schedulerEventMessageListeners;
 		_friendlyURLMapperTracker = friendlyURLMapperTracker;
 		_urlEncoderInstances = urlEncoderInstances;
 		_portletDataHandlerInstances = portletDataHandlerInstances;
@@ -119,7 +117,6 @@ public class PortletBagImpl implements PortletBag {
 		_assetRendererFactoryInstances = assetRendererFactoryInstances;
 		_atomCollectionAdapterInstances = atomCollectionAdapters;
 		_customAttributesDisplayInstances = customAttributesDisplayInstances;
-		_ddmDisplayInstances = ddmDisplayInstances;
 		_permissionPropagatorInstances = permissionPropagatorInstances;
 		_trashHandlerInstances = trashHandlerInstances;
 		_workflowHandlerInstances = workflowHandlerInstances;
@@ -132,7 +129,7 @@ public class PortletBagImpl implements PortletBag {
 			getPortletName(), getServletContext(), getPortletInstance(),
 			getResourceBundleTracker(), getConfigurationActionInstances(),
 			getIndexerInstances(), getOpenSearchInstances(),
-			getSchedulerEntryInstances(), getFriendlyURLMapperTracker(),
+			getSchedulerEventMessageListeners(), getFriendlyURLMapperTracker(),
 			getURLEncoderInstances(), getPortletDataHandlerInstances(),
 			getStagedModelDataHandlerInstances(), getTemplateHandlerInstances(),
 			getPortletLayoutListenerInstances(), getPollerProcessorInstances(),
@@ -144,7 +141,7 @@ public class PortletBagImpl implements PortletBag {
 			getXmlRpcMethodInstances(), getControlPanelEntryInstances(),
 			getAssetRendererFactoryInstances(),
 			getAtomCollectionAdapterInstances(),
-			getCustomAttributesDisplayInstances(), getDdmDisplayInstances(),
+			getCustomAttributesDisplayInstances(),
 			getPermissionPropagatorInstances(), getTrashHandlerInstances(),
 			getWorkflowHandlerInstances(), getPreferencesValidatorInstances());
 	}
@@ -156,7 +153,6 @@ public class PortletBagImpl implements PortletBag {
 		close(_configurationActionInstances);
 		close(_controlPanelEntryInstances);
 		close(_customAttributesDisplayInstances);
-		close(_ddmDisplayInstances);
 		close(_friendlyURLMapperTracker);
 		close(_indexerInstances);
 		close(_openSearchInstances);
@@ -167,9 +163,10 @@ public class PortletBagImpl implements PortletBag {
 		close(_portletLayoutListenerInstances);
 		close(_preferencesValidatorInstances);
 		close(_resourceBundleTracker);
-		close(_schedulerEntryInstances);
+		close(_schedulerEventMessageListeners);
 		close(_socialActivityInterpreterInstances);
 		close(_socialRequestInterpreterInstances);
+		close(_stagedModelDataHandlerInstances);
 		close(_templateHandlerInstances);
 		close(_trashHandlerInstances);
 		close(_urlEncoderInstances);
@@ -181,7 +178,7 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public List<AssetRendererFactory> getAssetRendererFactoryInstances() {
+	public List<AssetRendererFactory<?>> getAssetRendererFactoryInstances() {
 		return _assetRendererFactoryInstances;
 	}
 
@@ -206,17 +203,12 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public List<DDMDisplay> getDdmDisplayInstances() {
-		return _ddmDisplayInstances;
-	}
-
-	@Override
 	public FriendlyURLMapperTracker getFriendlyURLMapperTracker() {
 		return _friendlyURLMapperTracker;
 	}
 
 	@Override
-	public List<Indexer> getIndexerInstances() {
+	public List<Indexer<?>> getIndexerInstances() {
 		return _indexerInstances;
 	}
 
@@ -267,15 +259,16 @@ public class PortletBagImpl implements PortletBag {
 
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
-		ResourceBundle resourceBundle = _resourceBundleTracker.getResouceBundle(
-			LocaleUtil.toLanguageId(locale));
+		ResourceBundle resourceBundle =
+			_resourceBundleTracker.getResourceBundle(
+				LocaleUtil.toLanguageId(locale));
 
 		if (resourceBundle == null) {
-			resourceBundle = _resourceBundleTracker.getResouceBundle(
+			resourceBundle = _resourceBundleTracker.getResourceBundle(
 				locale.getLanguage());
 
 			if (resourceBundle == null) {
-				resourceBundle = _resourceBundleTracker.getResouceBundle(
+				resourceBundle = _resourceBundleTracker.getResourceBundle(
 					LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
 			}
 		}
@@ -289,8 +282,10 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public List<SchedulerEntry> getSchedulerEntryInstances() {
-		return _schedulerEntryInstances;
+	public List<SchedulerEventMessageListener>
+		getSchedulerEventMessageListeners() {
+
+		return _schedulerEventMessageListeners;
 	}
 
 	@Override
@@ -385,16 +380,15 @@ public class PortletBagImpl implements PortletBag {
 		}
 	}
 
-	private final List<AssetRendererFactory> _assetRendererFactoryInstances;
+	private final List<AssetRendererFactory<?>> _assetRendererFactoryInstances;
 	private final List<AtomCollectionAdapter<?>>
 		_atomCollectionAdapterInstances;
 	private final List<ConfigurationAction> _configurationActionInstances;
 	private final List<ControlPanelEntry> _controlPanelEntryInstances;
 	private final List<CustomAttributesDisplay>
 		_customAttributesDisplayInstances;
-	private final List<DDMDisplay> _ddmDisplayInstances;
 	private final FriendlyURLMapperTracker _friendlyURLMapperTracker;
-	private final List<Indexer> _indexerInstances;
+	private final List<Indexer<?>> _indexerInstances;
 	private final List<OpenSearch> _openSearchInstances;
 	private final List<PermissionPropagator> _permissionPropagatorInstances;
 	private final List<PollerProcessor> _pollerProcessorInstances;
@@ -405,7 +399,8 @@ public class PortletBagImpl implements PortletBag {
 	private String _portletName;
 	private final List<PreferencesValidator> _preferencesValidatorInstances;
 	private final ResourceBundleTracker _resourceBundleTracker;
-	private final List<SchedulerEntry> _schedulerEntryInstances;
+	private final List<SchedulerEventMessageListener>
+		_schedulerEventMessageListeners;
 	private final ServletContext _servletContext;
 	private final List<SocialActivityInterpreter>
 		_socialActivityInterpreterInstances;

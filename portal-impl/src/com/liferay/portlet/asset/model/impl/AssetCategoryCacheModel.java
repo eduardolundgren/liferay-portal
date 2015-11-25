@@ -16,6 +16,7 @@ package com.liferay.portlet.asset.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof AssetCategoryCacheModel)) {
+			return false;
+		}
+
+		AssetCategoryCacheModel assetCategoryCacheModel = (AssetCategoryCacheModel)obj;
+
+		if (categoryId == assetCategoryCacheModel.categoryId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, categoryId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -73,6 +98,8 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 		sb.append(description);
 		sb.append(", vocabularyId=");
 		sb.append(vocabularyId);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -142,6 +169,13 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 
 		assetCategoryImpl.setVocabularyId(vocabularyId);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			assetCategoryImpl.setLastPublishDate(null);
+		}
+		else {
+			assetCategoryImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		assetCategoryImpl.resetOriginalValues();
 
 		return assetCategoryImpl;
@@ -164,6 +198,7 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 		title = objectInput.readUTF();
 		description = objectInput.readUTF();
 		vocabularyId = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -216,6 +251,7 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 		}
 
 		objectOutput.writeLong(vocabularyId);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public String uuid;
@@ -233,4 +269,5 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 	public String title;
 	public String description;
 	public long vocabularyId;
+	public long lastPublishDate;
 }

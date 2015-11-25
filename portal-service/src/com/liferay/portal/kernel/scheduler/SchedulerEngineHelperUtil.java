@@ -15,9 +15,11 @@
 package com.liferay.portal.kernel.scheduler;
 
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.ProxyFactory;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -29,30 +31,6 @@ import javax.portlet.PortletRequest;
  * @author Michael C. Han
  */
 public class SchedulerEngineHelperUtil {
-
-	public static void addJob(
-			Trigger trigger, StorageType storageType, String description,
-			String destinationName, Message message,
-			String messageListenerClassName, String portletId,
-			int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getSchedulerEngineHelper().addJob(
-			trigger, storageType, description, destinationName, message,
-			messageListenerClassName, portletId, exceptionsMaxSize);
-	}
-
-	public static void addJob(
-			Trigger trigger, StorageType storageType, String description,
-			String destinationName, Object payload,
-			String messageListenerClassName, String portletId,
-			int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getSchedulerEngineHelper().addJob(
-			trigger, storageType, description, destinationName, payload,
-			messageListenerClassName, portletId, exceptionsMaxSize);
-	}
 
 	public static void addScriptingJob(
 			Trigger trigger, StorageType storageType, String description,
@@ -218,7 +196,7 @@ public class SchedulerEngineHelperUtil {
 		PortalRuntimePermission.checkGetBeanProperty(
 			SchedulerEngineHelperUtil.class);
 
-		return _schedulerEngineHelper;
+		return _instance;
 	}
 
 	public static Date getStartTime(SchedulerResponse schedulerResponse) {
@@ -233,8 +211,8 @@ public class SchedulerEngineHelperUtil {
 			jobName, groupName, storageType);
 	}
 
-	public static void initialize() throws SchedulerException {
-		getSchedulerEngineHelper().initialize();
+	public static boolean isClusteredSchedulerEngine() {
+		return getSchedulerEngineHelper().isClusteredSchedulerEngine();
 	}
 
 	public static void pause(String groupName, StorageType storageType)
@@ -250,6 +228,14 @@ public class SchedulerEngineHelperUtil {
 		getSchedulerEngineHelper().pause(jobName, groupName, storageType);
 	}
 
+	public static void register(
+		MessageListener messageListener, SchedulerEntry schedulerEntry,
+		String destinationName) {
+
+		getSchedulerEngineHelper().register(
+			messageListener, schedulerEntry, destinationName);
+	}
+
 	public static void resume(String groupName, StorageType storageType)
 		throws SchedulerException {
 
@@ -261,15 +247,6 @@ public class SchedulerEngineHelperUtil {
 		throws SchedulerException {
 
 		getSchedulerEngineHelper().resume(jobName, groupName, storageType);
-	}
-
-	public static void schedule(
-			SchedulerEntry schedulerEntry, StorageType storageType,
-			String portletId, int exceptionsMaxSize)
-		throws SchedulerException {
-
-		getSchedulerEngineHelper().schedule(
-			schedulerEntry, storageType, portletId, exceptionsMaxSize);
 	}
 
 	public static void schedule(
@@ -306,6 +283,10 @@ public class SchedulerEngineHelperUtil {
 
 		getSchedulerEngineHelper().suppressError(
 			jobName, groupName, storageType);
+	}
+
+	public static void unregister(MessageListener messageListener) {
+		getSchedulerEngineHelper().unregister(messageListener);
 	}
 
 	public static void unschedule(
@@ -345,14 +326,7 @@ public class SchedulerEngineHelperUtil {
 		getSchedulerEngineHelper().update(trigger, storageType);
 	}
 
-	public void setSchedulerEngineHelper(
-		SchedulerEngineHelper schedulerEngineHelper) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_schedulerEngineHelper = schedulerEngineHelper;
-	}
-
-	private static SchedulerEngineHelper _schedulerEngineHelper;
+	private static final SchedulerEngineHelper _instance =
+		ProxyFactory.newServiceTrackedInstance(SchedulerEngineHelper.class);
 
 }

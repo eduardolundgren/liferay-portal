@@ -14,14 +14,14 @@
 
 package com.liferay.portal.convert;
 
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public interface DLStoreConverter {
 
 	public void migrateDLFileEntry(
-		long companyId, long repositoryId, DLFileEntry dlFileEntry);
+		long companyId, long repositoryId, FileEntry fileEntry);
 
 }

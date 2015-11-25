@@ -15,6 +15,7 @@
 package com.liferay.taglib.search;
 
 import com.liferay.portal.kernel.dao.search.SearchEntry;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,12 +54,23 @@ public class ResultRow
 	public ResultRow(
 		String rowId, Object obj, String primaryKey, int pos, boolean bold) {
 
+		this(
+			rowId, obj, primaryKey, pos, bold, StringPool.BLANK,
+			StringPool.BLANK);
+	}
+
+	public ResultRow(
+		String rowId, Object obj, String primaryKey, int pos, boolean bold,
+		String cssClass, String state) {
+
 		_rowId = rowId;
 		_obj = obj;
 		_primaryKey = primaryKey;
 		_pos = pos;
 		_bold = bold;
-		_searchEntries = new ArrayList<SearchEntry>();
+		_cssClass = cssClass;
+		_state = state;
+		_searchEntries = new ArrayList<>();
 	}
 
 	@Override
@@ -233,6 +245,25 @@ public class ResultRow
 		addJSP(
 			_searchEntries.size(), align, valign, colspan, path, servletContext,
 			request, response);
+	}
+
+	@Override
+	public void addJSP(
+		String path, String cssClass, ServletContext servletContext,
+		HttpServletRequest request, HttpServletResponse response) {
+
+		JSPSearchEntry jspSearchEntry = new JSPSearchEntry();
+
+		jspSearchEntry.setAlign(SearchEntry.DEFAULT_ALIGN);
+		jspSearchEntry.setColspan(SearchEntry.DEFAULT_COLSPAN);
+		jspSearchEntry.setCssClass(cssClass);
+		jspSearchEntry.setPath(path);
+		jspSearchEntry.setRequest(request);
+		jspSearchEntry.setResponse(response);
+		jspSearchEntry.setServletContext(servletContext);
+		jspSearchEntry.setValign(SearchEntry.DEFAULT_VALIGN);
+
+		_searchEntries.add(_searchEntries.size(), jspSearchEntry);
 	}
 
 	@Override
@@ -515,6 +546,11 @@ public class ResultRow
 	}
 
 	@Override
+	public String getCssClass() {
+		return _cssClass;
+	}
+
+	@Override
 	public Map<String, Object> getData() {
 		return _data;
 	}
@@ -532,7 +568,7 @@ public class ResultRow
 	@Override
 	public Object getParameter(String param) {
 		if (_params == null) {
-			_params = new HashMap<String, Object>();
+			_params = new HashMap<>();
 		}
 
 		return _params.get(param);
@@ -551,6 +587,11 @@ public class ResultRow
 	@Override
 	public String getRowId() {
 		return _rowId;
+	}
+
+	@Override
+	public String getState() {
+		return _state;
 	}
 
 	@Override
@@ -589,6 +630,11 @@ public class ResultRow
 	}
 
 	@Override
+	public void setCssClass(String cssClass) {
+		_cssClass = cssClass;
+	}
+
+	@Override
 	public void setData(Map<String, Object> data) {
 		_data = data;
 	}
@@ -601,7 +647,7 @@ public class ResultRow
 	@Override
 	public void setParameter(String param, Object value) {
 		if (_params == null) {
-			_params = new HashMap<String, Object>();
+			_params = new HashMap<>();
 		}
 
 		_params.put(param, value);
@@ -627,9 +673,15 @@ public class ResultRow
 		_skip = skip;
 	}
 
+	@Override
+	public void setState(String state) {
+		_state = state;
+	}
+
 	private boolean _bold;
 	private String _classHoverName;
 	private String _className;
+	private String _cssClass;
 	private Map<String, Object> _data;
 	private Object _obj;
 	private Map<String, Object> _params;
@@ -639,5 +691,6 @@ public class ResultRow
 	private String _rowId;
 	private final List<SearchEntry> _searchEntries;
 	private boolean _skip;
+	private String _state;
 
 }

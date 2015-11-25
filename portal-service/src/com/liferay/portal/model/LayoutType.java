@@ -35,6 +35,8 @@ public interface LayoutType extends Serializable {
 
 	public Layout getLayout();
 
+	public LayoutTypeAccessPolicy getLayoutTypeAccessPolicy();
+
 	public LayoutTypeController getLayoutTypeController();
 
 	public UnicodeProperties getTypeSettingsProperties();
@@ -44,6 +46,8 @@ public interface LayoutType extends Serializable {
 	public String getTypeSettingsProperty(String key, String defaultValue);
 
 	public String getURL(Map<String, String> variables);
+
+	public boolean isBrowsable();
 
 	public boolean isFirstPageable();
 

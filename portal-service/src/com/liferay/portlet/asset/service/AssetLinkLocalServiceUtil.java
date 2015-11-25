@@ -59,15 +59,13 @@ public class AssetLinkLocalServiceUtil {
 	* @param entryId1 the primary key of the first asset entry
 	* @param entryId2 the primary key of the second asset entry
 	* @param type the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @param weight the weight of the relationship, allowing precedence
 	ordering of links
 	* @return the asset link
-	* @throws PortalException if the user could not be found
 	*/
 	public static com.liferay.portlet.asset.model.AssetLink addLink(
 		long userId, long entryId1, long entryId2, int type, int weight)
@@ -123,7 +121,6 @@ public class AssetLinkLocalServiceUtil {
 	* Deletes the asset link.
 	*
 	* @param linkId the primary key of the asset link
-	* @throws PortalException if the asset link could not be found
 	*/
 	public static void deleteLink(long linkId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -283,15 +280,6 @@ public class AssetLinkLocalServiceUtil {
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
-	/**
 	* Returns all the asset links whose first entry ID is the given entry ID.
 	*
 	* @param entryId the primary key of the asset entry
@@ -308,17 +296,25 @@ public class AssetLinkLocalServiceUtil {
 	*
 	* @param entryId the primary key of the asset entry
 	* @param typeId the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @return the asset links of the given link type whose first entry ID is
 	the given entry ID
 	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getDirectLinks(
 		long entryId, int typeId) {
 		return getService().getDirectLinks(entryId, typeId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionbleDynamicQuery(
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
+		return getService().getExportActionbleDynamicQuery(portletDataContext);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -340,17 +336,25 @@ public class AssetLinkLocalServiceUtil {
 	*
 	* @param entryId the primary key of the asset entry
 	* @param typeId the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @return the asset links of the given link type whose first or second
 	entry ID is the given entry ID
 	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getLinks(
 		long entryId, int typeId) {
 		return getService().getLinks(entryId, typeId);
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
@@ -365,26 +369,16 @@ public class AssetLinkLocalServiceUtil {
 	*
 	* @param entryId the primary key of the asset entry
 	* @param typeId the link type. Acceptable values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	AssetLinkConstants#TYPE_RELATED} which is a bidirectional
+	relationship and {@link AssetLinkConstants#TYPE_CHILD} which is a
+	unidirectional relationship. For more information see {@link
+	AssetLinkConstants}
 	* @return the asset links of the given link type whose second entry ID is
 	the given entry ID
 	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getReverseLinks(
 		long entryId, int typeId) {
 		return getService().getReverseLinks(entryId, typeId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -422,13 +416,10 @@ public class AssetLinkLocalServiceUtil {
 	* @param linkEntryIds the primary keys of the asset entries to be linked
 	with the asset entry to be managed
 	* @param typeId the type of the asset links to be created. Acceptable
-	values include {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
-	which is a bidirectional relationship and {@link
-	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
-	which is a unidirectional relationship. For more information see
-	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
-	* @throws PortalException if the user could not be found
+	values include {@link AssetLinkConstants#TYPE_RELATED} which is a
+	bidirectional relationship and {@link
+	AssetLinkConstants#TYPE_CHILD} which is a unidirectional
+	relationship. For more information see {@link AssetLinkConstants}
 	*/
 	public static void updateLinks(long userId, long entryId,
 		long[] linkEntryIds, int typeId)

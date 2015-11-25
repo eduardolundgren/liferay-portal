@@ -25,23 +25,22 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.asset.provider.DisplayPortletProvider;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
-import com.liferay.portlet.dynamicdatamapping.storage.Fields;
+import com.liferay.portlet.dynamicdatamapping.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.DDMFormFieldValue;
+import com.liferay.portlet.dynamicdatamapping.DDMFormValues;
 import com.liferay.portlet.trash.util.TrashUtil;
-import com.liferay.registry.collections.ServiceTrackerCollections;
-import com.liferay.registry.collections.ServiceTrackerMap;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletMode;
@@ -57,28 +56,26 @@ import javax.portlet.WindowState;
  * @author Jorge Ferrer
  * @author Sergio González
  */
-public abstract class BaseAssetRenderer implements AssetRenderer {
+public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String getAddToPagePortletId() throws Exception {
-		DisplayPortletProvider displayPortletProvider =
-			_serviceTrackerMap.getService(getClassName());
-
-		if (displayPortletProvider != null) {
-			return displayPortletProvider.getPortletId();
-		}
-
-		return PortletKeys.ASSET_PUBLISHER;
+		return StringPool.BLANK;
 	}
 
-	public AssetRendererFactory getAssetRendererFactory() {
+	public AssetRendererFactory<T> getAssetRendererFactory() {
 		if (_assetRendererFactory != null) {
 			return _assetRendererFactory;
 		}
 
 		_assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				getClassName());
+			(AssetRendererFactory<T>)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(getClassName());
 
 		return _assetRendererFactory;
 	}
@@ -103,8 +100,8 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 	}
 
 	@Override
-	public DDMFieldReader getDDMFieldReader() {
-		return _nullDDMFieldReader;
+	public DDMFormValuesReader getDDMFormValuesReader() {
+		return _nullDDMFormValuesReader;
 	}
 
 	@Override
@@ -136,17 +133,26 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return TrashUtil.getNewName(oldName, token);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public String getPreviewPath(
 			PortletRequest portletRequest, PortletResponse PortletResponse)
 		throws Exception {
 
-		return "/html/portlet/asset_publisher/display/preview.jsp";
+		return StringPool.BLANK;
 	}
 
 	@Override
 	public String getSearchSummary(Locale locale) {
 		return getSummary(null, null);
+	}
+
+	@Override
+	public int getStatus() {
+		return WorkflowConstants.STATUS_APPROVED;
 	}
 
 	@Override
@@ -223,8 +229,6 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		if (group.hasStagingGroup()) {
 			return null;
 		}
-
-		editPortletURL.setDoAsGroupId(getGroupId());
 
 		editPortletURL.setParameter("redirect", redirectURL.toString());
 
@@ -351,36 +355,15 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return null;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void setAddToPagePreferences(
 			PortletPreferences portletPreferences, String portletId,
 			ThemeDisplay themeDisplay)
 		throws Exception {
-
-		DisplayPortletProvider displayPortletProvider =
-			_serviceTrackerMap.getService(getClassName());
-
-		if (displayPortletProvider != null) {
-			displayPortletProvider.setPortletPreferences(
-				portletPreferences, portletId, getClassName(), getClassPK(),
-				themeDisplay);
-
-			return;
-		}
-
-		portletPreferences.setValue("displayStyle", "full-content");
-		portletPreferences.setValue(
-			"emailAssetEntryAddedEnabled", Boolean.FALSE.toString());
-		portletPreferences.setValue("selectionStyle", "manual");
-		portletPreferences.setValue(
-			"showAddContentButton", Boolean.FALSE.toString());
-
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
-			getClassName(), getClassPK());
-
-		AssetPublisherUtil.addSelection(
-			themeDisplay, portletPreferences, portletId,
-			assetEntry.getEntryId(), -1, assetEntry.getClassName());
 	}
 
 	public void setAssetRendererType(int assetRendererType) {
@@ -440,29 +423,25 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 
 	private static final String[] _AVAILABLE_LANGUAGE_IDS = new String[0];
 
-	private static final DDMFieldReader _nullDDMFieldReader =
-		new NullDDMFieldReader();
-	private static final ServiceTrackerMap<String, DisplayPortletProvider>
-		_serviceTrackerMap = ServiceTrackerCollections.singleValueMap(
-			DisplayPortletProvider.class, "model.class.name");
+	private static final DDMFormValuesReader _nullDDMFormValuesReader =
+		new NullDDMFormValuesReader();
 
-	static {
-		_serviceTrackerMap.open();
-	}
-
-	private AssetRendererFactory _assetRendererFactory;
+	private AssetRendererFactory<T> _assetRendererFactory;
 	private int _assetRendererType = AssetRendererFactory.TYPE_LATEST_APPROVED;
 
-	private static final class NullDDMFieldReader implements DDMFieldReader {
+	private static final class NullDDMFormValuesReader
+		implements DDMFormValuesReader {
 
 		@Override
-		public Fields getFields() {
-			return new Fields();
+		public List<DDMFormFieldValue> getDDMFormFieldValues(
+			String ddmFormFieldType) {
+
+			return Collections.emptyList();
 		}
 
 		@Override
-		public Fields getFields(String ddmType) {
-			return getFields();
+		public DDMFormValues getDDMFormValues() {
+			return new DDMFormValues(new DDMForm());
 		}
 
 	}

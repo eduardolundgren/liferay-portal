@@ -68,9 +68,10 @@ public interface Trash {
 		ActionRequest actionRequest, TrashedModel trashedModel, String cmd);
 
 	public void deleteEntriesAttachments(
-			long companyId, long repositoryId, Date date,
-			String[] attachmentFileNames)
-		throws PortalException;
+		long companyId, long repositoryId, Date date,
+		String[] attachmentFileNames);
+
+	public Group disableTrash(Group group);
 
 	public List<TrashEntry> getEntries(Hits hits) throws PortalException;
 
@@ -95,7 +96,14 @@ public interface Trash {
 	public String getTrashTitle(long trashEntryId);
 
 	public PortletURL getViewContentURL(
+			HttpServletRequest request, long trashEntryId)
+		throws PortalException;
+
+	public PortletURL getViewContentURL(
 			HttpServletRequest request, String className, long classPK)
+		throws PortalException;
+
+	public PortletURL getViewURL(HttpServletRequest request)
 		throws PortalException;
 
 	public boolean isInTrash(String className, long classPK)
@@ -104,5 +112,7 @@ public interface Trash {
 	public boolean isTrashEnabled(Group group);
 
 	public boolean isTrashEnabled(long groupId) throws PortalException;
+
+	public boolean isValidTrashTitle(String title);
 
 }

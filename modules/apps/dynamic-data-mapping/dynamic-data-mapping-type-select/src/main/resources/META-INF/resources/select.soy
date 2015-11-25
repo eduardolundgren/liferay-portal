@@ -1,0 +1,48 @@
+{namespace ddm}
+
+/**
+ * Prints the DDM form select field.
+ *
+ * @param childElementsHTML
+ * @param dir
+ * @param label
+ * @param multiple
+ * @param name
+ * @param options
+ * @param readOnly
+ * @param required
+ * @param showLabel
+ * @param strings
+ * @param visible
+ */
+{template .select}
+	<div class="form-group{$visible ? '' : ' hide'}" data-fieldname="{$name}">
+		<div class="input-select-wrapper">
+			{if $showLabel}
+				<label class="control-label" for="{$name}">
+					{$label}
+
+					{if $required}
+						<b>*</b>
+					{/if}
+				</label>
+			{/if}
+
+			<select class="form-control" dir="{$dir}" {if $readOnly}disabled{/if} id="{$name}" name="{$name}" {$multiple}>
+				{if not $readOnly}
+					<option dir="{$dir}" selected value="">
+						{$strings.chooseAnOption}
+					</option>
+				{/if}
+
+				{foreach $option in $options}
+					<option dir="{$dir}" {$option.status} value="{$option.value}">
+						{$option.label}
+					</option>
+				{/foreach}
+			</select>
+
+			{$childElementsHTML|noAutoescape}
+		</div>
+	</div>
+{/template}

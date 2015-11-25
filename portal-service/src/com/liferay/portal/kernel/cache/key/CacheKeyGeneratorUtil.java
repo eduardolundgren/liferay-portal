@@ -14,9 +14,9 @@
 
 package com.liferay.portal.kernel.cache.key;
 
-import com.liferay.portal.kernel.cache.Lifecycle;
-import com.liferay.portal.kernel.cache.ThreadLocalCache;
-import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.util.HashMap;
@@ -77,7 +77,7 @@ public class CacheKeyGeneratorUtil {
 	}
 
 	private static Map<String, CacheKeyGenerator> _cacheKeyGenerators =
-		new HashMap<String, CacheKeyGenerator>();
+		new HashMap<>();
 	private static CacheKeyGenerator _defaultCacheKeyGenerator;
 
 }

@@ -53,7 +53,7 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 		java.lang.String directDownloadURL, boolean testDirectDownloadURL,
 		boolean repoStoreArtifact, long[] frameworkVersionIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void addSCFrameworkVersionSCProductVersion(long frameworkVersionId,
 		long productVersionId);
@@ -96,13 +96,13 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void deleteProductVersion(
 		com.liferay.portlet.softwarecatalog.model.SCProductVersion productVersion);
 
 	public void deleteProductVersion(long productVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void deleteProductVersions(long productEntryId);
 
@@ -129,8 +129,7 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.softwarecatalog.model.SCProductVersion deleteSCProductVersion(
-		long productVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long productVersionId) throws PortalException;
 
 	/**
 	* Deletes the s c product version from the database. Also notifies the appropriate model listeners.
@@ -214,28 +213,28 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.softwarecatalog.model.SCProductVersion getProductVersion(
-		long productVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long productVersionId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.softwarecatalog.model.SCProductVersion getProductVersionByDirectDownloadURL(
-		java.lang.String directDownloadURL)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String directDownloadURL) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.softwarecatalog.model.SCProductVersion> getProductVersions(
@@ -279,8 +278,7 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.softwarecatalog.model.SCProductVersion getSCProductVersion(
-		long productVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long productVersionId) throws PortalException;
 
 	/**
 	* Returns a range of all the s c product versions.
@@ -313,13 +311,6 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 	public boolean hasSCFrameworkVersionSCProductVersions(
 		long frameworkVersionId);
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
 	public void setSCFrameworkVersionSCProductVersions(
 		long frameworkVersionId, long[] productVersionIds);
 
@@ -328,7 +319,7 @@ public interface SCProductVersionLocalService extends BaseLocalService,
 		java.lang.String changeLog, java.lang.String downloadPageURL,
 		java.lang.String directDownloadURL, boolean testDirectDownloadURL,
 		boolean repoStoreArtifact, long[] frameworkVersionIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the s c product version in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

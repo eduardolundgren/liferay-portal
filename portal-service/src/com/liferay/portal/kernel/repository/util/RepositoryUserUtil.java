@@ -22,25 +22,20 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.BaseServiceImpl;
 
 /**
- * @author Adolfo Pérez
- *
+ * @author     Adolfo Pérez
  * @deprecated As of 7.0.0, with no direct replacement
  */
 @Deprecated
 public class RepositoryUserUtil {
 
 	/**
-	 * See {@link com.liferay.portal.service.BaseServiceImpl#getUserId()}
+	 * See {@link BaseServiceImpl#getUserId()}
 	 *
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	public static long getUserId() throws PrincipalException {
 		String name = PrincipalThreadLocal.getName();
-
-		if (name == null) {
-			throw new PrincipalException();
-		}
 
 		if (Validator.isNull(name)) {
 			throw new PrincipalException("Principal is null");

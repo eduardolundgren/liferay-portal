@@ -17,7 +17,6 @@ package com.liferay.portal.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -26,9 +25,12 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -46,6 +48,12 @@ import com.liferay.portal.service.persistence.UserGroupFinder;
 import com.liferay.portal.service.persistence.UserGroupPersistence;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.util.PortalUtil;
+
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -67,7 +75,7 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
-	implements TeamLocalService, IdentifiableBean {
+	implements TeamLocalService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -212,6 +220,18 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the team matching the UUID and group.
+	 *
+	 * @param uuid the team's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching team, or <code>null</code> if a matching team could not be found
+	 */
+	@Override
+	public Team fetchTeamByUuidAndGroupId(String uuid, long groupId) {
+		return teamPersistence.fetchByUUID_G(uuid, groupId);
+	}
+
+	/**
 	 * Returns the team with the primary key.
 	 *
 	 * @param teamId the primary key of the team
@@ -228,21 +248,86 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.TeamLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(Team.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(Team.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("teamId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.TeamLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(Team.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("teamId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.TeamLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(Team.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(Team.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("teamId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType,
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType,
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<Team>() {
+				@Override
+				public void performAction(Team team) throws PortalException {
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						team);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(Team.class.getName())));
+
+		return exportActionableDynamicQuery;
 	}
 
 	/**
@@ -258,6 +343,49 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 		return teamPersistence.findByPrimaryKey(primaryKeyObj);
+	}
+
+	/**
+	 * Returns all the teams matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the teams
+	 * @param companyId the primary key of the company
+	 * @return the matching teams, or an empty list if no matches were found
+	 */
+	@Override
+	public List<Team> getTeamsByUuidAndCompanyId(String uuid, long companyId) {
+		return teamPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of teams matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the teams
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of teams
+	 * @param end the upper bound of the range of teams (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching teams, or an empty list if no matches were found
+	 */
+	@Override
+	public List<Team> getTeamsByUuidAndCompanyId(String uuid, long companyId,
+		int start, int end, OrderByComparator<Team> orderByComparator) {
+		return teamPersistence.findByUuid_C(uuid, companyId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	 * Returns the team matching the UUID and group.
+	 *
+	 * @param uuid the team's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching team
+	 * @throws PortalException if a matching team could not be found
+	 */
+	@Override
+	public Team getTeamByUuidAndGroupId(String uuid, long groupId)
+		throws PortalException {
+		return teamPersistence.findByUUID_G(uuid, groupId);
 	}
 
 	/**
@@ -552,7 +680,7 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the team local service
 	 */
-	public com.liferay.portal.service.TeamLocalService getTeamLocalService() {
+	public TeamLocalService getTeamLocalService() {
 		return teamLocalService;
 	}
 
@@ -561,8 +689,7 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param teamLocalService the team local service
 	 */
-	public void setTeamLocalService(
-		com.liferay.portal.service.TeamLocalService teamLocalService) {
+	public void setTeamLocalService(TeamLocalService teamLocalService) {
 		this.teamLocalService = teamLocalService;
 	}
 
@@ -893,23 +1020,13 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return TeamLocalService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -945,7 +1062,7 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	@BeanReference(type = com.liferay.portal.service.TeamLocalService.class)
-	protected com.liferay.portal.service.TeamLocalService teamLocalService;
+	protected TeamLocalService teamLocalService;
 	@BeanReference(type = com.liferay.portal.service.TeamService.class)
 	protected com.liferay.portal.service.TeamService teamService;
 	@BeanReference(type = TeamPersistence.class)
@@ -982,5 +1099,4 @@ public abstract class TeamLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected UserGroupFinder userGroupFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private String _beanIdentifier;
 }

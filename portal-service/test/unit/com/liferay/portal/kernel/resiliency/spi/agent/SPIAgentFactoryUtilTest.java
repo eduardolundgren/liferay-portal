@@ -16,8 +16,8 @@ package com.liferay.portal.kernel.resiliency.spi.agent;
 
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIConfiguration;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -111,7 +111,7 @@ public class SPIAgentFactoryUtilTest {
 
 		SPIAgentFactoryUtil spiAgentFactoryUtil = new SPIAgentFactoryUtil();
 
-		Set<String> agentClassNames = new HashSet<String>();
+		Set<String> agentClassNames = new HashSet<>();
 
 		agentClassNames.add(BadMockSPIAgent.class.getName());
 		agentClassNames.add(MockSPIAgent.class.getName());

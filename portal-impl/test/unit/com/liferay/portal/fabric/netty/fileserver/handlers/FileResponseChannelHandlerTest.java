@@ -20,8 +20,8 @@ import com.liferay.portal.fabric.netty.util.NettyUtil;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.Time;
 
 import io.netty.channel.Channel;
@@ -130,10 +130,10 @@ public class FileResponseChannelHandlerTest {
 		FileResponse fileResponse = new FileResponse(
 			_path, FileResponse.FILE_NOT_FOUND, -1, false);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			FileResponseChannelHandler.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					FileResponseChannelHandler.class.getName(), Level.SEVERE)) {
 
-		try {
 			_fileResponseChannelHandler.channelRead(
 				_channelHandlerContext, fileResponse, null);
 
@@ -148,9 +148,6 @@ public class FileResponseChannelHandlerTest {
 					" because no future exists with ID " +
 						fileResponse.getPath(),
 				logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -172,10 +169,10 @@ public class FileResponseChannelHandlerTest {
 		FileResponse fileResponse = new FileResponse(
 			_path, FileResponse.FILE_NOT_MODIFIED, -1, false);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			FileResponseChannelHandler.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					FileResponseChannelHandler.class.getName(), Level.SEVERE)) {
 
-		try {
 			_fileResponseChannelHandler.channelRead(
 				_channelHandlerContext, fileResponse, null);
 
@@ -191,15 +188,12 @@ public class FileResponseChannelHandlerTest {
 						fileResponse.getPath(),
 				logRecord.getMessage());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	private static final Path _path = Paths.get("testFile");
 
 	private final AsyncBroker<Path, FileResponse> _asyncBroker =
-		new AsyncBroker<Path, FileResponse>();
+		new AsyncBroker<>();
 	private ChannelHandlerContext _channelHandlerContext;
 	private final ChannelPipeline _channelPipeline =
 		NettyUtil.createEmptyChannelPipeline();

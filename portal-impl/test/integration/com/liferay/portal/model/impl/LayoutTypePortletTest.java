@@ -14,39 +14,38 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTemplate;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.PortletLocalService;
 import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.service.impl.PortletLocalServiceImpl;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
-import com.liferay.portlet.PortletInstanceFactoryUtil;
-import com.liferay.portlet.util.PortletKeys;
+import com.liferay.portlet.util.test.PortletKeys;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 /**
  * @author Raymond Augé
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LayoutTypePortletTest {
 
 	@ClassRule
@@ -163,8 +162,7 @@ public class LayoutTypePortletTest {
 	public void testAddPortletIdCheckColumn() throws Exception {
 		Layout layout = _layoutTypePortlet.getLayout();
 
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), layout.getGroupId());
+		_user = UserTestUtil.addUser(layout.getGroupId());
 
 		String portletId = PortletKeys.TEST;
 
@@ -190,8 +188,7 @@ public class LayoutTypePortletTest {
 	public void testAddPortletIdColumn2() throws Exception {
 		Layout layout = _layoutTypePortlet.getLayout();
 
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), layout.getGroupId());
+		_user = UserTestUtil.addUser(layout.getGroupId());
 
 		String portletId = PortletKeys.TEST;
 
@@ -222,25 +219,7 @@ public class LayoutTypePortletTest {
 	public void testAddPortletIdWithInvalidId() throws Exception {
 		Layout layout = _layoutTypePortlet.getLayout();
 
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), layout.getGroupId());
-
-		String portletId = RandomTestUtil.randomString();
-
-		portletId = _layoutTypePortlet.addPortletId(
-			_user.getUserId(), portletId);
-
-		Assert.assertNull(portletId);
-	}
-
-	@Test
-	public void testAddPortletIdWithInvalidIdWithoutPermission()
-		throws Exception {
-
-		Layout layout = _layoutTypePortlet.getLayout();
-
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), layout.getGroupId());
+		_user = UserTestUtil.addUser(layout.getGroupId());
 
 		String portletId = RandomTestUtil.randomString();
 
@@ -254,8 +233,7 @@ public class LayoutTypePortletTest {
 	public void testAddPortletIdWithValidId() throws Exception {
 		Layout layout = _layoutTypePortlet.getLayout();
 
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), layout.getGroupId());
+		_user = UserTestUtil.addUser(layout.getGroupId());
 
 		String portletId = PortletKeys.TEST;
 
@@ -269,24 +247,53 @@ public class LayoutTypePortletTest {
 	public void testGetAllPortlets() throws Exception {
 		Layout layout = _layoutTypePortlet.getLayout();
 
-		_user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), layout.getGroupId());
+		_user = UserTestUtil.addUser(layout.getGroupId());
 
-		String portletId = _layoutTypePortlet.addPortletId(
+		final String portletId = _layoutTypePortlet.addPortletId(
 			_user.getUserId(), PortletKeys.TEST);
 
 		List<Portlet> portlets = _layoutTypePortlet.getAllPortlets();
 
 		Assert.assertEquals(1, portlets.size());
 
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			TestPropsValues.getCompanyId(), portletId);
+		final long companyId = TestPropsValues.getCompanyId();
 
-		PortletInstanceFactoryUtil.destroy(portlet);
+		PortletLocalService portletLocalService =
+			PortletLocalServiceUtil.getService();
 
-		portlets = _layoutTypePortlet.getAllPortlets();
+		ReflectionTestUtil.setFieldValue(
+			PortletLocalServiceUtil.class, "_service",
+			new PortletLocalServiceImpl() {
 
-		Assert.assertEquals(0, portlets.size());
+				@Override
+				public Portlet getPortletById(
+					long localCompanyId, String localPortletId) {
+
+					Portlet portlet = super.getPortletById(
+						localCompanyId, localPortletId);
+
+					if ((companyId == localCompanyId) &&
+						portletId.equals(localPortletId)) {
+
+						portlet = (Portlet)portlet.clone();
+
+						portlet.setUndeployedPortlet(true);
+					}
+
+					return portlet;
+				}
+
+			});
+
+		try {
+			portlets = _layoutTypePortlet.getAllPortlets();
+
+			Assert.assertEquals(1, portlets.size());
+		}
+		finally {
+			ReflectionTestUtil.setFieldValue(
+				PortletLocalServiceUtil.class, "_service", portletLocalService);
+		}
 	}
 
 	@Test

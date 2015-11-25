@@ -41,19 +41,9 @@ public class MembershipRequestServiceWrapper implements MembershipRequestService
 	}
 
 	@Override
-	public void deleteMembershipRequests(long groupId, int statusId)
+	public void deleteMembershipRequests(long groupId, long statusId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_membershipRequestService.deleteMembershipRequests(groupId, statusId);
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _membershipRequestService.getBeanIdentifier();
 	}
 
 	@Override
@@ -64,18 +54,18 @@ public class MembershipRequestServiceWrapper implements MembershipRequestService
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @param beanIdentifier the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_membershipRequestService.setBeanIdentifier(beanIdentifier);
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _membershipRequestService.getOSGiServiceIdentifier();
 	}
 
 	@Override
 	public void updateStatus(long membershipRequestId,
-		java.lang.String reviewComments, int statusId,
+		java.lang.String reviewComments, long statusId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_membershipRequestService.updateStatus(membershipRequestId,

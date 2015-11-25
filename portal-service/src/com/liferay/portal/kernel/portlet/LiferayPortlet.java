@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 
@@ -52,6 +54,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -88,15 +91,21 @@ public class LiferayPortlet extends GenericPortlet {
 				return;
 			}
 
-			boolean emptySessionMessages = SessionMessages.isEmpty(
+			boolean emptySessionMessages = isEmptySessionMessages(
 				actionRequest);
 
 			if (emptySessionMessages) {
 				addSuccessMessage(actionRequest, actionResponse);
 			}
 
-			if (emptySessionMessages || isAlwaysSendRedirect()) {
-				sendRedirect(actionRequest, actionResponse);
+			if (!SessionMessages.contains(
+					actionRequest,
+					PortalUtil.getPortletId(actionRequest) +
+						SessionMessages.KEY_SUFFIX_FORCE_SEND_REDIRECT)) {
+
+				if (emptySessionMessages || isAlwaysSendRedirect()) {
+					sendRedirect(actionRequest, actionResponse);
+				}
 			}
 		}
 		catch (PortletException pe) {
@@ -176,7 +185,7 @@ public class LiferayPortlet extends GenericPortlet {
 				return true;
 			}
 			catch (Exception e) {
-				throw new PortletException(nsme);
+				throw new PortletException(e);
 			}
 		}
 		catch (InvocationTargetException ite) {
@@ -222,7 +231,7 @@ public class LiferayPortlet extends GenericPortlet {
 				return true;
 			}
 			catch (Exception e) {
-				throw new PortletException(nsme);
+				throw new PortletException(e);
 			}
 		}
 		catch (InvocationTargetException ite) {
@@ -400,6 +409,17 @@ public class LiferayPortlet extends GenericPortlet {
 		return method;
 	}
 
+	protected ServletContext getServletContext() {
+		LiferayPortletConfig liferayPortletConfig =
+			(LiferayPortletConfig)getPortletConfig();
+
+		Portlet portlet = liferayPortletConfig.getPortlet();
+
+		PortletApp portletApp = portlet.getPortletApp();
+
+		return portletApp.getServletContext();
+	}
+
 	@Override
 	protected String getTitle(RenderRequest renderRequest) {
 		try {
@@ -412,6 +432,28 @@ public class LiferayPortlet extends GenericPortlet {
 
 	protected boolean isAlwaysSendRedirect() {
 		return alwaysSendRedirect;
+	}
+
+	protected boolean isEmptySessionMessages(ActionRequest actionRequest) {
+		if (SessionMessages.isEmpty(actionRequest)) {
+			return true;
+		}
+
+		int sessionMessagesSize = SessionMessages.size(actionRequest);
+
+		String portletId = PortalUtil.getPortletId(actionRequest);
+
+		for (String suffix : _IGNORED_SESSION_MESSAGE_SUFFIXES) {
+			if (SessionMessages.contains(actionRequest, portletId + suffix)) {
+				sessionMessagesSize--;
+			}
+		}
+
+		if (sessionMessagesSize == 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	protected boolean isProcessActionRequest(ActionRequest actionRequest) {
@@ -507,13 +549,21 @@ public class LiferayPortlet extends GenericPortlet {
 	protected boolean addProcessActionSuccessMessage;
 	protected boolean alwaysSendRedirect;
 
+	private static final String[] _IGNORED_SESSION_MESSAGE_SUFFIXES = {
+		SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA,
+		SessionMessages.KEY_SUFFIX_FORCE_SEND_REDIRECT,
+		SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE,
+		SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE,
+		SessionMessages.KEY_SUFFIX_REFRESH_PORTLET
+	};
+
 	private static final boolean _PROCESS_PORTLET_REQUEST = true;
 
 	private static final Log _log = LogFactoryUtil.getLog(LiferayPortlet.class);
 
 	private final Map<String, Method> _actionMethods =
-		new ConcurrentHashMap<String, Method>();
+		new ConcurrentHashMap<>();
 	private final Map<String, Method> _resourceMethods =
-		new ConcurrentHashMap<String, Method>();
+		new ConcurrentHashMap<>();
 
 }

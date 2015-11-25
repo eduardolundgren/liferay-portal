@@ -114,7 +114,7 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	public boolean isRoleAllowed(long userId, long groupId, long roleId)
 		throws PortalException {
 
-		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+		List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
 		UserGroupRolePK userGroupRolePK = new UserGroupRolePK(
 			userId, groupId, roleId);
@@ -165,7 +165,7 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 
 	@Override
 	public boolean isRoleRequired(long userId, long groupId, long roleId) {
-		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+		List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
 		UserGroupRolePK userGroupRolePK = new UserGroupRolePK(
 			userId, groupId, roleId);
@@ -210,14 +210,10 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 
 			});
 		groupActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod() {
+			new ActionableDynamicQuery.PerformActionMethod<Group>() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
-					Group group = (Group)object;
-
+				public void performAction(Group group) throws PortalException {
 					verifyPolicy(group);
 
 					ActionableDynamicQuery userGroupRoleActionableDynamicQuery =
@@ -227,14 +223,13 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 					userGroupRoleActionableDynamicQuery.setGroupId(
 						group.getGroupId());
 					userGroupRoleActionableDynamicQuery.setPerformActionMethod(
-						new ActionableDynamicQuery.PerformActionMethod() {
+						new ActionableDynamicQuery.
+							PerformActionMethod<UserGroupRole>() {
 
 							@Override
-							public void performAction(Object object)
+							public void performAction(
+									UserGroupRole userGroupRole)
 								throws PortalException {
-
-								UserGroupRole userGroupRole =
-									(UserGroupRole)object;
 
 								verifyPolicy(userGroupRole.getRole());
 							}

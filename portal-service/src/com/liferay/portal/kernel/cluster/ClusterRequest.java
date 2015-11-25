@@ -14,129 +14,49 @@
 
 package com.liferay.portal.kernel.cluster;
 
-import com.liferay.portal.kernel.util.MethodHandler;
+import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Tina Tian
  */
 public class ClusterRequest implements Serializable {
 
-	public static ClusterRequest createClusterRequest(
-		ClusterMessageType clusterMessageType,
-		ClusterNode originatingClusterNode) {
-
-		ClusterRequest clusterRequest = new ClusterRequest();
-
-		clusterRequest.setClusterMessageType(clusterMessageType);
-		clusterRequest.setMulticast(true);
-		clusterRequest.setOriginatingClusterNode(originatingClusterNode);
-		clusterRequest.setSkipLocal(true);
-		clusterRequest.setUuid(PortalUUIDUtil.generate());
-
-		return clusterRequest;
+	public static ClusterRequest createMulticastRequest(Serializable payload) {
+		return createMulticastRequest(payload, false);
 	}
 
 	public static ClusterRequest createMulticastRequest(
-		MethodHandler methodHandler) {
+		Serializable payload, boolean skipLocal) {
 
-		return createMulticastRequest(methodHandler, false);
-	}
-
-	public static ClusterRequest createMulticastRequest(
-		MethodHandler methodHandler, boolean skipLocal) {
-
-		ClusterRequest clusterRequest = new ClusterRequest();
-
-		clusterRequest.setClusterMessageType(ClusterMessageType.EXECUTE);
-		clusterRequest.setMethodHandler(methodHandler);
-		clusterRequest.setMulticast(true);
-		clusterRequest.setSkipLocal(skipLocal);
-		clusterRequest.setUuid(PortalUUIDUtil.generate());
-
-		return clusterRequest;
+		return new ClusterRequest(payload, skipLocal, true);
 	}
 
 	public static ClusterRequest createUnicastRequest(
-		MethodHandler methodHandler, Address... targetClusterNodeAddresses) {
+		Serializable payload, String... targetClusterNodeIds) {
 
-		ClusterRequest clusterRequest = new ClusterRequest();
+		if ((targetClusterNodeIds == null) ||
+			(targetClusterNodeIds.length == 0)) {
 
-		clusterRequest.addTargetClusterNodeAddresses(
-			targetClusterNodeAddresses);
-		clusterRequest.setClusterMessageType(ClusterMessageType.EXECUTE);
-		clusterRequest.setMethodHandler(methodHandler);
-		clusterRequest.setMulticast(false);
-		clusterRequest.setSkipLocal(false);
-		clusterRequest.setUuid(PortalUUIDUtil.generate());
-
-		return clusterRequest;
-	}
-
-	public static ClusterRequest createUnicastRequest(
-		MethodHandler methodHandler, String... targetClusterNodeIds) {
-
-		ClusterRequest clusterRequest = new ClusterRequest();
-
-		clusterRequest.addTargetClusterNodeIds(targetClusterNodeIds);
-		clusterRequest.setClusterMessageType(ClusterMessageType.EXECUTE);
-		clusterRequest.setMethodHandler(methodHandler);
-		clusterRequest.setMulticast(false);
-		clusterRequest.setSkipLocal(false);
-		clusterRequest.setUuid(PortalUUIDUtil.generate());
-
-		return clusterRequest;
-	}
-
-	public void addTargetClusterNodeAddresses(
-		Address... targetClusterNodeAddresses) {
-
-		if (_targetClusterNodeAddresses == null) {
-			_targetClusterNodeAddresses = new HashSet<Address>(
-				targetClusterNodeAddresses.length);
+			throw new NullPointerException("Target cluster node IDs is null");
 		}
 
-		for (Address targetClusterNodeAddress : targetClusterNodeAddresses) {
-			_targetClusterNodeAddresses.add(targetClusterNodeAddress);
-		}
+		return new ClusterRequest(payload, false, false, targetClusterNodeIds);
 	}
 
-	public void addTargetClusterNodeIds(String... targetClusterNodeIds) {
-		if (_targetClusterNodeIds == null) {
-			_targetClusterNodeIds = new HashSet<String>(
-				targetClusterNodeIds.length);
-		}
-
-		for (String targetClusterNodeId : targetClusterNodeIds) {
-			_targetClusterNodeIds.add(targetClusterNodeId);
-		}
+	public Serializable getPayload() {
+		return _payload;
 	}
 
-	public ClusterMessageType getClusterMessageType() {
-		return _clusterMessageType;
-	}
-
-	public MethodHandler getMethodHandler() {
-		return _methodHandler;
-	}
-
-	public ClusterNode getOriginatingClusterNode() {
-		return _originatingClusterNode;
-	}
-
-	public Collection<Address> getTargetClusterNodeAddresses() {
-		return _targetClusterNodeAddresses;
-	}
-
-	public Collection<String> getTargetClusterNodeIds() {
-		return _targetClusterNodeIds;
+	public Set<String> getTargetClusterNodeIds() {
+		return Collections.unmodifiableSet(_targetClusterNodeIds);
 	}
 
 	public String getUuid() {
@@ -155,64 +75,26 @@ public class ClusterRequest implements Serializable {
 		return _skipLocal;
 	}
 
-	public void setClusterMessageType(ClusterMessageType clusterMessageType) {
-		_clusterMessageType = clusterMessageType;
-	}
-
 	public void setFireAndForget(boolean fireAndForget) {
 		_fireAndForget = fireAndForget;
-	}
-
-	public void setMethodHandler(MethodHandler methodHandler) {
-		_methodHandler = methodHandler;
-	}
-
-	public void setMulticast(boolean multicast) {
-		_multicast = multicast;
-	}
-
-	public void setOriginatingClusterNode(ClusterNode originatingClusterNode) {
-		_originatingClusterNode = originatingClusterNode;
-	}
-
-	public void setSkipLocal(boolean skipLocal) {
-		_skipLocal = skipLocal;
-	}
-
-	public void setUuid(String uuid) {
-		_uuid = uuid;
 	}
 
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(11);
 
-		sb.append("{clusterMessageType=");
-		sb.append(_clusterMessageType);
-
-		boolean clusterMessageTypeNotifyOrUpdate = false;
-
-		if (_clusterMessageType.equals(ClusterMessageType.NOTIFY) ||
-			_clusterMessageType.equals(ClusterMessageType.UPDATE)) {
-
-			clusterMessageTypeNotifyOrUpdate = true;
-		}
-
-		if (!clusterMessageTypeNotifyOrUpdate) {
-			sb.append(", methodHandler=");
-			sb.append(_methodHandler);
-		}
-
-		sb.append(", multicast=");
+		sb.append("{multicast=");
 		sb.append(_multicast);
-
-		if (clusterMessageTypeNotifyOrUpdate) {
-			sb.append(", originatingClusterNode=");
-			sb.append(_originatingClusterNode);
-		}
-
+		sb.append(", payload=");
+		sb.append(_payload);
 		sb.append(", skipLocal=");
 		sb.append(_skipLocal);
+
+		if (!_multicast) {
+			sb.append(", _targetClusterNodeIds=");
+			sb.append(_targetClusterNodeIds);
+		}
+
 		sb.append(", uuid=");
 		sb.append(_uuid);
 		sb.append("}");
@@ -220,17 +102,37 @@ public class ClusterRequest implements Serializable {
 		return sb.toString();
 	}
 
-	private ClusterRequest() {
+	private ClusterRequest(
+		Serializable payload, boolean skipLocal, boolean multicast,
+		String... targetClusterNodeIds) {
+
+		if (payload == null) {
+			throw new NullPointerException("Payload is null");
+		}
+
+		_payload = payload;
+		_skipLocal = skipLocal;
+		_multicast = multicast;
+
+		_uuid = _generateUUID();
+
+		for (String targetClusterNodeId : targetClusterNodeIds) {
+			_targetClusterNodeIds.add(targetClusterNodeId);
+		}
 	}
 
-	private ClusterMessageType _clusterMessageType;
+	private String _generateUUID() {
+		UUID uuid = new UUID(
+			SecureRandomUtil.nextLong(), SecureRandomUtil.nextLong());
+
+		return uuid.toString();
+	}
+
 	private boolean _fireAndForget;
-	private MethodHandler _methodHandler;
-	private boolean _multicast;
-	private ClusterNode _originatingClusterNode;
-	private boolean _skipLocal;
-	private Set<Address> _targetClusterNodeAddresses;
-	private Set<String> _targetClusterNodeIds;
-	private String _uuid;
+	private final boolean _multicast;
+	private final Serializable _payload;
+	private final boolean _skipLocal;
+	private final Set<String> _targetClusterNodeIds = new HashSet<>();
+	private final String _uuid;
 
 }

@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DLFileEntryCacheModel)) {
+			return false;
+		}
+
+		DLFileEntryCacheModel dlFileEntryCacheModel = (DLFileEntryCacheModel)obj;
+
+		if (fileEntryId == dlFileEntryCacheModel.fileEntryId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, fileEntryId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(59);
+		StringBundler sb = new StringBundler(61);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -101,6 +126,8 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		sb.append(custom2ImageId);
 		sb.append(", manualCheckInRequired=");
 		sb.append(manualCheckInRequired);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -221,6 +248,13 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		dlFileEntryImpl.setCustom2ImageId(custom2ImageId);
 		dlFileEntryImpl.setManualCheckInRequired(manualCheckInRequired);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			dlFileEntryImpl.setLastPublishDate(null);
+		}
+		else {
+			dlFileEntryImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		dlFileEntryImpl.resetOriginalValues();
 
 		return dlFileEntryImpl;
@@ -257,6 +291,7 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		custom1ImageId = objectInput.readLong();
 		custom2ImageId = objectInput.readLong();
 		manualCheckInRequired = objectInput.readBoolean();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -360,6 +395,7 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		objectOutput.writeLong(custom1ImageId);
 		objectOutput.writeLong(custom2ImageId);
 		objectOutput.writeBoolean(manualCheckInRequired);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public String uuid;
@@ -391,4 +427,5 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 	public long custom1ImageId;
 	public long custom2ImageId;
 	public boolean manualCheckInRequired;
+	public long lastPublishDate;
 }

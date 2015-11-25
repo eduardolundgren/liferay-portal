@@ -34,6 +34,7 @@ import com.liferay.portal.model.PortletPreferencesIds;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
+import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 
@@ -75,8 +76,8 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * optional service context parameters.
 	 */
 	public ServiceContext() {
-		_attributes = new LinkedHashMap<String, Serializable>();
-		_expandoBridgeAttributes = new LinkedHashMap<String, Serializable>();
+		_attributes = new LinkedHashMap<>();
+		_expandoBridgeAttributes = new LinkedHashMap<>();
 	}
 
 	/**
@@ -94,6 +95,7 @@ public class ServiceContext implements Cloneable, Serializable {
 		serviceContext.setAssetCategoryIds(getAssetCategoryIds());
 		serviceContext.setAssetEntryVisible(isAssetEntryVisible());
 		serviceContext.setAssetLinkEntryIds(getAssetLinkEntryIds());
+		serviceContext.setAssetPriority(getAssetPriority());
 		serviceContext.setAssetTagNames(getAssetTagNames());
 		serviceContext.setAttributes(getAttributes());
 		serviceContext.setCommand(getCommand());
@@ -109,6 +111,8 @@ public class ServiceContext implements Cloneable, Serializable {
 		serviceContext.setLanguageId(getLanguageId());
 		serviceContext.setLayoutFullURL(getLayoutFullURL());
 		serviceContext.setLayoutURL(getLayoutURL());
+		serviceContext.setModelPermissions(
+			(ModelPermissions)_modelPermissions.clone());
 		serviceContext.setModifiedDate(getModifiedDate());
 		serviceContext.setPathFriendlyURLPrivateGroup(
 			getPathFriendlyURLPrivateGroup());
@@ -147,8 +151,8 @@ public class ServiceContext implements Cloneable, Serializable {
 		Role defaultGroupRole = RoleLocalServiceUtil.getDefaultGroupRole(
 			siteGroupId);
 
-		List<String> groupPermissions = new ArrayList<String>();
-		List<String> guestPermissions = new ArrayList<String>();
+		List<String> groupPermissionsList = new ArrayList<>();
+		List<String> guestPermissionsList = new ArrayList<>();
 
 		String[] roleNames = {RoleConstants.GUEST, defaultGroupRole.getName()};
 
@@ -169,20 +173,25 @@ public class ServiceContext implements Cloneable, Serializable {
 					guestDefaultActions.contains(action) &&
 					siteGroup.hasPublicLayouts()) {
 
-					guestPermissions.add(action);
+					guestPermissionsList.add(action);
 				}
 				else if (roleName.equals(defaultGroupRole.getName()) &&
 						 groupDefaultActions.contains(action)) {
 
-					groupPermissions.add(action);
+					groupPermissionsList.add(action);
 				}
 			}
 		}
 
-		setGroupPermissions(
-			groupPermissions.toArray(new String[groupPermissions.size()]));
-		setGuestPermissions(
-			guestPermissions.toArray(new String[guestPermissions.size()]));
+		String[] groupPermissions = groupPermissionsList.toArray(
+			new String[groupPermissionsList.size()]);
+
+		setGroupPermissions(groupPermissions);
+
+		String[] guestPermissions = guestPermissionsList.toArray(
+			new String[guestPermissionsList.size()]);
+
+		setGuestPermissions(guestPermissions);
 	}
 
 	/**
@@ -224,6 +233,16 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
+	 * Returns the priority of an asset entry if this service context is being
+	 * passed as a parameter to a method which manipulates the asset entry.
+	 *
+	 * @return the asset entry's priority
+	 */
+	public double getAssetPriority() {
+		return _assetPriority;
+	}
+
+	/**
 	 * Returns the asset tag names to be applied to an asset entry if the
 	 * service context is being passed as a parameter to a method which
 	 * manipulates the asset entry.
@@ -256,8 +275,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
-	 * Returns the value of the {@link
-	 * com.liferay.portal.kernel.util.Constants#CMD} parameter used in most
+	 * Returns the value of the {@link Constants#CMD} parameter used in most
 	 * Liferay forms for internal portlets.
 	 *
 	 * @return the value of the command parameter
@@ -375,7 +393,8 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * @return the specific group permissions
 	 */
 	public String[] getGroupPermissions() {
-		return _groupPermissions;
+		return _modelPermissions.getActionIds(
+			RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE);
 	}
 
 	/**
@@ -385,8 +404,6 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * @return the user ID, or guest ID if there is no user in this service
 	 *         context, or <code>0</code> if there is no company in this service
 	 *         context
-	 * @throws PortalException if a default user for the company could not be
-	 *         found
 	 */
 	public long getGuestOrUserId() throws PortalException {
 		long userId = getUserId();
@@ -412,7 +429,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * @return the specific guest permissions
 	 */
 	public String[] getGuestPermissions() {
-		return _guestPermissions;
+		return _modelPermissions.getActionIds(RoleConstants.GUEST);
 	}
 
 	/**
@@ -420,7 +437,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * context.
 	 *
 	 * @return the the map of request header name/value pairs
-	 * @see    com.liferay.portal.kernel.servlet.HttpHeaders
+	 * @see    HttpHeaders
 	 */
 	@JSON(include = false)
 	public Map<String, String> getHeaders() {
@@ -489,6 +506,10 @@ public class ServiceContext implements Cloneable, Serializable {
 
 	public Locale getLocale() {
 		return LocaleUtil.fromLanguageId(_languageId);
+	}
+
+	public ModelPermissions getModelPermissions() {
+		return _modelPermissions;
 	}
 
 	/**
@@ -575,7 +596,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * passed as a parameter to a portlet.
 	 *
 	 * @return the ID of the current portlet
-	 * @see    com.liferay.portal.model.PortletPreferencesIds
+	 * @see    PortletPreferencesIds
 	 */
 	public String getPortletId() {
 		if (_portletPreferencesIds == null) {
@@ -590,12 +611,12 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * context is being passed as a parameter to a portlet.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.model.PortletPreferencesIds} can be used to
-	 * look up portlet preferences of the current portlet.
+	 * The {@link PortletPreferencesIds} can be used to look up portlet
+	 * preferences of the current portlet.
 	 * </p>
 	 *
 	 * @return the portlet preferences IDs of the current portlet
-	 * @see    com.liferay.portal.model.PortletPreferencesIds
+	 * @see    PortletPreferencesIds
 	 */
 	public PortletPreferencesIds getPortletPreferencesIds() {
 		return _portletPreferencesIds;
@@ -657,7 +678,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * this service context.
 	 *
 	 * @return the ID of the group corresponding to the current data scope
-	 * @see    com.liferay.portal.model.Group
+	 * @see    Group
 	 */
 	public long getScopeGroupId() {
 		return _scopeGroupId;
@@ -679,7 +700,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * Returns the user-agent request header of this service context.
 	 *
 	 * @return the user-agent request header
-	 * @see    com.liferay.portal.kernel.servlet.HttpHeaders
+	 * @see    HttpHeaders
 	 */
 	public String getUserAgent() {
 		if (_request == null) {
@@ -712,6 +733,11 @@ public class ServiceContext implements Cloneable, Serializable {
 	/**
 	 * Returns the UUID of this service context's current entity.
 	 *
+	 * <p>
+	 * To ensure the same UUID is never used by two entities, the UUID is reset
+	 * to <code>null</code> upon invoking this method.
+	 * </p>
+	 *
 	 * @return the UUID of this service context's current entity
 	 */
 	public String getUuid() {
@@ -720,6 +746,10 @@ public class ServiceContext implements Cloneable, Serializable {
 		_uuid = null;
 
 		return uuid;
+	}
+
+	public String getUuidWithoutReset() {
+		return _uuid;
 	}
 
 	/**
@@ -764,8 +794,7 @@ public class ServiceContext implements Cloneable, Serializable {
 
 	/**
 	 * Returns <code>true</code> if this service context contains an add command
-	 * (i.e. has command value {@link
-	 * com.liferay.portal.kernel.util.Constants#ADD})
+	 * (i.e. has command value {@link Constants#ADD})
 	 *
 	 * @return <code>true</code> if this service context contains an add
 	 *         command; <code>false</code> otherwise
@@ -785,14 +814,14 @@ public class ServiceContext implements Cloneable, Serializable {
 
 	/**
 	 * Returns <code>true</code> if this service context contains an update
-	 * command (i.e. has command value {@link
-	 * com.liferay.portal.kernel.util.Constants#UPDATE})
+	 * command (i.e. has command value {@link Constants#UPDATE})
 	 *
 	 * @return <code>true</code> if this service context contains an update
 	 *         command; <code>false</code> otherwise
 	 */
 	public boolean isCommandUpdate() {
 		if (Validator.equals(_command, Constants.UPDATE) ||
+			Validator.equals(_command, Constants.UPDATE_AND_CHECKIN) ||
 			Validator.equals(_command, Constants.UPDATE_WEBDAV)) {
 
 			return true;
@@ -861,6 +890,13 @@ public class ServiceContext implements Cloneable, Serializable {
 		return _signedIn;
 	}
 
+	/**
+	 * Merges all of the specified service context's non-<code>null</code>
+	 * attributes, attributes greater than <code>0</code>, and fields (except
+	 * the request) with this service context object.
+	 *
+	 * @param serviceContext the service context object to be merged
+	 */
 	public void merge(ServiceContext serviceContext) {
 		setAddGroupPermissions(serviceContext.isAddGroupPermissions());
 		setAddGuestPermissions(serviceContext.isAddGuestPermissions());
@@ -869,8 +905,14 @@ public class ServiceContext implements Cloneable, Serializable {
 			setAssetCategoryIds(serviceContext.getAssetCategoryIds());
 		}
 
+		setAssetEntryVisible(serviceContext.isAssetEntryVisible());
+
 		if (serviceContext.getAssetLinkEntryIds() != null) {
 			setAssetLinkEntryIds(serviceContext.getAssetLinkEntryIds());
+		}
+
+		if (serviceContext.getAssetPriority() > 0) {
+			setAssetPriority(serviceContext.getAssetPriority());
 		}
 
 		if (serviceContext.getAssetTagNames() != null) {
@@ -897,10 +939,15 @@ public class ServiceContext implements Cloneable, Serializable {
 			setCurrentURL(serviceContext.getCurrentURL());
 		}
 
+		setDeriveDefaultPermissions(
+			serviceContext.isDeriveDefaultPermissions());
+
 		if (serviceContext.getExpandoBridgeAttributes() != null) {
 			setExpandoBridgeAttributes(
 				serviceContext.getExpandoBridgeAttributes());
 		}
+
+		setFailOnPortalException(serviceContext.isFailOnPortalException());
 
 		if (serviceContext.getGroupPermissions() != null) {
 			setGroupPermissions(serviceContext.getGroupPermissions());
@@ -914,7 +961,7 @@ public class ServiceContext implements Cloneable, Serializable {
 			setHeaders(serviceContext.getHeaders());
 		}
 
-		setFailOnPortalException(serviceContext.isFailOnPortalException());
+		setIndexingEnabled(serviceContext.isIndexingEnabled());
 		setLanguageId(serviceContext.getLanguageId());
 
 		if (Validator.isNotNull(serviceContext.getLayoutFullURL())) {
@@ -927,6 +974,24 @@ public class ServiceContext implements Cloneable, Serializable {
 
 		if (serviceContext.getModifiedDate() != null) {
 			setModifiedDate(serviceContext.getModifiedDate());
+		}
+
+		if (Validator.isNotNull(
+				serviceContext.getPathFriendlyURLPrivateGroup())) {
+
+			setPathFriendlyURLPrivateGroup(
+				serviceContext.getPathFriendlyURLPrivateGroup());
+		}
+
+		if (Validator.isNotNull(
+				serviceContext.getPathFriendlyURLPrivateUser())) {
+
+			setPathFriendlyURLPrivateUser(
+				serviceContext.getPathFriendlyURLPrivateUser());
+		}
+
+		if (Validator.isNotNull(serviceContext.getPathFriendlyURLPublic())) {
+			setPathFriendlyURLPublic(serviceContext.getPathFriendlyURLPublic());
 		}
 
 		if (Validator.isNotNull(serviceContext.getPathMain())) {
@@ -959,6 +1024,10 @@ public class ServiceContext implements Cloneable, Serializable {
 
 		setSignedIn(serviceContext.isSignedIn());
 
+		if (serviceContext.getTimeZone() != null) {
+			setTimeZone(serviceContext.getTimeZone());
+		}
+
 		if (Validator.isNotNull(serviceContext.getUserDisplayURL())) {
 			setUserDisplayURL(serviceContext.getUserDisplayURL());
 		}
@@ -967,8 +1036,11 @@ public class ServiceContext implements Cloneable, Serializable {
 			setUserId(serviceContext.getUserId());
 		}
 
-		if (Validator.isNotNull(serviceContext.getUuid())) {
-			setUuid(serviceContext.getUuid());
+		// Refrence serviceContext#_uuid directly because calling
+		// serviceContext#getUuid() would set it to null
+
+		if (Validator.isNotNull(serviceContext._uuid)) {
+			setUuid(serviceContext._uuid);
 		}
 
 		if (serviceContext.getWorkflowAction() > 0) {
@@ -1054,6 +1126,16 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
+	 * Sets the priority of an asset entry if this service context is being
+	 * passed as a parameter to a method which manipulates the asset entry.
+	 *
+	 * @param assetPriority the priority of an asset entry
+	 */
+	public void setAssetPriority(double assetPriority) {
+		_assetPriority = assetPriority;
+	}
+
+	/**
 	 * Sets an array of asset tag names to be applied to an asset entry if this
 	 * service context is being passed as a parameter to a method which
 	 * manipulates the asset entry.
@@ -1086,12 +1168,10 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
-	 * Sets the value of the {@link
-	 * com.liferay.portal.kernel.util.Constants#CMD} parameter used in most
+	 * Sets the value of the {@link Constants#CMD} parameter used in most
 	 * Liferay forms for internal portlets.
 	 *
-	 * @param command the value of the {@link
-	 *        com.liferay.portal.kernel.util.Constants#CMD} parameter
+	 * @param command the value of the {@link Constants#CMD} parameter
 	 */
 	public void setCommand(String command) {
 		_command = command;
@@ -1212,7 +1292,8 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * @param groupPermissions the permissions (optionally <code>null</code>)
 	 */
 	public void setGroupPermissions(String[] groupPermissions) {
-		_groupPermissions = groupPermissions;
+		_modelPermissions.addRolePermissions(
+			RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE, groupPermissions);
 	}
 
 	/**
@@ -1224,7 +1305,8 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *        <code>null</code>)
 	 */
 	public void setGuestPermissions(String[] guestPermissions) {
-		_guestPermissions = guestPermissions;
+		_modelPermissions.addRolePermissions(
+			RoleConstants.GUEST, guestPermissions);
 	}
 
 	/**
@@ -1232,7 +1314,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *
 	 * @param headers map of request header name/value pairs of this service
 	 *        context
-	 * @see   com.liferay.portal.kernel.servlet.HttpHeaders
+	 * @see   HttpHeaders
 	 */
 	public void setHeaders(Map<String, String> headers) {
 		_headers = headers;
@@ -1282,6 +1364,10 @@ public class ServiceContext implements Cloneable, Serializable {
 	 */
 	public void setLayoutURL(String layoutURL) {
 		_layoutURL = layoutURL;
+	}
+
+	public void setModelPermissions(ModelPermissions modelPermissions) {
+		_modelPermissions = modelPermissions;
 	}
 
 	/**
@@ -1349,12 +1435,12 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * context is being passed as a parameter to a portlet.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.model.PortletPreferencesIds} can be used to
-	 * look up portlet preferences of the current portlet.
+	 * The {@link PortletPreferencesIds} can be used to look up portlet
+	 * preferences of the current portlet.
 	 * </p>
 	 *
 	 * @param portletPreferencesIds the portlet preferences
-	 * @see   com.liferay.portal.model.PortletPreferencesIds
+	 * @see   PortletPreferencesIds
 	 */
 	public void setPortletPreferencesIds(
 		PortletPreferencesIds portletPreferencesIds) {
@@ -1400,7 +1486,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *
 	 * @param scopeGroupId the ID of the group corresponding to the current data
 	 *        scope of this service context
-	 * @see   com.liferay.portal.model.Group
+	 * @see   Group
 	 */
 	public void setScopeGroupId(long scopeGroupId) {
 		_scopeGroupId = scopeGroupId;
@@ -1453,7 +1539,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * as parameter to a method that processes a workflow action.
 	 *
 	 * @param workflowAction workflow action to take (default is {@link
-	 *        com.liferay.portal.kernel.workflow.WorkflowConstants#ACTION_PUBLISH})
+	 *        WorkflowConstants#ACTION_PUBLISH})
 	 */
 	public void setWorkflowAction(int workflowAction) {
 		_workflowAction = workflowAction;
@@ -1490,6 +1576,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	private long[] _assetCategoryIds;
 	private boolean _assetEntryVisible = true;
 	private long[] _assetLinkEntryIds;
+	private double _assetPriority;
 	private String[] _assetTagNames;
 	private Map<String, Serializable> _attributes;
 	private String _command;
@@ -1500,13 +1587,12 @@ public class ServiceContext implements Cloneable, Serializable {
 	private Map<String, Serializable> _expandoBridgeAttributes;
 	private boolean _failOnPortalException = true;
 	private Date _formDate;
-	private String[] _groupPermissions;
-	private String[] _guestPermissions;
 	private transient Map<String, String> _headers;
 	private boolean _indexingEnabled = true;
 	private String _languageId;
 	private String _layoutFullURL;
 	private String _layoutURL;
+	private ModelPermissions _modelPermissions = new ModelPermissions();
 	private Date _modifiedDate;
 	private String _pathFriendlyURLPrivateGroup;
 	private String _pathFriendlyURLPrivateUser;

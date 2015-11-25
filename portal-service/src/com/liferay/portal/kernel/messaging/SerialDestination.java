@@ -14,8 +14,8 @@
 
 package com.liferay.portal.kernel.messaging;
 
-import com.liferay.portal.kernel.cache.Lifecycle;
-import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -38,17 +38,11 @@ public class SerialDestination extends BaseAsyncDestination {
 		setWorkersMaxSize(_WORKERS_MAX_SIZE);
 	}
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public SerialDestination(String name) {
-		super(name, _WORKERS_CORE_SIZE, _WORKERS_MAX_SIZE);
-	}
-
 	@Override
 	protected void dispatch(
 		final Set<MessageListener> messageListeners, final Message message) {
+
+		final Thread currentThread = Thread.currentThread();
 
 		ThreadPoolExecutor threadPoolExecutor = getThreadPoolExecutor();
 
@@ -70,9 +64,11 @@ public class SerialDestination extends BaseAsyncDestination {
 					}
 				}
 				finally {
-					ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
+					if (Thread.currentThread() != currentThread) {
+						ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 
-					CentralizedThreadLocal.clearShortLivedThreadLocals();
+						CentralizedThreadLocal.clearShortLivedThreadLocals();
+					}
 				}
 			}
 

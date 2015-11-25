@@ -80,14 +80,14 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if scope was set to individual scope or if a role
-	with the primary key or a resource action with the name and
-	action ID could not be found
 	*/
+	@com.liferay.portal.kernel.spring.aop.Retry(acceptor = com.liferay.portal.service.ExceptionRetryAcceptor.class, properties =  {
+		@com.liferay.portal.kernel.spring.aop.Property(name = ExceptionRetryAcceptor.EXCEPTION_NAME, value = "org.springframework.dao.DataIntegrityViolationException")
+	}
+	)
 	public void addResourcePermission(long companyId, java.lang.String name,
 		int scope, java.lang.String primKey, long roleId,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String actionId) throws PortalException;
 
 	/**
 	* Adds the resource permission to the database. Also notifies the appropriate model listeners.
@@ -134,7 +134,7 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the resource permission from the database. Also notifies the appropriate model listeners.
@@ -155,8 +155,7 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portal.model.ResourcePermission deleteResourcePermission(
-		long resourcePermissionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long resourcePermissionId) throws PortalException;
 
 	/**
 	* Deletes all resource permissions at the scope to resources of the type.
@@ -178,11 +177,10 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	portlet ID
 	* @param scope the scope
 	* @param primKey the primary key
-	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteResourcePermissions(long companyId,
 		java.lang.String name, int scope, long primKey)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes all resource permissions at the scope to resources of the type.
@@ -204,11 +202,10 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	portlet ID
 	* @param scope the scope
 	* @param primKey the primary key
-	* @throws PortalException if a portal exception occurred
 	*/
 	public void deleteResourcePermissions(long companyId,
 		java.lang.String name, int scope, java.lang.String primKey)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -306,15 +303,13 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param actionIds the action IDs
 	* @return the intersection of action IDs the role has permission at the
 	scope to perform on resources of the type
-	* @throws PortalException if a resouce action could not be found for any
-	one of the actions on the resource
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<java.lang.String> getAvailableResourcePermissionActionIds(
 		long companyId, java.lang.String name, int scope,
 		java.lang.String primKey, long roleId,
 		java.util.Collection<java.lang.String> actionIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
@@ -328,18 +323,20 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 		java.lang.String primKey, long[] roleIds,
 		java.util.Collection<java.lang.String> actionIds);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Returns the resource permission for the role at the scope to perform the
@@ -353,13 +350,11 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param roleId the primary key of the role
 	* @return the resource permission for the role at the scope to perform the
 	actions on resources of the type
-	* @throws PortalException if no matching resources could be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.ResourcePermission getResourcePermission(
 		long companyId, java.lang.String name, int scope,
-		java.lang.String primKey, long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String primKey, long roleId) throws PortalException;
 
 	/**
 	* Returns the resource permission with the primary key.
@@ -370,8 +365,7 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.ResourcePermission getResourcePermission(
-		long resourcePermissionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long resourcePermissionId) throws PortalException;
 
 	/**
 	* Returns all the resource permissions at the scope of the type.
@@ -474,6 +468,12 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.portal.model.ResourcePermission> getRoleResourcePermissions(
 		long roleId, int[] scopes, int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.Role> getRoles(
+		long companyId, java.lang.String name, int scope,
+		java.lang.String primKey, java.lang.String actionId)
+		throws PortalException;
+
 	/**
 	* Returns all the resource permissions where scope = any &#63;.
 	*
@@ -529,14 +529,11 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param actionId the action ID
 	* @return <code>true</code> if the role has permission to perform the
 	action on the resource; <code>false</code> otherwise
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasResourcePermission(long companyId, java.lang.String name,
 		int scope, java.lang.String primKey, long roleId,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String actionId) throws PortalException;
 
 	/**
 	* Returns <code>true</code> if the roles have permission at the scope to
@@ -557,15 +554,11 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param actionId the action ID
 	* @return <code>true</code> if any one of the roles has permission to
 	perform the action on the resource; <code>false</code> otherwise
-	* @throws PortalException if any one of the roles with the primary keys
-	could not be found or if a resource action with the name and
-	action ID could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasResourcePermission(long companyId, java.lang.String name,
 		int scope, java.lang.String primKey, long[] roleIds,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String actionId) throws PortalException;
 
 	/**
 	* Returns <code>true</code> if the roles have permission at the scope to
@@ -583,21 +576,21 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @return <code>true</code> if any one of the roles has permission to
 	perform the action on any one of the resources;
 	<code>false</code> otherwise
-	* @throws PortalException if any one of the roles with the primary keys
-	could not be found or if a resource action with the name and
-	action ID could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasResourcePermission(
 		java.util.List<com.liferay.portal.model.Resource> resources,
-		long[] roleIds, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long[] roleIds, java.lang.String actionId) throws PortalException;
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #getRoles(long, String, int,
+	String, String}
+	*/
+	@java.lang.Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean[] hasResourcePermissions(long companyId,
 		java.lang.String name, int scope, java.lang.String primKey,
-		long[] roleIds, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long[] roleIds, java.lang.String actionId) throws PortalException;
 
 	/**
 	* Returns <code>true</code> if the role has permission at the scope to
@@ -617,13 +610,11 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param actionId the action ID
 	* @return <code>true</code> if the role has permission to perform the
 	action on the resource; <code>false</code> otherwise
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasScopeResourcePermission(long companyId,
 		java.lang.String name, int scope, long roleId, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Reassigns all the resource permissions from the source role to the
@@ -631,10 +622,9 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	*
 	* @param fromRoleId the primary key of the source role
 	* @param toRoleId the primary key of the destination role
-	* @throws PortalException if a role with the primary key could not be found
 	*/
 	public void mergePermissions(long fromRoleId, long toRoleId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Grants the role default permissions to all the resources of the type and
@@ -644,11 +634,9 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	*
 	* @param resourcePermissionId the primary key of the resource permission
 	* @param toRoleId the primary key of the role
-	* @throws PortalException if a resource permission or role with the primary
-	key could not be found
 	*/
 	public void reassignPermissions(long resourcePermissionId, long toRoleId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Revokes permission at the scope from the role to perform the action on
@@ -668,13 +656,10 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	public void removeResourcePermission(long companyId, java.lang.String name,
 		int scope, java.lang.String primKey, long roleId,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String actionId) throws PortalException;
 
 	/**
 	* Revokes all permissions at the scope from the role to perform the action
@@ -688,19 +673,10 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param scope the scope
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	public void removeResourcePermissions(long companyId,
 		java.lang.String name, int scope, long roleId, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+		throws PortalException;
 
 	/**
 	* Updates the role's permissions at the scope, setting the actions that can
@@ -728,13 +704,15 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param ownerId the primary key of the owner (generally the user that
 	created the resource)
 	* @param actionIds the action IDs of the actions
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
+	@com.liferay.portal.kernel.spring.aop.Retry(acceptor = com.liferay.portal.service.ExceptionRetryAcceptor.class, properties =  {
+		@com.liferay.portal.kernel.spring.aop.Property(name = ExceptionRetryAcceptor.EXCEPTION_NAME, value = "org.springframework.dao.DataIntegrityViolationException")
+	}
+	)
 	public void setOwnerResourcePermissions(long companyId,
 		java.lang.String name, int scope, java.lang.String primKey,
 		long roleId, long ownerId, java.lang.String[] actionIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the role's permissions at the scope, setting the actions that can
@@ -759,13 +737,14 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionIds the action IDs of the actions
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
+	@com.liferay.portal.kernel.spring.aop.Retry(acceptor = com.liferay.portal.service.ExceptionRetryAcceptor.class, properties =  {
+		@com.liferay.portal.kernel.spring.aop.Property(name = ExceptionRetryAcceptor.EXCEPTION_NAME, value = "org.springframework.dao.DataIntegrityViolationException")
+	}
+	)
 	public void setResourcePermissions(long companyId, java.lang.String name,
 		int scope, java.lang.String primKey, long roleId,
-		java.lang.String[] actionIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String[] actionIds) throws PortalException;
 
 	/**
 	* Updates the role's permissions at the scope, setting the actions that can
@@ -789,13 +768,15 @@ public interface ResourcePermissionLocalService extends BaseLocalService,
 	* @param scope the scope
 	* @param primKey the primary key
 	* @param roleIdsToActionIds a map of role IDs to action IDs of the actions
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
+	@com.liferay.portal.kernel.spring.aop.Retry(acceptor = com.liferay.portal.service.ExceptionRetryAcceptor.class, properties =  {
+		@com.liferay.portal.kernel.spring.aop.Property(name = ExceptionRetryAcceptor.EXCEPTION_NAME, value = "org.springframework.dao.DataIntegrityViolationException")
+	}
+	)
 	public void setResourcePermissions(long companyId, java.lang.String name,
 		int scope, java.lang.String primKey,
 		java.util.Map<java.lang.Long, java.lang.String[]> roleIdsToActionIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the resource permission in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

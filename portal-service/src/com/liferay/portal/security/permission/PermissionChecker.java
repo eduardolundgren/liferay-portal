@@ -39,9 +39,6 @@ public interface PermissionChecker extends Cloneable {
 	 */
 	public long getCompanyId();
 
-	public List<Long> getGuestResourceBlockIds(
-		long companyId, long groupId, String name, String actionId);
-
 	public List<Long> getOwnerResourceBlockIds(
 		long companyId, long groupId, String name, String actionId);
 
@@ -67,6 +64,8 @@ public interface PermissionChecker extends Cloneable {
 	public long[] getRoleIds(long userId, long groupId);
 
 	public User getUser();
+
+	public UserBag getUserBag() throws Exception;
 
 	/**
 	 * Returns the primary key of the user.

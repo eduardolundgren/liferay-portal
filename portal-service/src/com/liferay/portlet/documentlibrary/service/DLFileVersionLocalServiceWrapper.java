@@ -200,18 +200,15 @@ public class DLFileVersionLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
-		return _dlFileVersionLocalService.getActionableDynamicQuery();
+	public com.liferay.portlet.documentlibrary.model.DLFileVersion fetchLatestFileVersion(
+		long fileEntryId, boolean excludeWorkingCopy) {
+		return _dlFileVersionLocalService.fetchLatestFileVersion(fileEntryId,
+			excludeWorkingCopy);
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _dlFileVersionLocalService.getBeanIdentifier();
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _dlFileVersionLocalService.getActionableDynamicQuery();
 	}
 
 	/**
@@ -305,7 +302,7 @@ public class DLFileVersionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _dlFileVersionLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -343,6 +340,11 @@ public class DLFileVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFileVersionLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
 		long fileEntryId, boolean excludeWorkingCopy)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -358,6 +360,16 @@ public class DLFileVersionLocalServiceWrapper
 			fileEntryId);
 	}
 
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _dlFileVersionLocalService.getOSGiServiceIdentifier();
+	}
+
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
@@ -369,16 +381,6 @@ public class DLFileVersionLocalServiceWrapper
 	public void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileVersionLocalService.rebuildTree(companyId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_dlFileVersionLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	@Override

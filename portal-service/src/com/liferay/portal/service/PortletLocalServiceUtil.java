@@ -71,8 +71,16 @@ public class PortletLocalServiceUtil {
 		getService().clearCache();
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #clearPortletsMap)}
+	*/
+	@Deprecated
 	public static void clearCompanyPortletsPool() {
 		getService().clearCompanyPortletsPool();
+	}
+
+	public static void clearPortletsMap() {
+		getService().clearPortletsMap();
 	}
 
 	/**
@@ -259,15 +267,6 @@ public class PortletLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
 	public static java.util.List<com.liferay.portlet.expando.model.CustomAttributesDisplay> getCustomAttributesDisplays() {
 		return getService().getCustomAttributesDisplays();
 	}
@@ -283,6 +282,19 @@ public class PortletLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portal.kernel.portlet.FriendlyURLMapper> getFriendlyURLMappers() {
 		return getService().getFriendlyURLMappers();
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
@@ -390,6 +402,15 @@ public class PortletLocalServiceUtil {
 			pluginPackage);
 	}
 
+	public static java.util.Map<java.lang.String, com.liferay.portal.model.Portlet> loadGetPortletsMap(
+		long companyId) {
+		return getService().loadGetPortletsMap(companyId);
+	}
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #loadGetPortletsMap(long))}
+	*/
+	@Deprecated
 	public static java.util.Map<java.lang.String, com.liferay.portal.model.Portlet> loadGetPortletsPool(
 		long companyId) {
 		return getService().loadGetPortletsPool(companyId);
@@ -397,15 +418,6 @@ public class PortletLocalServiceUtil {
 
 	public static void removeCompanyPortletsPool(long companyId) {
 		getService().removeCompanyPortletsPool(companyId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	public static com.liferay.portal.model.Portlet updatePortlet(

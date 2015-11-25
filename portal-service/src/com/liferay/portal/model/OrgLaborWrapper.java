@@ -52,6 +52,7 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("orgLaborId", getOrgLaborId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("organizationId", getOrganizationId());
 		attributes.put("typeId", getTypeId());
 		attributes.put("sunOpen", getSunOpen());
@@ -86,13 +87,19 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 			setOrgLaborId(orgLaborId);
 		}
 
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
 		Long organizationId = (Long)attributes.get("organizationId");
 
 		if (organizationId != null) {
 			setOrganizationId(organizationId);
 		}
 
-		Integer typeId = (Integer)attributes.get("typeId");
+		Long typeId = (Long)attributes.get("typeId");
 
 		if (typeId != null) {
 			setTypeId(typeId);
@@ -191,6 +198,16 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 	@Override
 	public int compareTo(com.liferay.portal.model.OrgLabor orgLabor) {
 		return _orgLabor.compareTo(orgLabor);
+	}
+
+	/**
+	* Returns the company ID of this org labor.
+	*
+	* @return the company ID of this org labor
+	*/
+	@Override
+	public long getCompanyId() {
+		return _orgLabor.getCompanyId();
 	}
 
 	@Override
@@ -375,7 +392,7 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 	* @return the type ID of this org labor
 	*/
 	@Override
-	public int getTypeId() {
+	public long getTypeId() {
 		return _orgLabor.getTypeId();
 	}
 
@@ -429,9 +446,18 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 		_orgLabor.setCachedModel(cachedModel);
 	}
 
+	/**
+	* Sets the company ID of this org labor.
+	*
+	* @param companyId the company ID of this org labor
+	*/
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setCompanyId(long companyId) {
+		_orgLabor.setCompanyId(companyId);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_orgLabor.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -623,7 +649,7 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 	* @param typeId the type ID of this org labor
 	*/
 	@Override
-	public void setTypeId(int typeId) {
+	public void setTypeId(long typeId) {
 		_orgLabor.setTypeId(typeId);
 	}
 
@@ -648,7 +674,7 @@ public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.OrgLabor> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.OrgLabor> toCacheModel() {
 		return _orgLabor.toCacheModel();
 	}
 

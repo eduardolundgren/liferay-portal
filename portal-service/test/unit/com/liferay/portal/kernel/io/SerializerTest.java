@@ -18,10 +18,11 @@ import com.liferay.portal.kernel.io.Serializer.BufferNode;
 import com.liferay.portal.kernel.io.Serializer.BufferQueue;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
+import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.IOException;
@@ -584,7 +585,7 @@ public class SerializerTest {
 	public void testWriteObjectByte() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Byte((byte)101));
+		serializer.writeObject(Byte.valueOf((byte)101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -597,7 +598,7 @@ public class SerializerTest {
 	public void testWriteObjectCharacter() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Character('a'));
+		serializer.writeObject(Character.valueOf('a'));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -608,7 +609,43 @@ public class SerializerTest {
 	}
 
 	@Test
-	public void testWriteObjectClass() throws UnsupportedEncodingException {
+	public void testWriteObjectClassWithBlankContextName()
+		throws UnsupportedEncodingException {
+
+		Serializer serializer = new Serializer();
+
+		Class<?> clazz = getClass();
+
+		ClassLoaderPool.register(StringPool.BLANK, clazz.getClassLoader());
+
+		try {
+			serializer.writeObject(clazz);
+		}
+		finally {
+			ClassLoaderPool.unregister(clazz.getClassLoader());
+		}
+
+		ByteBuffer byteBuffer = serializer.toByteBuffer();
+
+		String className = clazz.getName();
+
+		Assert.assertEquals(className.length() + 11, byteBuffer.limit());
+		Assert.assertEquals( SerializationConstants.TC_CLASS, byteBuffer.get());
+		Assert.assertEquals(1, byteBuffer.get());
+		Assert.assertEquals(0, byteBuffer.getInt());
+		Assert.assertEquals(1, byteBuffer.get());
+		Assert.assertEquals(className.length(), byteBuffer.getInt());
+		Assert.assertEquals(
+			className,
+			new String(
+				byteBuffer.array(), byteBuffer.position(),
+				byteBuffer.remaining(), StringPool.UTF8));
+	}
+
+	@Test
+	public void testWriteObjectClassWithNullContextName()
+		throws UnsupportedEncodingException {
+
 		Serializer serializer = new Serializer();
 
 		Class<?> clazz = getClass();
@@ -618,11 +655,22 @@ public class SerializerTest {
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
 		String className = clazz.getName();
+		String contextName = StringPool.NULL;
+		byte[] contextNameBytes = contextName.getBytes(StringPool.UTF8);
 
-		Assert.assertEquals(className.length() + 11, byteBuffer.limit());
+		Assert.assertEquals(
+			className.length() + contextName.length() + 11, byteBuffer.limit());
 		Assert.assertEquals(SerializationConstants.TC_CLASS, byteBuffer.get());
 		Assert.assertEquals(1, byteBuffer.get());
-		Assert.assertEquals(0, byteBuffer.getInt());
+		Assert.assertEquals(contextName.length(), byteBuffer.getInt());
+		Assert.assertEquals(
+			contextName,
+			new String(
+				byteBuffer.array(), byteBuffer.position(),
+				contextNameBytes.length, StringPool.UTF8));
+
+		byteBuffer.position(byteBuffer.position() + contextNameBytes.length);
+
 		Assert.assertEquals(1, byteBuffer.get());
 		Assert.assertEquals(className.length(), byteBuffer.getInt());
 		Assert.assertEquals(
@@ -636,7 +684,7 @@ public class SerializerTest {
 	public void testWriteObjectDouble() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Double(17.58D));
+		serializer.writeObject(Double.valueOf(17.58D));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -649,7 +697,7 @@ public class SerializerTest {
 	public void testWriteObjectFloat() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Float(17.58F));
+		serializer.writeObject(Float.valueOf(17.58F));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -662,7 +710,7 @@ public class SerializerTest {
 	public void testWriteObjectInteger() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Integer(101));
+		serializer.writeObject(Integer.valueOf(101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -676,7 +724,7 @@ public class SerializerTest {
 	public void testWriteObjectLong() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Long(101));
+		serializer.writeObject(Long.valueOf(101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -760,7 +808,7 @@ public class SerializerTest {
 	public void testWriteObjectShort() {
 		Serializer serializer = new Serializer();
 
-		serializer.writeObject(new Short((short)101));
+		serializer.writeObject(Short.valueOf((short)101));
 
 		ByteBuffer byteBuffer = serializer.toByteBuffer();
 
@@ -904,6 +952,6 @@ public class SerializerTest {
 
 	private static final int _COUNT = 1024;
 
-	private Random _random = new Random();
+	private final Random _random = new Random();
 
 }

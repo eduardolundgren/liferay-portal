@@ -15,13 +15,14 @@
 package com.liferay.portal.upgrade.v6_0_0;
 
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletPreferences;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.upgrade.util.UpgradeAssetPublisherManualEntries;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 
 import javax.portlet.PortletPreferences;
@@ -44,11 +45,9 @@ public class UpgradeAssetPublisher extends BaseUpgradePortletPreferences {
 
 			Element rootElement = document.getRootElement();
 
-			UpgradeAssetPublisherManualEntries.upgradeToAssetEntryIdElement(
-				rootElement);
+			upgradeToAssetEntryIdElement(rootElement);
 
-			UpgradeAssetPublisherManualEntries.upgradeToAssetEntryTypeElement(
-				rootElement);
+			upgradeToAssetEntryTypeElement(rootElement);
 
 			assetEntryXmls[i] = document.formattedString(StringPool.BLANK);
 		}
@@ -59,6 +58,19 @@ public class UpgradeAssetPublisher extends BaseUpgradePortletPreferences {
 	@Override
 	protected String[] getPortletIds() {
 		return new String[] {"101_INSTANCE_%"};
+	}
+
+	@Override
+	protected String getUpdatePortletPreferencesWhereClause() {
+		StringBundler sb = new StringBundler(5);
+
+		sb.append("(portletId like '101_INSTANCE_%') and ((preferences like ");
+		sb.append("'%<preference><name>selection-style</name><value>manual");
+		sb.append("</value></preference>%') OR (preferences like ");
+		sb.append("'%<preference><name>selectionStyle</name><value>manual");
+		sb.append("</value></preference>%'))");
+
+		return sb.toString();
 	}
 
 	@Override
@@ -148,7 +160,61 @@ public class UpgradeAssetPublisher extends BaseUpgradePortletPreferences {
 			portletPreferences.setValues("asset-entry-xml", assetEntryXmls);
 		}
 
+		String[] assetEntryXmls = portletPreferences.getValues(
+			"asset-entry-xml", new String[0]);
+
+		if (ArrayUtil.isEmpty(assetEntryXmls)) {
+			assetEntryXmls = portletPreferences.getValues(
+				"assetEntryXml", new String[0]);
+		}
+
+		String[] manualEntries = portletPreferences.getValues(
+			"manual-entries", new String[0]);
+
+		if (ArrayUtil.isEmpty(manualEntries)) {
+			manualEntries = portletPreferences.getValues(
+				"manualEntries", new String[0]);
+		}
+
+		if (ArrayUtil.isEmpty(assetEntryXmls) &&
+			ArrayUtil.isNotEmpty(manualEntries)) {
+
+			assetEntryXmls = getAssetEntryXmls(manualEntries);
+
+			portletPreferences.setValues("asset-entry-xml", assetEntryXmls);
+		}
+
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
+	}
+
+	protected void upgradeToAssetEntryIdElement(Element rootElement) {
+		Element assetIdElement = rootElement.element("asset-id");
+
+		if (assetIdElement != null) {
+			String assetEntryId = assetIdElement.getText();
+
+			Element assetEntryIdElement = rootElement.addElement(
+				"assetEntryId");
+
+			assetEntryIdElement.addText(assetEntryId);
+
+			rootElement.remove(assetIdElement);
+		}
+	}
+
+	protected void upgradeToAssetEntryTypeElement(Element rootElement) {
+		Element assetTypeElement = rootElement.element("asset-type");
+
+		if (assetTypeElement != null) {
+			String assetEntryType = assetTypeElement.getText();
+
+			Element assetEntryTypeElement = rootElement.addElement(
+				"assetEntryType");
+
+			assetEntryTypeElement.addText(assetEntryType);
+
+			rootElement.remove(assetTypeElement);
+		}
 	}
 
 }

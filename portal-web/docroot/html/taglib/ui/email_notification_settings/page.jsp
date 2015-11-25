@@ -57,6 +57,7 @@ boolean showSubject = GetterUtil.getBoolean(request.getAttribute("liferay-ui:ema
 		<c:choose>
 			<c:when test="<%= Validator.isNotNull(emailBody) && Validator.isXml(emailBody) %>">
 				<liferay-ui:input-localized
+					editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.taglib.ui.email_notification_settings.jsp") %>'
 					fieldPrefix="<%= fieldPrefix %>"
 					fieldPrefixSeparator="<%= fieldPrefixSeparator %>"
 					name='<%= emailParam + "Body" %>'
@@ -66,7 +67,7 @@ boolean showSubject = GetterUtil.getBoolean(request.getAttribute("liferay-ui:ema
 				/>
 			</c:when>
 			<c:otherwise>
-				<liferay-ui:input-editor contents="<%= emailBody %>" editorImpl="<%= EDITOR_WYSIWYG_IMPL_KEY %>" name="<%= emailParam %>" />
+				<liferay-ui:input-editor contents="<%= emailBody %>" editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.taglib.ui.email_notification_settings.jsp") %>' name="<%= emailParam %>" />
 
 				<aui:input name='<%= fieldPrefix + fieldPrefixSeparator + emailParam + "Body" + fieldPrefixSeparator %>' type="hidden" />
 			</c:otherwise>
@@ -96,7 +97,3 @@ boolean showSubject = GetterUtil.getBoolean(request.getAttribute("liferay-ui:ema
 		</dl>
 	</aui:fieldset>
 </c:if>
-
-<%!
-public static final String EDITOR_WYSIWYG_IMPL_KEY = "editor.wysiwyg.portal-web.docroot.html.taglib.ui.email_notification_settings.jsp";
-%>

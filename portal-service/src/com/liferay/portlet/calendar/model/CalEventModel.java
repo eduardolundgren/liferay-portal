@@ -19,7 +19,9 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.StagedGroupedModel;
+import com.liferay.portal.model.GroupedModel;
+import com.liferay.portal.model.ShardedModel;
+import com.liferay.portal.model.StagedAuditedModel;
 import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -39,10 +41,13 @@ import java.util.Date;
  * @see CalEvent
  * @see com.liferay.portlet.calendar.model.impl.CalEventImpl
  * @see com.liferay.portlet.calendar.model.impl.CalEventModelImpl
+ * @deprecated As of 7.0.0, with no direct replacement
  * @generated
  */
+@Deprecated
 @ProviderType
-public interface CalEventModel extends BaseModel<CalEvent>, StagedGroupedModel {
+public interface CalEventModel extends BaseModel<CalEvent>, GroupedModel,
+	ShardedModel, StagedAuditedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *

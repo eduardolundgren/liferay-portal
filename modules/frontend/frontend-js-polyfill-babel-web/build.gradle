@@ -1,0 +1,38 @@
+import com.liferay.gradle.util.copy.StripPathSegmentsAction
+
+configurations {
+	babelCore
+}
+
+task buildBabelCore(type: Copy)
+
+String babelCoreVersion = "5.6.14"
+
+buildBabelCore {
+	eachFile new StripPathSegmentsAction(5)
+
+	from {
+		zipTree(configurations.babelCore.singleFile)
+	}
+
+	include "META-INF/resources/webjars/babel-core/${babelCoreVersion}/browser-polyfill.min.js"
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+}
+
+classes {
+	dependsOn buildBabelCore
+}
+
+dependencies {
+	babelCore group: "org.webjars.npm", name: "babel-core", transitive: false, version: babelCoreVersion
+
+	compile group: "com.liferay.portal", name: "portal-service", version: liferay.portalVersion
+	compile group: "javax.servlet", name: "javax.servlet-api", version: "3.0.1"
+	compile group: "org.osgi", name: "org.osgi.compendium", version: "5.0.0"
+	compile group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/modules")
+}

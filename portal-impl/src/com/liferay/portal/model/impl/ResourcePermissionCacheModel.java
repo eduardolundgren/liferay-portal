@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -38,6 +39,33 @@ import java.io.ObjectOutput;
 public class ResourcePermissionCacheModel implements CacheModel<ResourcePermission>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof ResourcePermissionCacheModel)) {
+			return false;
+		}
+
+		ResourcePermissionCacheModel resourcePermissionCacheModel = (ResourcePermissionCacheModel)obj;
+
+		if ((resourcePermissionId == resourcePermissionCacheModel.resourcePermissionId) &&
+				(mvccVersion == resourcePermissionCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, resourcePermissionId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -49,7 +77,7 @@ public class ResourcePermissionCacheModel implements CacheModel<ResourcePermissi
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -63,12 +91,16 @@ public class ResourcePermissionCacheModel implements CacheModel<ResourcePermissi
 		sb.append(scope);
 		sb.append(", primKey=");
 		sb.append(primKey);
+		sb.append(", primKeyId=");
+		sb.append(primKeyId);
 		sb.append(", roleId=");
 		sb.append(roleId);
 		sb.append(", ownerId=");
 		sb.append(ownerId);
 		sb.append(", actionIds=");
 		sb.append(actionIds);
+		sb.append(", viewActionId=");
+		sb.append(viewActionId);
 		sb.append("}");
 
 		return sb.toString();
@@ -98,9 +130,11 @@ public class ResourcePermissionCacheModel implements CacheModel<ResourcePermissi
 			resourcePermissionImpl.setPrimKey(primKey);
 		}
 
+		resourcePermissionImpl.setPrimKeyId(primKeyId);
 		resourcePermissionImpl.setRoleId(roleId);
 		resourcePermissionImpl.setOwnerId(ownerId);
 		resourcePermissionImpl.setActionIds(actionIds);
+		resourcePermissionImpl.setViewActionId(viewActionId);
 
 		resourcePermissionImpl.resetOriginalValues();
 
@@ -115,9 +149,11 @@ public class ResourcePermissionCacheModel implements CacheModel<ResourcePermissi
 		name = objectInput.readUTF();
 		scope = objectInput.readInt();
 		primKey = objectInput.readUTF();
+		primKeyId = objectInput.readLong();
 		roleId = objectInput.readLong();
 		ownerId = objectInput.readLong();
 		actionIds = objectInput.readLong();
+		viewActionId = objectInput.readBoolean();
 	}
 
 	@Override
@@ -143,9 +179,11 @@ public class ResourcePermissionCacheModel implements CacheModel<ResourcePermissi
 			objectOutput.writeUTF(primKey);
 		}
 
+		objectOutput.writeLong(primKeyId);
 		objectOutput.writeLong(roleId);
 		objectOutput.writeLong(ownerId);
 		objectOutput.writeLong(actionIds);
+		objectOutput.writeBoolean(viewActionId);
 	}
 
 	public long mvccVersion;
@@ -154,7 +192,9 @@ public class ResourcePermissionCacheModel implements CacheModel<ResourcePermissi
 	public String name;
 	public int scope;
 	public String primKey;
+	public long primKeyId;
 	public long roleId;
 	public long ownerId;
 	public long actionIds;
+	public boolean viewActionId;
 }

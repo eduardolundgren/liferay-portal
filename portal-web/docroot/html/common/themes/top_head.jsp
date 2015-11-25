@@ -16,9 +16,7 @@
 
 <%@ include file="/html/common/themes/init.jsp" %>
 
-<c:if test="<%= PropsValues.MONITORING_PORTAL_REQUEST %>">
-	<%@ include file="/html/common/themes/top_monitoring.jspf" %>
-</c:if>
+<liferay-util:dynamic-include key="/html/common/themes/top_head.jsp#pre" />
 
 <%@ include file="/html/common/themes/top_meta.jspf" %>
 <%@ include file="/html/common/themes/top_meta-ext.jsp" %>
@@ -37,9 +35,9 @@ if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
 	<link href="<%= HtmlUtil.escapeAttribute(canonicalURL) %>" rel="canonical" />
 
 	<%
-	Locale[] availableLocales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+	Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
 
-	if (availableLocales.length > 1) {
+	if (availableLocales.size() > 1) {
 		for (Locale availableLocale : availableLocales) {
 	%>
 
@@ -62,7 +60,11 @@ if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
 
 <link class="lfr-css-file" href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeCss() + "/aui.css")) %>" rel="stylesheet" type="text/css" />
 
-<link href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathContext() + "/html/css/main.css")) %>" rel="stylesheet" type="text/css" />
+<%
+long cssLastModifiedTime = PortalWebResourcesUtil.getLastModified(PortalWebResourceConstants.RESOURCE_TYPE_CSS);
+%>
+
+<link href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_CSS) + "/main.css", cssLastModifiedTime)) %>" rel="stylesheet" type="text/css" />
 
 <%
 List<Portlet> portlets = null;
@@ -70,27 +72,7 @@ List<Portlet> portlets = null;
 if (layout != null) {
 	String ppid = ParamUtil.getString(request, "p_p_id");
 
-	if (ppid.equals(PortletKeys.PORTLET_CONFIGURATION)) {
-		if (themeDisplay.isStatePopUp()) {
-			portlets = new ArrayList<Portlet>();
-		}
-		else {
-			portlets = layoutTypePortlet.getAllPortlets();
-		}
-
-		portlets.add(PortletLocalServiceUtil.getPortletById(company.getCompanyId(), PortletKeys.PORTLET_CONFIGURATION));
-
-		ppid = ParamUtil.getString(request, PortalUtil.getPortletNamespace(ppid) + "portletResource");
-
-		if (Validator.isNotNull(ppid)) {
-			Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), ppid);
-
-			if ((portlet != null) && !portlets.contains(portlet)) {
-				portlets.add(portlet);
-			}
-		}
-	}
-	else if (layout.isTypeEmbedded() || layout.isTypePortlet()) {
+	if (layout.isTypeEmbedded() || layout.isTypePortlet()) {
 		portlets = layoutTypePortlet.getAllPortlets();
 
 		if (themeDisplay.isStateMaximized() || themeDisplay.isStatePopUp()) {
@@ -106,9 +88,21 @@ if (layout != null) {
 	else if ((layout.isTypeControlPanel() || layout.isTypePanel()) && Validator.isNotNull(ppid)) {
 		portlets = new ArrayList<Portlet>();
 
+		portlets.addAll(layout.getEmbeddedPortlets());
+
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), ppid);
 
 		if (portlet != null) {
+			portlets.add(portlet);
+		}
+	}
+
+	String portletResource = ParamUtil.getString(request, PortalUtil.getPortletNamespace(ppid) + "portletResource");
+
+	if (Validator.isNotNull(portletResource)) {
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletResource);
+
+		if ((portlet != null) && !portlets.contains(portlet)) {
 			portlets.add(portlet);
 		}
 	}
@@ -206,6 +200,8 @@ StringBundler pageTopSB = OutputTag.getData(request, WebKeys.PAGE_TOP);
 	</style>
 </c:if>
 
+<liferay-util:dynamic-include key="/html/common/themes/top_head.jsp#post" />
+
 <%!
 private String _escapeCssBlock(String css) {
 	return StringUtil.replace(
@@ -215,5 +211,5 @@ private String _escapeCssBlock(String css) {
 	);
 }
 
-private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.common.themes.top_head_jsp");
+private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.common.themes.top_head_jsp");
 %>

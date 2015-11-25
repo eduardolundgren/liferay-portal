@@ -140,7 +140,7 @@ public class DefaultLicenseManagerImpl
 
 	@Override
 	public int getLicenseState(String productId) {
-		Map<String, String> licenseProperties = new HashMap<String, String>();
+		Map<String, String> licenseProperties = new HashMap<>();
 
 		licenseProperties.put("productId", productId);
 
@@ -173,7 +173,7 @@ public class DefaultLicenseManagerImpl
 		LicenseUtil.writeServerProperties(bytes);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		DefaultLicenseManagerImpl.class);
 
 }

@@ -363,16 +363,6 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 		return _dlFolderLocalService.getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _dlFolderLocalService.getBeanIdentifier();
-	}
-
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getCompanyFolders(
 		long companyId, int start, int end) {
@@ -511,7 +501,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _dlFolderLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -613,6 +603,15 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return _dlFolderLocalService.getFolders(groupId, parentFolderId, start,
 			end, obc);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
+		return _dlFolderLocalService.getFolders(groupId, parentFolderId,
+			status, includeMountfolders, start, end, obc);
 	}
 
 	@Override
@@ -722,6 +721,11 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFolderLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFolder getMountFolder(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -745,6 +749,16 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getNoAssetFolders() {
 		return _dlFolderLocalService.getNoAssetFolders();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _dlFolderLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -810,14 +824,16 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	}
 
 	@Override
-	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId)
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
+		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFolderLocalService.lockFolder(userId, folderId);
 	}
 
 	@Override
-	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId,
-		java.lang.String owner, boolean inheritable, long expirationTime)
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
+		long folderId, java.lang.String owner, boolean inheritable,
+		long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFolderLocalService.lockFolder(userId, folderId, owner,
 			inheritable, expirationTime);
@@ -844,16 +860,6 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFolderLocalService.rebuildTree(companyId, parentFolderId,
 			parentTreePath, reindex);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_dlFolderLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	@Override

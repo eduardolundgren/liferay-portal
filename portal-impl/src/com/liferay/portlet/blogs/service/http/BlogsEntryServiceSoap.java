@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.portlet.blogs.service.BlogsEntryServiceUtil} service utility. The
+ * {@link BlogsEntryServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -60,7 +60,7 @@ import java.rmi.RemoteException;
  * @author Brian Wing Shun Chan
  * @see BlogsEntryServiceHttp
  * @see com.liferay.portlet.blogs.model.BlogsEntrySoap
- * @see com.liferay.portlet.blogs.service.BlogsEntryServiceUtil
+ * @see BlogsEntryServiceUtil
  * @generated
  */
 @ProviderType
@@ -71,6 +71,7 @@ public class BlogsEntryServiceSoap {
 		int displayDateMonth, int displayDateDay, int displayDateYear,
 		int displayDateHour, int displayDateMinute, boolean allowPingbacks,
 		boolean allowTrackbacks, java.lang.String[] trackbacks,
+		java.lang.String coverImageCaption,
 		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector coverImageImageSelector,
 		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector smallImageImageSelector,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -80,7 +81,7 @@ public class BlogsEntryServiceSoap {
 					subtitle, description, content, displayDateMonth,
 					displayDateDay, displayDateYear, displayDateHour,
 					displayDateMinute, allowPingbacks, allowTrackbacks,
-					trackbacks, coverImageImageSelector,
+					trackbacks, coverImageCaption, coverImageImageSelector,
 					smallImageImageSelector, serviceContext);
 
 			return com.liferay.portlet.blogs.model.BlogsEntrySoap.toSoapModel(returnValue);
@@ -214,6 +215,24 @@ public class BlogsEntryServiceSoap {
 		}
 	}
 
+	public static com.liferay.portlet.blogs.model.BlogsEntrySoap[] getGroupEntries(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> returnValue =
+				BlogsEntryServiceUtil.getGroupEntries(groupId, status, start,
+					end, obc);
+
+			return com.liferay.portlet.blogs.model.BlogsEntrySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static int getGroupEntriesCount(long groupId,
 		java.util.Date displayDate, int status) throws RemoteException {
 		try {
@@ -253,6 +272,39 @@ public class BlogsEntryServiceSoap {
 					displayDate, status, max);
 
 			return com.liferay.portlet.blogs.model.BlogsEntrySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.blogs.model.BlogsEntrySoap[] getGroupUserEntries(
+		long groupId, long userId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> returnValue =
+				BlogsEntryServiceUtil.getGroupUserEntries(groupId, userId,
+					status, start, end, obc);
+
+			return com.liferay.portlet.blogs.model.BlogsEntrySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getGroupUserEntriesCount(long groupId, long userId,
+		int status) throws RemoteException {
+		try {
+			int returnValue = BlogsEntryServiceUtil.getGroupUserEntriesCount(groupId,
+					userId, status);
+
+			return returnValue;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -332,6 +384,7 @@ public class BlogsEntryServiceSoap {
 		int displayDateMonth, int displayDateDay, int displayDateYear,
 		int displayDateHour, int displayDateMinute, boolean allowPingbacks,
 		boolean allowTrackbacks, java.lang.String[] trackbacks,
+		java.lang.String coverImageCaption,
 		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector coverImageImageSelector,
 		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector smallImageImageSelector,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -341,7 +394,7 @@ public class BlogsEntryServiceSoap {
 					title, subtitle, description, content, displayDateMonth,
 					displayDateDay, displayDateYear, displayDateHour,
 					displayDateMinute, allowPingbacks, allowTrackbacks,
-					trackbacks, coverImageImageSelector,
+					trackbacks, coverImageCaption, coverImageImageSelector,
 					smallImageImageSelector, serviceContext);
 
 			return com.liferay.portlet.blogs.model.BlogsEntrySoap.toSoapModel(returnValue);

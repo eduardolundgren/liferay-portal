@@ -1,0 +1,16 @@
+dependencies {
+	compile group: "rome", name: "rome", version: "1.0"
+	compile project(":apps:dynamic-data-mapping:dynamic-data-mapping-api")
+	compile project(":apps:dynamic-data-mapping:dynamic-data-mapping-taglib")
+	compile project(":apps:export-import:export-import-api")
+	compile project(":apps:export-import:export-import-service")
+	compile project(":apps:journal:journal-api")
+	compile project(":apps:portlet-display-template:portlet-display-template")
+	compile project(":portal:portal-upgrade")
+
+	provided group: "com.liferay.portal", name: "util-java", version: liferay.portalVersion
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/modules")
+}

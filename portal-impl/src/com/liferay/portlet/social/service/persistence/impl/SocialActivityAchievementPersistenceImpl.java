@@ -16,8 +16,9 @@ package com.liferay.portlet.social.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
+import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
@@ -58,7 +59,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SocialActivityAchievementPersistence
- * @see SocialActivityAchievementUtil
+ * @see com.liferay.portlet.social.service.persistence.SocialActivityAchievementUtil
  * @generated
  */
 @ProviderType
@@ -124,7 +125,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns a range of all the social activity achievements where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -142,7 +143,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns an ordered range of all the social activity achievements where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -155,6 +156,28 @@ public class SocialActivityAchievementPersistenceImpl
 	public List<SocialActivityAchievement> findByGroupId(long groupId,
 		int start, int end,
 		OrderByComparator<SocialActivityAchievement> orderByComparator) {
+		return findByGroupId(groupId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the social activity achievements where groupId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param start the lower bound of the range of social activity achievements
+	 * @param end the upper bound of the range of social activity achievements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching social activity achievements
+	 */
+	@Override
+	public List<SocialActivityAchievement> findByGroupId(long groupId,
+		int start, int end,
+		OrderByComparator<SocialActivityAchievement> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -170,15 +193,19 @@ public class SocialActivityAchievementPersistenceImpl
 			finderArgs = new Object[] { groupId, start, end, orderByComparator };
 		}
 
-		List<SocialActivityAchievement> list = (List<SocialActivityAchievement>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<SocialActivityAchievement> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (SocialActivityAchievement socialActivityAchievement : list) {
-				if ((groupId != socialActivityAchievement.getGroupId())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<SocialActivityAchievement>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (SocialActivityAchievement socialActivityAchievement : list) {
+					if ((groupId != socialActivityAchievement.getGroupId())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -235,10 +262,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -256,7 +283,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByGroupId_First(long groupId,
@@ -307,7 +334,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByGroupId_Last(long groupId,
@@ -365,7 +392,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement[] findByGroupId_PrevAndNext(
@@ -531,8 +558,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 		Object[] finderArgs = new Object[] { groupId };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -556,10 +582,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -612,7 +638,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns a range of all the social activity achievements where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -631,7 +657,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -645,6 +671,29 @@ public class SocialActivityAchievementPersistenceImpl
 	public List<SocialActivityAchievement> findByG_U(long groupId, long userId,
 		int start, int end,
 		OrderByComparator<SocialActivityAchievement> orderByComparator) {
+		return findByG_U(groupId, userId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and userId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param start the lower bound of the range of social activity achievements
+	 * @param end the upper bound of the range of social activity achievements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching social activity achievements
+	 */
+	@Override
+	public List<SocialActivityAchievement> findByG_U(long groupId, long userId,
+		int start, int end,
+		OrderByComparator<SocialActivityAchievement> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -664,16 +713,20 @@ public class SocialActivityAchievementPersistenceImpl
 				};
 		}
 
-		List<SocialActivityAchievement> list = (List<SocialActivityAchievement>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<SocialActivityAchievement> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (SocialActivityAchievement socialActivityAchievement : list) {
-				if ((groupId != socialActivityAchievement.getGroupId()) ||
-						(userId != socialActivityAchievement.getUserId())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<SocialActivityAchievement>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (SocialActivityAchievement socialActivityAchievement : list) {
+					if ((groupId != socialActivityAchievement.getGroupId()) ||
+							(userId != socialActivityAchievement.getUserId())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -734,10 +787,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -756,7 +809,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_U_First(long groupId, long userId,
@@ -813,7 +866,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_U_Last(long groupId, long userId,
@@ -876,7 +929,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement[] findByG_U_PrevAndNext(
@@ -1048,8 +1101,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 		Object[] finderArgs = new Object[] { groupId, userId };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -1077,10 +1129,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1134,7 +1186,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns a range of all the social activity achievements where groupId = &#63; and name = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1153,7 +1205,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and name = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1167,6 +1219,29 @@ public class SocialActivityAchievementPersistenceImpl
 	public List<SocialActivityAchievement> findByG_N(long groupId, String name,
 		int start, int end,
 		OrderByComparator<SocialActivityAchievement> orderByComparator) {
+		return findByG_N(groupId, name, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and name = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param name the name
+	 * @param start the lower bound of the range of social activity achievements
+	 * @param end the upper bound of the range of social activity achievements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching social activity achievements
+	 */
+	@Override
+	public List<SocialActivityAchievement> findByG_N(long groupId, String name,
+		int start, int end,
+		OrderByComparator<SocialActivityAchievement> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1186,17 +1261,21 @@ public class SocialActivityAchievementPersistenceImpl
 				};
 		}
 
-		List<SocialActivityAchievement> list = (List<SocialActivityAchievement>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<SocialActivityAchievement> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (SocialActivityAchievement socialActivityAchievement : list) {
-				if ((groupId != socialActivityAchievement.getGroupId()) ||
-						!Validator.equals(name,
-							socialActivityAchievement.getName())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<SocialActivityAchievement>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (SocialActivityAchievement socialActivityAchievement : list) {
+					if ((groupId != socialActivityAchievement.getGroupId()) ||
+							!Validator.equals(name,
+								socialActivityAchievement.getName())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -1271,10 +1350,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1293,7 +1372,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_N_First(long groupId, String name,
@@ -1350,7 +1429,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_N_Last(long groupId, String name,
@@ -1413,7 +1492,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param name the name
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement[] findByG_N_PrevAndNext(
@@ -1599,8 +1678,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 		Object[] finderArgs = new Object[] { groupId, name };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -1642,10 +1720,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1702,7 +1780,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns a range of all the social activity achievements where groupId = &#63; and firstInGroup = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1721,7 +1799,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and firstInGroup = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1735,6 +1813,30 @@ public class SocialActivityAchievementPersistenceImpl
 	public List<SocialActivityAchievement> findByG_F(long groupId,
 		boolean firstInGroup, int start, int end,
 		OrderByComparator<SocialActivityAchievement> orderByComparator) {
+		return findByG_F(groupId, firstInGroup, start, end, orderByComparator,
+			true);
+	}
+
+	/**
+	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and firstInGroup = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param firstInGroup the first in group
+	 * @param start the lower bound of the range of social activity achievements
+	 * @param end the upper bound of the range of social activity achievements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching social activity achievements
+	 */
+	@Override
+	public List<SocialActivityAchievement> findByG_F(long groupId,
+		boolean firstInGroup, int start, int end,
+		OrderByComparator<SocialActivityAchievement> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1754,16 +1856,20 @@ public class SocialActivityAchievementPersistenceImpl
 				};
 		}
 
-		List<SocialActivityAchievement> list = (List<SocialActivityAchievement>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<SocialActivityAchievement> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (SocialActivityAchievement socialActivityAchievement : list) {
-				if ((groupId != socialActivityAchievement.getGroupId()) ||
-						(firstInGroup != socialActivityAchievement.getFirstInGroup())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<SocialActivityAchievement>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (SocialActivityAchievement socialActivityAchievement : list) {
+					if ((groupId != socialActivityAchievement.getGroupId()) ||
+							(firstInGroup != socialActivityAchievement.getFirstInGroup())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -1824,10 +1930,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1846,7 +1952,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param firstInGroup the first in group
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_F_First(long groupId,
@@ -1904,7 +2010,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param firstInGroup the first in group
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_F_Last(long groupId,
@@ -1969,7 +2075,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param firstInGroup the first in group
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement[] findByG_F_PrevAndNext(
@@ -2142,8 +2248,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 		Object[] finderArgs = new Object[] { groupId, firstInGroup };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2171,10 +2276,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2209,13 +2314,13 @@ public class SocialActivityAchievementPersistenceImpl
 			});
 
 	/**
-	 * Returns the social activity achievement where groupId = &#63; and userId = &#63; and name = &#63; or throws a {@link com.liferay.portlet.social.NoSuchActivityAchievementException} if it could not be found.
+	 * Returns the social activity achievement where groupId = &#63; and userId = &#63; and name = &#63; or throws a {@link NoSuchActivityAchievementException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param name the name
 	 * @return the matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_U_N(long groupId, long userId,
@@ -2269,7 +2374,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param name the name
-	 * @param retrieveFromCache whether to use the finder cache
+	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching social activity achievement, or <code>null</code> if a matching social activity achievement could not be found
 	 */
 	@Override
@@ -2280,7 +2385,7 @@ public class SocialActivityAchievementPersistenceImpl
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_G_U_N,
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_G_U_N,
 					finderArgs, this);
 		}
 
@@ -2339,7 +2444,7 @@ public class SocialActivityAchievementPersistenceImpl
 				List<SocialActivityAchievement> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U_N,
+					finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N,
 						finderArgs, list);
 				}
 				else {
@@ -2353,14 +2458,13 @@ public class SocialActivityAchievementPersistenceImpl
 							(socialActivityAchievement.getUserId() != userId) ||
 							(socialActivityAchievement.getName() == null) ||
 							!socialActivityAchievement.getName().equals(name)) {
-						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U_N,
+						finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N,
 							finderArgs, socialActivityAchievement);
 					}
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U_N,
-					finderArgs);
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_N, finderArgs);
 
 				throw processException(e);
 			}
@@ -2408,8 +2512,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 		Object[] finderArgs = new Object[] { groupId, userId, name };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -2455,10 +2558,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2525,7 +2628,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns a range of all the social activity achievements where groupId = &#63; and userId = &#63; and firstInGroup = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -2545,7 +2648,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and userId = &#63; and firstInGroup = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -2560,6 +2663,31 @@ public class SocialActivityAchievementPersistenceImpl
 	public List<SocialActivityAchievement> findByG_U_F(long groupId,
 		long userId, boolean firstInGroup, int start, int end,
 		OrderByComparator<SocialActivityAchievement> orderByComparator) {
+		return findByG_U_F(groupId, userId, firstInGroup, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the social activity achievements where groupId = &#63; and userId = &#63; and firstInGroup = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param firstInGroup the first in group
+	 * @param start the lower bound of the range of social activity achievements
+	 * @param end the upper bound of the range of social activity achievements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching social activity achievements
+	 */
+	@Override
+	public List<SocialActivityAchievement> findByG_U_F(long groupId,
+		long userId, boolean firstInGroup, int start, int end,
+		OrderByComparator<SocialActivityAchievement> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -2579,17 +2707,21 @@ public class SocialActivityAchievementPersistenceImpl
 				};
 		}
 
-		List<SocialActivityAchievement> list = (List<SocialActivityAchievement>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<SocialActivityAchievement> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (SocialActivityAchievement socialActivityAchievement : list) {
-				if ((groupId != socialActivityAchievement.getGroupId()) ||
-						(userId != socialActivityAchievement.getUserId()) ||
-						(firstInGroup != socialActivityAchievement.getFirstInGroup())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<SocialActivityAchievement>)finderCache.getResult(finderPath,
+					finderArgs, this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (SocialActivityAchievement socialActivityAchievement : list) {
+					if ((groupId != socialActivityAchievement.getGroupId()) ||
+							(userId != socialActivityAchievement.getUserId()) ||
+							(firstInGroup != socialActivityAchievement.getFirstInGroup())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -2654,10 +2786,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2677,7 +2809,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param firstInGroup the first in group
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_U_F_First(long groupId,
@@ -2740,7 +2872,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param firstInGroup the first in group
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a matching social activity achievement could not be found
+	 * @throws NoSuchActivityAchievementException if a matching social activity achievement could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByG_U_F_Last(long groupId,
@@ -2810,7 +2942,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * @param firstInGroup the first in group
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement[] findByG_U_F_PrevAndNext(
@@ -2992,8 +3124,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 		Object[] finderArgs = new Object[] { groupId, userId, firstInGroup };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -3025,10 +3156,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -3055,11 +3186,11 @@ public class SocialActivityAchievementPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(SocialActivityAchievement socialActivityAchievement) {
-		EntityCacheUtil.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 			SocialActivityAchievementImpl.class,
 			socialActivityAchievement.getPrimaryKey(), socialActivityAchievement);
 
-		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U_N,
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N,
 			new Object[] {
 				socialActivityAchievement.getGroupId(),
 				socialActivityAchievement.getUserId(),
@@ -3078,7 +3209,7 @@ public class SocialActivityAchievementPersistenceImpl
 	public void cacheResult(
 		List<SocialActivityAchievement> socialActivityAchievements) {
 		for (SocialActivityAchievement socialActivityAchievement : socialActivityAchievements) {
-			if (EntityCacheUtil.getResult(
+			if (entityCache.getResult(
 						SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 						SocialActivityAchievementImpl.class,
 						socialActivityAchievement.getPrimaryKey()) == null) {
@@ -3094,102 +3225,94 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Clears the cache for all social activity achievements.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(SocialActivityAchievementImpl.class.getName());
-		}
+		entityCache.clearCache(SocialActivityAchievementImpl.class);
 
-		EntityCacheUtil.clearCache(SocialActivityAchievementImpl.class);
-
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
 	 * Clears the cache for the social activity achievement.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(SocialActivityAchievement socialActivityAchievement) {
-		EntityCacheUtil.removeResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 			SocialActivityAchievementImpl.class,
 			socialActivityAchievement.getPrimaryKey());
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache(socialActivityAchievement);
+		clearUniqueFindersCache((SocialActivityAchievementModelImpl)socialActivityAchievement);
 	}
 
 	@Override
 	public void clearCache(
 		List<SocialActivityAchievement> socialActivityAchievements) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (SocialActivityAchievement socialActivityAchievement : socialActivityAchievements) {
-			EntityCacheUtil.removeResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+			entityCache.removeResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 				SocialActivityAchievementImpl.class,
 				socialActivityAchievement.getPrimaryKey());
 
-			clearUniqueFindersCache(socialActivityAchievement);
+			clearUniqueFindersCache((SocialActivityAchievementModelImpl)socialActivityAchievement);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
-		SocialActivityAchievement socialActivityAchievement) {
-		if (socialActivityAchievement.isNew()) {
+		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl,
+		boolean isNew) {
+		if (isNew) {
 			Object[] args = new Object[] {
-					socialActivityAchievement.getGroupId(),
-					socialActivityAchievement.getUserId(),
-					socialActivityAchievement.getName()
+					socialActivityAchievementModelImpl.getGroupId(),
+					socialActivityAchievementModelImpl.getUserId(),
+					socialActivityAchievementModelImpl.getName()
 				};
 
-			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
+			finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
 				Long.valueOf(1));
-			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
-				socialActivityAchievement);
+			finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
+				socialActivityAchievementModelImpl);
 		}
 		else {
-			SocialActivityAchievementModelImpl socialActivityAchievementModelImpl =
-				(SocialActivityAchievementModelImpl)socialActivityAchievement;
-
 			if ((socialActivityAchievementModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_G_U_N.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						socialActivityAchievement.getGroupId(),
-						socialActivityAchievement.getUserId(),
-						socialActivityAchievement.getName()
+						socialActivityAchievementModelImpl.getGroupId(),
+						socialActivityAchievementModelImpl.getUserId(),
+						socialActivityAchievementModelImpl.getName()
 					};
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
+				finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_N, args,
 					Long.valueOf(1));
-				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
-					socialActivityAchievement);
+				finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N, args,
+					socialActivityAchievementModelImpl);
 			}
 		}
 	}
 
 	protected void clearUniqueFindersCache(
-		SocialActivityAchievement socialActivityAchievement) {
-		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl = (SocialActivityAchievementModelImpl)socialActivityAchievement;
-
+		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl) {
 		Object[] args = new Object[] {
-				socialActivityAchievement.getGroupId(),
-				socialActivityAchievement.getUserId(),
-				socialActivityAchievement.getName()
+				socialActivityAchievementModelImpl.getGroupId(),
+				socialActivityAchievementModelImpl.getUserId(),
+				socialActivityAchievementModelImpl.getName()
 			};
 
-		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_N, args);
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U_N, args);
+		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_N, args);
+		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_N, args);
 
 		if ((socialActivityAchievementModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U_N.getColumnBitmask()) != 0) {
@@ -3199,8 +3322,8 @@ public class SocialActivityAchievementPersistenceImpl
 					socialActivityAchievementModelImpl.getOriginalName()
 				};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_N, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U_N, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_N, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_N, args);
 		}
 	}
 
@@ -3225,7 +3348,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 *
 	 * @param activityAchievementId the primary key of the social activity achievement
 	 * @return the social activity achievement that was removed
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement remove(long activityAchievementId)
@@ -3238,7 +3361,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 *
 	 * @param primaryKey the primary key of the social activity achievement
 	 * @return the social activity achievement that was removed
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement remove(Serializable primaryKey)
@@ -3308,7 +3431,7 @@ public class SocialActivityAchievementPersistenceImpl
 
 	@Override
 	public SocialActivityAchievement updateImpl(
-		com.liferay.portlet.social.model.SocialActivityAchievement socialActivityAchievement) {
+		SocialActivityAchievement socialActivityAchievement) {
 		socialActivityAchievement = toUnwrappedModel(socialActivityAchievement);
 
 		boolean isNew = socialActivityAchievement.isNew();
@@ -3326,7 +3449,7 @@ public class SocialActivityAchievementPersistenceImpl
 				socialActivityAchievement.setNew(false);
 			}
 			else {
-				session.merge(socialActivityAchievement);
+				socialActivityAchievement = (SocialActivityAchievement)session.merge(socialActivityAchievement);
 			}
 		}
 		catch (Exception e) {
@@ -3336,11 +3459,11 @@ public class SocialActivityAchievementPersistenceImpl
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (isNew ||
 				!SocialActivityAchievementModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
 
 		else {
@@ -3350,16 +3473,16 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getOriginalGroupId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
 					args);
 
 				args = new Object[] {
 						socialActivityAchievementModelImpl.getGroupId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
 					args);
 			}
 
@@ -3370,8 +3493,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getOriginalUserId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U,
 					args);
 
 				args = new Object[] {
@@ -3379,8 +3502,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getUserId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U,
 					args);
 			}
 
@@ -3391,8 +3514,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getOriginalName()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_N,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_N,
 					args);
 
 				args = new Object[] {
@@ -3400,8 +3523,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getName()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_N,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_N,
 					args);
 			}
 
@@ -3412,8 +3535,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getOriginalFirstInGroup()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_F, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_F,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_F, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_F,
 					args);
 
 				args = new Object[] {
@@ -3421,8 +3544,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getFirstInGroup()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_F, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_F,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_F, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_F,
 					args);
 			}
 
@@ -3434,8 +3557,8 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getOriginalFirstInGroup()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_F, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_F,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_F, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_F,
 					args);
 
 				args = new Object[] {
@@ -3444,19 +3567,19 @@ public class SocialActivityAchievementPersistenceImpl
 						socialActivityAchievementModelImpl.getFirstInGroup()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_F, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_F,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_F, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_F,
 					args);
 			}
 		}
 
-		EntityCacheUtil.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 			SocialActivityAchievementImpl.class,
 			socialActivityAchievement.getPrimaryKey(),
 			socialActivityAchievement, false);
 
-		clearUniqueFindersCache(socialActivityAchievement);
-		cacheUniqueFindersCache(socialActivityAchievement);
+		clearUniqueFindersCache(socialActivityAchievementModelImpl);
+		cacheUniqueFindersCache(socialActivityAchievementModelImpl, isNew);
 
 		socialActivityAchievement.resetOriginalValues();
 
@@ -3490,7 +3613,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 *
 	 * @param primaryKey the primary key of the social activity achievement
 	 * @return the social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByPrimaryKey(Serializable primaryKey)
@@ -3510,11 +3633,11 @@ public class SocialActivityAchievementPersistenceImpl
 	}
 
 	/**
-	 * Returns the social activity achievement with the primary key or throws a {@link com.liferay.portlet.social.NoSuchActivityAchievementException} if it could not be found.
+	 * Returns the social activity achievement with the primary key or throws a {@link NoSuchActivityAchievementException} if it could not be found.
 	 *
 	 * @param activityAchievementId the primary key of the social activity achievement
 	 * @return the social activity achievement
-	 * @throws com.liferay.portlet.social.NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
+	 * @throws NoSuchActivityAchievementException if a social activity achievement with the primary key could not be found
 	 */
 	@Override
 	public SocialActivityAchievement findByPrimaryKey(
@@ -3530,7 +3653,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 */
 	@Override
 	public SocialActivityAchievement fetchByPrimaryKey(Serializable primaryKey) {
-		SocialActivityAchievement socialActivityAchievement = (SocialActivityAchievement)EntityCacheUtil.getResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+		SocialActivityAchievement socialActivityAchievement = (SocialActivityAchievement)entityCache.getResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 				SocialActivityAchievementImpl.class, primaryKey);
 
 		if (socialActivityAchievement == _nullSocialActivityAchievement) {
@@ -3550,13 +3673,13 @@ public class SocialActivityAchievementPersistenceImpl
 					cacheResult(socialActivityAchievement);
 				}
 				else {
-					EntityCacheUtil.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+					entityCache.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 						SocialActivityAchievementImpl.class, primaryKey,
 						_nullSocialActivityAchievement);
 				}
 			}
 			catch (Exception e) {
-				EntityCacheUtil.removeResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 					SocialActivityAchievementImpl.class, primaryKey);
 
 				throw processException(e);
@@ -3607,7 +3730,7 @@ public class SocialActivityAchievementPersistenceImpl
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			SocialActivityAchievement socialActivityAchievement = (SocialActivityAchievement)EntityCacheUtil.getResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+			SocialActivityAchievement socialActivityAchievement = (SocialActivityAchievement)entityCache.getResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 					SocialActivityAchievementImpl.class, primaryKey);
 
 			if (socialActivityAchievement == null) {
@@ -3660,7 +3783,7 @@ public class SocialActivityAchievementPersistenceImpl
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.putResult(SocialActivityAchievementModelImpl.ENTITY_CACHE_ENABLED,
 					SocialActivityAchievementImpl.class, primaryKey,
 					_nullSocialActivityAchievement);
 			}
@@ -3689,7 +3812,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns a range of all the social activity achievements.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of social activity achievements
@@ -3705,7 +3828,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 * Returns an ordered range of all the social activity achievements.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.social.model.impl.SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of social activity achievements
@@ -3716,6 +3839,26 @@ public class SocialActivityAchievementPersistenceImpl
 	@Override
 	public List<SocialActivityAchievement> findAll(int start, int end,
 		OrderByComparator<SocialActivityAchievement> orderByComparator) {
+		return findAll(start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the social activity achievements.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SocialActivityAchievementModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param start the lower bound of the range of social activity achievements
+	 * @param end the upper bound of the range of social activity achievements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of social activity achievements
+	 */
+	@Override
+	public List<SocialActivityAchievement> findAll(int start, int end,
+		OrderByComparator<SocialActivityAchievement> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -3731,8 +3874,12 @@ public class SocialActivityAchievementPersistenceImpl
 			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
-		List<SocialActivityAchievement> list = (List<SocialActivityAchievement>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<SocialActivityAchievement> list = null;
+
+		if (retrieveFromCache) {
+			list = (List<SocialActivityAchievement>)finderCache.getResult(finderPath,
+					finderArgs, this);
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -3779,10 +3926,10 @@ public class SocialActivityAchievementPersistenceImpl
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -3812,7 +3959,7 @@ public class SocialActivityAchievementPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
+		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
 				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
@@ -3825,11 +3972,11 @@ public class SocialActivityAchievementPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
+				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
 					FINDER_ARGS_EMPTY);
 
 				throw processException(e);
@@ -3842,6 +3989,11 @@ public class SocialActivityAchievementPersistenceImpl
 		return count.intValue();
 	}
 
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return SocialActivityAchievementModelImpl.TABLE_COLUMNS_MAP;
+	}
+
 	/**
 	 * Initializes the social activity achievement persistence.
 	 */
@@ -3849,12 +4001,14 @@ public class SocialActivityAchievementPersistenceImpl
 	}
 
 	public void destroy() {
-		EntityCacheUtil.removeCache(SocialActivityAchievementImpl.class.getName());
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		entityCache.removeCache(SocialActivityAchievementImpl.class.getName());
+		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
+	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_SOCIALACTIVITYACHIEVEMENT = "SELECT socialActivityAchievement FROM SocialActivityAchievement socialActivityAchievement";
 	private static final String _SQL_SELECT_SOCIALACTIVITYACHIEVEMENT_WHERE_PKS_IN =
 		"SELECT socialActivityAchievement FROM SocialActivityAchievement socialActivityAchievement WHERE activityAchievementId IN (";
@@ -3864,7 +4018,6 @@ public class SocialActivityAchievementPersistenceImpl
 	private static final String _ORDER_BY_ENTITY_ALIAS = "socialActivityAchievement.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SocialActivityAchievement exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SocialActivityAchievement exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(SocialActivityAchievementPersistenceImpl.class);
 	private static final SocialActivityAchievement _nullSocialActivityAchievement =
 		new SocialActivityAchievementImpl() {

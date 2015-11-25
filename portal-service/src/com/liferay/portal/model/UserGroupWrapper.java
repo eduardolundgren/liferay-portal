@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -64,6 +65,7 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
 		attributes.put("addedByLDAPImport", getAddedByLDAPImport());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -141,6 +143,12 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 		if (addedByLDAPImport != null) {
 			setAddedByLDAPImport(addedByLDAPImport);
 		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
 	}
 
 	@Override
@@ -179,7 +187,7 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	* @return the create date of this user group
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _userGroup.getCreateDate();
 	}
 
@@ -211,12 +219,22 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	}
 
 	/**
+	* Returns the last publish date of this user group.
+	*
+	* @return the last publish date of this user group
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _userGroup.getLastPublishDate();
+	}
+
+	/**
 	* Returns the modified date of this user group.
 	*
 	* @return the modified date of this user group
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _userGroup.getModifiedDate();
 	}
 
@@ -405,7 +423,7 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	* @param createDate the create date of this user group
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_userGroup.setCreateDate(createDate);
 	}
 
@@ -420,8 +438,7 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_userGroup.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -438,12 +455,22 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	}
 
 	/**
+	* Sets the last publish date of this user group.
+	*
+	* @param lastPublishDate the last publish date of this user group
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_userGroup.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the modified date of this user group.
 	*
 	* @param modifiedDate the modified date of this user group
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_userGroup.setModifiedDate(modifiedDate);
 	}
 
@@ -548,7 +575,7 @@ public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.UserGroup> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.UserGroup> toCacheModel() {
 		return _userGroup.toCacheModel();
 	}
 

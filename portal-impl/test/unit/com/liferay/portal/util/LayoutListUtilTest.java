@@ -136,7 +136,7 @@ public class LayoutListUtilTest extends PowerMockito {
 					" ms");
 		}
 
-		List<String> expectedLayoutDescriptionStrings = new ArrayList<String>(
+		List<String> expectedLayoutDescriptionStrings = new ArrayList<>(
 			_layoutListUtilStrings.length);
 
 		for (String layoutListUtilString : _layoutListUtilStrings) {
@@ -150,7 +150,7 @@ public class LayoutListUtilTest extends PowerMockito {
 			expectedLayoutDescriptionStrings.add(plid + name + depth);
 		}
 
-		List<String> actualLayoutDescriptionStrings = new ArrayList<String>(
+		List<String> actualLayoutDescriptionStrings = new ArrayList<>(
 			layoutDescriptions.size() - 1);
 
 		Iterator<LayoutDescription> iterator = layoutDescriptions.listIterator(
@@ -200,10 +200,11 @@ public class LayoutListUtilTest extends PowerMockito {
 
 	private static final int _NODES = 10;
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutListUtilTest.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutListUtilTest.class);
 
 	private String[] _layoutListUtilStrings;
-	private List<Layout> _layouts = new ArrayList<Layout>();
+	private final List<Layout> _layouts = new ArrayList<>();
 	private long _plid;
 
 	private static class MockLayoutImpl extends LayoutImpl {

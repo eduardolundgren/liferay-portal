@@ -35,6 +35,7 @@ public class TeamSoap implements Serializable {
 		TeamSoap soapModel = new TeamSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setUuid(model.getUuid());
 		soapModel.setTeamId(model.getTeamId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -44,6 +45,7 @@ public class TeamSoap implements Serializable {
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setName(model.getName());
 		soapModel.setDescription(model.getDescription());
+		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
 	}
@@ -102,6 +104,14 @@ public class TeamSoap implements Serializable {
 
 	public void setMvccVersion(long mvccVersion) {
 		_mvccVersion = mvccVersion;
+	}
+
+	public String getUuid() {
+		return _uuid;
+	}
+
+	public void setUuid(String uuid) {
+		_uuid = uuid;
 	}
 
 	public long getTeamId() {
@@ -176,7 +186,16 @@ public class TeamSoap implements Serializable {
 		_description = description;
 	}
 
+	public Date getLastPublishDate() {
+		return _lastPublishDate;
+	}
+
+	public void setLastPublishDate(Date lastPublishDate) {
+		_lastPublishDate = lastPublishDate;
+	}
+
 	private long _mvccVersion;
+	private String _uuid;
 	private long _teamId;
 	private long _companyId;
 	private long _userId;
@@ -186,4 +205,5 @@ public class TeamSoap implements Serializable {
 	private long _groupId;
 	private String _name;
 	private String _description;
+	private Date _lastPublishDate;
 }

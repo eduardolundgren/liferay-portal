@@ -30,18 +30,8 @@ public class ListTypeServiceWrapper implements ListTypeService,
 		_listTypeService = listTypeService;
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _listTypeService.getBeanIdentifier();
-	}
-
-	@Override
-	public com.liferay.portal.model.ListType getListType(int listTypeId)
+	public com.liferay.portal.model.ListType getListType(long listTypeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _listTypeService.getListType(listTypeId);
 	}
@@ -53,23 +43,24 @@ public class ListTypeServiceWrapper implements ListTypeService,
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @param beanIdentifier the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_listTypeService.setBeanIdentifier(beanIdentifier);
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _listTypeService.getOSGiServiceIdentifier();
 	}
 
 	@Override
-	public void validate(int listTypeId, long classNameId, java.lang.String type)
+	public void validate(long listTypeId, long classNameId,
+		java.lang.String type)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_listTypeService.validate(listTypeId, classNameId, type);
 	}
 
 	@Override
-	public void validate(int listTypeId, java.lang.String type)
+	public void validate(long listTypeId, java.lang.String type)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_listTypeService.validate(listTypeId, type);
 	}

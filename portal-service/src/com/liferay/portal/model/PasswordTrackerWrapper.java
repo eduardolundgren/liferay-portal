@@ -54,6 +54,7 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("passwordTrackerId", getPasswordTrackerId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("password", getPassword());
@@ -73,6 +74,12 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 
 		if (passwordTrackerId != null) {
 			setPasswordTrackerId(passwordTrackerId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long userId = (Long)attributes.get("userId");
@@ -106,12 +113,22 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
+	* Returns the company ID of this password tracker.
+	*
+	* @return the company ID of this password tracker
+	*/
+	@Override
+	public long getCompanyId() {
+		return _passwordTracker.getCompanyId();
+	}
+
+	/**
 	* Returns the create date of this password tracker.
 	*
 	* @return the create date of this password tracker
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _passwordTracker.getCreateDate();
 	}
 
@@ -216,18 +233,27 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
+	* Sets the company ID of this password tracker.
+	*
+	* @param companyId the company ID of this password tracker
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_passwordTracker.setCompanyId(companyId);
+	}
+
+	/**
 	* Sets the create date of this password tracker.
 	*
 	* @param createDate the create date of this password tracker
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_passwordTracker.setCreateDate(createDate);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_passwordTracker.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -314,7 +340,7 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.PasswordTracker> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.PasswordTracker> toCacheModel() {
 		return _passwordTracker.toCacheModel();
 	}
 

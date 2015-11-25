@@ -18,9 +18,9 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -44,15 +44,17 @@ public class IGUtil {
 			RenderResponse renderResponse)
 		throws Exception {
 
-		String strutsAction = ParamUtil.getString(request, "struts_action");
+		String mvcRenderCommandName = ParamUtil.getString(
+			request, "mvcRenderCommandName");
 
 		PortletURL portletURL = renderResponse.createRenderURL();
 
-		if (strutsAction.equals("/image_gallery_display/select_folder")) {
+		if (mvcRenderCommandName.equals("/document_library/select_folder")) {
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-			portletURL.setParameter("struts_action", strutsAction);
+			portletURL.setParameter(
+				"mvcRenderCommandName", mvcRenderCommandName);
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 			PortalUtil.addPortletBreadcrumbEntry(
@@ -60,7 +62,7 @@ public class IGUtil {
 		}
 		else {
 			portletURL.setParameter(
-				"struts_action", "/image_gallery_display/view");
+				"mvcRenderCommandName", "/image_gallery_display/view");
 		}
 
 		long defaultFolderId = getDefaultFolderId(request);
@@ -97,11 +99,6 @@ public class IGUtil {
 
 		portletURL.setParameter(
 			"folderId", String.valueOf(folder.getFolderId()));
-
-		if (strutsAction.equals("/journal/select_image_gallery")) {
-			portletURL.setParameter(
-				"groupId", String.valueOf(folder.getGroupId()));
-		}
 
 		PortalUtil.addPortletBreadcrumbEntry(
 			request, folder.getName(), portletURL.toString());

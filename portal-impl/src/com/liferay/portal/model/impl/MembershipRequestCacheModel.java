@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -39,6 +40,33 @@ import java.util.Date;
 @ProviderType
 public class MembershipRequestCacheModel implements CacheModel<MembershipRequest>,
 	Externalizable, MVCCModel {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MembershipRequestCacheModel)) {
+			return false;
+		}
+
+		MembershipRequestCacheModel membershipRequestCacheModel = (MembershipRequestCacheModel)obj;
+
+		if ((membershipRequestId == membershipRequestCacheModel.membershipRequestId) &&
+				(mvccVersion == membershipRequestCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, membershipRequestId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
 	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
@@ -138,7 +166,7 @@ public class MembershipRequestCacheModel implements CacheModel<MembershipRequest
 		replyComments = objectInput.readUTF();
 		replyDate = objectInput.readLong();
 		replierUserId = objectInput.readLong();
-		statusId = objectInput.readInt();
+		statusId = objectInput.readLong();
 	}
 
 	@Override
@@ -167,7 +195,7 @@ public class MembershipRequestCacheModel implements CacheModel<MembershipRequest
 
 		objectOutput.writeLong(replyDate);
 		objectOutput.writeLong(replierUserId);
-		objectOutput.writeInt(statusId);
+		objectOutput.writeLong(statusId);
 	}
 
 	public long mvccVersion;
@@ -180,5 +208,5 @@ public class MembershipRequestCacheModel implements CacheModel<MembershipRequest
 	public String replyComments;
 	public long replyDate;
 	public long replierUserId;
-	public int statusId;
+	public long statusId;
 }

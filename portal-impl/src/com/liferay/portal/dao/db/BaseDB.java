@@ -16,6 +16,7 @@ package com.liferay.portal.dao.db;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
+import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.Index;
 import com.liferay.portal.kernel.dao.db.IndexMetadata;
@@ -23,17 +24,23 @@ import com.liferay.portal.kernel.dao.db.IndexMetadataFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.template.StringTemplateResource;
+import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.util.ClassLoaderUtil;
-import com.liferay.portal.velocity.VelocityUtil;
 import com.liferay.util.SimpleCounter;
 
 import java.io.File;
@@ -113,7 +120,6 @@ public abstract class BaseDB implements DB {
 
 		buildCreateFile(sqlDir, databaseName, BARE);
 		buildCreateFile(sqlDir, databaseName, DEFAULT);
-		buildCreateFile(sqlDir, databaseName, SHARDED);
 	}
 
 	@Override
@@ -127,35 +133,11 @@ public abstract class BaseDB implements DB {
 			sqlDir + "/create" + suffix + "/create" + suffix + "-" +
 				getServerName() + ".sql");
 
-		if (population != SHARDED) {
-			String content = buildCreateFileContent(
-				sqlDir, databaseName, population);
+		String content = buildCreateFileContent(
+			sqlDir, databaseName, population);
 
-			if (content != null) {
-				FileUtil.write(file, content);
-			}
-		}
-		else {
-			String content = buildCreateFileContent(
-				sqlDir, databaseName, DEFAULT);
-
-			if (content != null) {
-				FileUtil.write(file, content);
-			}
-
-			content = buildCreateFileContent(
-				sqlDir, databaseName + "1", DEFAULT);
-
-			if (content != null) {
-				FileUtil.write(file, content, false, true);
-			}
-
-			content = buildCreateFileContent(
-				sqlDir, databaseName + "2", DEFAULT);
-
-			if (content != null) {
-				FileUtil.write(file, content, false, true);
-			}
+		if (content != null) {
+			FileUtil.write(file, content);
 		}
 	}
 
@@ -187,6 +169,16 @@ public abstract class BaseDB implements DB {
 	}
 
 	@Override
+	public int getMajorVersion() {
+		return _majorVersion;
+	}
+
+	@Override
+	public int getMinorVersion() {
+		return _minorVersion;
+	}
+
+	@Override
 	public String getTemplateFalse() {
 		return getTemplate()[2];
 	}
@@ -199,6 +191,11 @@ public abstract class BaseDB implements DB {
 	@Override
 	public String getType() {
 		return _type;
+	}
+
+	@Override
+	public String getVersionString() {
+		return _majorVersion + StringPool.PERIOD + _minorVersion;
 	}
 
 	@Override
@@ -219,11 +216,6 @@ public abstract class BaseDB implements DB {
 	@Override
 	public boolean isSupportsAlterColumnType() {
 		return _SUPPORTS_ALTER_COLUMN_TYPE;
-	}
-
-	@Override
-	public boolean isSupportsDateMilliseconds() {
-		return _SUPPORTS_DATE_MILLISECONDS;
 	}
 
 	@Override
@@ -354,12 +346,16 @@ public abstract class BaseDB implements DB {
 
 	@Override
 	public void runSQLTemplateString(
-			String template, boolean evaluate, boolean failOnError)
+			Connection connection, String template, boolean evaluate,
+			boolean failOnError)
 		throws IOException, NamingException, SQLException {
+
+		template = applyMaxStringIndexLengthLimitation(
+			_columnLengthPattern.matcher(template));
 
 		if (evaluate) {
 			try {
-				template = evaluateVM(template);
+				template = evaluateVM(template.hashCode() + "", template);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -398,7 +394,7 @@ public abstract class BaseDB implements DB {
 
 					if (includeFileName.endsWith(".vm")) {
 						try {
-							include = evaluateVM(include);
+							include = evaluateVM(includeFileName, include);
 						}
 						catch (Exception e) {
 							_log.error(e, e);
@@ -420,7 +416,7 @@ public abstract class BaseDB implements DB {
 
 						try {
 							if (!sql.equals("COMMIT_TRANSACTION;")) {
-								runSQL(sql);
+								runSQL(connection, sql);
 							}
 							else {
 								if (_log.isDebugEnabled()) {
@@ -472,6 +468,16 @@ public abstract class BaseDB implements DB {
 	}
 
 	@Override
+	public void runSQLTemplateString(
+			String template, boolean evaluate, boolean failOnError)
+		throws IOException, NamingException, SQLException {
+
+		try (Connection connection = DataAccess.getConnection()) {
+			runSQLTemplateString(connection, template, evaluate, failOnError);
+		}
+	}
+
+	@Override
 	public void setSupportsStringCaseSensitiveQuery(
 		boolean supportsStringCaseSensitiveQuery) {
 
@@ -501,7 +507,7 @@ public abstract class BaseDB implements DB {
 			validIndexNames = dropIndexes(con, tablesSQL, indexesSQL, indexes);
 		}
 		else {
-			validIndexNames = new HashSet<String>();
+			validIndexNames = new HashSet<>();
 
 			for (Index index : indexes) {
 				String indexName = StringUtil.toUpperCase(index.getIndexName());
@@ -510,17 +516,53 @@ public abstract class BaseDB implements DB {
 			}
 		}
 
+		indexesSQL = applyMaxStringIndexLengthLimitation(
+			_columnLengthPattern.matcher(indexesSQL));
+
 		addIndexes(con, indexesSQL, validIndexNames);
 	}
 
-	protected BaseDB(String type) {
+	protected BaseDB(String type, int majorVersion, int minorVersion) {
 		_type = type;
+		_majorVersion = majorVersion;
+		_minorVersion = minorVersion;
 
 		String[] actual = getTemplate();
 
 		for (int i = 0; i < TEMPLATE.length; i++) {
 			_templateMap.put(TEMPLATE[i], actual[i]);
 		}
+	}
+
+	protected String applyMaxStringIndexLengthLimitation(Matcher matcher) {
+		int stringIndexMaxLength = GetterUtil.getInteger(
+			PropsUtil.get(
+				PropsKeys.DATABASE_STRING_INDEX_MAX_LENGTH,
+				new Filter(getType())),
+			-1);
+
+		if (stringIndexMaxLength < 0) {
+			return matcher.replaceAll(StringPool.BLANK);
+		}
+
+		StringBuffer sb = new StringBuffer();
+
+		String replacement = "\\(" + stringIndexMaxLength + "\\)";
+
+		while (matcher.find()) {
+			int length = Integer.valueOf(matcher.group(1));
+
+			if (length > stringIndexMaxLength) {
+				matcher.appendReplacement(sb, replacement);
+			}
+			else {
+				matcher.appendReplacement(sb, StringPool.BLANK);
+			}
+		}
+
+		matcher.appendTail(sb);
+
+		return sb.toString();
 	}
 
 	protected String[] buildColumnNameTokens(String line) {
@@ -532,9 +574,7 @@ public abstract class BaseDB implements DB {
 			nullable = "not null;";
 		}
 
-		String[] template = {
-			words[1], words[2], words[3], words[4], nullable
-		};
+		String[] template = {words[1], words[2], words[3], words[4], nullable};
 
 		return template;
 	}
@@ -558,9 +598,7 @@ public abstract class BaseDB implements DB {
 			}
 		}
 
-		String[] template = {
-			words[1], words[2], "", words[3], nullable
-		};
+		String[] template = {words[1], words[2], "", words[3], nullable};
 
 		return template;
 	}
@@ -608,7 +646,7 @@ public abstract class BaseDB implements DB {
 
 						if (includeFileName.endsWith(".vm")) {
 							try {
-								include = evaluateVM(include);
+								include = evaluateVM(includeFileName, include);
 							}
 							catch (Exception e) {
 								_log.error(e, e);
@@ -631,8 +669,13 @@ public abstract class BaseDB implements DB {
 			template = sb.toString();
 		}
 
-		if (fileName.equals("indexes") && (this instanceof SybaseDB)) {
-			template = removeBooleanIndexes(sqlDir, template);
+		if (fileName.equals("indexes")) {
+			template = applyMaxStringIndexLengthLimitation(
+				_columnLengthPattern.matcher(template));
+
+			if (this instanceof SybaseDB) {
+				template = removeBooleanIndexes(sqlDir, template);
+			}
 		}
 
 		return template;
@@ -662,7 +705,7 @@ public abstract class BaseDB implements DB {
 			_log.info("Dropping stale indexes");
 		}
 
-		Set<String> validIndexNames = new HashSet<String>();
+		Set<String> validIndexNames = new HashSet<>();
 
 		if (indexes.isEmpty()) {
 			return validIndexNames;
@@ -673,7 +716,7 @@ public abstract class BaseDB implements DB {
 
 		String[] lines = StringUtil.splitLines(indexesSQL);
 
-		Set<String> indexNames = new HashSet<String>();
+		Set<String> indexNames = new HashSet<>();
 
 		for (String line : lines) {
 			if (Validator.isNull(line)) {
@@ -734,19 +777,31 @@ public abstract class BaseDB implements DB {
 		return validIndexNames;
 	}
 
-	protected String evaluateVM(String template) throws Exception {
-		Map<String, Object> variables = new HashMap<String, Object>();
+	protected String evaluateVM(String templateId, String templateContent)
+		throws Exception {
 
-		variables.put("counter", new SimpleCounter());
-		variables.put("portalUUIDUtil", PortalUUIDUtil.class);
+		if (Validator.isNull(templateContent)) {
+			return StringPool.BLANK;
+		}
 
 		ClassLoader classLoader = ClassLoaderUtil.getContextClassLoader();
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		try {
 			ClassLoaderUtil.setContextClassLoader(
 				ClassLoaderUtil.getPortalClassLoader());
 
-			template = VelocityUtil.evaluate(template, variables);
+			StringTemplateResource stringTemplateResource =
+				new StringTemplateResource(templateId, templateContent);
+
+			Template template = TemplateManagerUtil.getTemplate(
+				TemplateConstants.LANG_TYPE_VM, stringTemplateResource, false);
+
+			template.put("counter", new SimpleCounter());
+			template.put("portalUUIDUtil", PortalUUIDUtil.class);
+
+			template.processTemplate(unsyncStringWriter);
 		}
 		finally {
 			ClassLoaderUtil.setContextClassLoader(classLoader);
@@ -757,7 +812,8 @@ public abstract class BaseDB implements DB {
 		StringBundler sb = new StringBundler();
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
-				new UnsyncBufferedReader(new UnsyncStringReader(template))) {
+			new UnsyncBufferedReader(
+				new UnsyncStringReader(unsyncStringWriter.toString()))) {
 
 			String line = null;
 
@@ -769,10 +825,10 @@ public abstract class BaseDB implements DB {
 			}
 		}
 
-		template = sb.toString();
-		template = StringUtil.replace(template, "\n\n\n", "\n\n");
+		templateContent = sb.toString();
+		templateContent = StringUtil.replace(templateContent, "\n\n\n", "\n\n");
 
-		return template;
+		return templateContent;
 	}
 
 	protected String getCreateTablesContent(String sqlDir, String suffix)
@@ -806,9 +862,6 @@ public abstract class BaseDB implements DB {
 	protected String getSuffix(int type) {
 		if (type == BARE) {
 			return "-bare";
-		}
-		else if (type == SHARDED) {
-			return "-sharded";
 		}
 		else {
 			return StringPool.BLANK;
@@ -1063,8 +1116,6 @@ public abstract class BaseDB implements DB {
 
 	private static final boolean _SUPPORTS_ALTER_COLUMN_TYPE = true;
 
-	private static final boolean _SUPPORTS_DATE_MILLISECONDS = true;
-
 	private static final boolean _SUPPORTS_INLINE_DISTINCT = true;
 
 	private static final boolean _SUPPORTS_QUERYING_AFTER_EXCEPTION = true;
@@ -1073,10 +1124,12 @@ public abstract class BaseDB implements DB {
 
 	private static final boolean _SUPPORTS_UPDATE_WITH_INNER_JOIN = true;
 
-	private static Log _log = LogFactoryUtil.getLog(BaseDB.class);
+	private static final Log _log = LogFactoryUtil.getLog(BaseDB.class);
 
-	private static Pattern _templatePattern;
-	private static Pattern _timestampPattern = Pattern.compile(
+	private static final Pattern _columnLengthPattern = Pattern.compile(
+		"\\[\\$COLUMN_LENGTH:(\\d+)\\$\\]");
+	private static final Pattern _templatePattern;
+	private static final Pattern _timestampPattern = Pattern.compile(
 		"SPECIFIC_TIMESTAMP_\\d+");
 
 	static {
@@ -1104,8 +1157,10 @@ public abstract class BaseDB implements DB {
 		_templatePattern = Pattern.compile(sb.toString());
 	}
 
+	private final int _majorVersion;
+	private final int _minorVersion;
 	private boolean _supportsStringCaseSensitiveQuery;
-	private Map<String, String> _templateMap = new HashMap<String, String>();
-	private String _type;
+	private final Map<String, String> _templateMap = new HashMap<>();
+	private final String _type;
 
 }

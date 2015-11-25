@@ -16,9 +16,10 @@ package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
+import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.template.TemplateConstants;
-import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.util.ThemeHelper;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ColorScheme;
 import com.liferay.portal.model.Plugin;
+import com.liferay.portal.model.PortletDecorator;
 import com.liferay.portal.model.SpriteImage;
 import com.liferay.portal.model.Theme;
 import com.liferay.portal.model.ThemeSetting;
@@ -117,8 +119,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 
 	@Override
 	public Map<String, ThemeSetting> getConfigurableSettings() {
-		Map<String, ThemeSetting> configurableSettings =
-			new LinkedHashMap<String, ThemeSetting>();
+		Map<String, ThemeSetting> configurableSettings = new LinkedHashMap<>();
 
 		for (Map.Entry<String, ThemeSetting> entry :
 				_themeSettingsMap.entrySet()) {
@@ -145,7 +146,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 			ServletContext servletContext = ServletContextPool.get(
 				servletContextName);
 
-			return ContextPathUtil.getContextPath(servletContext);
+			return servletContext.getContextPath();
 		}
 
 		return StringPool.SLASH.concat(servletContextName);
@@ -204,6 +205,19 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 	@Override
 	public String getPluginType() {
 		return Plugin.TYPE_THEME;
+	}
+
+	@Override
+	public List<PortletDecorator> getPortletDecorators() {
+		List<PortletDecorator> portletDecorators = ListUtil.fromMapValues(
+			_portletDecoratorsMap);
+
+		return ListUtil.sort(portletDecorators);
+	}
+
+	@Override
+	public Map<String, PortletDecorator> getPortletDecoratorsMap() {
+		return _portletDecoratorsMap;
 	}
 
 	@Override
@@ -306,10 +320,23 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 			return proxyPath.concat(virtualPath);
 		}
 
-		String contextPath = getContextPath();
+		if (isWARFile()) {
+			return getContextPath();
+		}
 
-		if (!isWARFile()) {
-			return contextPath;
+		String contextPath = null;
+
+		if (_themeId.equals("admin")) {
+			contextPath = PortalWebResourcesUtil.getContextPath(
+				PortalWebResourceConstants.RESOURCE_TYPE_THEME_ADMIN);
+		}
+		else if (_themeId.equals("classic")) {
+			contextPath = PortalWebResourcesUtil.getContextPath(
+				PortalWebResourceConstants.RESOURCE_TYPE_THEME_CLASSIC);
+		}
+
+		if (Validator.isNull(contextPath)) {
+			return proxyPath;
 		}
 
 		return proxyPath.concat(contextPath);
@@ -651,8 +678,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 
 	private static final Log _log = LogFactoryUtil.getLog(ThemeImpl.class);
 
-	private final Map<String, ColorScheme> _colorSchemesMap =
-		new HashMap<String, ColorScheme>();
+	private final Map<String, ColorScheme> _colorSchemesMap = new HashMap<>();
 	private boolean _controlPanelTheme;
 	private String _cssPath = "${root-path}/css";
 	private String _imagesPath = "${root-path}/images";
@@ -660,21 +686,22 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 	private boolean _loadFromServletContext;
 	private String _name;
 	private boolean _pageTheme;
+	private final Map<String, PortletDecorator> _portletDecoratorsMap =
+		new HashMap<>();
 	private final Map<String, Boolean> _resourceExistsMap =
-		new ConcurrentHashMap<String, Boolean>();
+		new ConcurrentHashMap<>();
 	private final Map<String, String> _resourcePathsMap =
-		new ConcurrentHashMap<String, String>();
+		new ConcurrentHashMap<>();
 	private String _rootPath = "/";
 	private String _servletContextName = StringPool.BLANK;
-	private final Map<String, SpriteImage> _spriteImagesMap =
-		new HashMap<String, SpriteImage>();
+	private final Map<String, SpriteImage> _spriteImagesMap = new HashMap<>();
 	private String _templateExtension = "vm";
 	private String _templatesPath = "${root-path}/templates";
 	private ThemeCompanyLimit _themeCompanyLimit;
 	private ThemeGroupLimit _themeGroupLimit;
 	private final String _themeId;
 	private final Map<String, ThemeSetting> _themeSettingsMap =
-		new LinkedHashMap<String, ThemeSetting>();
+		new LinkedHashMap<>();
 	private long _timestamp;
 	private String _virtualPath = StringPool.BLANK;
 	private boolean _wapTheme;

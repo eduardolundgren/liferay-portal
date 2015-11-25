@@ -68,12 +68,6 @@ public interface DestinationNames {
 
 	public static final String FLAGS = "liferay/flags";
 
-	/**
-	 * This is a special destination. Binding a message listener to this
-	 * destination will allow it to listen to messages sent to all destinations.
-	 */
-	public static final String GLOBAL = "liferay/global";
-
 	public static final String HOT_DEPLOY = "liferay/hot_deploy";
 
 	public static final String IP_GEOCODER = "liferay/ip_geocoder";

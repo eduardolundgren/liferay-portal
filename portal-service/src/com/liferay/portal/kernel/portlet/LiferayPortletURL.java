@@ -163,8 +163,6 @@ public interface LiferayPortletURL
 	 */
 	public void setAnchor(boolean anchor);
 
-	public void setControlPanelCategory(String controlPanelCategory);
-
 	/**
 	 * Sets whether the render parameters in the current request should be
 	 * copied to this URL.
@@ -296,6 +294,8 @@ public interface LiferayPortletURL
 	 * Sets the ID of the target portlet.
 	 */
 	public void setPortletId(String portletId);
+
+	public void setRefererGroupId(long refererGroupId);
 
 	/**
 	 * Sets the referer layout ID.

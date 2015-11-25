@@ -20,9 +20,6 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.proxy.MessagingProxy;
 import com.liferay.portal.kernel.messaging.proxy.ProxyMode;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.List;
 
@@ -37,9 +34,6 @@ public interface SchedulerEngine {
 
 	public static final String DESCRIPTION = "DESCRIPTION";
 
-	public static final int DESCRIPTION_MAX_LENGTH = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.SCHEDULER_DESCRIPTION_MAX_LENGTH));
-
 	public static final String DESTINATION_NAME = "DESTINATION_NAME";
 
 	public static final String DISABLE = "DISABLE";
@@ -52,13 +46,7 @@ public interface SchedulerEngine {
 
 	public static final String GROUP_NAME = "GROUP_NAME";
 
-	public static final int GROUP_NAME_MAX_LENGTH = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH));
-
 	public static final String JOB_NAME = "JOB_NAME";
-
-	public static final int JOB_NAME_MAX_LENGTH = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH));
 
 	public static final String JOB_STATE = "JOB_STATE";
 
@@ -66,13 +54,25 @@ public interface SchedulerEngine {
 
 	public static final String MESSAGE = "MESSAGE";
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public static final String MESSAGE_LISTENER_CLASS_NAME =
 		"MESSAGE_LISTENER_CLASS_NAME";
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public static final String MESSAGE_LISTENER_UUID = "MESSAGE_LISTENER_UUID";
 
 	public static final String NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public static final String PORTLET_ID = "PORTLET_ID";
 
 	public static final String PREVIOUS_FIRE_TIME = "PREVIOUS_FIRE_TIME";
@@ -80,6 +80,7 @@ public interface SchedulerEngine {
 	/**
 	 * @deprecated As of 7.0.0
 	 */
+	@Deprecated
 	public static final String RECEIVER_KEY = "RECEIVER_KEY";
 
 	public static final String SCHEDULER = "SCHEDULER";

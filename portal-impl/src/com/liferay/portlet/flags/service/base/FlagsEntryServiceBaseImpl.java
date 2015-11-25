@@ -15,12 +15,12 @@
 package com.liferay.portlet.flags.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.persistence.ClassNamePersistence;
@@ -58,7 +58,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class FlagsEntryServiceBaseImpl extends BaseServiceImpl
-	implements FlagsEntryService, IdentifiableBean {
+	implements FlagsEntryService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -70,7 +70,7 @@ public abstract class FlagsEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the flags entry remote service
 	 */
-	public com.liferay.portlet.flags.service.FlagsEntryService getFlagsEntryService() {
+	public FlagsEntryService getFlagsEntryService() {
 		return flagsEntryService;
 	}
 
@@ -79,8 +79,7 @@ public abstract class FlagsEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param flagsEntryService the flags entry remote service
 	 */
-	public void setFlagsEntryService(
-		com.liferay.portlet.flags.service.FlagsEntryService flagsEntryService) {
+	public void setFlagsEntryService(FlagsEntryService flagsEntryService) {
 		this.flagsEntryService = flagsEntryService;
 	}
 
@@ -781,23 +780,13 @@ public abstract class FlagsEntryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return FlagsEntryService.class.getName();
 	}
 
 	/**
@@ -825,7 +814,7 @@ public abstract class FlagsEntryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	@BeanReference(type = com.liferay.portlet.flags.service.FlagsEntryService.class)
-	protected com.liferay.portlet.flags.service.FlagsEntryService flagsEntryService;
+	protected FlagsEntryService flagsEntryService;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.mail.service.MailService.class)
@@ -900,5 +889,4 @@ public abstract class FlagsEntryServiceBaseImpl extends BaseServiceImpl
 	protected AssetEntryPersistence assetEntryPersistence;
 	@BeanReference(type = AssetEntryFinder.class)
 	protected AssetEntryFinder assetEntryFinder;
-	private String _beanIdentifier;
 }

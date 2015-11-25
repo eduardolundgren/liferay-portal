@@ -44,7 +44,7 @@ import org.apache.catalina.startup.HostConfig;
  * </p>
  *
  * <p>
- * See <code>org.apache.catalina.startup.HostConfig</code>.
+ * See <code>HostConfig</code>.
  * </p>
  *
  * @author Brian Wing Shun Chan
@@ -80,6 +80,7 @@ public class PortalHostConfig extends HostConfig {
 		return files;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PortalHostConfig.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalHostConfig.class);
 
 }

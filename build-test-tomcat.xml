@@ -8,6 +8,8 @@
 			app.server.type=tomcat
 		</app-server-properties-update>
 
+		<set-tomcat-version-number liferay.portal.bundle="${liferay.portal.bundle}" />
+
 		<if>
 			<not>
 				<isset property="build.app.server" />
@@ -19,7 +21,15 @@
 
 		<antcall target="revert-test-properties" />
 
-		<ant dir="portal-impl" target="build-selenium-test-case" />
+		<if>
+			<equals arg1="${test.poshi.runner.enabled}" arg2="true" />
+			<then>
+				<antcall target="record-test-generated-properties" />
+			</then>
+			<else>
+				<ant dir="portal-impl" target="build-selenium-test-case" />
+			</else>
+		</if>
 
 		<if>
 			<isset property="vm.host" />
@@ -36,16 +46,25 @@
 
 		<antcall target="start-selenium" />
 
-		<antcall target="run-tomcat" inheritAll="false">
-			<param name="test.class" value="${test.name}" />
-		</antcall>
+		<if>
+			<isset property="test.base.dir.name" />
+			<then>
+				<antcall target="run-tomcat" inheritAll="false">
+					<param name="test.base.dir.name" value="${test.base.dir.name}" />
+					<param name="test.class" value="${test.class}" />
+				</antcall>
+			</then>
+			<else>
+				<antcall target="run-tomcat" inheritAll="false">
+					<param name="test.class" value="${test.class}" />
+				</antcall>
+			</else>
+		</if>
 
 		<antcall target="stop-selenium" />
 	</target>
 
 	<target name="run-tomcat">
 		<antcall target="run-simple-server" />
-
-		<antcall target="evaluate-logs" />
 	</target>
 </project>

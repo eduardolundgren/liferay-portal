@@ -17,9 +17,9 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -70,10 +70,9 @@ public class ThreadLocalDistributorTest {
 		threadLocalDistributor.setClassLoader(getClassLoader());
 		threadLocalDistributor.setThreadLocalSources(_keyValuePairs);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ThreadLocalDistributor.class.getName(), Level.WARNING);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ThreadLocalDistributor.class.getName(), Level.WARNING)) {
 
 			// With log
 
@@ -125,9 +124,6 @@ public class ThreadLocalDistributorTest {
 			Assert.assertEquals(1, threadLocals.size());
 			Assert.assertSame(TestClass._threadLocal, threadLocals.get(0));
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
@@ -151,7 +147,32 @@ public class ThreadLocalDistributorTest {
 		threadLocalDistributor.setClassLoader(getClassLoader());
 		threadLocalDistributor.setThreadLocalSources(_keyValuePairs);
 
-		threadLocalDistributor.afterPropertiesSet();
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ThreadLocalDistributor.class.getName(), Level.WARNING)) {
+
+			threadLocalDistributor.afterPropertiesSet();
+
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(3, logRecords.size());
+
+			LogRecord logRecord = logRecords.get(0);
+
+			Assert.assertEquals(
+				"_nonStatic is not a static ThreadLocal",
+				logRecord.getMessage());
+
+			logRecord = logRecords.get(1);
+
+			Assert.assertEquals(
+				"_nullValue is not initialized", logRecord.getMessage());
+
+			logRecord = logRecords.get(2);
+
+			Assert.assertEquals(
+				"_object is not of type ThreadLocal", logRecord.getMessage());
+		}
 
 		String testValue = "testValue";
 
@@ -208,8 +229,7 @@ public class ThreadLocalDistributorTest {
 		return clazz.getClassLoader();
 	}
 
-	private final List<KeyValuePair> _keyValuePairs =
-		new ArrayList<KeyValuePair>();
+	private final List<KeyValuePair> _keyValuePairs = new ArrayList<>();
 
 	private static class TestClass {
 
@@ -217,7 +237,7 @@ public class ThreadLocalDistributorTest {
 		private static ThreadLocal<?> _nullValue;
 
 		private static final ThreadLocal<String> _threadLocal =
-			new ThreadLocal<String>();
+			new ThreadLocal<>();
 
 		@SuppressWarnings("unused")
 		private ThreadLocal<?> _nonStatic;

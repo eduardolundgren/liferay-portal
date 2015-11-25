@@ -18,8 +18,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.service.ServiceContext;
 
@@ -68,6 +70,18 @@ public class LocalRepositoryProxyBean
 			changeLog, is, size, serviceContext);
 
 		return newFileEntryProxyBean(fileEntry);
+	}
+
+	@Override
+	public FileShortcut addFileShortcut(
+			long userId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		FileShortcut fileShortcut = _localRepository.addFileShortcut(
+			userId, folderId, toFileEntryId, serviceContext);
+
+		return newFileShortcutProxyBean(fileShortcut);
 	}
 
 	@Override
@@ -125,6 +139,16 @@ public class LocalRepositoryProxyBean
 	}
 
 	@Override
+	public void deleteFileShortcut(long fileShortcutId) throws PortalException {
+		_localRepository.deleteFileShortcut(fileShortcutId);
+	}
+
+	@Override
+	public void deleteFileShortcuts(long toFileEntryId) throws PortalException {
+		_localRepository.deleteFileShortcuts(toFileEntryId);
+	}
+
+	@Override
 	public void deleteFolder(long folderId) throws PortalException {
 		_localRepository.deleteFolder(folderId);
 	}
@@ -132,6 +156,53 @@ public class LocalRepositoryProxyBean
 	@Override
 	public <T extends Capability> T getCapability(Class<T> capabilityClass) {
 		return _localRepository.getCapability(capabilityClass);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+			long folderId, int status, int start, int end,
+			OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return _localRepository.getFileEntries(
+			folderId, status, start, end, obc);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+			long folderId, int start, int end, OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return _localRepository.getFileEntries(folderId, start, end, obc);
+	}
+
+	@Override
+	public List<RepositoryEntry> getFileEntriesAndFileShortcuts(
+			long folderId, int status, int start, int end)
+		throws PortalException {
+
+		return _localRepository.getFileEntriesAndFileShortcuts(
+			folderId, status, start, end);
+	}
+
+	@Override
+	public int getFileEntriesAndFileShortcutsCount(long folderId, int status)
+		throws PortalException {
+
+		return _localRepository.getFileEntriesAndFileShortcutsCount(
+			folderId, status);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId) throws PortalException {
+		return _localRepository.getFileEntriesCount(folderId);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId, int status)
+		throws PortalException {
+
+		return _localRepository.getFileEntriesCount(folderId, status);
 	}
 
 	@Override
@@ -158,6 +229,16 @@ public class LocalRepositoryProxyBean
 	}
 
 	@Override
+	public FileShortcut getFileShortcut(long fileShortcutId)
+		throws PortalException {
+
+		FileShortcut fileShortcut = _localRepository.getFileShortcut(
+			fileShortcutId);
+
+		return newFileShortcutProxyBean(fileShortcut);
+	}
+
+	@Override
 	public FileVersion getFileVersion(long fileVersionId)
 		throws PortalException {
 
@@ -179,6 +260,43 @@ public class LocalRepositoryProxyBean
 		throws PortalException {
 
 		return _localRepository.getFolder(parentFolderId, name);
+	}
+
+	@Override
+	public List<Folder> getFolders(
+			long parentFolderId, boolean includeMountFolders, int start,
+			int end, OrderByComparator<Folder> obc)
+		throws PortalException {
+
+		return _localRepository.getFolders(
+			parentFolderId, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public List<Folder> getFolders(
+			long parentFolderId, int status, boolean includeMountFolders,
+			int start, int end, OrderByComparator<Folder> obc)
+		throws PortalException {
+
+		return _localRepository.getFolders(
+			parentFolderId, status, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public int getFoldersCount(long parentFolderId, boolean includeMountfolders)
+		throws PortalException {
+
+		return _localRepository.getFoldersCount(
+			parentFolderId, includeMountfolders);
+	}
+
+	@Override
+	public int getFoldersCount(
+			long parentFolderId, int status, boolean includeMountfolders)
+		throws PortalException {
+
+		return _localRepository.getFoldersCount(
+			parentFolderId, status, includeMountfolders);
 	}
 
 	@Override
@@ -280,6 +398,27 @@ public class LocalRepositoryProxyBean
 			changeLog, majorVersion, is, size, serviceContext);
 
 		return newFileEntryProxyBean(fileEntry);
+	}
+
+	@Override
+	public FileShortcut updateFileShortcut(
+			long userId, long fileShortcutId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		FileShortcut fileShortcut = _localRepository.updateFileShortcut(
+			userId, fileShortcutId, folderId, toFileEntryId, serviceContext);
+
+		return newFileShortcutProxyBean(fileShortcut);
+	}
+
+	@Override
+	public void updateFileShortcuts(
+			long oldToFileEntryId, long newToFileEntryId)
+		throws PortalException {
+
+		_localRepository.updateFileShortcuts(
+			oldToFileEntryId, newToFileEntryId);
 	}
 
 	@Override

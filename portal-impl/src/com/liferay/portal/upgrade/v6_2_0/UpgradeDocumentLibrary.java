@@ -61,11 +61,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 			while (rs.next()) {
 				long companyId = rs.getLong("companyId");
 
-				try {
-					DLStoreUtil.deleteDirectory(companyId, 0, "checksum");
-				}
-				catch (Exception e) {
-				}
+				DLStoreUtil.deleteDirectory(companyId, 0, "checksum");
 			}
 		}
 		finally {
@@ -74,11 +70,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 	}
 
 	protected void deleteTempDirectory() {
-		try {
-			DLStoreUtil.deleteDirectory(0, 0, "liferay_temp/");
-		}
-		catch (Exception e) {
-		}
+		DLStoreUtil.deleteDirectory(0, 0, "liferay_temp/");
 	}
 
 	@Override
@@ -152,7 +144,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 
 		Locale locale = LocaleUtil.fromLanguageId(languageId);
 
-		Map<Locale, String> localizationMap = new HashMap<Locale, String>();
+		Map<Locale, String> localizationMap = new HashMap<>();
 
 		localizationMap.put(locale, content);
 

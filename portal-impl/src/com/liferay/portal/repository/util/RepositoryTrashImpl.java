@@ -14,14 +14,13 @@
 
 package com.liferay.portal.repository.util;
 
-import com.liferay.portal.InvalidRepositoryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.LocalRepository;
+import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.util.RepositoryTrash;
-import com.liferay.portal.service.RepositoryLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 
@@ -37,9 +36,7 @@ public class RepositoryTrashImpl implements RepositoryTrash {
 		throws PortalException {
 
 		LocalRepository localRepository =
-			RepositoryLocalServiceUtil.getLocalRepositoryImpl(repositoryId);
-
-		validateCapability(localRepository);
+			RepositoryProviderUtil.getLocalRepository(repositoryId);
 
 		TrashCapability trashCapability = localRepository.getCapability(
 			TrashCapability.class);
@@ -62,9 +59,7 @@ public class RepositoryTrashImpl implements RepositoryTrash {
 		throws PortalException {
 
 		LocalRepository localRepository =
-			RepositoryLocalServiceUtil.getLocalRepositoryImpl(repositoryId);
-
-		validateCapability(localRepository);
+			RepositoryProviderUtil.getLocalRepository(repositoryId);
 
 		TrashCapability trashCapability = localRepository.getCapability(
 			TrashCapability.class);
@@ -80,9 +75,7 @@ public class RepositoryTrashImpl implements RepositoryTrash {
 		throws PortalException {
 
 		LocalRepository localRepository =
-			RepositoryLocalServiceUtil.getLocalRepositoryImpl(repositoryId);
-
-		validateCapability(localRepository);
+			RepositoryProviderUtil.getLocalRepository(repositoryId);
 
 		TrashCapability trashCapability = localRepository.getCapability(
 			TrashCapability.class);
@@ -90,16 +83,6 @@ public class RepositoryTrashImpl implements RepositoryTrash {
 		FileEntry fileEntry = localRepository.getFileEntry(fileEntryId);
 
 		trashCapability.restoreFileEntryFromTrash(userId, fileEntry);
-	}
-
-	protected void validateCapability(LocalRepository localRepository)
-		throws InvalidRepositoryException {
-
-		if (!localRepository.isCapabilityProvided(TrashCapability.class)) {
-			throw new InvalidRepositoryException(
-				"Repository " + localRepository.getRepositoryId() +
-					" does not support trash operations");
-		}
 	}
 
 }

@@ -877,7 +877,9 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public boolean isEditable(String locator) {
-		throw new UnsupportedOperationException();
+		WebElement webElement = getWebElement(locator);
+
+		return webElement.isEnabled();
 	}
 
 	@Override
@@ -1482,7 +1484,15 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void type(String locator, String value) {
-		WebDriverHelper.type(this, locator, value);
+		WebElement webElement = getWebElement(locator);
+
+		if (!webElement.isEnabled()) {
+			return;
+		}
+
+		webElement.clear();
+
+		typeKeys(locator, value);
 	}
 
 	@Override
@@ -1504,12 +1514,13 @@ public class WebDriverToSeleniumBridge
 		for (int specialCharIndex : specialCharIndexes) {
 			webElement.sendKeys(value.substring(i, specialCharIndex));
 
-			webElement.sendKeys(Keys.ESCAPE);
-
 			String specialChar = String.valueOf(value.charAt(specialCharIndex));
 
 			if (specialChar.equals("-")) {
 				webElement.sendKeys(Keys.SUBTRACT);
+			}
+			else if (specialChar.equals("\t")) {
+				webElement.sendKeys(Keys.TAB);
 			}
 			else {
 				webElement.sendKeys(
@@ -1627,15 +1638,16 @@ public class WebDriverToSeleniumBridge
 	}
 
 	protected Set<Integer> getSpecialCharIndexes(String value) {
-		Set<Integer> specialCharIndexes = new TreeSet<Integer>();
+		Set<Integer> specialCharIndexes = new TreeSet<>();
 
-		while (value.contains("-")) {
-			specialCharIndexes.add(value.indexOf("-"));
+		Set<String> specialChars = new TreeSet<>();
 
-			value = StringUtil.replaceFirst(value, "-", " ");
-		}
+		specialChars.addAll(_keysSpecialChars.keySet());
 
-		for (String specialChar : _keysSpecialChars.keySet()) {
+		specialChars.add("-");
+		specialChars.add("\t");
+
+		for (String specialChar : specialChars) {
 			while (value.contains(specialChar)) {
 				specialCharIndexes.add(value.indexOf(specialChar));
 
@@ -1743,10 +1755,9 @@ public class WebDriverToSeleniumBridge
 		select.selectByIndex(index);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		WebDriverToSeleniumBridge.class);
 
-	private Map<String, String> _keysSpecialChars =
-		new HashMap<String, String>();
+	private final Map<String, String> _keysSpecialChars = new HashMap<>();
 
 }

@@ -45,18 +45,15 @@ public class ThemeLocalServiceUtil {
 		return getService().fetchColorScheme(companyId, themeId, colorSchemeId);
 	}
 
+	public static com.liferay.portal.model.PortletDecorator fetchPortletDecorator(
+		long companyId, java.lang.String themeId, java.lang.String colorSchemeId) {
+		return getService()
+				   .fetchPortletDecorator(companyId, themeId, colorSchemeId);
+	}
+
 	public static com.liferay.portal.model.Theme fetchTheme(long companyId,
 		java.lang.String themeId) {
 		return getService().fetchTheme(companyId, themeId);
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
 	}
 
 	public static com.liferay.portal.model.ColorScheme getColorScheme(
@@ -71,9 +68,25 @@ public class ThemeLocalServiceUtil {
 		return getService().getControlPanelThemes(companyId, userId, wapTheme);
 	}
 
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
+	}
+
 	public static java.util.List<com.liferay.portal.model.Theme> getPageThemes(
 		long companyId, long groupId, long userId, boolean wapTheme) {
 		return getService().getPageThemes(companyId, groupId, userId, wapTheme);
+	}
+
+	public static com.liferay.portal.model.PortletDecorator getPortletDecorator(
+		long companyId, java.lang.String themeId,
+		java.lang.String portletDecoratorId) {
+		return getService()
+				   .getPortletDecorator(companyId, themeId, portletDecoratorId);
 	}
 
 	public static com.liferay.portal.model.Theme getTheme(long companyId,
@@ -118,15 +131,6 @@ public class ThemeLocalServiceUtil {
 		return getService()
 				   .init(servletContextName, servletContext, themesPath,
 			loadFromServletContext, xmls, pluginPackage);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	public static void uninstallThemes(

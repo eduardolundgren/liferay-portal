@@ -18,7 +18,6 @@ import com.liferay.portal.image.DLHook;
 import com.liferay.portal.image.DatabaseHook;
 import com.liferay.portal.image.FileSystemHook;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
-import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.image.Hook;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -26,6 +25,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.service.ImageLocalServiceUtil;
-import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.upgrade.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -49,7 +49,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,10 +70,11 @@ public class UpgradeImageGallery extends UpgradeProcess {
 	public UpgradeImageGallery() throws Exception {
 		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
 
-		_sourceHookClassName = FileSystemHook.class.getName();
-
 		if (Validator.isNotNull(PropsValues.IMAGE_HOOK_IMPL)) {
 			_sourceHookClassName = PropsValues.IMAGE_HOOK_IMPL;
+		}
+		else {
+			_sourceHookClassName = FileSystemHook.class.getName();
 		}
 
 		Class<?> clazz = classLoader.loadClass(_sourceHookClassName);
@@ -333,63 +333,35 @@ public class UpgradeImageGallery extends UpgradeProcess {
 			String igResourceName, String dlResourceName)
 		throws Exception {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		String selectSQL =
+			"select companyId, scope, primKey, roleId from " +
+				"ResourcePermission where name = ?";
+		String deleteSQL =
+			"delete from ResourcePermission where name = ? and companyId = ? " +
+				"and scope = ? and primKey = ? and roleId = ?";
 
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
+		try (Connection con = DataAccess.getUpgradeOptimizedConnection();
+			PreparedStatement ps1 = con.prepareStatement(selectSQL);) {
 
-			DatabaseMetaData databaseMetaData = con.getMetaData();
+			ps1.setString(1, igResourceName);
 
-			boolean supportsBatchUpdates =
-				databaseMetaData.supportsBatchUpdates();
+			try (ResultSet rs = ps1.executeQuery();
+				PreparedStatement ps2 =
+					AutoBatchPreparedStatementUtil.autoBatch(
+						con.prepareStatement(deleteSQL))) {
 
-			ps = con.prepareStatement(
-				"select companyId, scope, primKey, roleId from " +
-					"ResourcePermission where name = ?");
+				while (rs.next()) {
+					ps2.setString(1, dlResourceName);
+					ps2.setLong(2, rs.getLong("companyId"));
+					ps2.setInt(3, rs.getInt("scope"));
+					ps2.setString(4, rs.getString("primKey"));
+					ps2.setLong(5, rs.getLong("roleId"));
 
-			ps.setString(1, igResourceName);
-
-			rs = ps.executeQuery();
-
-			ps = con.prepareStatement(
-				"delete from ResourcePermission where name = ? and " +
-					"companyId = ? and scope = ? and primKey = ? and " +
-						"roleId = ?");
-
-			int count = 0;
-
-			while (rs.next()) {
-				ps.setString(1, dlResourceName);
-				ps.setLong(2, rs.getLong("companyId"));
-				ps.setInt(3, rs.getInt("scope"));
-				ps.setString(4, rs.getString("primKey"));
-				ps.setLong(5, rs.getLong("roleId"));
-
-				if (supportsBatchUpdates) {
-					ps.addBatch();
-
-					if (count == PropsValues.HIBERNATE_JDBC_BATCH_SIZE) {
-						ps.executeBatch();
-
-						count = 0;
-					}
-					else {
-						count++;
-					}
+					ps2.addBatch();
 				}
-				else {
-					ps.executeUpdate();
-				}
-			}
 
-			if (supportsBatchUpdates && (count > 0)) {
-				ps.executeBatch();
+				ps2.executeBatch();
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
@@ -432,12 +404,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String currentShardName = null;
-
 		try {
-			currentShardName = ShardUtil.setTargetSource(
-				PropsValues.SHARD_DEFAULT_NAME);
-
 			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
@@ -448,7 +415,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 
 			rs = ps.executeQuery();
 
-			Map<String, Long> bitwiseValues = new HashMap<String, Long>();
+			Map<String, Long> bitwiseValues = new HashMap<>();
 
 			while (rs.next()) {
 				String actionId = rs.getString("actionId");
@@ -460,10 +427,6 @@ public class UpgradeImageGallery extends UpgradeProcess {
 			return bitwiseValues;
 		}
 		finally {
-			if (Validator.isNotNull(currentShardName)) {
-				ShardUtil.setTargetSource(currentShardName);
-			}
-
 			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
@@ -582,7 +545,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 		return is;
 	}
 
-	protected Object[] getImage(long imageId) throws Exception {
+	protected Image getImage(long imageId) throws Exception {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -591,15 +554,22 @@ public class UpgradeImageGallery extends UpgradeProcess {
 			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
-				"select type_, size_ from Image where imageId = " + imageId);
+				"select imageId, modifiedDate, type_, height, width, size_ " +
+					"from Image where imageId = " + imageId);
 
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				String type = rs.getString("type_");
-				long size = rs.getInt("size_");
+				Image image = ImageLocalServiceUtil.createImage(
+					rs.getLong("imageId"));
 
-				return new Object[] {type, size};
+				image.setModifiedDate(rs.getTimestamp("modifiedDate"));
+				image.setType(rs.getString("type_"));
+				image.setHeight(rs.getInt("height"));
+				image.setWidth(rs.getInt("width"));
+				image.setSize(rs.getInt("size_"));
+
+				return image;
 			}
 
 			return null;
@@ -612,7 +582,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 	protected List<String> getResourceActionIds(
 		Map<String, Long> bitwiseValues, long actionIdsLong) {
 
-		List<String> actionIds = new ArrayList<String>();
+		List<String> actionIds = new ArrayList<>();
 
 		for (String actionId : bitwiseValues.keySet()) {
 			long bitwiseValue = bitwiseValues.get(actionId);
@@ -643,7 +613,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 	}
 
 	protected void migrateImage(long imageId) throws Exception {
-		Image image = ImageLocalServiceUtil.getImage(imageId);
+		Image image = getImage(imageId);
 
 		try {
 			migrateFile(0, 0, null, image);
@@ -668,7 +638,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 		Image largeImage = null;
 
 		if (largeImageId != 0) {
-			largeImage = ImageLocalServiceUtil.getImage(largeImageId);
+			largeImage = getImage(largeImageId);
 
 			long repositoryId = DLFolderConstants.getDataRepositoryId(
 				groupId, folderId);
@@ -699,7 +669,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 		Image thumbnailImage = null;
 
 		if (thumbnailImageId != 0) {
-			thumbnailImage = ImageLocalServiceUtil.getImage(thumbnailImageId);
+			thumbnailImage = getImage(thumbnailImageId);
 
 			Connection con = null;
 			PreparedStatement ps = null;
@@ -831,7 +801,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 
 			rs = ps.executeQuery();
 
-			Map<Long, Long> folderIds = new HashMap<Long, Long>();
+			Map<Long, Long> folderIds = new HashMap<>();
 
 			while (rs.next()) {
 				String uuid = rs.getString("uuid_");
@@ -955,13 +925,13 @@ public class UpgradeImageGallery extends UpgradeProcess {
 				long custom1ImageId = rs.getLong("custom1ImageId");
 				long custom2ImageId = rs.getLong("custom2ImageId");
 
-				Object[] image = getImage(largeImageId);
+				Image image = getImage(largeImageId);
 
 				if (image == null) {
 					continue;
 				}
 
-				String extension = (String)image[0];
+				String extension = image.getType();
 
 				String mimeType = MimeTypesUtil.getExtensionContentType(
 					extension);
@@ -969,7 +939,7 @@ public class UpgradeImageGallery extends UpgradeProcess {
 				String name = String.valueOf(
 					increment(DLFileEntry.class.getName()));
 
-				long size = (Long)image[1];
+				long size = image.getSize();
 
 				try {
 					addDLFileEntry(
@@ -1111,9 +1081,10 @@ public class UpgradeImageGallery extends UpgradeProcess {
 	private static final String _IG_IMAGE_CLASS_NAME =
 		"com.liferay.portlet.imagegallery.model.IGImage";
 
-	private static Log _log = LogFactoryUtil.getLog(UpgradeImageGallery.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		UpgradeImageGallery.class);
 
-	private Hook _sourceHook;
-	private String _sourceHookClassName;
+	private final Hook _sourceHook;
+	private final String _sourceHookClassName;
 
 }

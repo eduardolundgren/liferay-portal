@@ -43,13 +43,6 @@ public abstract class BasePermissionChecker implements PermissionChecker {
 	}
 
 	@Override
-	public List<Long> getGuestResourceBlockIds(
-		long companyId, long groupId, String name, String actionId) {
-
-		return Collections.emptyList();
-	}
-
-	@Override
 	public List<Long> getOwnerResourceBlockIds(
 		long companyId, long groupId, String name, String actionId) {
 
@@ -166,10 +159,18 @@ public abstract class BasePermissionChecker implements PermissionChecker {
 		return signedIn;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public void resetValues() {
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public void setValues(PortletRequest portletRequest) {
 	}

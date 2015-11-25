@@ -35,29 +35,24 @@ public class PortalServiceWrapper implements PortalService,
 		return _portalService.getAutoDeployDirectory();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _portalService.getBeanIdentifier();
-	}
-
 	@Override
 	public int getBuildNumber() {
 		return _portalService.getBuildNumber();
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @param beanIdentifier the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_portalService.setBeanIdentifier(beanIdentifier);
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _portalService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public java.lang.String getVersion() {
+		return _portalService.getVersion();
 	}
 
 	@Override

@@ -14,10 +14,14 @@
 
 package com.liferay.portal.service.persistence.impl;
 
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -28,20 +32,29 @@ public class TableMapperFactory {
 	public static
 		<L extends BaseModel<L>, R extends BaseModel<R>> TableMapper<L, R>
 			getTableMapper(
-				String tableName, String leftColumnName, String rightColumnName,
+				String tableName, String companyColumnName,
+				String leftColumnName, String rightColumnName,
 				BasePersistence<L> leftPersistence,
 				BasePersistence<R> rightPersistence) {
 
 		TableMapper<?, ?> tableMapper = tableMappers.get(tableName);
 
 		if (tableMapper == null) {
-			TableMapperImpl<L, R> tableMapperImpl =
-				new TableMapperImpl<L, R>(
-					tableName, leftColumnName, rightColumnName, leftPersistence,
-					rightPersistence);
+			TableMapperImpl<L, R> tableMapperImpl = null;
+
+			if (cacheMappingTableNames.contains(tableName)) {
+				tableMapperImpl = new TableMapperImpl<>(
+					tableName, companyColumnName, leftColumnName,
+					rightColumnName, leftPersistence, rightPersistence);
+			}
+			else {
+				tableMapperImpl = new CachelessTableMapperImpl<>(
+					tableName, companyColumnName, leftColumnName,
+					rightColumnName, leftPersistence, rightPersistence);
+			}
 
 			tableMapperImpl.setReverseTableMapper(
-				new ReverseTableMapper<R, L>(tableMapperImpl));
+				new ReverseTableMapper<>(tableMapperImpl));
 
 			tableMapper = tableMapperImpl;
 
@@ -62,7 +75,11 @@ public class TableMapperFactory {
 		}
 	}
 
-	protected static Map<String, TableMapper<?, ?>> tableMappers =
-		new ConcurrentHashMap<String, TableMapper<?, ?>>();
+	protected static final Set<String> cacheMappingTableNames =
+		SetUtil.fromArray(
+			PropsUtil.getArray(
+				PropsKeys.TABLE_MAPPER_CACHE_MAPPING_TABLE_NAMES));
+	protected static final Map<String, TableMapper<?, ?>> tableMappers =
+		new ConcurrentHashMap<>();
 
 }

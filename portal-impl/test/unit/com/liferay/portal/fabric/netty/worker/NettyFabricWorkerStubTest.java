@@ -26,12 +26,12 @@ import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.local.ReturnProcessCallable;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -193,7 +193,7 @@ public class NettyFabricWorkerStubTest {
 	@Test
 	public void testSetResult() throws Exception {
 		final DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>();
+			new DefaultNoticeableFuture<>();
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
@@ -228,7 +228,7 @@ public class NettyFabricWorkerStubTest {
 	@Test
 	public void testSetResultWithCancellation() {
 		final DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>();
+			new DefaultNoticeableFuture<>();
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
@@ -259,7 +259,7 @@ public class NettyFabricWorkerStubTest {
 	@Test
 	public void testSetResultWithException() throws InterruptedException {
 		final DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>();
+			new DefaultNoticeableFuture<>();
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(

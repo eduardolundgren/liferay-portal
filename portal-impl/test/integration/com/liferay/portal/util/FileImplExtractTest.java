@@ -14,10 +14,10 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 
 import java.io.InputStream;
 
@@ -49,11 +49,11 @@ public class FileImplExtractTest {
 	public void testDocx() {
 		String text = extractText("test-2007.docx");
 
-		Assert.assertEquals("Extract test.", text);
+		Assert.assertTrue(text.contains("Extract test."));
 
 		text = extractText("test-2010.docx");
 
-		Assert.assertEquals("Extract test.", text);
+		Assert.assertTrue(text.contains("Extract test."));
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class FileImplExtractTest {
 	public void testPptx() {
 		String text = extractText("test-2010.pptx");
 
-		Assert.assertEquals("Extract test.", text);
+		Assert.assertTrue(text.contains("Extract test."));
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class FileImplExtractTest {
 	public void testXlsx() {
 		String text = extractText("test-2010.xlsx");
 
-		Assert.assertEquals("Sheet1\n\tExtract test.", text);
+		Assert.assertTrue(text.contains("Extract test."));
 	}
 
 	@Test

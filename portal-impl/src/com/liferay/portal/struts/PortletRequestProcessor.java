@@ -24,12 +24,12 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.WebKeys;
 
 import java.io.IOException;
 
@@ -156,7 +156,8 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 								currentURL);
 					}
 
-					throw new PrincipalException(currentURL);
+					throw new PrincipalException.MustBeInvokedUsingPost(
+						currentURL);
 				}
 			}
 
@@ -560,10 +561,8 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 			if (!strutsPath.equals(portlet.getStrutsPath()) &&
 				!strutsPath.equals(portlet.getParentStrutsPath())) {
 
-				throw new PrincipalException(
-					"The struts path " + strutsPath + " does not belong to " +
-						"portlet " + portlet.getPortletId() + ". Check the " +
-							"definition in liferay-portlet.xml");
+				throw new PrincipalException.MustBePortletStrutsPath(
+					strutsPath, portlet.getPortletId());
 			}
 			else if (!portlet.isActive()) {
 				ForwardConfig forwardConfig = actionMapping.findForward(

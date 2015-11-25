@@ -107,7 +107,8 @@ public class RepositoryLocalServiceUtil {
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static void deleteRepositories(long groupId) {
+	public static void deleteRepositories(long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteRepositories(groupId);
 	}
 
@@ -244,47 +245,33 @@ public class RepositoryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.repository.LocalRepository> getGroupLocalRepositoryImpl(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getGroupLocalRepositoryImpl(groupId);
+	public static java.util.List<com.liferay.portal.model.Repository> getGroupRepositories(
+		long groupId) {
+		return getService().getGroupRepositories(groupId);
 	}
 
-	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .getLocalRepositoryImpl(folderId, fileEntryId, fileVersionId);
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
-	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getLocalRepositoryImpl(repositoryId);
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
-	}
-
-	public static java.lang.String getRegistryName() {
-		return getService().getRegistryName();
 	}
 
 	/**
@@ -381,36 +368,10 @@ public class RepositoryLocalServiceUtil {
 		return getService().getRepositoryByUuidAndGroupId(uuid, groupId);
 	}
 
-	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long folderId, long fileEntryId, long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .getRepositoryImpl(folderId, fileEntryId, fileVersionId);
-	}
-
-	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
-		long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getRepositoryImpl(repositoryId);
-	}
-
 	public static com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTypeSettingsProperties(repositoryId);
-	}
-
-	public static void invalidate() {
-		getService().invalidate();
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -428,6 +389,12 @@ public class RepositoryLocalServiceUtil {
 		java.lang.String name, java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().updateRepository(repositoryId, name, description);
+	}
+
+	public static void updateRepository(long repositoryId,
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().updateRepository(repositoryId, typeSettingsProperties);
 	}
 
 	public static RepositoryLocalService getService() {

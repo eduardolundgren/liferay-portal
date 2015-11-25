@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.concurrent;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +39,7 @@ public class ConcurrentIdentityHashMapTest {
 	@Test
 	public void testConcurrentIdentityHashMap() {
 		ConcurrentIdentityHashMap<String, Object> concurrentIdentityHashMap =
-			new ConcurrentIdentityHashMap<String, Object>();
+			new ConcurrentIdentityHashMap<>();
 
 		Assert.assertFalse(concurrentIdentityHashMap.containsKey(_TEST_KEY_1));
 		Assert.assertFalse(
@@ -80,18 +80,17 @@ public class ConcurrentIdentityHashMapTest {
 	@Test
 	public void testConstructor() {
 		ConcurrentMap<IdentityKey<String>, Object> innerConcurrentMap =
-			new ConcurrentHashMap<IdentityKey<String>, Object>();
+			new ConcurrentHashMap<>();
 
 		ConcurrentIdentityHashMap<String, Object> concurrentIdentityHashMap =
-			new ConcurrentIdentityHashMap<String, Object>(innerConcurrentMap);
+			new ConcurrentIdentityHashMap<>(innerConcurrentMap);
 
 		Assert.assertSame(
 			innerConcurrentMap, concurrentIdentityHashMap.innerConcurrentMap);
 
 		Map<String, Object> dataMap = createDataMap();
 
-		concurrentIdentityHashMap =
-			new ConcurrentIdentityHashMap<String, Object>(dataMap);
+		concurrentIdentityHashMap = new ConcurrentIdentityHashMap<>(dataMap);
 
 		Assert.assertEquals(dataMap, concurrentIdentityHashMap);
 
@@ -100,7 +99,7 @@ public class ConcurrentIdentityHashMapTest {
 	}
 
 	protected Map<String, Object> createDataMap() {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 
 		map.put(_TEST_KEY_1, _testValue1);
 		map.put("testKey2", _testValue2);

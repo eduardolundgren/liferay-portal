@@ -17,6 +17,10 @@ package com.liferay.portal.kernel.servlet.taglib;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.collections.ServiceReferenceMapper;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
@@ -78,10 +82,34 @@ public class DynamicIncludeUtil {
 	}
 
 	private DynamicIncludeUtil() {
-		_dynamicIncludes = ServiceTrackerCollections.multiValueMap(
-			DynamicInclude.class, "key");
+		_dynamicIncludes = ServiceTrackerCollections.openMultiValueMap(
+			DynamicInclude.class, null,
+			new ServiceReferenceMapper<String, DynamicInclude>() {
 
-		_dynamicIncludes.open();
+				@Override
+				public void map(
+					ServiceReference<DynamicInclude> serviceReference,
+					final Emitter<String> emitter) {
+
+					Registry registry = RegistryUtil.getRegistry();
+
+					DynamicInclude dynamicInclude = registry.getService(
+						serviceReference);
+
+					dynamicInclude.register(
+						new DynamicInclude.DynamicIncludeRegistry() {
+
+							@Override
+							public void register(String key) {
+								emitter.emit(key);
+							}
+
+						});
+
+					registry.ungetService(serviceReference);
+				}
+
+			});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

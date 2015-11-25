@@ -19,10 +19,10 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.security.ac.AccessControlled;
 
 /**
  * Provides the remote service interface for UserGroup. Methods of this
@@ -52,24 +52,18 @@ public interface UserGroupService extends BaseService {
 	*
 	* @param groupId the primary key of the group
 	* @param userGroupIds the primary keys of the user groups
-	* @throws PortalException if a group or user group with the primary key
-	could not be found, or if the user did not have permission to
-	assign group members
 	*/
 	public void addGroupUserGroups(long groupId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the user groups to the team
 	*
 	* @param teamId the primary key of the team
 	* @param userGroupIds the primary keys of the user groups
-	* @throws PortalException if a team or user group with the primary key
-	could not be found, or if the user did not have permission to
-	assign team members
 	*/
 	public void addTeamUserGroups(long teamId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a user group.
@@ -82,15 +76,13 @@ public interface UserGroupService extends BaseService {
 	* @param name the user group's name
 	* @param description the user group's description
 	* @return the user group
-	* @throws PortalException if the user group's information was invalid
-	or if the user did not have permission to add the user group
 	* @deprecated As of 6.2.0, replaced by {@link #addUserGroup(String, String,
 	ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portal.model.UserGroup addUserGroup(
 		java.lang.String name, java.lang.String description)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds a user group.
@@ -106,98 +98,87 @@ public interface UserGroupService extends BaseService {
 	<code>null</code>). Can set expando bridge attributes for the
 	user group.
 	* @return the user group
-	* @throws PortalException if the user group's information was invalid or if
-	the user did not have permission to add the user group
 	*/
 	public com.liferay.portal.model.UserGroup addUserGroup(
 		java.lang.String name, java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the user group.
 	*
 	* @param userGroupId the primary key of the user group
-	* @throws PortalException if a user group with the primary key could not be
-	found, if the user did not have permission to delete the user
-	group, or if the user group had a workflow in approved status
 	*/
-	public void deleteUserGroup(long userGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public void deleteUserGroup(long userGroupId) throws PortalException;
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Fetches the user group with the primary key.
 	*
-	* @return the Spring bean ID for this bean
+	* @param userGroupId the primary key of the user group
+	* @return the user group with the primary key
 	*/
-	public java.lang.String getBeanIdentifier();
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.UserGroup fetchUserGroup(long userGroupId)
+		throws PortalException;
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
 
 	/**
 	* Returns the user group with the name.
 	*
 	* @param name the user group's name
-	* @return Returns the user group with the name
-	* @throws PortalException if a user group with the name could not be found
-	or if the user did not have permission to view the user group
+	* @return the user group with the name
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserGroup getUserGroup(
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String name) throws PortalException;
 
 	/**
 	* Returns the user group with the primary key.
 	*
 	* @param userGroupId the primary key of the user group
-	* @return Returns the user group with the primary key
-	* @throws PortalException if a user group with the primary key could not be
-	found or if the user did not have permission to view the user
-	group
+	* @return the user group with the primary key
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserGroup getUserGroup(long userGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserGroups(
+		long companyId) throws PortalException;
 
 	/**
 	* Returns all the user groups to which the user belongs.
 	*
 	* @param userId the primary key of the user
 	* @return the user groups to which the user belongs
-	* @throws PortalException if the current user did not have permission to
-	view the user or any one of the user group members
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
-		long userId) throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
+		long userId) throws PortalException;
 
 	/**
 	* Removes the user groups from the group.
 	*
 	* @param groupId the primary key of the group
 	* @param userGroupIds the primary keys of the user groups
-	* @throws PortalException if the user did not have permission to assign
-	group members
 	*/
 	public void unsetGroupUserGroups(long groupId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Removes the user groups from the team.
 	*
 	* @param teamId the primary key of the team
 	* @param userGroupIds the primary keys of the user groups
-	* @throws PortalException if the user did not have permission to assign
-	team members
 	*/
 	public void unsetTeamUserGroups(long teamId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user group.
@@ -206,16 +187,13 @@ public interface UserGroupService extends BaseService {
 	* @param name the user group's name
 	* @param description the the user group's description
 	* @return the user group
-	* @throws PortalException if a user group with the primary key was not
-	found, if the new information was invalid, or if the user did
-	not have permission to update the user group information
 	* @deprecated As of 6.2.0, replaced by {@link #updateUserGroup(long,
 	String, String, ServiceContext)}
 	*/
 	@java.lang.Deprecated
 	public com.liferay.portal.model.UserGroup updateUserGroup(
 		long userGroupId, java.lang.String name, java.lang.String description)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the user group.
@@ -227,12 +205,9 @@ public interface UserGroupService extends BaseService {
 	<code>null</code>). Can set expando bridge attributes for the
 	user group.
 	* @return the user group
-	* @throws PortalException if a user group with the primary key was not
-	found, if the new information was invalid, or if the user did not
-	have permission to update the user group information
 	*/
 	public com.liferay.portal.model.UserGroup updateUserGroup(
 		long userGroupId, java.lang.String name, java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 }

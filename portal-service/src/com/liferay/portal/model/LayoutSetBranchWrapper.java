@@ -251,7 +251,7 @@ public class LayoutSetBranchWrapper implements LayoutSetBranch,
 	* @return the create date of this layout set branch
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _layoutSetBranch.getCreateDate();
 	}
 
@@ -367,7 +367,7 @@ public class LayoutSetBranchWrapper implements LayoutSetBranch,
 	* @return the modified date of this layout set branch
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _layoutSetBranch.getModifiedDate();
 	}
 
@@ -613,7 +613,7 @@ public class LayoutSetBranchWrapper implements LayoutSetBranch,
 	* @param createDate the create date of this layout set branch
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_layoutSetBranch.setCreateDate(createDate);
 	}
 
@@ -638,8 +638,7 @@ public class LayoutSetBranchWrapper implements LayoutSetBranch,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_layoutSetBranch.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -723,7 +722,7 @@ public class LayoutSetBranchWrapper implements LayoutSetBranch,
 	* @param modifiedDate the modified date of this layout set branch
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_layoutSetBranch.setModifiedDate(modifiedDate);
 	}
 
@@ -854,7 +853,7 @@ public class LayoutSetBranchWrapper implements LayoutSetBranch,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.LayoutSetBranch> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.LayoutSetBranch> toCacheModel() {
 		return _layoutSetBranch.toCacheModel();
 	}
 

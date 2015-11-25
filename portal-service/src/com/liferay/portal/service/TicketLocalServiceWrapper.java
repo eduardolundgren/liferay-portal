@@ -31,6 +31,15 @@ public class TicketLocalServiceWrapper implements TicketLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.model.Ticket addDistinctTicket(long companyId,
+		java.lang.String className, long classPK, int type,
+		java.lang.String extraInfo, java.util.Date expirationDate,
+		com.liferay.portal.service.ServiceContext serviceContext) {
+		return _ticketLocalService.addDistinctTicket(companyId, className,
+			classPK, type, extraInfo, expirationDate, serviceContext);
+	}
+
+	@Override
 	public com.liferay.portal.model.Ticket addTicket(long companyId,
 		java.lang.String className, long classPK, int type,
 		java.lang.String extraInfo, java.util.Date expirationDate,
@@ -196,14 +205,19 @@ public class TicketLocalServiceWrapper implements TicketLocalService,
 		return _ticketLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ticketLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _ticketLocalService.getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _ticketLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -257,16 +271,6 @@ public class TicketLocalServiceWrapper implements TicketLocalService,
 	@Override
 	public int getTicketsCount() {
 		return _ticketLocalService.getTicketsCount();
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_ticketLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**

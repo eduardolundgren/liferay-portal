@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,6 +41,33 @@ import java.util.Date;
 public class RepositoryCacheModel implements CacheModel<Repository>,
 	Externalizable, MVCCModel {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof RepositoryCacheModel)) {
+			return false;
+		}
+
+		RepositoryCacheModel repositoryCacheModel = (RepositoryCacheModel)obj;
+
+		if ((repositoryId == repositoryCacheModel.repositoryId) &&
+				(mvccVersion == repositoryCacheModel.mvccVersion)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = HashUtil.hash(0, repositoryId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
 	public long getMvccVersion() {
 		return mvccVersion;
 	}
@@ -51,7 +79,7 @@ public class RepositoryCacheModel implements CacheModel<Repository>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -83,6 +111,8 @@ public class RepositoryCacheModel implements CacheModel<Repository>,
 		sb.append(typeSettings);
 		sb.append(", dlFolderId=");
 		sb.append(dlFolderId);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -159,6 +189,13 @@ public class RepositoryCacheModel implements CacheModel<Repository>,
 
 		repositoryImpl.setDlFolderId(dlFolderId);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			repositoryImpl.setLastPublishDate(null);
+		}
+		else {
+			repositoryImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		repositoryImpl.resetOriginalValues();
 
 		return repositoryImpl;
@@ -181,6 +218,7 @@ public class RepositoryCacheModel implements CacheModel<Repository>,
 		portletId = objectInput.readUTF();
 		typeSettings = objectInput.readUTF();
 		dlFolderId = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -240,6 +278,7 @@ public class RepositoryCacheModel implements CacheModel<Repository>,
 		}
 
 		objectOutput.writeLong(dlFolderId);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
@@ -257,4 +296,5 @@ public class RepositoryCacheModel implements CacheModel<Repository>,
 	public String portletId;
 	public String typeSettings;
 	public long dlFolderId;
+	public long lastPublishDate;
 }

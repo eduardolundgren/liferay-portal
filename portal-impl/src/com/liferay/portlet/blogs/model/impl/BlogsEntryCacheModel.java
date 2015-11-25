@@ -16,6 +16,7 @@ package com.liferay.portlet.blogs.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof BlogsEntryCacheModel)) {
+			return false;
+		}
+
+		BlogsEntryCacheModel blogsEntryCacheModel = (BlogsEntryCacheModel)obj;
+
+		if (entryId == blogsEntryCacheModel.entryId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, entryId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -77,6 +102,8 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		sb.append(allowTrackbacks);
 		sb.append(", trackbacks=");
 		sb.append(trackbacks);
+		sb.append(", coverImageCaption=");
+		sb.append(coverImageCaption);
 		sb.append(", coverImageFileEntryId=");
 		sb.append(coverImageFileEntryId);
 		sb.append(", coverImageURL=");
@@ -89,6 +116,8 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		sb.append(smallImageId);
 		sb.append(", smallImageURL=");
 		sb.append(smallImageURL);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -191,6 +220,13 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 			blogsEntryImpl.setTrackbacks(trackbacks);
 		}
 
+		if (coverImageCaption == null) {
+			blogsEntryImpl.setCoverImageCaption(StringPool.BLANK);
+		}
+		else {
+			blogsEntryImpl.setCoverImageCaption(coverImageCaption);
+		}
+
 		blogsEntryImpl.setCoverImageFileEntryId(coverImageFileEntryId);
 
 		if (coverImageURL == null) {
@@ -209,6 +245,13 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		}
 		else {
 			blogsEntryImpl.setSmallImageURL(smallImageURL);
+		}
+
+		if (lastPublishDate == Long.MIN_VALUE) {
+			blogsEntryImpl.setLastPublishDate(null);
+		}
+		else {
+			blogsEntryImpl.setLastPublishDate(new Date(lastPublishDate));
 		}
 
 		blogsEntryImpl.setStatus(status);
@@ -252,12 +295,14 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		allowPingbacks = objectInput.readBoolean();
 		allowTrackbacks = objectInput.readBoolean();
 		trackbacks = objectInput.readUTF();
+		coverImageCaption = objectInput.readUTF();
 		coverImageFileEntryId = objectInput.readLong();
 		coverImageURL = objectInput.readUTF();
 		smallImage = objectInput.readBoolean();
 		smallImageFileEntryId = objectInput.readLong();
 		smallImageId = objectInput.readLong();
 		smallImageURL = objectInput.readUTF();
+		lastPublishDate = objectInput.readLong();
 		status = objectInput.readInt();
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
@@ -335,6 +380,13 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 			objectOutput.writeUTF(trackbacks);
 		}
 
+		if (coverImageCaption == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(coverImageCaption);
+		}
+
 		objectOutput.writeLong(coverImageFileEntryId);
 
 		if (coverImageURL == null) {
@@ -355,6 +407,7 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 			objectOutput.writeUTF(smallImageURL);
 		}
 
+		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeInt(status);
 		objectOutput.writeLong(statusByUserId);
 
@@ -385,12 +438,14 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 	public boolean allowPingbacks;
 	public boolean allowTrackbacks;
 	public String trackbacks;
+	public String coverImageCaption;
 	public long coverImageFileEntryId;
 	public String coverImageURL;
 	public boolean smallImage;
 	public long smallImageFileEntryId;
 	public long smallImageId;
 	public String smallImageURL;
+	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

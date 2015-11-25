@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.TeamService;
@@ -49,7 +49,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class TeamServiceBaseImpl extends BaseServiceImpl
-	implements TeamService, IdentifiableBean {
+	implements TeamService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -80,7 +80,7 @@ public abstract class TeamServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the team remote service
 	 */
-	public com.liferay.portal.service.TeamService getTeamService() {
+	public TeamService getTeamService() {
 		return teamService;
 	}
 
@@ -89,8 +89,7 @@ public abstract class TeamServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param teamService the team remote service
 	 */
-	public void setTeamService(
-		com.liferay.portal.service.TeamService teamService) {
+	public void setTeamService(TeamService teamService) {
 		this.teamService = teamService;
 	}
 
@@ -398,23 +397,13 @@ public abstract class TeamServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return TeamService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -452,7 +441,7 @@ public abstract class TeamServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.TeamLocalService.class)
 	protected com.liferay.portal.service.TeamLocalService teamLocalService;
 	@BeanReference(type = com.liferay.portal.service.TeamService.class)
-	protected com.liferay.portal.service.TeamService teamService;
+	protected TeamService teamService;
 	@BeanReference(type = TeamPersistence.class)
 	protected TeamPersistence teamPersistence;
 	@BeanReference(type = TeamFinder.class)
@@ -485,5 +474,4 @@ public abstract class TeamServiceBaseImpl extends BaseServiceImpl
 	protected UserGroupPersistence userGroupPersistence;
 	@BeanReference(type = UserGroupFinder.class)
 	protected UserGroupFinder userGroupFinder;
-	private String _beanIdentifier;
 }

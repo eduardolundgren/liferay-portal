@@ -66,9 +66,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if scope was set to individual scope or if a role
-	with the primary key or a resource action with the name and
-	action ID could not be found
 	*/
 	@Override
 	public void addResourcePermission(long companyId, java.lang.String name,
@@ -183,7 +180,6 @@ public class ResourcePermissionLocalServiceWrapper
 	portlet ID
 	* @param scope the scope
 	* @param primKey the primary key
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void deleteResourcePermissions(long companyId,
@@ -213,7 +209,6 @@ public class ResourcePermissionLocalServiceWrapper
 	portlet ID
 	* @param scope the scope
 	* @param primKey the primary key
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void deleteResourcePermissions(long companyId,
@@ -350,8 +345,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param actionIds the action IDs
 	* @return the intersection of action IDs the role has permission at the
 	scope to perform on resources of the type
-	* @throws PortalException if a resouce action could not be found for any
-	one of the actions on the resource
 	*/
 	@Override
 	public java.util.List<java.lang.String> getAvailableResourcePermissionActionIds(
@@ -378,14 +371,19 @@ public class ResourcePermissionLocalServiceWrapper
 			name, scope, primKey, roleIds, actionIds);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _resourcePermissionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _resourcePermissionLocalService.getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _resourcePermissionLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -407,7 +405,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param roleId the primary key of the role
 	* @return the resource permission for the role at the scope to perform the
 	actions on resources of the type
-	* @throws PortalException if no matching resources could be found
 	*/
 	@Override
 	public com.liferay.portal.model.ResourcePermission getResourcePermission(
@@ -551,6 +548,15 @@ public class ResourcePermissionLocalServiceWrapper
 			scopes, start, end);
 	}
 
+	@Override
+	public java.util.List<com.liferay.portal.model.Role> getRoles(
+		long companyId, java.lang.String name, int scope,
+		java.lang.String primKey, java.lang.String actionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _resourcePermissionLocalService.getRoles(companyId, name, scope,
+			primKey, actionId);
+	}
+
 	/**
 	* Returns all the resource permissions where scope = any &#63;.
 	*
@@ -611,8 +617,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param actionId the action ID
 	* @return <code>true</code> if the role has permission to perform the
 	action on the resource; <code>false</code> otherwise
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public boolean hasResourcePermission(long companyId, java.lang.String name,
@@ -642,9 +646,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param actionId the action ID
 	* @return <code>true</code> if any one of the roles has permission to
 	perform the action on the resource; <code>false</code> otherwise
-	* @throws PortalException if any one of the roles with the primary keys
-	could not be found or if a resource action with the name and
-	action ID could not be found
 	*/
 	@Override
 	public boolean hasResourcePermission(long companyId, java.lang.String name,
@@ -671,9 +672,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @return <code>true</code> if any one of the roles has permission to
 	perform the action on any one of the resources;
 	<code>false</code> otherwise
-	* @throws PortalException if any one of the roles with the primary keys
-	could not be found or if a resource action with the name and
-	action ID could not be found
 	*/
 	@Override
 	public boolean hasResourcePermission(
@@ -684,6 +682,11 @@ public class ResourcePermissionLocalServiceWrapper
 			roleIds, actionId);
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #getRoles(long, String, int,
+	String, String}
+	*/
+	@Deprecated
 	@Override
 	public boolean[] hasResourcePermissions(long companyId,
 		java.lang.String name, int scope, java.lang.String primKey,
@@ -711,8 +714,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param actionId the action ID
 	* @return <code>true</code> if the role has permission to perform the
 	action on the resource; <code>false</code> otherwise
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public boolean hasScopeResourcePermission(long companyId,
@@ -728,7 +729,6 @@ public class ResourcePermissionLocalServiceWrapper
 	*
 	* @param fromRoleId the primary key of the source role
 	* @param toRoleId the primary key of the destination role
-	* @throws PortalException if a role with the primary key could not be found
 	*/
 	@Override
 	public void mergePermissions(long fromRoleId, long toRoleId)
@@ -744,8 +744,6 @@ public class ResourcePermissionLocalServiceWrapper
 	*
 	* @param resourcePermissionId the primary key of the resource permission
 	* @param toRoleId the primary key of the role
-	* @throws PortalException if a resource permission or role with the primary
-	key could not be found
 	*/
 	@Override
 	public void reassignPermissions(long resourcePermissionId, long toRoleId)
@@ -772,8 +770,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public void removeResourcePermission(long companyId, java.lang.String name,
@@ -796,8 +792,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param scope the scope
 	* @param roleId the primary key of the role
 	* @param actionId the action ID
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public void removeResourcePermissions(long companyId,
@@ -805,16 +799,6 @@ public class ResourcePermissionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_resourcePermissionLocalService.removeResourcePermissions(companyId,
 			name, scope, roleId, actionId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_resourcePermissionLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -843,8 +827,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param ownerId the primary key of the owner (generally the user that
 	created the resource)
 	* @param actionIds the action IDs of the actions
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public void setOwnerResourcePermissions(long companyId,
@@ -878,8 +860,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param primKey the primary key
 	* @param roleId the primary key of the role
 	* @param actionIds the action IDs of the actions
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public void setResourcePermissions(long companyId, java.lang.String name,
@@ -912,8 +892,6 @@ public class ResourcePermissionLocalServiceWrapper
 	* @param scope the scope
 	* @param primKey the primary key
 	* @param roleIdsToActionIds a map of role IDs to action IDs of the actions
-	* @throws PortalException if a role with the primary key or a resource
-	action with the name and action ID could not be found
 	*/
 	@Override
 	public void setResourcePermissions(long companyId, java.lang.String name,

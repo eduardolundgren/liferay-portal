@@ -16,8 +16,8 @@ package com.liferay.portal.kernel.cluster;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.MethodHandler;
+import com.liferay.portal.kernel.util.ProxyFactory;
 
 import java.util.concurrent.Future;
 
@@ -27,6 +27,21 @@ import java.util.concurrent.Future;
 @ProviderType
 public class ClusterMasterExecutorUtil {
 
+	public static void addClusterMasterTokenTransitionListener(
+		ClusterMasterTokenTransitionListener
+			clusterMasterTokenTransitionListener) {
+
+		ClusterMasterExecutor clusterMasterExecutor =
+			getClusterMasterExecutor();
+
+		if (clusterMasterExecutor == null) {
+			return;
+		}
+
+		clusterMasterExecutor.addClusterMasterTokenTransitionListener(
+			clusterMasterTokenTransitionListener);
+	}
+
 	public static <T> Future<T> executeOnMaster(MethodHandler methodHandler) {
 		ClusterMasterExecutor clusterMasterExecutor =
 			getClusterMasterExecutor();
@@ -35,22 +50,11 @@ public class ClusterMasterExecutorUtil {
 			return null;
 		}
 
-		return _clusterMasterExecutor.executeOnMaster(methodHandler);
+		return clusterMasterExecutor.executeOnMaster(methodHandler);
 	}
 
 	public static ClusterMasterExecutor getClusterMasterExecutor() {
-		return _clusterMasterExecutor;
-	}
-
-	public static void initialize() {
-		ClusterMasterExecutor clusterMasterExecutor =
-			getClusterMasterExecutor();
-
-		if (clusterMasterExecutor == null) {
-			return;
-		}
-
-		_clusterMasterExecutor.initialize();
+		return _instance;
 	}
 
 	public static boolean isEnabled() {
@@ -61,7 +65,7 @@ public class ClusterMasterExecutorUtil {
 			return false;
 		}
 
-		return _clusterMasterExecutor.isEnabled();
+		return clusterMasterExecutor.isEnabled();
 	}
 
 	public static boolean isMaster() {
@@ -72,10 +76,10 @@ public class ClusterMasterExecutorUtil {
 			return false;
 		}
 
-		return _clusterMasterExecutor.isMaster();
+		return clusterMasterExecutor.isMaster();
 	}
 
-	public static void registerClusterMasterTokenTransitionListener(
+	public static void removeClusterMasterTokenTransitionListener(
 		ClusterMasterTokenTransitionListener
 			clusterMasterTokenTransitionListener) {
 
@@ -86,33 +90,11 @@ public class ClusterMasterExecutorUtil {
 			return;
 		}
 
-		_clusterMasterExecutor.registerClusterMasterTokenTransitionListener(
+		clusterMasterExecutor.removeClusterMasterTokenTransitionListener(
 			clusterMasterTokenTransitionListener);
 	}
 
-	public static void unregisterClusterMasterTokenTransitionListener(
-		ClusterMasterTokenTransitionListener
-			clusterMasterTokenTransitionListener) {
-
-		ClusterMasterExecutor clusterMasterExecutor =
-			getClusterMasterExecutor();
-
-		if (clusterMasterExecutor == null) {
-			return;
-		}
-
-		_clusterMasterExecutor.unregisterClusterMasterTokenTransitionListener(
-			clusterMasterTokenTransitionListener);
-	}
-
-	public void setClusterMasterExecutor(
-		ClusterMasterExecutor clusterMasterExecutor) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_clusterMasterExecutor = clusterMasterExecutor;
-	}
-
-	private static ClusterMasterExecutor _clusterMasterExecutor;
+	private static final ClusterMasterExecutor _instance =
+		ProxyFactory.newServiceTrackedInstance(ClusterMasterExecutor.class);
 
 }

@@ -71,7 +71,7 @@ public class HeapUtil {
 		sb.append("file=");
 		sb.append(file);
 
-		List<String> arguments = new ArrayList<String>();
+		List<String> arguments = new ArrayList<>();
 
 		arguments.add("jmap");
 		arguments.add(sb.toString());
@@ -90,10 +90,9 @@ public class HeapUtil {
 	}
 
 	private static void _checkJMap(int processId) throws Exception {
-		Future<ObjectValuePair<byte[], byte[]>> future =
-			ProcessUtil.execute(
-				ProcessUtil.COLLECTOR_OUTPUT_PROCESSOR, "jmap", "-histo:live",
-				String.valueOf(processId));
+		Future<ObjectValuePair<byte[], byte[]>> future = ProcessUtil.execute(
+			ProcessUtil.COLLECTOR_OUTPUT_PROCESSOR, "jmap", "-histo:live",
+			String.valueOf(processId));
 
 		ObjectValuePair<byte[], byte[]> objectValuePair = future.get();
 

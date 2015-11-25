@@ -33,6 +33,14 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 		return super.doStartTag();
 	}
 
+	public boolean getCollapsed() {
+		return _collapsed;
+	}
+
+	public boolean getCollapsible() {
+		return _collapsible;
+	}
+
 	public boolean getColumn() {
 		return _column;
 	}
@@ -55,6 +63,18 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 
 	public boolean getLocalizeLabel() {
 		return _localizeLabel;
+	}
+
+	public void setCollapsed(boolean collapsed) {
+		_collapsed = collapsed;
+
+		setScopedAttribute("collapsed", collapsed);
+	}
+
+	public void setCollapsible(boolean collapsible) {
+		_collapsible = collapsible;
+
+		setScopedAttribute("collapsible", collapsible);
 	}
 
 	public void setColumn(boolean column) {
@@ -95,6 +115,10 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
+		_collapsed = false;
+		_collapsible = false;
 		_column = false;
 		_cssClass = null;
 		_helpMessage = null;
@@ -104,17 +128,14 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 	}
 
 	@Override
-	protected String getEndPage() {
-		return _END_PAGE;
-	}
-
-	@Override
 	protected String getStartPage() {
 		return _START_PAGE;
 	}
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
+		setNamespacedAttribute(request, "collapsed", _collapsed);
+		setNamespacedAttribute(request, "collapsible", _collapsible);
 		setNamespacedAttribute(request, "column", _column);
 		setNamespacedAttribute(request, "cssClass", _cssClass);
 		setNamespacedAttribute(request, "helpMessage", _helpMessage);
@@ -125,12 +146,11 @@ public abstract class BaseFieldsetTag extends com.liferay.taglib.util.IncludeTag
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:fieldset:";
 
-	private static final String _END_PAGE =
-		"/html/taglib/aui/fieldset/end.jsp";
-
 	private static final String _START_PAGE =
 		"/html/taglib/aui/fieldset/start.jsp";
 
+	private boolean _collapsed = false;
+	private boolean _collapsible = false;
 	private boolean _column = false;
 	private java.lang.String _cssClass = null;
 	private java.lang.String _helpMessage = null;

@@ -123,7 +123,7 @@ public abstract class BaseOrganizationMembershipPolicy
 	public boolean isRoleAllowed(long userId, long organizationId, long roleId)
 		throws PortalException {
 
-		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+		List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
 		Organization organization =
 			OrganizationLocalServiceUtil.getOrganization(organizationId);
@@ -184,7 +184,7 @@ public abstract class BaseOrganizationMembershipPolicy
 	public boolean isRoleRequired(long userId, long organizationId, long roleId)
 		throws PortalException {
 
-		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+		List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
 		Organization organization =
 			OrganizationLocalServiceUtil.getOrganization(organizationId);
@@ -219,13 +219,11 @@ public abstract class BaseOrganizationMembershipPolicy
 			OrganizationLocalServiceUtil.getActionableDynamicQuery();
 
 		organizationActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod() {
+			new ActionableDynamicQuery.PerformActionMethod<Organization>() {
 
 				@Override
-				public void performAction(Object object)
+				public void performAction(Organization organization)
 					throws PortalException {
-
-					Organization organization = (Organization)object;
 
 					verifyPolicy(organization);
 
@@ -236,14 +234,13 @@ public abstract class BaseOrganizationMembershipPolicy
 					userGroupRoleActionableDynamicQuery.setGroupId(
 						organization.getGroupId());
 					userGroupRoleActionableDynamicQuery.setPerformActionMethod(
-						new ActionableDynamicQuery.PerformActionMethod() {
+						new ActionableDynamicQuery.
+							PerformActionMethod<UserGroupRole>() {
 
 							@Override
-							public void performAction(Object object)
+							public void performAction(
+									UserGroupRole userGroupRole)
 								throws PortalException {
-
-								UserGroupRole userGroupRole =
-									(UserGroupRole)object;
 
 								verifyPolicy(userGroupRole.getRole());
 							}

@@ -175,6 +175,8 @@ public abstract class BaseButtonTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_cssClass = null;
 		_data = null;
 		_disabled = false;
@@ -194,11 +196,6 @@ public abstract class BaseButtonTag extends com.liferay.taglib.util.IncludeTag {
 	@Override
 	protected String getEndPage() {
 		return _END_PAGE;
-	}
-
-	@Override
-	protected String getStartPage() {
-		return _START_PAGE;
 	}
 
 	@Override
@@ -223,9 +220,6 @@ public abstract class BaseButtonTag extends com.liferay.taglib.util.IncludeTag {
 
 	private static final String _END_PAGE =
 		"/html/taglib/aui/button/end.jsp";
-
-	private static final String _START_PAGE =
-		"/html/taglib/aui/button/start.jsp";
 
 	private java.lang.String _cssClass = null;
 	private java.lang.Object _data = null;

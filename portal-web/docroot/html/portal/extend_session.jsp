@@ -43,6 +43,10 @@ for (String servletContextName : ServletContextPool.keySet()) {
 
 		RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
 
+		if (requestDispatcher == null) {
+			continue;
+		}
+
 		request.setAttribute(WebKeys.EXTEND_SESSION, Boolean.TRUE);
 
 		try {
@@ -58,5 +62,5 @@ for (String servletContextName : ServletContextPool.keySet()) {
 %>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.portal.extend_session_jsp");
+private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.portal.extend_session_jsp");
 %>

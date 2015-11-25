@@ -15,6 +15,7 @@
 package com.liferay.portlet.documentlibrary.util.comparator;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -33,20 +34,54 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 
 	public static final String[] ORDER_BY_FIELDS = {"size"};
 
+	public static final String ORDER_BY_MODEL_ASC =
+		"modelFolder DESC, size_ ASC";
+
+	public static final String ORDER_BY_MODEL_DESC =
+		"modelFolder DESC, size_ DESC";
+
 	public RepositoryModelSizeComparator() {
 		this(false);
 	}
 
 	public RepositoryModelSizeComparator(boolean ascending) {
 		_ascending = ascending;
+		_orderByModel = false;
+	}
+
+	public RepositoryModelSizeComparator(
+		boolean ascending, boolean orderByModel) {
+
+		_ascending = ascending;
+		_orderByModel = orderByModel;
 	}
 
 	@Override
 	public int compare(T t1, T t2) {
+		int value = 0;
+
 		Long size1 = getSize(t1);
 		Long size2 = getSize(t2);
 
-		int value = size1.compareTo(size2);
+		if (_orderByModel) {
+			if (((t1 instanceof DLFolder) || (t1 instanceof Folder)) &&
+				((t2 instanceof DLFolder) || (t2 instanceof Folder))) {
+
+				value = size1.compareTo(size2);
+			}
+			else if ((t1 instanceof DLFolder) || (t1 instanceof Folder)) {
+				value = -1;
+			}
+			else if ((t2 instanceof DLFolder) || (t2 instanceof Folder)) {
+				value = 1;
+			}
+			else {
+				value = size1.compareTo(size2);
+			}
+		}
+		else {
+			value = size1.compareTo(size2);
+		}
 
 		if (_ascending) {
 			return value;
@@ -58,11 +93,21 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 
 	@Override
 	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
+		if (_orderByModel) {
+			if (_ascending) {
+				return ORDER_BY_MODEL_ASC;
+			}
+			else {
+				return ORDER_BY_MODEL_DESC;
+			}
 		}
 		else {
-			return ORDER_BY_DESC;
+			if (_ascending) {
+				return ORDER_BY_ASC;
+			}
+			else {
+				return ORDER_BY_DESC;
+			}
 		}
 	}
 
@@ -76,26 +121,41 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 		return _ascending;
 	}
 
+	protected long getFileShortcutSize(Object obj) {
+		long toFileEntryId = 0;
+
+		if (obj instanceof FileShortcut) {
+			FileShortcut fileShortcut = (FileShortcut)obj;
+
+			toFileEntryId = fileShortcut.getToFileEntryId();
+		}
+		else {
+			DLFileShortcut dlFileShortcut = (DLFileShortcut)obj;
+
+			toFileEntryId = dlFileShortcut.getToFileEntryId();
+		}
+
+		try {
+			DLFileEntry dlFileEntry = DLFileEntryLocalServiceUtil.getFileEntry(
+				toFileEntryId);
+
+			return dlFileEntry.getSize();
+		}
+		catch (Exception e) {
+			return 0;
+		}
+	}
+
 	protected long getSize(Object obj) {
 		if (obj instanceof DLFileEntry) {
 			DLFileEntry dlFileEntry = (DLFileEntry)obj;
 
 			return dlFileEntry.getSize();
 		}
-		else if (obj instanceof DLFileShortcut) {
-			DLFileShortcut dlFileShortcut = (DLFileShortcut)obj;
+		else if ((obj instanceof DLFileShortcut) ||
+				 (obj instanceof FileShortcut)) {
 
-			long toFileEntryId = dlFileShortcut.getToFileEntryId();
-
-			try {
-				DLFileEntry dlFileEntry =
-					DLFileEntryLocalServiceUtil.getFileEntry(toFileEntryId);
-
-				return dlFileEntry.getSize();
-			}
-			catch (Exception e) {
-				return 0;
-			}
+			return getFileShortcutSize(obj);
 		}
 		else if ((obj instanceof DLFolder) || (obj instanceof Folder)) {
 			return 0;
@@ -108,5 +168,6 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 	}
 
 	private final boolean _ascending;
+	private final boolean _orderByModel;
 
 }

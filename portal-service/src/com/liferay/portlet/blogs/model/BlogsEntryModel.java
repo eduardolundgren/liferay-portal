@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.ShardedModel;
 import com.liferay.portal.model.StagedGroupedModel;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.model.WorkflowedModel;
@@ -47,7 +48,7 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface BlogsEntryModel extends BaseModel<BlogsEntry>,
+public interface BlogsEntryModel extends BaseModel<BlogsEntry>, ShardedModel,
 	StagedGroupedModel, TrashedModel, WorkflowedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -360,6 +361,21 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>,
 	public void setTrackbacks(String trackbacks);
 
 	/**
+	 * Returns the cover image caption of this blogs entry.
+	 *
+	 * @return the cover image caption of this blogs entry
+	 */
+	@AutoEscape
+	public String getCoverImageCaption();
+
+	/**
+	 * Sets the cover image caption of this blogs entry.
+	 *
+	 * @param coverImageCaption the cover image caption of this blogs entry
+	 */
+	public void setCoverImageCaption(String coverImageCaption);
+
+	/**
 	 * Returns the cover image file entry ID of this blogs entry.
 	 *
 	 * @return the cover image file entry ID of this blogs entry
@@ -451,6 +467,22 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>,
 	 * @param smallImageURL the small image u r l of this blogs entry
 	 */
 	public void setSmallImageURL(String smallImageURL);
+
+	/**
+	 * Returns the last publish date of this blogs entry.
+	 *
+	 * @return the last publish date of this blogs entry
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this blogs entry.
+	 *
+	 * @param lastPublishDate the last publish date of this blogs entry
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
 
 	/**
 	 * Returns the status of this blogs entry.

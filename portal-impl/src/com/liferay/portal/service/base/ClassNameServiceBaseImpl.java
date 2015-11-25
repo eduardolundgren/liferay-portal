@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.ClassName;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.ClassNameService;
@@ -42,7 +42,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class ClassNameServiceBaseImpl extends BaseServiceImpl
-	implements ClassNameService, IdentifiableBean {
+	implements ClassNameService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -73,7 +73,7 @@ public abstract class ClassNameServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
+	public ClassNameService getClassNameService() {
 		return classNameService;
 	}
 
@@ -82,8 +82,7 @@ public abstract class ClassNameServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param classNameService the class name remote service
 	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
+	public void setClassNameService(ClassNameService classNameService) {
 		this.classNameService = classNameService;
 	}
 
@@ -132,23 +131,13 @@ public abstract class ClassNameServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return ClassNameService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -186,10 +175,9 @@ public abstract class ClassNameServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
+	protected ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
-	private String _beanIdentifier;
 }

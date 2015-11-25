@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.Country;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.CountryService;
@@ -42,7 +42,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class CountryServiceBaseImpl extends BaseServiceImpl
-	implements CountryService, IdentifiableBean {
+	implements CountryService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -54,7 +54,7 @@ public abstract class CountryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the country remote service
 	 */
-	public com.liferay.portal.service.CountryService getCountryService() {
+	public CountryService getCountryService() {
 		return countryService;
 	}
 
@@ -63,8 +63,7 @@ public abstract class CountryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param countryService the country remote service
 	 */
-	public void setCountryService(
-		com.liferay.portal.service.CountryService countryService) {
+	public void setCountryService(CountryService countryService) {
 		this.countryService = countryService;
 	}
 
@@ -112,23 +111,13 @@ public abstract class CountryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return CountryService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -164,10 +153,9 @@ public abstract class CountryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	@BeanReference(type = com.liferay.portal.service.CountryService.class)
-	protected com.liferay.portal.service.CountryService countryService;
+	protected CountryService countryService;
 	@BeanReference(type = CountryPersistence.class)
 	protected CountryPersistence countryPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
-	private String _beanIdentifier;
 }

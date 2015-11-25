@@ -28,6 +28,8 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.PortletPreferencesIds;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.permission.ModelPermissions;
+import com.liferay.portal.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -129,8 +131,7 @@ public class ServiceContextFactory {
 
 		// Attributes
 
-		Map<String, Serializable> attributes =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> attributes = new HashMap<>();
 
 		Map<String, String[]> parameters = request.getParameterMap();
 
@@ -174,17 +175,25 @@ public class ServiceContextFactory {
 
 		// Permissions
 
-		boolean addGroupPermissions = ParamUtil.getBoolean(
-			request, "addGroupPermissions");
-		boolean addGuestPermissions = ParamUtil.getBoolean(
-			request, "addGuestPermissions");
-		String[] groupPermissions = PortalUtil.getGroupPermissions(request);
-		String[] guestPermissions = PortalUtil.getGuestPermissions(request);
+		ModelPermissions modelPermissions = ModelPermissionsFactory.create(
+			request);
 
-		serviceContext.setAddGroupPermissions(addGroupPermissions);
-		serviceContext.setAddGuestPermissions(addGuestPermissions);
-		serviceContext.setGroupPermissions(groupPermissions);
-		serviceContext.setGuestPermissions(guestPermissions);
+		if (!modelPermissions.isEmpty()) {
+			serviceContext.setModelPermissions(modelPermissions);
+		}
+		else {
+			boolean addGroupPermissions = ParamUtil.getBoolean(
+				request, "addGroupPermissions");
+			boolean addGuestPermissions = ParamUtil.getBoolean(
+				request, "addGuestPermissions");
+			String[] groupPermissions = PortalUtil.getGroupPermissions(request);
+			String[] guestPermissions = PortalUtil.getGuestPermissions(request);
+
+			serviceContext.setAddGroupPermissions(addGroupPermissions);
+			serviceContext.setAddGuestPermissions(addGuestPermissions);
+			serviceContext.setGroupPermissions(groupPermissions);
+			serviceContext.setGuestPermissions(guestPermissions);
+		}
 
 		// Portlet preferences ids
 
@@ -200,7 +209,7 @@ public class ServiceContextFactory {
 
 		// Request
 
-		Map<String, String> headerMap = new HashMap<String, String>();
+		Map<String, String> headerMap = new HashMap<>();
 
 		Enumeration<String> enu = request.getHeaderNames();
 
@@ -222,7 +231,7 @@ public class ServiceContextFactory {
 
 		Map<String, String[]> parameterMap = request.getParameterMap();
 
-		List<Long> assetCategoryIdsList = new ArrayList<Long>();
+		List<Long> assetCategoryIdsList = new ArrayList<>();
 
 		boolean updateAssetCategoryIds = false;
 
@@ -263,6 +272,10 @@ public class ServiceContextFactory {
 
 			serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
 		}
+
+		Double assetPriority = ParamUtil.getDouble(request, "assetPriority");
+
+		serviceContext.setAssetPriority(assetPriority);
 
 		String assetTagNamesString = request.getParameter("assetTagNames");
 
@@ -327,8 +340,7 @@ public class ServiceContextFactory {
 
 		// Attributes
 
-		Map<String, Serializable> attributes =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> attributes = new HashMap<>();
 
 		Enumeration<String> enu = portletRequest.getParameterNames();
 
@@ -373,19 +385,27 @@ public class ServiceContextFactory {
 
 		// Permissions
 
-		boolean addGroupPermissions = ParamUtil.getBoolean(
-			portletRequest, "addGroupPermissions");
-		boolean addGuestPermissions = ParamUtil.getBoolean(
-			portletRequest, "addGuestPermissions");
-		String[] groupPermissions = PortalUtil.getGroupPermissions(
-			portletRequest);
-		String[] guestPermissions = PortalUtil.getGuestPermissions(
+		ModelPermissions modelPermissions = ModelPermissionsFactory.create(
 			portletRequest);
 
-		serviceContext.setAddGroupPermissions(addGroupPermissions);
-		serviceContext.setAddGuestPermissions(addGuestPermissions);
-		serviceContext.setGroupPermissions(groupPermissions);
-		serviceContext.setGuestPermissions(guestPermissions);
+		if (!modelPermissions.isEmpty()) {
+			serviceContext.setModelPermissions(modelPermissions);
+		}
+		else {
+			boolean addGroupPermissions = ParamUtil.getBoolean(
+				portletRequest, "addGroupPermissions");
+			boolean addGuestPermissions = ParamUtil.getBoolean(
+				portletRequest, "addGuestPermissions");
+			String[] groupPermissions = PortalUtil.getGroupPermissions(
+				portletRequest);
+			String[] guestPermissions = PortalUtil.getGuestPermissions(
+				portletRequest);
+
+			serviceContext.setAddGroupPermissions(addGroupPermissions);
+			serviceContext.setAddGuestPermissions(addGuestPermissions);
+			serviceContext.setGroupPermissions(groupPermissions);
+			serviceContext.setGuestPermissions(guestPermissions);
+		}
 
 		// Portlet preferences ids
 
@@ -402,7 +422,7 @@ public class ServiceContextFactory {
 
 		// Request
 
-		Map<String, String> headerMap = new HashMap<String, String>();
+		Map<String, String> headerMap = new HashMap<>();
 
 		enu = request.getHeaderNames();
 
@@ -424,7 +444,7 @@ public class ServiceContextFactory {
 
 		Map<String, String[]> parameterMap = portletRequest.getParameterMap();
 
-		List<Long> assetCategoryIdsList = new ArrayList<Long>();
+		List<Long> assetCategoryIdsList = new ArrayList<>();
 
 		boolean updateAssetCategoryIds = false;
 
@@ -466,6 +486,10 @@ public class ServiceContextFactory {
 			serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
 		}
 
+		Double assetPriority = ParamUtil.getDouble(request, "assetPriority");
+
+		serviceContext.setAssetPriority(assetPriority);
+
 		String assetTagNamesString = request.getParameter("assetTagNames");
 
 		if (assetTagNamesString != null) {
@@ -480,6 +504,40 @@ public class ServiceContextFactory {
 			portletRequest, "workflowAction", WorkflowConstants.ACTION_PUBLISH);
 
 		serviceContext.setWorkflowAction(workflowAction);
+
+		return serviceContext;
+	}
+
+	public static ServiceContext getInstance(
+			String className, HttpServletRequest request)
+		throws PortalException {
+
+		ServiceContext serviceContext = getInstance(request);
+
+		// Permissions
+
+		String[] groupPermissions = PortalUtil.getGroupPermissions(
+			request, className);
+		String[] guestPermissions = PortalUtil.getGuestPermissions(
+			request, className);
+
+		if (groupPermissions != null) {
+			serviceContext.setGroupPermissions(groupPermissions);
+		}
+
+		if (guestPermissions != null) {
+			serviceContext.setGuestPermissions(guestPermissions);
+		}
+
+		// Expando
+
+		Map<String, Serializable> expandoBridgeAttributes =
+			PortalUtil.getExpandoBridgeAttributes(
+				ExpandoBridgeFactoryUtil.getExpandoBridge(
+					serviceContext.getCompanyId(), className),
+				request);
+
+		serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
 
 		return serviceContext;
 	}

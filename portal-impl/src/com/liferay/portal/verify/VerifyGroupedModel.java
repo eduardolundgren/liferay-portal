@@ -40,7 +40,7 @@ public class VerifyGroupedModel extends VerifyProcess {
 	public void verify(VerifiableGroupedModel ... verifiableGroupedModels)
 		throws Exception {
 
-		List<String> unverifiedTableNames = new ArrayList<String>();
+		List<String> unverifiedTableNames = new ArrayList<>();
 
 		for (VerifiableGroupedModel verifiableGroupedModel :
 				verifiableGroupedModels) {
@@ -49,8 +49,7 @@ public class VerifyGroupedModel extends VerifyProcess {
 		}
 
 		List<VerifiableGroupedModelRunnable> verifiableGroupedModelRunnables =
-			new ArrayList<VerifiableGroupedModelRunnable>(
-				unverifiedTableNames.size());
+			new ArrayList<>(unverifiedTableNames.size());
 
 		while (!unverifiedTableNames.isEmpty()) {
 			int count = unverifiedTableNames.size();
@@ -101,14 +100,11 @@ public class VerifyGroupedModel extends VerifyProcess {
 			String tableName, String primaryKeColumnName, long primKey)
 		throws Exception {
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
+			ps = connection.prepareStatement(
 				"select groupId from " + tableName + " where " +
 					primaryKeColumnName + " = ?");
 
@@ -127,7 +123,7 @@ public class VerifyGroupedModel extends VerifyProcess {
 			return 0;
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
 	}
 
@@ -135,13 +131,10 @@ public class VerifyGroupedModel extends VerifyProcess {
 			VerifiableGroupedModel verifiableGroupedModel)
 		throws Exception {
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
+		try (Connection con = DataAccess.getUpgradeOptimizedConnection()) {
 			StringBundler sb = new StringBundler(7);
 
 			sb.append("select ");
@@ -182,11 +175,11 @@ public class VerifyGroupedModel extends VerifyProcess {
 				sb.append(" = ");
 				sb.append(primKey);
 
-				runSQL(sb.toString());
+				runSQL(con, sb.toString());
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
 	}
 

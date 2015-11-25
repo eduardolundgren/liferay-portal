@@ -16,6 +16,8 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.Accessor;
+
 /**
  * The extended model interface for the LayoutSet service. Represents a row in the &quot;LayoutSet&quot; database table, with each column mapped to a property of this class.
  *
@@ -32,6 +34,22 @@ public interface LayoutSet extends LayoutSetModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.LayoutSetImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public static final Accessor<LayoutSet, Long> LAYOUT_SET_ID_ACCESSOR = new Accessor<LayoutSet, Long>() {
+			@Override
+			public Long get(LayoutSet layoutSet) {
+				return layoutSet.getLayoutSetId();
+			}
+
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
+
+			@Override
+			public Class<LayoutSet> getTypeClass() {
+				return LayoutSet.class;
+			}
+		};
 
 	/**
 	* Returns the layout set's color scheme.
@@ -52,8 +70,6 @@ public interface LayoutSet extends LayoutSetModel, PersistedModel {
 	* Returns the layout set's group.
 	*
 	* @return the layout set's group
-	* @throws PortalException if a group with the primary key could not be
-	found
 	*/
 	public com.liferay.portal.model.Group getGroup()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -68,8 +84,6 @@ public interface LayoutSet extends LayoutSetModel, PersistedModel {
 	*
 	* @return the layout set prototype's ID, or <code>0</code> if it has no
 	layout set prototype
-	* @throws PortalException if a matching layout set prototype could not be
-	found
 	*/
 	public long getLayoutSetPrototypeId()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -103,6 +117,8 @@ public interface LayoutSet extends LayoutSetModel, PersistedModel {
 	public com.liferay.portal.model.ColorScheme getWapColorScheme();
 
 	public com.liferay.portal.model.Theme getWapTheme();
+
+	public boolean hasSetModifiedDate();
 
 	public boolean isLayoutSetPrototypeLinkActive();
 

@@ -16,8 +16,8 @@ package com.liferay.portal.template;
 
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -55,14 +55,19 @@ public class ClassLoaderResourceParserTest {
 			classLoaderResourceParser.getURL(
 				TemplateConstants.THEME_LOADER_SEPARATOR));
 
+		Class<?> clazz = getClass();
+
+		classLoaderResourceParser = new ClassLoaderResourceParser(
+			clazz.getClassLoader());
+
 		String templateId = "DummyFile";
 
 		Assert.assertNull(classLoaderResourceParser.getURL(templateId));
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ClassLoaderResourceParser.class.getName(), Level.FINEST);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ClassLoaderResourceParser.class.getName(), Level.FINEST)) {
 
-		try {
 			Assert.assertNull(classLoaderResourceParser.getURL(templateId));
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -74,44 +79,6 @@ public class ClassLoaderResourceParserTest {
 			Assert.assertEquals(
 				"Loading " + templateId, logRecord.getMessage());
 		}
-		finally {
-			captureHandler.close();
-		}
-	}
-
-	@Test
-	public void testNormalizePath() {
-		Assert.assertEquals(
-			"abc", ClassLoaderResourceParser.normalizePath("abc"));
-		Assert.assertEquals(
-			"/abc", ClassLoaderResourceParser.normalizePath("/abc"));
-
-		try {
-			ClassLoaderResourceParser.normalizePath("//");
-
-			Assert.fail();
-		}
-		catch (IllegalArgumentException iae) {
-			Assert.assertEquals("Unable to parse path //", iae.getMessage());
-		}
-
-		Assert.assertEquals(
-			"abc", ClassLoaderResourceParser.normalizePath("abc/./"));
-		Assert.assertEquals(
-			"def", ClassLoaderResourceParser.normalizePath("abc/../def"));
-
-		try {
-			ClassLoaderResourceParser.normalizePath("../");
-
-			Assert.fail();
-		}
-		catch (IllegalArgumentException iae) {
-			Assert.assertEquals("Unable to parse path ../", iae.getMessage());
-		}
-
-		Assert.assertEquals(
-			"/efg/hij",
-			ClassLoaderResourceParser.normalizePath("/abc/../efg/./hij/"));
 	}
 
 }

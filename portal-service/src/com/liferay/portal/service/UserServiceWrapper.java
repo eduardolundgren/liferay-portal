@@ -37,10 +37,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userIds the primary keys of the users
 	* @param serviceContext the service context to be applied (optionally
 	<code>null</code>)
-	* @throws PortalException if a group or user with the primary key could not
-	be found, if the user did not have permission to assign group
-	members, or if the operation was not allowed by the membership
-	policy
 	*/
 	@Override
 	public void addGroupUsers(long groupId, long[] userIds,
@@ -54,11 +50,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param organizationId the primary key of the organization
 	* @param userIds the primary keys of the users
-	* @throws PortalException if an organization or user with the primary key
-	could not be found, if the user did not have permission to assign
-	organization members, if current user did not have an
-	organization in common with a given user, or if the operation was
-	not allowed by the membership policy
 	*/
 	@Override
 	public void addOrganizationUsers(long organizationId, long[] userIds)
@@ -72,8 +63,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param passwordPolicyId the primary key of the password policy
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the user did not have permission to assign
-	policy members
 	*/
 	@Override
 	public void addPasswordPolicyUsers(long passwordPolicyId, long[] userIds)
@@ -86,10 +75,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param roleId the primary key of the role
 	* @param userIds the primary keys of the users
-	* @throws PortalException if a role or user with the primary key could not
-	be found, if the user did not have permission to assign role
-	members, or if the operation was not allowed by the membership
-	policy
 	*/
 	@Override
 	public void addRoleUsers(long roleId, long[] userIds)
@@ -102,9 +87,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param teamId the primary key of the team
 	* @param userIds the primary keys of the users
-	* @throws PortalException if a team or user with the primary key could not
-	be found or if the user did not have permission to assign team
-	members
 	*/
 	@Override
 	public void addTeamUsers(long teamId, long[] userIds)
@@ -161,10 +143,6 @@ public class UserServiceWrapper implements UserService,
 	attribute), asset category IDs, asset tag names, and expando
 	bridge attributes for the user.
 	* @return the new user
-	* @throws PortalException if the user's information was invalid, if the
-	creator did not have permission to add users, if the email
-	address was reserved, if the operation was not allowed by the
-	membership policy, or if some other portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.User addUser(long companyId,
@@ -173,7 +151,7 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds,
@@ -238,10 +216,6 @@ public class UserServiceWrapper implements UserService,
 	attribute), asset category IDs, asset tag names, and expando
 	bridge attributes for the user.
 	* @return the new user
-	* @throws PortalException if the user's information was invalid, if the
-	operation was not allowed by the membership policy, if the
-	creator did not have permission to add users, or if the email
-	address was reserved
 	*/
 	@Override
 	public com.liferay.portal.model.User addUser(long companyId,
@@ -250,7 +224,7 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds, boolean sendEmail,
@@ -269,10 +243,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param userGroupId the primary key of the user group
 	* @param userIds the primary keys of the users
-	* @throws PortalException if a user group or user with the primary could
-	could not be found, if the current user did not have permission
-	to assign group members, or if the operation was not allowed by
-	the membership policy
 	*/
 	@Override
 	public void addUserGroupUsers(long userGroupId, long[] userIds)
@@ -329,10 +299,6 @@ public class UserServiceWrapper implements UserService,
 	attribute), asset category IDs, asset tag names, and expando
 	bridge attributes for the user.
 	* @return the new user
-	* @throws PortalException if the user's information was invalid, if the
-	operation was not allowed by the membership policy, if the
-	creator did not have permission to add users, if the email
-	address was reserved, or if some other portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.User addUserWithWorkflow(long companyId,
@@ -341,7 +307,7 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds,
@@ -406,10 +372,6 @@ public class UserServiceWrapper implements UserService,
 	attribute), asset category IDs, asset tag names, and expando
 	bridge attributes for the user.
 	* @return the new user
-	* @throws PortalException if the user's information was invalid, if the
-	operation was not allowed by the membership policy, if the
-	creator did not have permission to add users, or if the email
-	address was reserved
 	*/
 	@Override
 	public com.liferay.portal.model.User addUserWithWorkflow(long companyId,
@@ -418,7 +380,7 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
 		long[] roleIds, long[] userGroupIds, boolean sendEmail,
@@ -436,9 +398,6 @@ public class UserServiceWrapper implements UserService,
 	* Deletes the user's portrait image.
 	*
 	* @param userId the primary key of the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the user's portrait could not be found, or if the
-	current user did not have permission to update the user
 	*/
 	@Override
 	public void deletePortrait(long userId)
@@ -451,9 +410,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param roleId the primary key of the role
 	* @param userId the primary key of the user
-	* @throws PortalException if a role or user with the primary key could not
-	be found, or if the current user did not have permission to
-	assign role members
 	*/
 	@Override
 	public void deleteRoleUser(long roleId, long userId)
@@ -465,23 +421,11 @@ public class UserServiceWrapper implements UserService,
 	* Deletes the user.
 	*
 	* @param userId the primary key of the user
-	* @throws PortalException if a user with the primary key could not be found
-	or if the current user did not have permission to delete the user
 	*/
 	@Override
 	public void deleteUser(long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_userService.deleteUser(userId);
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _userService.getBeanIdentifier();
 	}
 
 	@Override
@@ -497,13 +441,17 @@ public class UserServiceWrapper implements UserService,
 		return _userService.getCompanyUsersCount(companyId);
 	}
 
+	@Override
+	public com.liferay.portal.model.User getCurrentUser()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userService.getCurrentUser();
+	}
+
 	/**
 	* Returns the primary keys of all the users belonging to the group.
 	*
 	* @param groupId the primary key of the group
 	* @return the primary keys of the users belonging to the group
-	* @throws PortalException if the current user did not have permission to
-	view group assignments
 	*/
 	@Override
 	public long[] getGroupUserIds(long groupId)
@@ -516,8 +464,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param groupId the primary key of the group
 	* @return the users belonging to the group
-	* @throws PortalException if the current user did not have permission to
-	view group assignments
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.User> getGroupUsers(
@@ -527,12 +473,20 @@ public class UserServiceWrapper implements UserService,
 	}
 
 	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _userService.getOSGiServiceIdentifier();
+	}
+
+	/**
 	* Returns the primary keys of all the users belonging to the organization.
 	*
 	* @param organizationId the primary key of the organization
 	* @return the primary keys of the users belonging to the organization
-	* @throws PortalException if the current user did not have permission to
-	view organization assignments
 	*/
 	@Override
 	public long[] getOrganizationUserIds(long organizationId)
@@ -545,8 +499,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param organizationId the primary key of the organization
 	* @return users belonging to the organization
-	* @throws PortalException if the current user did not have permission to
-	view organization assignments
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.User> getOrganizationUsers(
@@ -560,8 +512,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param roleId the primary key of the role
 	* @return the primary keys of the users belonging to the role
-	* @throws PortalException if the current user did not have permission to
-	view role members
 	*/
 	@Override
 	public long[] getRoleUserIds(long roleId)
@@ -575,9 +525,6 @@ public class UserServiceWrapper implements UserService,
 	* @param companyId the primary key of the user's company
 	* @param emailAddress the user's email address
 	* @return the user with the email address
-	* @throws PortalException if a user with the email address could not be
-	found or if the current user did not have permission to view the
-	user
 	*/
 	@Override
 	public com.liferay.portal.model.User getUserByEmailAddress(long companyId,
@@ -591,8 +538,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param userId the primary key of the user
 	* @return the user with the primary key
-	* @throws PortalException if a user with the primary key could not be found
-	or if the current user did not have permission to view the user
 	*/
 	@Override
 	public com.liferay.portal.model.User getUserById(long userId)
@@ -606,8 +551,6 @@ public class UserServiceWrapper implements UserService,
 	* @param companyId the primary key of the user's company
 	* @param screenName the user's screen name
 	* @return the user with the screen name
-	* @throws PortalException if a user with the screen name could not be found
-	or if the current user did not have permission to view the user
 	*/
 	@Override
 	public com.liferay.portal.model.User getUserByScreenName(long companyId,
@@ -629,8 +572,6 @@ public class UserServiceWrapper implements UserService,
 	* @param companyId the primary key of the user's company
 	* @param emailAddress the user's email address
 	* @return the primary key of the user with the email address
-	* @throws PortalException if a user with the email address could not be
-	found
 	*/
 	@Override
 	public long getUserIdByEmailAddress(long companyId,
@@ -645,7 +586,6 @@ public class UserServiceWrapper implements UserService,
 	* @param companyId the primary key of the user's company
 	* @param screenName the user's screen name
 	* @return the primary key of the user with the screen name
-	* @throws PortalException if a user with the screen name could not be found
 	*/
 	@Override
 	public long getUserIdByScreenName(long companyId,
@@ -661,8 +601,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @return <code>true</code> if the user is a member of the group;
 	<code>false</code> otherwise
-	* @throws PortalException if the current user did not have permission to
-	view the user or group members
 	*/
 	@Override
 	public boolean hasGroupUser(long groupId, long userId)
@@ -682,7 +620,6 @@ public class UserServiceWrapper implements UserService,
 	sites, etc.
 	* @return <code>true</code> if the user has the role; <code>false</code>
 	otherwise
-	* @throws PortalException if a role with the name could not be found
 	*/
 	@Override
 	public boolean hasRoleUser(long companyId, java.lang.String name,
@@ -698,8 +635,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @return <code>true</code> if the user is a member of the role;
 	<code>false</code> otherwise
-	* @throws PortalException if the current user did not have permission to
-	view the user or role members
 	*/
 	@Override
 	public boolean hasRoleUser(long roleId, long userId)
@@ -707,6 +642,26 @@ public class UserServiceWrapper implements UserService,
 		return _userService.hasRoleUser(roleId, userId);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the email
+	* address. The portal's settings determine whether a password is sent
+	* explicitly or whether a link for resetting the user's password is sent.
+	* The method sends the email asynchronously and returns before the email is
+	* sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param emailAddress the user's email address
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	*/
 	@Override
 	public boolean sendPasswordByEmailAddress(long companyId,
 		java.lang.String emailAddress)
@@ -714,6 +669,25 @@ public class UserServiceWrapper implements UserService,
 		return _userService.sendPasswordByEmailAddress(companyId, emailAddress);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the screen name.
+	* The portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param screenName the user's screen name
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	*/
 	@Override
 	public boolean sendPasswordByScreenName(long companyId,
 		java.lang.String screenName)
@@ -721,20 +695,28 @@ public class UserServiceWrapper implements UserService,
 		return _userService.sendPasswordByScreenName(companyId, screenName);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the ID. The
+	* portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param userId the user's primary key
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	*/
 	@Override
 	public boolean sendPasswordByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userService.sendPasswordByUserId(userId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_userService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -743,9 +725,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param roleId the primary key of the role
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	assign role members or if the operation was not allowed by the
-	membership policy
 	*/
 	@Override
 	public void setRoleUsers(long roleId, long[] userIds)
@@ -759,8 +738,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param userGroupId the primary key of the user group
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	assign group members
 	*/
 	@Override
 	public void setUserGroupUsers(long userGroupId, long[] userIds)
@@ -773,8 +750,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param groupId the primary key of the group
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	modify user group assignments
 	*/
 	@Override
 	public void unsetGroupTeamsUsers(long groupId, long[] userIds)
@@ -789,9 +764,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userIds the primary keys of the users
 	* @param serviceContext the service context to be applied (optionally
 	<code>null</code>)
-	* @throws PortalException if the current user did not have permission to
-	modify group assignments or if the operation was not allowed by
-	the membership policy
 	*/
 	@Override
 	public void unsetGroupUsers(long groupId, long[] userIds,
@@ -805,9 +777,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param organizationId the primary key of the organization
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	modify organization assignments or if the operation was not
-	allowed by the membership policy
 	*/
 	@Override
 	public void unsetOrganizationUsers(long organizationId, long[] userIds)
@@ -820,8 +789,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param passwordPolicyId the primary key of the password policy
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	modify policy assignments
 	*/
 	@Override
 	public void unsetPasswordPolicyUsers(long passwordPolicyId, long[] userIds)
@@ -834,9 +801,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param roleId the primary key of the role
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	modify role assignments or if the operation was not allowed by
-	the membership policy
 	*/
 	@Override
 	public void unsetRoleUsers(long roleId, long[] userIds)
@@ -849,8 +813,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param teamId the primary key of the team
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	modify team assignments
 	*/
 	@Override
 	public void unsetTeamUsers(long teamId, long[] userIds)
@@ -863,9 +825,6 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param userGroupId the primary key of the user group
 	* @param userIds the primary keys of the users
-	* @throws PortalException if the current user did not have permission to
-	modify user group assignments or if the operation was not allowed
-	by the membership policy
 	*/
 	@Override
 	public void unsetUserGroupUsers(long userGroupId, long[] userIds)
@@ -879,8 +838,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @param agreedToTermsOfUse whether the user has agree to the terms of use
 	* @return the user
-	* @throws PortalException if the current user did not have permission to
-	update the user's agreement to terms-of-use
 	*/
 	@Override
 	public com.liferay.portal.model.User updateAgreedToTermsOfUse(long userId,
@@ -900,8 +857,6 @@ public class UserServiceWrapper implements UserService,
 	portal URL, main path, primary key of the layout, remote address,
 	remote host, and agent for the user.
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be found
-	or if the current user did not have permission to update the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updateEmailAddress(long userId,
@@ -948,8 +903,6 @@ public class UserServiceWrapper implements UserService,
 	<code>null</code>). Can set the expando bridge attributes for the
 	user.
 	* @return the user
-	* @throws PortalException if the user's information was invalid or if the
-	email address was reserved
 	*/
 	@Override
 	public com.liferay.portal.model.User updateIncompleteUser(long companyId,
@@ -958,7 +911,7 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String screenName, java.lang.String emailAddress,
 		long facebookId, java.lang.String openId, java.util.Locale locale,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
 		java.lang.String jobTitle, boolean updateUserInformation,
 		boolean sendEmail,
@@ -977,8 +930,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @param lockout whether the user is locked out
 	* @return the user
-	* @throws PortalException if the user did not have permission to lock out
-	the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updateLockoutById(long userId,
@@ -993,8 +944,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @param openId the new OpenID
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be found
-	or if the current user did not have permission to update the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updateOpenId(long userId,
@@ -1009,10 +958,8 @@ public class UserServiceWrapper implements UserService,
 	*
 	* @param userId the primary key of the user
 	* @param organizationIds the primary keys of the organizations
-	* @param serviceContext the service context to be applied. Must set
-	whether user indexing is enabled.
-	* @throws PortalException if a user with the primary key could not be found
-	or if the current user did not have permission to update the user
+	* @param serviceContext the service context to be applied. Must set whether
+	user indexing is enabled.
 	*/
 	@Override
 	public void updateOrganizations(long userId, long[] organizationIds,
@@ -1030,8 +977,6 @@ public class UserServiceWrapper implements UserService,
 	* @param passwordReset whether the user should be asked to reset their
 	password the next time they log in
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be found
-	or if the current user did not have permission to update the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updatePassword(long userId,
@@ -1048,9 +993,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @param bytes the new portrait image data
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the new portrait was invalid, or if the current user
-	did not have permission to update the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updatePortrait(long userId,
@@ -1066,9 +1008,6 @@ public class UserServiceWrapper implements UserService,
 	* @param question the user's new password reset question
 	* @param answer the user's new password reset answer
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the new question or answer were invalid, or if the
-	current user did not have permission to update the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updateReminderQuery(long userId,
@@ -1083,9 +1022,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @param screenName the user's new screen name
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the new screen name was invalid, or if the current user
-	did not have permission to update the user
 	*/
 	@Override
 	public com.liferay.portal.model.User updateScreenName(long userId,
@@ -1100,12 +1036,6 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @param status the user's new workflow status
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the current user was updating her own status to
-	anything but {@link
-	com.liferay.portal.kernel.workflow.WorkflowConstants#STATUS_APPROVED},
-	or if the current user did not have permission to update the
-	user's workflow status.
 	* @deprecated As of 7.0.0, replaced by {@link #updateStatus(long, int,
 	ServiceContext)}
 	*/
@@ -1125,12 +1055,6 @@ public class UserServiceWrapper implements UserService,
 	an unencrypted custom password (used by an LDAP listener) for the
 	user via attribute <code>passwordUnencrypted</code>.
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the current user was updating her own status to
-	anything but {@link
-	com.liferay.portal.kernel.workflow.WorkflowConstants#STATUS_APPROVED},
-	or if the current user did not have permission to update the
-	user's workflow status.
 	*/
 	@Override
 	public com.liferay.portal.model.User updateStatus(long userId, int status,
@@ -1171,15 +1095,10 @@ public class UserServiceWrapper implements UserService,
 	* @param birthdayDay the user's new birthday day
 	* @param birthdayYear the user's birthday year
 	* @param smsSn the user's new SMS screen name
-	* @param aimSn the user's new AIM screen name
 	* @param facebookSn the user's new Facebook screen name
-	* @param icqSn the user's new ICQ screen name
 	* @param jabberSn the user's new Jabber screen name
-	* @param msnSn the user's new MSN screen name
-	* @param mySpaceSn the user's new MySpace screen name
 	* @param skypeSn the user's new Skype screen name
 	* @param twitterSn the user's new Twitter screen name
-	* @param ymSn the user's new Yahoo! Messenger screen name
 	* @param jobTitle the user's new job title
 	* @param groupIds the primary keys of the user's groups
 	* @param organizationIds the primary keys of the user's organizations
@@ -1196,19 +1115,13 @@ public class UserServiceWrapper implements UserService,
 	<code>uuid</code> attribute), asset category IDs, asset tag
 	names, and expando bridge attributes for the user.
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the new information was invalid, if the current
-	user did not have permission to update the user, or if the
-	operation was not allowed by the membership policy
 	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
 	String, String, boolean, String, String, String, String,
-	long, String, String, String, String, String, String, String,
-	String, int, int, boolean, int, int, int, String, String,
-	String, String, String, String, String, String, String,
-	String, String, long[], long[], long[], java.util.List,
-	long[], java.util.List, java.util.List, java.util.List,
-	java.util.List, java.util.List, boolean, byte[],
-	com.liferay.portal.service.ServiceContext)}
+	long, String, boolean, byte[], String, String, String,
+	String, String, String, String, int, int, boolean, int, int,
+	int, String, String, String, String, String, String, String,
+	String, String, String, String, long[], long[], long[], List,
+	long[], List, List, List, List, List, ServiceContext)}
 	*/
 	@Deprecated
 	@Override
@@ -1221,15 +1134,12 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String openId, java.lang.String languageId,
 		java.lang.String timeZoneId, java.lang.String greeting,
 		java.lang.String comments, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
-		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
-		java.lang.String facebookSn, java.lang.String icqSn,
-		java.lang.String jabberSn, java.lang.String msnSn,
-		java.lang.String mySpaceSn, java.lang.String skypeSn,
-		java.lang.String twitterSn, java.lang.String ymSn,
-		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
-		long[] roleIds,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		int birthdayYear, java.lang.String smsSn, java.lang.String facebookSn,
+		java.lang.String jabberSn, java.lang.String skypeSn,
+		java.lang.String twitterSn, java.lang.String jobTitle, long[] groupIds,
+		long[] organizationIds, long[] roleIds,
 		java.util.List<com.liferay.portal.model.UserGroupRole> userGroupRoles,
 		long[] userGroupIds,
 		java.util.List<com.liferay.portal.model.Address> addresses,
@@ -1244,11 +1154,10 @@ public class UserServiceWrapper implements UserService,
 			reminderQueryAnswer, screenName, emailAddress, facebookId, openId,
 			languageId, timeZoneId, greeting, comments, firstName, middleName,
 			lastName, prefixId, suffixId, male, birthdayMonth, birthdayDay,
-			birthdayYear, smsSn, aimSn, facebookSn, icqSn, jabberSn, msnSn,
-			mySpaceSn, skypeSn, twitterSn, ymSn, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupRoles, userGroupIds, addresses,
-			emailAddresses, phones, websites, announcementsDelivers,
-			serviceContext);
+			birthdayYear, smsSn, facebookSn, jabberSn, skypeSn, twitterSn,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupRoles,
+			userGroupIds, addresses, emailAddresses, phones, websites,
+			announcementsDelivers, serviceContext);
 	}
 
 	/**
@@ -1283,15 +1192,10 @@ public class UserServiceWrapper implements UserService,
 	* @param birthdayDay the user's new birthday day
 	* @param birthdayYear the user's birthday year
 	* @param smsSn the user's new SMS screen name
-	* @param aimSn the user's new AIM screen name
 	* @param facebookSn the user's new Facebook screen name
-	* @param icqSn the user's new ICQ screen name
 	* @param jabberSn the user's new Jabber screen name
-	* @param msnSn the user's new MSN screen name
-	* @param mySpaceSn the user's new MySpace screen name
 	* @param skypeSn the user's new Skype screen name
 	* @param twitterSn the user's new Twitter screen name
-	* @param ymSn the user's new Yahoo! Messenger screen name
 	* @param jobTitle the user's new job title
 	* @param groupIds the primary keys of the user's groups
 	* @param organizationIds the primary keys of the user's organizations
@@ -1303,10 +1207,6 @@ public class UserServiceWrapper implements UserService,
 	attribute), asset category IDs, asset tag names, and expando
 	bridge attributes for the user.
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the new information was invalid, if the current user
-	did not have permission to update the user, or if the operation
-	was not allowed by the membership policy
 	*/
 	@Override
 	public com.liferay.portal.model.User updateUser(long userId,
@@ -1318,15 +1218,12 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String openId, java.lang.String languageId,
 		java.lang.String timeZoneId, java.lang.String greeting,
 		java.lang.String comments, java.lang.String firstName,
-		java.lang.String middleName, java.lang.String lastName, int prefixId,
-		int suffixId, boolean male, int birthdayMonth, int birthdayDay,
-		int birthdayYear, java.lang.String smsSn, java.lang.String aimSn,
-		java.lang.String facebookSn, java.lang.String icqSn,
-		java.lang.String jabberSn, java.lang.String msnSn,
-		java.lang.String mySpaceSn, java.lang.String skypeSn,
-		java.lang.String twitterSn, java.lang.String ymSn,
-		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
-		long[] roleIds,
+		java.lang.String middleName, java.lang.String lastName, long prefixId,
+		long suffixId, boolean male, int birthdayMonth, int birthdayDay,
+		int birthdayYear, java.lang.String smsSn, java.lang.String facebookSn,
+		java.lang.String jabberSn, java.lang.String skypeSn,
+		java.lang.String twitterSn, java.lang.String jobTitle, long[] groupIds,
+		long[] organizationIds, long[] roleIds,
 		java.util.List<com.liferay.portal.model.UserGroupRole> userGroupRoles,
 		long[] userGroupIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -1336,10 +1233,9 @@ public class UserServiceWrapper implements UserService,
 			reminderQueryAnswer, screenName, emailAddress, facebookId, openId,
 			languageId, timeZoneId, greeting, comments, firstName, middleName,
 			lastName, prefixId, suffixId, male, birthdayMonth, birthdayDay,
-			birthdayYear, smsSn, aimSn, facebookSn, icqSn, jabberSn, msnSn,
-			mySpaceSn, skypeSn, twitterSn, ymSn, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupRoles, userGroupIds,
-			serviceContext);
+			birthdayYear, smsSn, facebookSn, jabberSn, skypeSn, twitterSn,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupRoles,
+			userGroupIds, serviceContext);
 	}
 
 	/**
@@ -1376,15 +1272,10 @@ public class UserServiceWrapper implements UserService,
 	* @param birthdayDay the user's new birthday day
 	* @param birthdayYear the user's birthday year
 	* @param smsSn the user's new SMS screen name
-	* @param aimSn the user's new AIM screen name
 	* @param facebookSn the user's new Facebook screen name
-	* @param icqSn the user's new ICQ screen name
 	* @param jabberSn the user's new Jabber screen name
-	* @param msnSn the user's new MSN screen name
-	* @param mySpaceSn the user's new MySpace screen name
 	* @param skypeSn the user's new Skype screen name
 	* @param twitterSn the user's new Twitter screen name
-	* @param ymSn the user's new Yahoo! Messenger screen name
 	* @param jobTitle the user's new job title
 	* @param groupIds the primary keys of the user's groups
 	* @param organizationIds the primary keys of the user's organizations
@@ -1401,10 +1292,6 @@ public class UserServiceWrapper implements UserService,
 	attribute), asset category IDs, asset tag names, and expando
 	bridge attributes for the user.
 	* @return the user
-	* @throws PortalException if a user with the primary key could not be
-	found, if the new information was invalid, if the current user
-	did not have permission to update the user, or if the operation
-	was not allowed by the membership policy
 	*/
 	@Override
 	public com.liferay.portal.model.User updateUser(long userId,
@@ -1417,15 +1304,12 @@ public class UserServiceWrapper implements UserService,
 		java.lang.String languageId, java.lang.String timeZoneId,
 		java.lang.String greeting, java.lang.String comments,
 		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		java.lang.String lastName, long prefixId, long suffixId, boolean male,
 		int birthdayMonth, int birthdayDay, int birthdayYear,
-		java.lang.String smsSn, java.lang.String aimSn,
-		java.lang.String facebookSn, java.lang.String icqSn,
-		java.lang.String jabberSn, java.lang.String msnSn,
-		java.lang.String mySpaceSn, java.lang.String skypeSn,
-		java.lang.String twitterSn, java.lang.String ymSn,
-		java.lang.String jobTitle, long[] groupIds, long[] organizationIds,
-		long[] roleIds,
+		java.lang.String smsSn, java.lang.String facebookSn,
+		java.lang.String jabberSn, java.lang.String skypeSn,
+		java.lang.String twitterSn, java.lang.String jobTitle, long[] groupIds,
+		long[] organizationIds, long[] roleIds,
 		java.util.List<com.liferay.portal.model.UserGroupRole> userGroupRoles,
 		long[] userGroupIds,
 		java.util.List<com.liferay.portal.model.Address> addresses,
@@ -1440,11 +1324,10 @@ public class UserServiceWrapper implements UserService,
 			reminderQueryAnswer, screenName, emailAddress, facebookId, openId,
 			portrait, portraitBytes, languageId, timeZoneId, greeting,
 			comments, firstName, middleName, lastName, prefixId, suffixId,
-			male, birthdayMonth, birthdayDay, birthdayYear, smsSn, aimSn,
-			facebookSn, icqSn, jabberSn, msnSn, mySpaceSn, skypeSn, twitterSn,
-			ymSn, jobTitle, groupIds, organizationIds, roleIds, userGroupRoles,
-			userGroupIds, addresses, emailAddresses, phones, websites,
-			announcementsDelivers, serviceContext);
+			male, birthdayMonth, birthdayDay, birthdayYear, smsSn, facebookSn,
+			jabberSn, skypeSn, twitterSn, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupRoles, userGroupIds, addresses, emailAddresses,
+			phones, websites, announcementsDelivers, serviceContext);
 	}
 
 	/**

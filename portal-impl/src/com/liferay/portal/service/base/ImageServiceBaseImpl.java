@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.ImageService;
@@ -45,7 +45,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class ImageServiceBaseImpl extends BaseServiceImpl
-	implements ImageService, IdentifiableBean {
+	implements ImageService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -76,7 +76,7 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the image remote service
 	 */
-	public com.liferay.portal.service.ImageService getImageService() {
+	public ImageService getImageService() {
 		return imageService;
 	}
 
@@ -85,8 +85,7 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param imageService the image remote service
 	 */
-	public void setImageService(
-		com.liferay.portal.service.ImageService imageService) {
+	public void setImageService(ImageService imageService) {
 		this.imageService = imageService;
 	}
 
@@ -209,23 +208,13 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return ImageService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -263,7 +252,7 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.ImageLocalService.class)
 	protected com.liferay.portal.service.ImageLocalService imageLocalService;
 	@BeanReference(type = com.liferay.portal.service.ImageService.class)
-	protected com.liferay.portal.service.ImageService imageService;
+	protected ImageService imageService;
 	@BeanReference(type = ImagePersistence.class)
 	protected ImagePersistence imagePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -276,5 +265,4 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 	protected DLFileEntryPersistence dlFileEntryPersistence;
 	@BeanReference(type = DLFileEntryFinder.class)
 	protected DLFileEntryFinder dlFileEntryFinder;
-	private String _beanIdentifier;
 }

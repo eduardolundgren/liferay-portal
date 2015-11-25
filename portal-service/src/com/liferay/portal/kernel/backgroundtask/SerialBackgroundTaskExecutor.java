@@ -14,14 +14,12 @@
 
 package com.liferay.portal.kernel.backgroundtask;
 
-import com.liferay.portal.DuplicateLockException;
+import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lock.DuplicateLockException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.BackgroundTask;
-import com.liferay.portal.model.Lock;
-import com.liferay.portal.service.LockLocalServiceUtil;
 
 /**
  * @author Michael C. Han
@@ -36,18 +34,22 @@ public class SerialBackgroundTaskExecutor
 	}
 
 	@Override
+	public BackgroundTaskExecutor clone() {
+		BackgroundTaskExecutor backgroundTaskExecutor =
+			new SerialBackgroundTaskExecutor(getBackgroundTaskExecutor());
+
+		return backgroundTaskExecutor;
+	}
+
+	@Override
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
 		throws Exception {
 
 		Lock lock = null;
 
-		String owner =
-			backgroundTask.getName() + StringPool.POUND +
-				backgroundTask.getBackgroundTaskId();
-
 		try {
 			if (isSerial()) {
-				lock = acquireLock(backgroundTask, owner);
+				lock = acquireLock(backgroundTask);
 			}
 
 			BackgroundTaskExecutor backgroundTaskExecutor =
@@ -57,29 +59,27 @@ public class SerialBackgroundTaskExecutor
 		}
 		finally {
 			if (lock != null) {
-				LockLocalServiceUtil.unlock(
-					BackgroundTaskExecutor.class.getName(),
-					backgroundTask.getTaskExecutorClassName(), owner);
+				BackgroundTaskLockHelperUtil.unlockBackgroundTask(
+					backgroundTask);
 			}
 		}
 	}
 
-	protected Lock acquireLock(BackgroundTask backgroundTask, String owner)
+	protected Lock acquireLock(BackgroundTask backgroundTask)
 		throws DuplicateLockException {
 
 		Lock lock = null;
 
 		while (true) {
 			try {
-				lock = LockLocalServiceUtil.lock(
-					BackgroundTaskExecutor.class.getName(),
-					backgroundTask.getTaskExecutorClassName(), owner);
+				lock = BackgroundTaskLockHelperUtil.lockBackgroundTask(
+					backgroundTask);
 
 				break;
 			}
-			catch (SystemException se) {
+			catch (ORMException | SystemException e) {
 				if (_log.isDebugEnabled()) {
-					_log.debug("Unable to acquire acquiring lock", se);
+					_log.debug("Unable to acquire acquiring lock", e);
 				}
 
 				try {

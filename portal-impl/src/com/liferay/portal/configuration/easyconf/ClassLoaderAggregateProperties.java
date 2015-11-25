@@ -64,8 +64,12 @@ public class ClassLoaderAggregateProperties extends AggregatedProperties {
 		Configuration configuration = _addPropertiesSource(
 			fileName, url, _baseCompositeConfiguration);
 
-		if ((configuration != null) && !configuration.isEmpty()) {
+		if (configuration != null) {
 			_baseConfigurationLoaded = true;
+
+			if (configuration.isEmpty() && _log.isDebugEnabled()) {
+				_log.debug("Empty configuration " + fileName);
+			}
 		}
 	}
 
@@ -375,7 +379,7 @@ public class ClassLoaderAggregateProperties extends AggregatedProperties {
 	private final String _componentName;
 	private final CompositeConfiguration _globalCompositeConfiguration =
 		new CompositeConfiguration();
-	private final List<String> _loadedSources = new ArrayList<String>();
+	private final List<String> _loadedSources = new ArrayList<>();
 	private final Configuration _prefixedSystemConfiguration;
 	private final SystemConfiguration _systemConfiguration =
 		new SystemConfiguration();

@@ -40,7 +40,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface UserGroupModel extends BaseModel<UserGroup>, MVCCModel,
-	StagedAuditedModel {
+	ShardedModel, StagedAuditedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -269,6 +269,20 @@ public interface UserGroupModel extends BaseModel<UserGroup>, MVCCModel,
 	 * @param addedByLDAPImport the added by l d a p import of this user group
 	 */
 	public void setAddedByLDAPImport(boolean addedByLDAPImport);
+
+	/**
+	 * Returns the last publish date of this user group.
+	 *
+	 * @return the last publish date of this user group
+	 */
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this user group.
+	 *
+	 * @param lastPublishDate the last publish date of this user group
+	 */
+	public void setLastPublishDate(Date lastPublishDate);
 
 	@Override
 	public boolean isNew();

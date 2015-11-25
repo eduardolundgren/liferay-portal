@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -50,7 +49,7 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.security.lang.SecurityManagerUtil;
 import com.liferay.portal.tools.ToolDependencies;
@@ -67,12 +66,16 @@ import com.liferay.util.ant.ExpandTask;
 import com.liferay.util.ant.UpToDateTask;
 import com.liferay.util.ant.WarTask;
 import com.liferay.util.xml.DocUtil;
-import com.liferay.util.xml.XMLFormatter;
+import com.liferay.util.xml.XMLUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,8 +99,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	public static void main(String[] args) {
 		ToolDependencies.wireDeployers();
 
-		List<String> wars = new ArrayList<String>();
-		List<String> jars = new ArrayList<String>();
+		List<String> wars = new ArrayList<>();
+		List<String> jars = new ArrayList<>();
 
 		for (String arg : args) {
 			String fileName = StringUtil.toLowerCase(arg);
@@ -134,6 +137,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		jbossPrefix = GetterUtil.getString(
 			System.getProperty("deployer.jboss.prefix"));
 		tomcatLibDir = System.getProperty("deployer.tomcat.lib.dir");
+		wildflyPrefix = GetterUtil.getString(
+			System.getProperty("deployer.wildfly.prefix"));
 		this.wars = wars;
 		this.jars = jars;
 
@@ -197,7 +202,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	public int autoDeploy(AutoDeploymentContext autoDeploymentContext)
 		throws AutoDeployException {
 
-		List<String> wars = new ArrayList<String>();
+		List<String> wars = new ArrayList<>();
 
 		File file = autoDeploymentContext.getFile();
 
@@ -230,8 +235,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				"The system property deployer.app.server.type is not set");
 		}
 
-		if (!appServerType.equals(ServerDetector.GERONIMO_ID) &&
-			!appServerType.equals(ServerDetector.GLASSFISH_ID) &&
+		if (!appServerType.equals(ServerDetector.GLASSFISH_ID) &&
 			!appServerType.equals(ServerDetector.JBOSS_ID) &&
 			!appServerType.equals(ServerDetector.JONAS_ID) &&
 			!appServerType.equals(ServerDetector.JETTY_ID) &&
@@ -239,7 +243,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			!appServerType.equals(ServerDetector.RESIN_ID) &&
 			!appServerType.equals(ServerDetector.TOMCAT_ID) &&
 			!appServerType.equals(ServerDetector.WEBLOGIC_ID) &&
-			!appServerType.equals(ServerDetector.WEBSPHERE_ID)) {
+			!appServerType.equals(ServerDetector.WEBSPHERE_ID) &&
+			!appServerType.equals(ServerDetector.WILDFLY_ID)) {
 
 			throw new IllegalArgumentException(
 				appServerType + " is not a valid application server type");
@@ -255,6 +260,12 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			!Validator.isNumber(jbossPrefix)) {
 
 			jbossPrefix = "1";
+		}
+
+		if (Validator.isNotNull(wildflyPrefix) &&
+			!Validator.isNumber(wildflyPrefix)) {
+
+			wildflyPrefix = "1";
 		}
 	}
 
@@ -281,6 +292,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			deployer.setUnpackWar(unpackWar);
 			deployer.setUtilTaglibDTD(utilTaglibDTD);
 			deployer.setWars(wars);
+			deployer.setWildflyPrefix(wildflyPrefix);
 
 			return (AutoDeployer)deployer;
 		}
@@ -312,37 +324,6 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		DeployUtil.copyDependencyXml(
 			fileName, targetDir, fileName, filterMap, overwrite);
-	}
-
-	public void copyDtds(File srcFile, PluginPackage pluginPackage)
-		throws Exception {
-
-		File portalLog4jXml = new File(
-			srcFile.getAbsolutePath() +
-				"/WEB-INF/classes/META-INF/portal-log4j.xml");
-
-		if (!portalLog4jXml.exists()) {
-			return;
-		}
-
-		InputStream is = null;
-
-		try {
-			Class<?> clazz = getClass();
-
-			ClassLoader classLoader = clazz.getClassLoader();
-
-			is = classLoader.getResourceAsStream("META-INF/log4j.dtd");
-
-			File file = new File(
-				srcFile.getAbsolutePath() +
-					"/WEB-INF/classes/META-INF/log4j.dtd");
-
-			FileUtil.write(file, is);
-		}
-		finally {
-			StreamUtil.cleanUp(is);
-		}
 	}
 
 	@Override
@@ -510,7 +491,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		if (Validator.isNotNull(auiTaglibDTD)) {
 			FileUtil.copyFile(
-				auiTaglibDTD, srcFile + "/WEB-INF/tld/aui.tld", true);
+				auiTaglibDTD, srcFile + "/WEB-INF/tld/liferay-aui.tld", true);
 		}
 
 		if (Validator.isNotNull(portletTaglibDTD)) {
@@ -578,23 +559,19 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			File srcFile, String displayName, PluginPackage pluginPackage)
 		throws Exception {
 
-		if (appServerType.equals(ServerDetector.GERONIMO_ID)) {
-			copyDependencyXml("geronimo-web.xml", srcFile + "/WEB-INF");
-		}
-		else if (appServerType.equals(ServerDetector.JBOSS_ID)) {
-			if (ServerDetector.isJBoss5()) {
-				copyDependencyXml("jboss-web.xml", srcFile + "/WEB-INF");
-			}
-			else {
-				copyDependencyXml(
-					"jboss-deployment-structure.xml", srcFile + "/WEB-INF");
-			}
+		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
+			copyDependencyXml(
+				"jboss-deployment-structure.xml", srcFile + "/WEB-INF");
 		}
 		else if (appServerType.equals(ServerDetector.WEBLOGIC_ID)) {
 			copyDependencyXml("weblogic.xml", srcFile + "/WEB-INF");
 		}
 		else if (appServerType.equals(ServerDetector.WEBSPHERE_ID)) {
 			copyDependencyXml("ibm-web-ext.xmi", srcFile + "/WEB-INF");
+		}
+		else if (appServerType.equals(ServerDetector.WILDFLY_ID)) {
+			copyDependencyXml(
+				"jboss-deployment-structure.xml", srcFile + "/WEB-INF");
 		}
 
 		copyDependencyXml("web.xml", srcFile + "/WEB-INF");
@@ -661,14 +638,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		processPluginPackageProperties(srcFile, displayName, pluginPackage);
 
-		copyDtds(srcFile, pluginPackage);
 		copyJars(srcFile, pluginPackage);
 		copyProperties(srcFile, pluginPackage);
 		copyTlds(srcFile, pluginPackage);
 		copyXmls(srcFile, displayName, pluginPackage);
 		copyPortalDependencies(srcFile);
-
-		updateGeronimoWebXml(srcFile, displayName, pluginPackage);
 
 		File webXml = new File(srcFile + "/WEB-INF/web.xml");
 
@@ -704,7 +678,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		String excludes = StringPool.BLANK;
 
-		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
+		if (appServerType.equals(ServerDetector.JBOSS_ID) ||
+			appServerType.equals(ServerDetector.WILDFLY_ID )) {
+
 			excludes += "**/WEB-INF/lib/log4j.jar,";
 		}
 		else if (appServerType.equals(ServerDetector.TOMCAT_ID)) {
@@ -770,9 +746,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		if (!unpackWar) {
-			File tempDir = new File(
-				SystemProperties.get(SystemProperties.TMP_DIR) +
-					File.separator + Time.getTimestamp());
+			Path tempDirPath = Files.createTempDirectory(
+				Paths.get(SystemProperties.get(SystemProperties.TMP_DIR)),
+				null);
+
+			File tempDir = tempDirPath.toFile();
 
 			excludes += "/WEB-INF/web.xml";
 
@@ -941,8 +919,10 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
 			deployDir = jbossPrefix + deployDir;
 		}
-		else if (appServerType.equals(ServerDetector.GERONIMO_ID) ||
-				 appServerType.equals(ServerDetector.GLASSFISH_ID) ||
+		else if (appServerType.equals(ServerDetector.WILDFLY_ID)) {
+			deployDir = wildflyPrefix + deployDir;
+		}
+		else if (appServerType.equals(ServerDetector.GLASSFISH_ID) ||
 				 appServerType.equals(ServerDetector.JETTY_ID) ||
 				 appServerType.equals(ServerDetector.JONAS_ID) ||
 				 appServerType.equals(ServerDetector.OC4J_ID) ||
@@ -1065,9 +1045,10 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return false;
 		}
 
-		File tempDir = new File(
-			SystemProperties.get(SystemProperties.TMP_DIR) + File.separator +
-				Time.getTimestamp());
+		Path tempDirPath = Files.createTempDirectory(
+			Paths.get(SystemProperties.get(SystemProperties.TMP_DIR)), null);
+
+		File tempDir = tempDirPath.toFile();
 
 		ExpandTask.expand(srcFile, tempDir);
 
@@ -1132,9 +1113,12 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			displayName = displayName.substring(0, displayName.length() - 4);
 		}
 
-		if (appServerType.equals(ServerDetector.JBOSS_ID) &&
-			Validator.isNotNull(jbossPrefix) &&
-			displayName.startsWith(jbossPrefix)) {
+		if ((appServerType.equals(ServerDetector.JBOSS_ID) &&
+			 Validator.isNotNull(jbossPrefix) &&
+			 displayName.startsWith(jbossPrefix)) ||
+			(appServerType.equals(ServerDetector.WILDFLY_ID) &&
+			 Validator.isNotNull(wildflyPrefix) &&
+			 displayName.startsWith(wildflyPrefix))) {
 
 			displayName = displayName.substring(1);
 		}
@@ -1249,7 +1233,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			sb.append("<taglib>");
 			sb.append("<taglib-uri>http://liferay.com/tld/aui</taglib-uri>");
 			sb.append("<taglib-location>");
-			sb.append("/WEB-INF/tld/aui.tld");
+			sb.append("/WEB-INF/tld/liferay-aui.tld");
 			sb.append("</taglib-location>");
 			sb.append("</taglib>");
 		}
@@ -1527,7 +1511,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return null;
 		}
 
-		Map<String, String> filterMap = new HashMap<String, String>();
+		Map<String, String> filterMap = new HashMap<>();
 
 		filterMap.put("author", wrapCDATA(pluginPackage.getAuthor()));
 		filterMap.put("change_log", wrapCDATA(pluginPackage.getChangeLog()));
@@ -1648,6 +1632,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		else if (appServerType.equals(ServerDetector.WEBSPHERE_ID)) {
 			postDeployWebSphere(destDir, deployDir);
 		}
+		else if (appServerType.equals(ServerDetector.WILDFLY_ID)) {
+			postDeployWildfly(destDir, deployDir);
+		}
 	}
 
 	public void postDeployGlassfish(String destDir, String deployDir)
@@ -1742,7 +1729,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		String webSphereHome = System.getenv("WAS_HOME");
 
-		List<String> commands = new ArrayList<String>();
+		List<String> commands = new ArrayList<>();
 
 		if (OSDetector.isWindows()) {
 			commands.add(webSphereHome + "\\bin\\wsadmin.bat");
@@ -1790,21 +1777,33 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				_log.info("Process output: " + line);
 			}
 
-			int exitValue = process.exitValue();
+			try {
+				int exitValue = process.exitValue();
 
-			if (exitValue == 0) {
-				_log.info(
-					"Successfully executed command with an exit value of " +
-						exitValue);
+				if (exitValue == 0) {
+					_log.info(
+						"Successfully executed command with an exit value of " +
+							exitValue);
+				}
+				else {
+					_log.info(
+						"Unsuccessfully executed command with an exit value " +
+							"of " + exitValue);
+				}
 			}
-			else {
-				_log.info(
-					"Unsuccessfully executed command with an exit value of " +
-						exitValue);
+			catch (IllegalThreadStateException itse) {
+				_log.info("Process did not terminate");
 			}
 		}
 
 		FileUtil.delete(wsadminFileName);
+	}
+
+	public void postDeployWildfly(String destDir, String deployDir)
+		throws Exception {
+
+		FileUtil.write(
+			destDir + "/" + deployDir + ".dodeploy", StringPool.BLANK);
 	}
 
 	@Override
@@ -1955,7 +1954,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			else {
 				String xml = StringUtil.read(is);
 
-				xml = XMLFormatter.fixProlog(xml);
+				xml = XMLUtil.fixProlog(xml);
 
 				return PluginPackageUtil.readPluginPackageXml(xml);
 			}
@@ -2009,7 +2008,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			File file = new File(srcDir + "/WEB-INF/" + fileName);
 
 			try {
-				Document doc = SAXReaderUtil.read(file);
+				Document doc = UnsecureSAXReaderUtil.read(file);
 
 				String content = doc.formattedString(StringPool.TAB, true);
 
@@ -2033,11 +2032,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return content;
 		}
 
-		Document document = SAXReaderUtil.read(content);
+		Document document = UnsecureSAXReaderUtil.read(content);
 
 		Element rootElement = document.getRootElement();
 
-		List<String> listenerClasses = new ArrayList<String>();
+		List<String> listenerClasses = new ArrayList<>();
 
 		List<Element> listenerElements = rootElement.elements("listener");
 
@@ -2176,42 +2175,12 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		this.wars = wars;
 	}
 
-	public void updateDeployDirectory(File srcFile) throws Exception {
+	@Override
+	public void setWildflyPrefix(String wildflyPrefix) {
+		this.wildflyPrefix = wildflyPrefix;
 	}
 
-	public void updateGeronimoWebXml(
-			File srcFile, String displayName, PluginPackage pluginPackage)
-		throws Exception {
-
-		if (!appServerType.equals(ServerDetector.GERONIMO_ID)) {
-			return;
-		}
-
-		File geronimoWebXml = new File(srcFile + "/WEB-INF/geronimo-web.xml");
-
-		Document document = SAXReaderUtil.read(geronimoWebXml);
-
-		Element rootElement = document.getRootElement();
-
-		Element environmentElement = rootElement.element("environment");
-
-		Element moduleIdElement = environmentElement.element("moduleId");
-
-		Element artifactIdElement = moduleIdElement.element("artifactId");
-
-		artifactIdElement.setText(displayName);
-
-		Element versionElement = moduleIdElement.element("version");
-
-		versionElement.setText(pluginPackage.getVersion());
-
-		String content = document.formattedString();
-
-		FileUtil.write(geronimoWebXml, content);
-
-		if (_log.isInfoEnabled()) {
-			_log.info("Modifying Geronimo " + geronimoWebXml);
-		}
+	public void updateDeployDirectory(File srcFile) throws Exception {
 	}
 
 	public String updateLiferayWebXml(
@@ -2307,14 +2276,14 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			content = content.substring(0, x) + content.substring(y);
 		}
 
-		Document document = SAXReaderUtil.read(content);
+		Document document = UnsecureSAXReaderUtil.read(content);
 
 		Element rootElement = document.getRootElement();
 
 		double webXmlVersion = GetterUtil.getDouble(
 			rootElement.attributeValue("version"), 2.3);
 
-		if (!PropsValues.TCK_URL && (webXmlVersion <= 2.3)) {
+		if (webXmlVersion <= 2.3) {
 			throw new AutoDeployException(
 				webXml.getName() +
 					" must be updated to the Servlet 2.4 specification");
@@ -2424,10 +2393,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	protected boolean unpackWar;
 	protected String utilTaglibDTD;
 	protected List<String> wars;
+	protected String wildflyPrefix;
 
 	private static final String _PORTAL_CLASS_LOADER =
 		"com.liferay.support.tomcat.loader.PortalClassLoader";
 
-	private static Log _log = LogFactoryUtil.getLog(BaseDeployer.class);
+	private static final Log _log = LogFactoryUtil.getLog(BaseDeployer.class);
 
 }

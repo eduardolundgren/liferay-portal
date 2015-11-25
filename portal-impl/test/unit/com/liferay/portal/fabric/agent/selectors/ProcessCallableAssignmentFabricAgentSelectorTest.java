@@ -18,7 +18,7 @@ import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.kernel.process.local.ExceptionProcessCallable;
 import com.liferay.portal.kernel.process.local.ReturnProcessCallable;
 import com.liferay.portal.kernel.process.log.LoggingProcessCallable;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,11 +48,13 @@ public class ProcessCallableAssignmentFabricAgentSelectorTest
 
 		FabricAgent fabricAgent1 = createFabricAgent(
 			Collections.<String, String>singletonMap(
-				ProcessCallableAssignmentFabricAgentSelector.PROCESS_CALLABLE_ASSIGNMENT_EXPRESSION_KEY,
+				ProcessCallableAssignmentFabricAgentSelector.
+					PROCESS_CALLABLE_ASSIGNMENT_EXPRESSION_KEY,
 				".*ReturnProcessCallable"));
 		FabricAgent fabricAgent2 = createFabricAgent(
 			Collections.<String, String>singletonMap(
-				ProcessCallableAssignmentFabricAgentSelector.PROCESS_CALLABLE_ASSIGNMENT_EXPRESSION_KEY,
+				ProcessCallableAssignmentFabricAgentSelector.
+					PROCESS_CALLABLE_ASSIGNMENT_EXPRESSION_KEY,
 				".*LoggingProcessCallable"));
 		FabricAgent fabricAgent3 = createFabricAgent(
 			Collections.<String, String>emptyMap());

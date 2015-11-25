@@ -212,7 +212,7 @@ public class WorkflowDefinitionLinkWrapper implements WorkflowDefinitionLink,
 	* @return the create date of this workflow definition link
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _workflowDefinitionLink.getCreateDate();
 	}
 
@@ -237,7 +237,7 @@ public class WorkflowDefinitionLinkWrapper implements WorkflowDefinitionLink,
 	* @return the modified date of this workflow definition link
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _workflowDefinitionLink.getModifiedDate();
 	}
 
@@ -407,13 +407,12 @@ public class WorkflowDefinitionLinkWrapper implements WorkflowDefinitionLink,
 	* @param createDate the create date of this workflow definition link
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_workflowDefinitionLink.setCreateDate(createDate);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_workflowDefinitionLink.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -445,7 +444,7 @@ public class WorkflowDefinitionLinkWrapper implements WorkflowDefinitionLink,
 	* @param modifiedDate the modified date of this workflow definition link
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_workflowDefinitionLink.setModifiedDate(modifiedDate);
 	}
 
@@ -551,7 +550,7 @@ public class WorkflowDefinitionLinkWrapper implements WorkflowDefinitionLink,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.WorkflowDefinitionLink> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.WorkflowDefinitionLink> toCacheModel() {
 		return _workflowDefinitionLink.toCacheModel();
 	}
 

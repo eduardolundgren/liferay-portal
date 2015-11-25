@@ -16,9 +16,10 @@ package com.liferay.portlet.documentlibrary.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -77,6 +78,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 		attributes.put("version", getVersion());
 		attributes.put("size", getSize());
 		attributes.put("checksum", getChecksum());
+		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -225,6 +227,12 @@ public class DLFileVersionWrapper implements DLFileVersion,
 			setChecksum(checksum);
 		}
 
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
+
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
@@ -318,12 +326,12 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	* @return the create date of this document library file version
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _dlFileVersion.getCreateDate();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getDDMStructures()
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.DDMStructure> getDDMStructures()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersion.getDDMStructures();
 	}
@@ -452,6 +460,16 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	}
 
 	/**
+	* Returns the last publish date of this document library file version.
+	*
+	* @return the last publish date of this document library file version
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _dlFileVersion.getLastPublishDate();
+	}
+
+	/**
 	* Returns the mime type of this document library file version.
 	*
 	* @return the mime type of this document library file version
@@ -467,7 +485,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	* @return the modified date of this document library file version
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _dlFileVersion.getModifiedDate();
 	}
 
@@ -552,7 +570,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	* @return the status date of this document library file version
 	*/
 	@Override
-	public java.util.Date getStatusDate() {
+	public Date getStatusDate() {
 		return _dlFileVersion.getStatusDate();
 	}
 
@@ -772,7 +790,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	* @param createDate the create date of this document library file version
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_dlFileVersion.setCreateDate(createDate);
 	}
 
@@ -891,6 +909,16 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	}
 
 	/**
+	* Sets the last publish date of this document library file version.
+	*
+	* @param lastPublishDate the last publish date of this document library file version
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_dlFileVersion.setLastPublishDate(lastPublishDate);
+	}
+
+	/**
 	* Sets the mime type of this document library file version.
 	*
 	* @param mimeType the mime type of this document library file version
@@ -906,7 +934,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	* @param modifiedDate the modified date of this document library file version
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_dlFileVersion.setModifiedDate(modifiedDate);
 	}
 
@@ -996,7 +1024,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	* @param statusDate the status date of this document library file version
 	*/
 	@Override
-	public void setStatusDate(java.util.Date statusDate) {
+	public void setStatusDate(Date statusDate) {
 		_dlFileVersion.setStatusDate(statusDate);
 	}
 

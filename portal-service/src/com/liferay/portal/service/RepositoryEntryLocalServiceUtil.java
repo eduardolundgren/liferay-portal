@@ -82,6 +82,12 @@ public class RepositoryEntryLocalServiceUtil {
 		return getService().deletePersistedModel(persistedModel);
 	}
 
+	public static void deleteRepositoryEntries(long repositoryId,
+		java.lang.Iterable<java.lang.String> mappedIds)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteRepositoryEntries(repositoryId, mappedIds);
+	}
+
 	/**
 	* Deletes the repository entry from the database. Also notifies the appropriate model listeners.
 	*
@@ -104,6 +110,12 @@ public class RepositoryEntryLocalServiceUtil {
 		long repositoryEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteRepositoryEntry(repositoryEntryId);
+	}
+
+	public static void deleteRepositoryEntry(long repositoryId,
+		java.lang.String mappedId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteRepositoryEntry(repositoryId, mappedId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
@@ -205,18 +217,22 @@ public class RepositoryEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
+	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
+		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
-		return getService().getExportActionableDynamicQuery(portletDataContext);
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
@@ -299,6 +315,19 @@ public class RepositoryEntryLocalServiceUtil {
 		return getService().getRepositoryEntry(repositoryEntryId);
 	}
 
+	public static com.liferay.portal.model.RepositoryEntry getRepositoryEntry(
+		long userId, long groupId, long repositoryId, java.lang.String objectId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getRepositoryEntry(userId, groupId, repositoryId, objectId);
+	}
+
+	public static com.liferay.portal.model.RepositoryEntry getRepositoryEntry(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getRepositoryEntry(uuid, groupId);
+	}
+
 	/**
 	* Returns the repository entry matching the UUID and group.
 	*
@@ -311,15 +340,6 @@ public class RepositoryEntryLocalServiceUtil {
 		java.lang.String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRepositoryEntryByUuidAndGroupId(uuid, groupId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	/**

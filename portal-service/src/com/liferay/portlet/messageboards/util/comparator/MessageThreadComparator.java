@@ -27,10 +27,18 @@ import java.util.Comparator;
 public class MessageThreadComparator
 	implements Comparator<MBMessage>, Serializable {
 
+	public MessageThreadComparator() {
+		this(true);
+	}
+
+	public MessageThreadComparator(boolean ascending) {
+		_ascending = ascending;
+	}
+
 	@Override
 	public int compare(MBMessage msg1, MBMessage msg2) {
-		Long parentMessageId1 = new Long(msg1.getParentMessageId());
-		Long parentMessageId2 = new Long(msg2.getParentMessageId());
+		Long parentMessageId1 = Long.valueOf(msg1.getParentMessageId());
+		Long parentMessageId2 = Long.valueOf(msg2.getParentMessageId());
 
 		int value = parentMessageId1.compareTo(parentMessageId2);
 
@@ -40,13 +48,20 @@ public class MessageThreadComparator
 		}
 
 		if (value == 0) {
-			Long messageId1 = new Long(msg1.getMessageId());
-			Long messageId2 = new Long(msg2.getMessageId());
+			Long messageId1 = Long.valueOf(msg1.getMessageId());
+			Long messageId2 = Long.valueOf(msg2.getMessageId());
 
 			value = messageId1.compareTo(messageId2);
 		}
 
-		return value;
+		if (_ascending) {
+			return value;
+		}
+		else {
+			return -value;
+		}
 	}
+
+	private final boolean _ascending;
 
 }

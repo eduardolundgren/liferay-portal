@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -42,7 +43,6 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -237,9 +237,9 @@ public class EditQuestionAction extends PortletAction {
 			expirationDateHour += 12;
 		}
 
-		List<PollsChoice> choices = new ArrayList<PollsChoice>();
+		List<PollsChoice> choices = new ArrayList<>();
 
-		Set<String> readParameters = new HashSet<String>();
+		Set<String> readParameters = new HashSet<>();
 
 		Enumeration<String> enu = actionRequest.getParameterNames();
 

@@ -112,6 +112,12 @@ public abstract class BaseControlPanelEntry implements ControlPanelEntry {
 
 		String category = portlet.getControlPanelEntryCategory();
 
+		if (category.startsWith(PortletCategoryKeys.SITE_ADMINISTRATION) &&
+			group.isLayoutPrototype()) {
+
+			return true;
+		}
+
 		if (category.equals(PortletCategoryKeys.SITE_ADMINISTRATION_CONTENT) &&
 			group.isLayout() && !portlet.isScopeable()) {
 
@@ -145,10 +151,11 @@ public abstract class BaseControlPanelEntry implements ControlPanelEntry {
 
 		long groupId = group.getGroupId();
 
-		if (category.equals(PortletCategoryKeys.APPS) ||
-			category.equals(PortletCategoryKeys.CONFIGURATION) ||
-			category.equals(PortletCategoryKeys.SITES) ||
-			category.equals(PortletCategoryKeys.USERS)) {
+		if (category.equals(PortletCategoryKeys.CONTROL_PANEL_APPS) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_CONFIGURATION) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_SITES) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_SYSTEM) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_USERS)) {
 
 			groupId = 0;
 		}
@@ -158,9 +165,8 @@ public abstract class BaseControlPanelEntry implements ControlPanelEntry {
 
 		if (actions.contains(ActionKeys.ACCESS_IN_CONTROL_PANEL) &&
 			PortletPermissionUtil.contains(
-				permissionChecker, groupId, getDefaultPlid(group, category),
-				portlet.getPortletId(), ActionKeys.ACCESS_IN_CONTROL_PANEL,
-				true)) {
+				permissionChecker, groupId, 0, portlet.getRootPortletId(),
+				ActionKeys.ACCESS_IN_CONTROL_PANEL, true)) {
 
 			return true;
 		}
@@ -171,6 +177,14 @@ public abstract class BaseControlPanelEntry implements ControlPanelEntry {
 	protected boolean hasPermissionImplicitlyGranted(
 			PermissionChecker permissionChecker, Group group, Portlet portlet)
 		throws Exception {
+
+		String category = portlet.getControlPanelEntryCategory();
+
+		if ((category != null) &&
+			category.equals(PortletCategoryKeys.USER_MY_ACCOUNT)) {
+
+			return true;
+		}
 
 		return false;
 	}

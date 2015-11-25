@@ -16,6 +16,8 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.Accessor;
+
 /**
  * The extended model interface for the Group service. Represents a row in the &quot;Group_&quot; database table, with each column mapped to a property of this class.
  *
@@ -32,6 +34,23 @@ public interface Group extends GroupModel, PersistedModel, TreeModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.GroupImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public static final Accessor<Group, Long> GROUP_ID_ACCESSOR = new Accessor<Group, Long>() {
+			@Override
+			public Long get(Group group) {
+				return group.getGroupId();
+			}
+
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
+
+			@Override
+			public Class<Group> getTypeClass() {
+				return Group.class;
+			}
+		};
+
 	public void clearStagingGroup();
 
 	public java.util.List<com.liferay.portal.model.Group> getAncestors()
@@ -42,7 +61,8 @@ public interface Group extends GroupModel, PersistedModel, TreeModel {
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
-	#getChildrenWithLayouts(boolean, int, int, OrderByComparator}
+	#getChildrenWithLayouts(boolean, int, int,
+	OrderByComparator)}
 	*/
 	@java.lang.Deprecated()
 	public java.util.List<com.liferay.portal.model.Group> getChildrenWithLayouts(
@@ -86,6 +106,9 @@ public interface Group extends GroupModel, PersistedModel, TreeModel {
 
 	public java.lang.String getLiveParentTypeSettingsProperty(
 		java.lang.String key);
+
+	public java.lang.String getLogoURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay, boolean useDefault);
 
 	public long getOrganizationId();
 

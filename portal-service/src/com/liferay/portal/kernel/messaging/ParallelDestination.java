@@ -14,8 +14,8 @@
 
 package com.liferay.portal.kernel.messaging;
 
-import com.liferay.portal.kernel.cache.Lifecycle;
-import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,30 +33,11 @@ import java.util.Set;
  */
 public class ParallelDestination extends BaseAsyncDestination {
 
-	public ParallelDestination() {
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public ParallelDestination(String name) {
-		super(name);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public ParallelDestination(
-		String name, int workersCoreSize, int workersMaxSize) {
-
-		super(name, workersCoreSize, workersMaxSize);
-	}
-
 	@Override
 	protected void dispatch(
 		Set<MessageListener> messageListeners, final Message message) {
+
+		final Thread currentThread = Thread.currentThread();
 
 		ThreadPoolExecutor threadPoolExecutor = getThreadPoolExecutor();
 
@@ -74,9 +55,12 @@ public class ParallelDestination extends BaseAsyncDestination {
 						_log.error("Unable to process message " + message, mle);
 					}
 					finally {
-						ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
+						if (Thread.currentThread() != currentThread) {
+							ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 
-						CentralizedThreadLocal.clearShortLivedThreadLocals();
+							CentralizedThreadLocal.
+								clearShortLivedThreadLocals();
+						}
 					}
 				}
 

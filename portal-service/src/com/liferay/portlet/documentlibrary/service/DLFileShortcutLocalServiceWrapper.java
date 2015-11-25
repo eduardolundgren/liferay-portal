@@ -48,11 +48,12 @@ public class DLFileShortcutLocalServiceWrapper
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
-		long userId, long groupId, long folderId, long toFileEntryId,
+		long userId, long groupId, long repositoryId, long folderId,
+		long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcutLocalService.addFileShortcut(userId, groupId,
-			folderId, toFileEntryId, serviceContext);
+			repositoryId, folderId, toFileEntryId, serviceContext);
 	}
 
 	@Override
@@ -67,10 +68,10 @@ public class DLFileShortcutLocalServiceWrapper
 	@Override
 	public void addFileShortcutResources(
 		com.liferay.portlet.documentlibrary.model.DLFileShortcut fileShortcut,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileShortcutLocalService.addFileShortcutResources(fileShortcut,
-			groupPermissions, guestPermissions);
+			modelPermissions);
 	}
 
 	@Override
@@ -83,10 +84,10 @@ public class DLFileShortcutLocalServiceWrapper
 
 	@Override
 	public void addFileShortcutResources(long fileShortcutId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileShortcutLocalService.addFileShortcutResources(fileShortcutId,
-			groupPermissions, guestPermissions);
+			modelPermissions);
 	}
 
 	/**
@@ -291,16 +292,6 @@ public class DLFileShortcutLocalServiceWrapper
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _dlFileShortcutLocalService.getBeanIdentifier();
-	}
-
-	/**
 	* Returns the document library file shortcut with the primary key.
 	*
 	* @param fileShortcutId the primary key of the document library file shortcut
@@ -391,7 +382,7 @@ public class DLFileShortcutLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _dlFileShortcutLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -411,10 +402,31 @@ public class DLFileShortcutLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileShortcut> getFileShortcuts(
+		long toFileEntryId) {
+		return _dlFileShortcutLocalService.getFileShortcuts(toFileEntryId);
+	}
+
+	@Override
 	public int getFileShortcutsCount(long groupId, long folderId,
 		boolean active, int status) {
 		return _dlFileShortcutLocalService.getFileShortcutsCount(groupId,
 			folderId, active, status);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFileShortcutLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _dlFileShortcutLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -428,16 +440,6 @@ public class DLFileShortcutLocalServiceWrapper
 	public void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileShortcutLocalService.rebuildTree(companyId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_dlFileShortcutLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	@Override
@@ -469,17 +471,25 @@ public class DLFileShortcutLocalServiceWrapper
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
-		long userId, long fileShortcutId, long folderId, long toFileEntryId,
+		long userId, long fileShortcutId, long repositoryId, long folderId,
+		long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcutLocalService.updateFileShortcut(userId,
-			fileShortcutId, folderId, toFileEntryId, serviceContext);
+			fileShortcutId, repositoryId, folderId, toFileEntryId,
+			serviceContext);
 	}
 
 	@Override
 	public void updateFileShortcuts(long oldToFileEntryId, long newToFileEntryId) {
 		_dlFileShortcutLocalService.updateFileShortcuts(oldToFileEntryId,
 			newToFileEntryId);
+	}
+
+	@Override
+	public void updateFileShortcutsActive(long toFileEntryId, boolean active) {
+		_dlFileShortcutLocalService.updateFileShortcutsActive(toFileEntryId,
+			active);
 	}
 
 	@Override

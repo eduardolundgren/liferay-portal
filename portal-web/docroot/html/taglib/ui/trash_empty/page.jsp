@@ -34,7 +34,7 @@ int totalEntries = GetterUtil.getInteger(request.getAttribute("liferay-ui:trash-
 
 			<liferay-ui:message arguments="<%= StringUtil.toLowerCase(trashEntriesMaxAgeTimeDescription) %>" key="<%= infoMessage %>" translateArguments="<%= false %>" />
 
-			<a class="trash-empty-link" href="javascript:;" id="<%= namespace %>empty"><liferay-ui:message key="<%= emptyMessage %>" /></a>
+			<aui:a cssClass="alert-link trash-empty-link" href="javascript:;" id="empty" label="<%= emptyMessage %>" />
 
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.EMPTY_TRASH %>" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -44,17 +44,13 @@ int totalEntries = GetterUtil.getInteger(request.getAttribute("liferay-ui:trash-
 	</div>
 </c:if>
 
-<aui:script use="aui-base">
-	var emptyLink = A.one('#<%= namespace %>empty');
-
-	if (emptyLink) {
-		emptyLink.on(
-			'click',
-			function(event) {
-				if (confirm('<%= UnicodeLanguageUtil.get(request, confirmMessage) %>')) {
-					submitForm(document.<portlet:namespace />emptyForm);
-				}
+<aui:script>
+	AUI.$('#<%= namespace %>empty').on(
+		'click',
+		function(event) {
+			if (confirm('<%= UnicodeLanguageUtil.get(request, confirmMessage) %>')) {
+				submitForm(document.<portlet:namespace />emptyForm);
 			}
-		);
-	}
+		}
+	);
 </aui:script>

@@ -14,12 +14,9 @@
 
 package com.liferay.portal.model;
 
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.staging.MergeLayoutPrototypesThreadLocal;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -32,7 +29,8 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.LayoutTypePortletFactoryUtil;
-import com.liferay.portal.util.comparator.LayoutRevisionCreateDateComparator;
+import com.liferay.portlet.exportimport.staging.MergeLayoutPrototypesThreadLocal;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 
 import java.io.Serializable;
 
@@ -41,7 +39,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -209,25 +206,9 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 			return layoutRevision;
 		}
 
-		layoutRevision = null;
-
-		List<LayoutRevision> layoutRevisions =
-			LayoutRevisionLocalServiceUtil.getLayoutRevisions(
-				layoutSetBranchId, layout.getPlid(), QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS,
-				new LayoutRevisionCreateDateComparator(true));
-
-		if (!layoutRevisions.isEmpty()) {
-			layoutRevision = layoutRevisions.get(0);
-
-			for (LayoutRevision curLayoutRevision : layoutRevisions) {
-				if (curLayoutRevision.isHead()) {
-					layoutRevision = curLayoutRevision;
-
-					break;
-				}
-			}
-		}
+		layoutRevision =
+			LayoutRevisionLocalServiceUtil.fetchLatestLayoutRevision(
+				layoutSetBranchId, layout.getPlid());
 
 		if (layoutRevision != null) {
 			StagingUtil.setRecentLayoutRevisionId(
@@ -304,7 +285,7 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 		LayoutStagingHandler.class);
 
 	private static final Set<String> _layoutRevisionMethodNames =
-		new HashSet<String>();
+		new HashSet<>();
 
 	static {
 		_layoutRevisionMethodNames.add("getColorScheme");

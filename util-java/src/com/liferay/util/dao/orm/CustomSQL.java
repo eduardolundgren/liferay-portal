@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import java.io.IOException;
@@ -149,6 +149,37 @@ public class CustomSQL {
 			}
 		}
 
+		if (queryDefinition.getOwnerUserId() > 0) {
+			if (queryDefinition.isIncludeOwner()) {
+				StringBundler sb = new StringBundler(7);
+
+				sb.append(StringPool.OPEN_PARENTHESIS);
+				sb.append(tableName);
+				sb.append(_OWNER_USER_ID_CONDITION_DEFAULT);
+				sb.append(" AND ");
+				sb.append(tableName);
+				sb.append(_STATUS_CONDITION_INVERSE);
+				sb.append(StringPool.CLOSE_PARENTHESIS);
+
+				sql = sql.replace(_OWNER_USER_ID_KEYWORD, sb.toString());
+
+				sql = sql.replace(_OWNER_USER_ID_AND_OR_CONNECTOR, " OR ");
+			}
+			else {
+				sql = sql.replace(
+					_OWNER_USER_ID_KEYWORD,
+					tableName.concat(_OWNER_USER_ID_CONDITION_DEFAULT));
+
+				sql = sql.replace(_OWNER_USER_ID_AND_OR_CONNECTOR, " AND ");
+			}
+		}
+		else {
+			sql = sql.replace(_OWNER_USER_ID_KEYWORD, StringPool.BLANK);
+
+			sql = sql.replace(
+				_OWNER_USER_ID_AND_OR_CONNECTOR, StringPool.BLANK);
+		}
+
 		return sql;
 	}
 
@@ -252,7 +283,7 @@ public class CustomSQL {
 
 		keywords = keywords.trim();
 
-		List<String> keywordsList = new ArrayList<String>();
+		List<String> keywordsList = new ArrayList<>();
 
 		for (int i = 0; i < keywords.length(); i++) {
 			char c = keywords.charAt(i);
@@ -433,7 +464,7 @@ public class CustomSQL {
 		}
 
 		if (_sqlPool == null) {
-			_sqlPool = new HashMap<String, String>();
+			_sqlPool = new HashMap<>();
 		}
 		else {
 			_sqlPool.clear();
@@ -492,13 +523,8 @@ public class CustomSQL {
 		}
 
 		sql = StringUtil.replace(
-			sql,
-			new String[] {
-				"[$AND_OR_CONNECTOR$]", "[$AND_OR_NULL_CHECK$]"
-			},
-			new String[] {
-				andOrConnector, andOrNullCheck
-			});
+			sql, new String[] {"[$AND_OR_CONNECTOR$]", "[$AND_OR_NULL_CHECK$]"},
+			new String[] {andOrConnector, andOrNullCheck});
 
 		if (_vendorPostgreSQL) {
 			sql = StringUtil.replace(
@@ -564,13 +590,8 @@ public class CustomSQL {
 	public String replaceIsNull(String sql) {
 		if (Validator.isNotNull(_functionIsNull)) {
 			sql = StringUtil.replace(
-				sql,
-				new String[] {
-					"? IS NULL", "? IS NOT NULL"
-				},
-				new String[] {
-					_functionIsNull, _functionIsNotNull
-				});
+				sql, new String[] {"? IS NULL", "? IS NOT NULL"},
+				new String[] {_functionIsNull, _functionIsNotNull});
 		}
 
 		return sql;
@@ -762,33 +783,33 @@ public class CustomSQL {
 	protected void read(ClassLoader classLoader, String source)
 		throws Exception {
 
-		InputStream is = classLoader.getResourceAsStream(source);
-
-		if (is == null) {
-			return;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Loading " + source);
-		}
-
-		Document document = SAXReaderUtil.read(is);
-
-		Element rootElement = document.getRootElement();
-
-		for (Element sqlElement : rootElement.elements("sql")) {
-			String file = sqlElement.attributeValue("file");
-
-			if (Validator.isNotNull(file)) {
-				read(classLoader, file);
+		try (InputStream is = classLoader.getResourceAsStream(source)) {
+			if (is == null) {
+				return;
 			}
-			else {
-				String id = sqlElement.attributeValue("id");
-				String content = transform(sqlElement.getText());
 
-				content = replaceIsNull(content);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Loading " + source);
+			}
 
-				_sqlPool.put(id, content);
+			Document document = UnsecureSAXReaderUtil.read(is);
+
+			Element rootElement = document.getRootElement();
+
+			for (Element sqlElement : rootElement.elements("sql")) {
+				String file = sqlElement.attributeValue("file");
+
+				if (Validator.isNotNull(file)) {
+					read(classLoader, file);
+				}
+				else {
+					String id = sqlElement.attributeValue("id");
+					String content = transform(sqlElement.getText());
+
+					content = replaceIsNull(content);
+
+					_sqlPool.put(id, content);
+				}
 			}
 		}
 	}
@@ -851,6 +872,13 @@ public class CustomSQL {
 
 	private static final String _ORDER_BY_CLAUSE = " ORDER BY ";
 
+	private static final String _OWNER_USER_ID_AND_OR_CONNECTOR =
+		"[$OWNER_USER_ID_AND_OR_CONNECTOR$]";
+
+	private static final String _OWNER_USER_ID_CONDITION_DEFAULT = "userId = ?";
+
+	private static final String _OWNER_USER_ID_KEYWORD = "[$OWNER_USER_ID$]";
+
 	private static final String _STATUS_CONDITION_DEFAULT = "status = ?";
 
 	private static final String _STATUS_CONDITION_EMPTY =
@@ -860,7 +888,7 @@ public class CustomSQL {
 
 	private static final String _STATUS_KEYWORD = "[$STATUS$]";
 
-	private static Log _log = LogFactoryUtil.getLog(CustomSQL.class);
+	private static final Log _log = LogFactoryUtil.getLog(CustomSQL.class);
 
 	private String _functionIsNotNull;
 	private String _functionIsNull;

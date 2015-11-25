@@ -40,7 +40,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface OrganizationModel extends BaseModel<Organization>, MVCCModel,
-	StagedAuditedModel {
+	ShardedModel, StagedAuditedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -317,14 +317,14 @@ public interface OrganizationModel extends BaseModel<Organization>, MVCCModel,
 	 *
 	 * @return the status ID of this organization
 	 */
-	public int getStatusId();
+	public long getStatusId();
 
 	/**
 	 * Sets the status ID of this organization.
 	 *
 	 * @param statusId the status ID of this organization
 	 */
-	public void setStatusId(int statusId);
+	public void setStatusId(long statusId);
 
 	/**
 	 * Returns the comments of this organization.

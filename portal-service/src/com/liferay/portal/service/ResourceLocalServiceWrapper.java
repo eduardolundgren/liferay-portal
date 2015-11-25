@@ -40,9 +40,9 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* <li>
 	* If the service context specifies that default group or default guest
 	* permissions are to be added, then only default permissions are added. See
-	* {@link com.liferay.portal.service.ServiceContext#setAddGroupPermissions(
+	* {@link ServiceContext#setAddGroupPermissions(
 	* boolean)} and {@link
-	* com.liferay.portal.service.ServiceContext#setAddGuestPermissions(
+	* ServiceContext#setAddGuestPermissions(
 	* boolean)}.
 	* </li>
 	* <li>
@@ -52,15 +52,15 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* If the service context specifies to derive default permissions, then
 	* default group and guest permissions are derived from the model and
 	* added. See {@link
-	* com.liferay.portal.service.ServiceContext#setDeriveDefaultPermissions(
+	* ServiceContext#setDeriveDefaultPermissions(
 	* boolean)}.
 	* </li>
 	* <li>
 	* Lastly group and guest permissions from the service
 	* context are applied. See {@link
-	* com.liferay.portal.service.ServiceContext#setGroupPermissions(String[])}
+	* ServiceContext#setGroupPermissions(String[])}
 	* and {@link
-	* com.liferay.portal.service.ServiceContext#setGuestPermissions(String[])}.
+	* ServiceContext#setGuestPermissions(String[])}.
 	* </li>
 	* </ol>
 	*
@@ -72,8 +72,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	add the model's default group and guest permissions, set whether
 	to derive default group and guest permissions from the model, set
 	group permissions to apply, and set guest permissions to apply.
-	* @throws PortalException if no portal actions could be found associated
-	with the model or if a portal exception occurred
 	*/
 	@Override
 	public void addModelResources(
@@ -97,8 +95,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	<code>0</code> if no instance exists
 	* @param groupPermissions the group permissions to be applied
 	* @param guestPermissions the guest permissions to be applied
-	* @throws PortalException if no portal actions could be found associated
-	with the model or if a portal exception occurred
 	*/
 	@Override
 	public void addModelResources(long companyId, long groupId, long userId,
@@ -123,8 +119,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	an empty string if no instance exists
 	* @param groupPermissions the group permissions to be applied
 	* @param guestPermissions the guest permissions to be applied
-	* @throws PortalException if no portal actions could be found associated
-	with the model or if a portal exception occurred
 	*/
 	@Override
 	public void addModelResources(long companyId, long groupId, long userId,
@@ -133,6 +127,24 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_resourceLocalService.addModelResources(companyId, groupId, userId,
 			name, primKey, groupPermissions, guestPermissions);
+	}
+
+	@Override
+	public void addModelResources(long companyId, long groupId, long userId,
+		java.lang.String name, long primKey,
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_resourceLocalService.addModelResources(companyId, groupId, userId,
+			name, primKey, modelPermissions);
+	}
+
+	@Override
+	public void addModelResources(long companyId, long groupId, long userId,
+		java.lang.String name, java.lang.String primKey,
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_resourceLocalService.addModelResources(companyId, groupId, userId,
+			name, primKey, modelPermissions);
 	}
 
 	/**
@@ -145,8 +157,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	resource is a portlet or the resource's class name otherwise
 	* @param portletActions whether to associate portlet actions with the
 	resource
-	* @throws PortalException if no portal actions could be found associated
-	with the resource or if a portal exception occurred
 	*/
 	@Override
 	public void addResources(long companyId, long groupId,
@@ -173,8 +183,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	resource
 	* @param addGroupPermissions whether to add group permissions
 	* @param addGuestPermissions whether to add guest permissions
-	* @throws PortalException if no portal actions could be found associated
-	with the resource or if a portal exception occurred
 	*/
 	@Override
 	public void addResources(long companyId, long groupId, long userId,
@@ -203,8 +211,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	resource
 	* @param addGroupPermissions whether to add group permissions
 	* @param addGuestPermissions whether to add guest permissions
-	* @throws PortalException if no portal actions could be found associated
-	with the resource or if a portal exception occurred
 	*/
 	@Override
 	public void addResources(long companyId, long groupId, long userId,
@@ -220,8 +226,7 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	*
 	* @param auditedModel the model associated with the resource
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
-	* @throws PortalException if a portal exception occurred
+	ResourceConstants}.
 	*/
 	@Override
 	public void deleteResource(
@@ -237,9 +242,8 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param name the resource's name, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key of the resource instance
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void deleteResource(long companyId, java.lang.String name,
@@ -255,9 +259,8 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param name the resource's name, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key string of the resource instance
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void deleteResource(long companyId, java.lang.String name,
@@ -267,13 +270,13 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	}
 
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _resourceLocalService.getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _resourceLocalService.getOSGiServiceIdentifier();
 	}
 
 	/**
@@ -283,7 +286,7 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param name a name for the resource, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key string of the resource
 	* @return the new resource
 	*/
@@ -308,9 +311,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param roleIds the primary keys of the roles
 	* @return <code>true</code> if the roles have permission to perform the
 	action on the resources;<code>false</code> otherwise
-	* @throws PortalException if any one of the roles with the primary keys
-	could not be found or if a resource action with the action ID
-	could not be found
 	*/
 	@Override
 	public boolean hasUserPermissions(long userId, long resourceId,
@@ -322,23 +322,12 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_resourceLocalService.setBeanIdentifier(beanIdentifier);
-	}
-
-	/**
 	* Updates the resources for the model, replacing their group and guest
 	* permissions with new ones from the service context.
 	*
 	* @param auditedModel the model associated with the resources
 	* @param serviceContext the service context to be applied. Can set group
 	and guest permissions.
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void updateModelResources(
@@ -359,7 +348,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param primKey the primary key string of the resource instance
 	* @param groupPermissions the group permissions to be applied
 	* @param guestPermissions the guest permissions to be applied
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void updateResources(long companyId, long groupId,
@@ -381,7 +369,6 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param primKey the primary key of the resource instance
 	* @param groupPermissions the group permissions to be applied
 	* @param guestPermissions the guest permissions to be applied
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public void updateResources(long companyId, long groupId,
@@ -393,6 +380,46 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	}
 
 	/**
+	* Updates resources matching the group, name, and primary key at the
+	* individual scope, setting new permissions.
+	*
+	* @param companyId the primary key of the portal instance
+	* @param groupId the primary key of the group
+	* @param name the resource's name, which should be a portlet ID if the
+	resource is a portlet or the resource's class name otherwise
+	* @param primKey the primary key of the resource instance
+	* @param modelPermissions the model permissions to be applied
+	*/
+	@Override
+	public void updateResources(long companyId, long groupId,
+		java.lang.String name, long primKey,
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_resourceLocalService.updateResources(companyId, groupId, name,
+			primKey, modelPermissions);
+	}
+
+	/**
+	* Updates resources matching the group, name, and primary key string at the
+	* individual scope, setting new permissions.
+	*
+	* @param companyId the primary key of the portal instance
+	* @param groupId the primary key of the group
+	* @param name the resource's name, which should be a portlet ID if the
+	resource is a portlet or the resource's class name otherwise
+	* @param primKey the primary key string of the resource instance
+	* @param modelPermissions the model permissions to be applied
+	*/
+	@Override
+	public void updateResources(long companyId, long groupId,
+		java.lang.String name, java.lang.String primKey,
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_resourceLocalService.updateResources(companyId, groupId, name,
+			primKey, modelPermissions);
+	}
+
+	/**
 	* Updates resources matching the name, primary key string and scope,
 	* replacing the primary key of their resource permissions with the new
 	* primary key.
@@ -401,7 +428,7 @@ public class ResourceLocalServiceWrapper implements ResourceLocalService,
 	* @param name the resource's name, which should be a portlet ID if the
 	resource is a portlet or the resource's class name otherwise
 	* @param scope the scope of the resource. For more information see {@link
-	com.liferay.portal.model.ResourceConstants}.
+	ResourceConstants}.
 	* @param primKey the primary key string of the resource instance
 	* @param newPrimKey the new primary key string of the resource
 	*/

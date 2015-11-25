@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.concurrent.ThrowableAwareRunnable;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.ResourceConstants;
@@ -60,8 +61,7 @@ public class VerifyResourcePermissions extends VerifyProcess {
 				companyId, RoleConstants.OWNER);
 
 			List<VerifyResourcedModelRunnable> verifyResourcedModelRunnables =
-				new ArrayList<VerifyResourcedModelRunnable>(
-					verifiableResourcedModels.length);
+				new ArrayList<>(verifiableResourcedModels.length);
 
 			for (VerifiableResourcedModel verifiableResourcedModel :
 					verifiableResourcedModels) {
@@ -173,57 +173,63 @@ public class VerifyResourcePermissions extends VerifyProcess {
 			Role role, VerifiableResourcedModel verifiableResourcedModel)
 		throws Exception {
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		int total = 0;
 
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
+		try (Connection con = DataAccess.getUpgradeOptimizedConnection()) {
+			try {
+				ps = con.prepareStatement(
+					"select count(*) from " +
+						verifiableResourcedModel.getTableName() +
+							" where companyId = " + role.getCompanyId());
 
-			ps = con.prepareStatement(
-				"select count(*) from " +
-					verifiableResourcedModel.getTableName() +
-						" where companyId = " + role.getCompanyId());
+				rs = ps.executeQuery();
 
-			rs = ps.executeQuery();
-
-			if (rs.next()) {
-				total = rs.getInt(1);
+				if (rs.next()) {
+					total = rs.getInt(1);
+				}
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
-		}
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
-				"select " + verifiableResourcedModel.getPrimaryKeyColumnName() +
-					", userId from " + verifiableResourcedModel.getTableName() +
-						" where companyId = " + role.getCompanyId());
-
-			rs = ps.executeQuery();
-
-			for (int i = 0; rs.next(); i++) {
-				long primKey = rs.getLong(
-					verifiableResourcedModel.getPrimaryKeyColumnName());
-				long userId = rs.getLong("userId");
-
-				verifyResourcedModel(
-					role.getCompanyId(),
-					verifiableResourcedModel.getModelName(), primKey, role,
-					userId, i, total);
+			finally {
+				DataAccess.cleanUp(null, ps, rs);
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
+
+			try {
+				StringBundler sb = new StringBundler(8);
+
+				sb.append("select ");
+				sb.append(verifiableResourcedModel.getPrimaryKeyColumnName());
+				sb.append(", ");
+				sb.append(verifiableResourcedModel.getUserIdColumnName());
+				sb.append(" from ");
+				sb.append(verifiableResourcedModel.getTableName());
+				sb.append(" where companyId = ");
+				sb.append(role.getCompanyId());
+
+				ps = con.prepareStatement(sb.toString());
+
+				rs = ps.executeQuery();
+
+				for (int i = 0; rs.next(); i++) {
+					long primKey = rs.getLong(
+						verifiableResourcedModel.getPrimaryKeyColumnName());
+					long userId = rs.getLong(
+						verifiableResourcedModel.getUserIdColumnName());
+
+					verifyResourcedModel(
+						role.getCompanyId(),
+						verifiableResourcedModel.getModelName(), primKey, role,
+						userId, i, total);
+				}
+			}
+			finally {
+				DataAccess.cleanUp(null, ps, rs);
+			}
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		VerifyResourcePermissions.class);
 
 	private class VerifyResourcedModelRunnable extends ThrowableAwareRunnable {

@@ -22,11 +22,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.SortedProperties;
+import com.liferay.portal.kernel.util.URLUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.util.PropertyComparator;
 
@@ -95,14 +95,14 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 			spriteRootDir = new File(spriteRootDirName);
 		}
 
-		spriteRootDir.mkdirs();
+		FileUtil.mkdirs(spriteRootDir);
 
 		File spritePropertiesFile = new File(
 			spriteRootDir, spritePropertiesFileName);
 
 		File spritePropertiesParentFile = spritePropertiesFile.getParentFile();
 
-		spritePropertiesParentFile.mkdirs();
+		FileUtil.mkdirs(spritePropertiesParentFile);
 
 		boolean build = false;
 
@@ -111,14 +111,8 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 		if (spritePropertiesFile.exists()) {
 			lastModified = spritePropertiesFile.lastModified();
 
-			URLConnection urlConnection = null;
-
 			for (URL imageURL : imageURLs) {
-				urlConnection = imageURL.openConnection();
-
-				if ((urlConnection != null) &&
-					(urlConnection.getLastModified() > lastModified)) {
-
+				if (URLUtil.getLastModifiedTime(imageURL) > lastModified) {
 					build = true;
 
 					break;
@@ -140,7 +134,7 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 			}
 		}
 
-		List<RenderedImage> renderedImages = new ArrayList<RenderedImage>();
+		List<RenderedImage> renderedImages = new ArrayList<>();
 
 		Properties spriteProperties = new SortedProperties();
 
@@ -183,8 +177,7 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 						key = key.substring(rootPath.length());
 					}
 
-					String contextPath = ContextPathUtil.getContextPath(
-						servletContext);
+					String contextPath = servletContext.getContextPath();
 
 					key = contextPath.concat(key);
 
@@ -224,7 +217,7 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 
 			File spriteDir = spriteFile.getParentFile();
 
-			spriteDir.mkdirs();
+			FileUtil.mkdirs(spriteDir);
 
 			ImageIO.write(renderedImage, "png", spriteFile);
 
@@ -274,10 +267,10 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 				renderedImage, lookupTableJAI, null);
 		}
 		else if (sampleModel.getNumBands() == 2) {
-			List<Byte> bytesList = new ArrayList<Byte>(
+			List<Byte> bytesList = new ArrayList<>(
 				height * width * _NUM_OF_BANDS);
 
-			List<Byte> tempBytesList = new ArrayList<Byte>(_NUM_OF_BANDS);
+			List<Byte> tempBytesList = new ArrayList<>(_NUM_OF_BANDS);
 
 			for (int i = 0; i < dataBuffer.getSize(); i++) {
 				int mod = (i + 1) % 2;
@@ -309,10 +302,10 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 				renderedImage, height, width, newDataBuffer);
 		}
 		else if (colorModel.getTransparency() != Transparency.TRANSLUCENT) {
-			List<Byte> bytesList = new ArrayList<Byte>(
+			List<Byte> bytesList = new ArrayList<>(
 				height * width * _NUM_OF_BANDS);
 
-			List<Byte> tempBytesList = new ArrayList<Byte>(_NUM_OF_BANDS);
+			List<Byte> tempBytesList = new ArrayList<>(_NUM_OF_BANDS);
 
 			for (int i = 0; i < dataBuffer.getSize(); i++) {
 				int mod = (i + 1) % 3;
@@ -402,6 +395,7 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 
 	private static final int _NUM_OF_BANDS = 4;
 
-	private static Log _log = LogFactoryUtil.getLog(SpriteProcessorImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SpriteProcessorImpl.class);
 
 }

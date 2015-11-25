@@ -34,7 +34,7 @@ public class OrderByComparatorFactoryUtil {
 				"Columns length is not an even number");
 		}
 
-		return new DefaultOrderByComparator<T>(tableName, columns);
+		return new DefaultOrderByComparator<>(tableName, columns);
 	}
 
 	protected static class DefaultOrderByComparator<T extends BaseModel<T>>
@@ -180,22 +180,22 @@ public class OrderByComparatorFactoryUtil {
 
 		private static final String _ORDER_BY_DESC = " DESC";
 
-		private static Map<Class<?>, Object> _primitiveObjects =
-			new HashMap<Class<?>, Object>();
+		private static final Map<Class<?>, Object> _primitiveObjects =
+			new HashMap<>();
 
 		static {
-			_primitiveObjects.put(boolean.class, new Boolean(true));
-			_primitiveObjects.put(byte.class, new Byte("0"));
-			_primitiveObjects.put(char.class, new Character('0'));
-			_primitiveObjects.put(double.class, new Double(0));
-			_primitiveObjects.put(float.class, new Float(0));
-			_primitiveObjects.put(int.class, new Integer(0));
-			_primitiveObjects.put(long.class, new Long(0));
-			_primitiveObjects.put(short.class, new Short("0"));
+			_primitiveObjects.put(boolean.class, Boolean.TRUE);
+			_primitiveObjects.put(byte.class, Byte.valueOf("0"));
+			_primitiveObjects.put(char.class, Character.valueOf('0'));
+			_primitiveObjects.put(double.class, Double.valueOf(0));
+			_primitiveObjects.put(float.class, Float.valueOf(0));
+			_primitiveObjects.put(int.class, Integer.valueOf(0));
+			_primitiveObjects.put(long.class, Long.valueOf(0));
+			_primitiveObjects.put(short.class, Short.valueOf("0"));
 		}
 
-		private Object[] _columns;
-		private String _tableName;
+		private final Object[] _columns;
+		private final String _tableName;
 
 	}
 

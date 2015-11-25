@@ -22,6 +22,7 @@ import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
+import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -99,10 +100,10 @@ public class TrashHandlerRegistryUtil {
 		new TrashHandlerRegistryUtil();
 
 	private final ServiceRegistrationMap<TrashHandler> _serviceRegistrations =
-		new ServiceRegistrationMap<TrashHandler>();
+		new ServiceRegistrationMapImpl<>();
 	private final ServiceTracker<TrashHandler, TrashHandler> _serviceTracker;
 	private final Map<String, TrashHandler> _trashHandlers =
-		new ConcurrentSkipListMap<String, TrashHandler>();
+		new ConcurrentSkipListMap<>();
 
 	private class TrashHandlerServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<TrashHandler, TrashHandler> {

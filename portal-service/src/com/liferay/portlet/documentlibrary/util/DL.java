@@ -17,7 +17,6 @@ package com.liferay.portlet.documentlibrary.util;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -35,10 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
-import javax.portlet.RenderResponse;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Eudaldo Alonso
@@ -58,35 +53,6 @@ public interface DL {
 		StringPool.SLASH + OFFICE_EXTENSION;
 
 	public static final String WEBDAV_CHECK_IN_MODE = "webDAVCheckInMode";
-
-	public void addPortletBreadcrumbEntries(
-			DLFileShortcut dlFileShortcut, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception;
-
-	public void addPortletBreadcrumbEntries(
-			FileEntry fileEntry, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception;
-
-	public void addPortletBreadcrumbEntries(
-			Folder folder, HttpServletRequest request,
-			LiferayPortletResponse liferayPortletResponse)
-		throws Exception;
-
-	public void addPortletBreadcrumbEntries(
-			Folder folder, HttpServletRequest request, PortletURL portletURL)
-		throws Exception;
-
-	public void addPortletBreadcrumbEntries(
-			Folder folder, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception;
-
-	public void addPortletBreadcrumbEntries(
-			long folderId, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception;
 
 	public int compareVersions(String version1, String version2);
 
@@ -129,8 +95,6 @@ public interface DL {
 		PortletRequest portletRequest, String emailFromAddress,
 		String emailFromName);
 
-	public List<Object> getEntries(Hits hits);
-
 	public List<FileEntry> getFileEntries(Hits hits);
 
 	public String getFileEntryImage(
@@ -141,8 +105,6 @@ public interface DL {
 	public String getFileIcon(String extension);
 
 	public String getFileIconCssClass(String extension);
-
-	public String getFileName(long groupId, long folderId, String tempFileName);
 
 	public String getGenericName(String extension);
 
@@ -174,6 +136,9 @@ public interface DL {
 
 	public <T> OrderByComparator<T> getRepositoryModelOrderByComparator(
 		String orderByCol, String orderByType);
+
+	public <T> OrderByComparator<T> getRepositoryModelOrderByComparator(
+		String orderByCol, String orderByType, boolean orderByModel);
 
 	public String getSanitizedFileName(String title, String extension);
 
@@ -210,13 +175,19 @@ public interface DL {
 			FileEntry fileEntry, ThemeDisplay themeDisplay)
 		throws Exception;
 
-	public String getThumbnailStyle() throws Exception;
+	public String getThumbnailStyle();
 
-	public String getThumbnailStyle(boolean max, int margin) throws Exception;
+	public String getThumbnailStyle(boolean max, int margin);
+
+	public String getThumbnailStyle(
+		boolean max, int margin, int height, int width);
 
 	public String getTitleWithExtension(FileEntry fileEntry);
 
 	public String getTitleWithExtension(String title, String extension);
+
+	public String getUniqueFileName(
+		long groupId, long folderId, String fileName);
 
 	public String getWebDavURL(
 			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry)

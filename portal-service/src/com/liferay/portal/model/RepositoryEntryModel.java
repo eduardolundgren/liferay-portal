@@ -40,7 +40,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface RepositoryEntryModel extends BaseModel<RepositoryEntry>,
-	MVCCModel, StagedGroupedModel {
+	MVCCModel, ShardedModel, StagedGroupedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -270,6 +270,22 @@ public interface RepositoryEntryModel extends BaseModel<RepositoryEntry>,
 	 * @param manualCheckInRequired the manual check in required of this repository entry
 	 */
 	public void setManualCheckInRequired(boolean manualCheckInRequired);
+
+	/**
+	 * Returns the last publish date of this repository entry.
+	 *
+	 * @return the last publish date of this repository entry
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this repository entry.
+	 *
+	 * @param lastPublishDate the last publish date of this repository entry
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
 
 	@Override
 	public boolean isNew();

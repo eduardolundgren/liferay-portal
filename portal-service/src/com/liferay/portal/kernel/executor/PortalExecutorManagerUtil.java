@@ -14,38 +14,17 @@
 
 package com.liferay.portal.kernel.executor;
 
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.security.pacl.PACLConstants;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 
 /**
  * @author Shuyang Zhou
  */
 public class PortalExecutorManagerUtil {
-
-	public static <T> NoticeableFuture<T> execute(
-		String name, Callable<T> callable) {
-
-		PortalRuntimePermission.checkThreadPoolExecutor(name);
-
-		return getPortalExecutorManager().execute(name, callable);
-	}
-
-	public static <T> T execute(
-			String name, Callable<T> callable, long timeout, TimeUnit timeUnit)
-		throws ExecutionException, InterruptedException, TimeoutException {
-
-		PortalRuntimePermission.checkThreadPoolExecutor(name);
-
-		return getPortalExecutorManager().execute(
-			name, callable, timeout, timeUnit);
-	}
 
 	public static ThreadPoolExecutor getPortalExecutor(String name) {
 		PortalRuntimePermission.checkThreadPoolExecutor(name);
@@ -66,7 +45,15 @@ public class PortalExecutorManagerUtil {
 		PortalRuntimePermission.checkGetBeanProperty(
 			PortalExecutorManagerUtil.class);
 
-		return _portalExecutorManager;
+		try {
+			while (_instance._serviceTracker.getService() == null) {
+				Thread.sleep(500);
+			}
+		}
+		catch (InterruptedException e) {
+		}
+
+		return _instance._serviceTracker.getService();
 	}
 
 	public static ThreadPoolExecutor registerPortalExecutor(
@@ -92,26 +79,18 @@ public class PortalExecutorManagerUtil {
 		getPortalExecutorManager().shutdown(interrupt);
 	}
 
-	public static void shutdown(String name) {
-		PortalRuntimePermission.checkThreadPoolExecutor(name);
+	private PortalExecutorManagerUtil() {
+		Registry registry = RegistryUtil.getRegistry();
 
-		getPortalExecutorManager().shutdown(name);
+		_serviceTracker = registry.trackServices(PortalExecutorManager.class);
+
+		_serviceTracker.open();
 	}
 
-	public static void shutdown(String name, boolean interrupt) {
-		PortalRuntimePermission.checkThreadPoolExecutor(name);
+	private static final PortalExecutorManagerUtil _instance =
+		new PortalExecutorManagerUtil();
 
-		getPortalExecutorManager().shutdown(name, interrupt);
-	}
-
-	public void setPortalExecutorManager(
-		PortalExecutorManager portalExecutorManager) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_portalExecutorManager = portalExecutorManager;
-	}
-
-	private static PortalExecutorManager _portalExecutorManager;
+	private final ServiceTracker<PortalExecutorManager, PortalExecutorManager>
+		_serviceTracker;
 
 }

@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.Phone;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.PhoneService;
@@ -46,7 +46,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
-	implements PhoneService, IdentifiableBean {
+	implements PhoneService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -77,7 +77,7 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the phone remote service
 	 */
-	public com.liferay.portal.service.PhoneService getPhoneService() {
+	public PhoneService getPhoneService() {
 		return phoneService;
 	}
 
@@ -86,8 +86,7 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param phoneService the phone remote service
 	 */
-	public void setPhoneService(
-		com.liferay.portal.service.PhoneService phoneService) {
+	public void setPhoneService(PhoneService phoneService) {
 		this.phoneService = phoneService;
 	}
 
@@ -183,6 +182,25 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
 		this.classNamePersistence = classNamePersistence;
+	}
+
+	/**
+	 * Returns the list type local service.
+	 *
+	 * @return the list type local service
+	 */
+	public com.liferay.portal.service.ListTypeLocalService getListTypeLocalService() {
+		return listTypeLocalService;
+	}
+
+	/**
+	 * Sets the list type local service.
+	 *
+	 * @param listTypeLocalService the list type local service
+	 */
+	public void setListTypeLocalService(
+		com.liferay.portal.service.ListTypeLocalService listTypeLocalService) {
+		this.listTypeLocalService = listTypeLocalService;
 	}
 
 	/**
@@ -303,23 +321,13 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return PhoneService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -357,7 +365,7 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.PhoneLocalService.class)
 	protected com.liferay.portal.service.PhoneLocalService phoneLocalService;
 	@BeanReference(type = com.liferay.portal.service.PhoneService.class)
-	protected com.liferay.portal.service.PhoneService phoneService;
+	protected PhoneService phoneService;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -368,6 +376,8 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
+	@BeanReference(type = com.liferay.portal.service.ListTypeLocalService.class)
+	protected com.liferay.portal.service.ListTypeLocalService listTypeLocalService;
 	@BeanReference(type = com.liferay.portal.service.ListTypeService.class)
 	protected com.liferay.portal.service.ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)
@@ -380,5 +390,4 @@ public abstract class PhoneServiceBaseImpl extends BaseServiceImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-	private String _beanIdentifier;
 }

@@ -80,6 +80,10 @@ public interface ResultRow {
 		ServletContext servletContext, HttpServletRequest request,
 		HttpServletResponse response);
 
+	public void addJSP(
+		String path, String cssClass, ServletContext servletContext,
+		HttpServletRequest request, HttpServletResponse response);
+
 	public void addJSP(String align, String valign, String path);
 
 	public void addJSP(
@@ -156,6 +160,8 @@ public interface ResultRow {
 
 	public String getClassName();
 
+	public String getCssClass();
+
 	public Map<String, Object> getData();
 
 	public List<SearchEntry> getEntries();
@@ -169,6 +175,8 @@ public interface ResultRow {
 	public String getPrimaryKey();
 
 	public String getRowId();
+
+	public String getState();
 
 	public boolean isBold();
 
@@ -184,6 +192,8 @@ public interface ResultRow {
 
 	public void setClassName(String className);
 
+	public void setCssClass(String cssClass);
+
 	public void setData(Map<String, Object> data);
 
 	public void setObject(Object obj);
@@ -197,5 +207,7 @@ public interface ResultRow {
 	public void setRowId(String rowId);
 
 	public void setSkip(boolean skip);
+
+	public void setState(String state);
 
 }

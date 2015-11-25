@@ -1,0 +1,84 @@
+<definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="Site Pages Administration" />
+
+	<set-up>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="SignIn#signInPortalInstanceSetUp" />
+			</then>
+		</if>
+
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="WebContent#tearDownCP" />
+
+				<execute macro="Page#tearDownPG" />
+			</else>
+		</if>
+	</tear-down>
+
+	<command name="AddPageFromExistingPage" priority="3">
+		<execute macro="Page#openURL" />
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Site Page" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Site Page Name" />
+			<var name="pageTemplateName" value="Content Display Page" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page Name" />
+		</execute>
+
+		<for list="Tags Navigation,Search,Categories Navigation,Asset Publisher" param="portletName">
+			<execute macro="Portlet#viewSpecificPG">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+		</for>
+	</command>
+
+	<command name="EditSitePage" priority="4">
+		<execute macro="Page#openURL" />
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Site Page" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page" />
+		</execute>
+
+		<execute macro="SitePage#editPG">
+			<var name="sitePageNameEdit" value="Site Page Edit" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Site Page Edit" />
+		</execute>
+
+		<execute macro="Page#viewPG">
+			<var name="liferaySite" value="true" />
+			<var name="pageName" value="Site Page Edit" />
+		</execute>
+	</command>
+</definition>

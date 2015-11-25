@@ -14,9 +14,9 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.cache.Lifecycle;
-import com.liferay.portal.kernel.cache.ThreadLocalCache;
-import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -85,14 +85,12 @@ public class LayoutListUtil {
 		long groupId, boolean privateLayout, String rootNodeName,
 		Locale locale) {
 
-		List<LayoutDescription> layoutDescriptions =
-			new ArrayList<LayoutDescription>();
+		List<LayoutDescription> layoutDescriptions = new ArrayList<>();
 
-		List<Layout> layouts = new ArrayList<Layout>(
+		List<Layout> layouts = new ArrayList<>(
 			LayoutLocalServiceUtil.getLayouts(groupId, privateLayout));
 
-		Deque<ObjectValuePair<Layout, Integer>> deque =
-			new LinkedList<ObjectValuePair<Layout, Integer>>();
+		Deque<ObjectValuePair<Layout, Integer>> deque = new LinkedList<>();
 
 		Layout rootLayout = new LayoutImpl();
 

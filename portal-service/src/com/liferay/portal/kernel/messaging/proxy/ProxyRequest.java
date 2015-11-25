@@ -39,8 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProxyRequest implements Externalizable {
 
 	/**
-	 * The empty constructor is required by {@link java.io.Externalizable}. Do
-	 * not use this for any other purpose.
+	 * The empty constructor is required by {@link Externalizable}. Do not use
+	 * this for any other purpose.
 	 */
 	public ProxyRequest() {
 		_local = false;
@@ -158,7 +158,7 @@ public class ProxyRequest implements Externalizable {
 	}
 
 	private static final Map<Method, boolean[]> _localAndSynchronousMap =
-		new ConcurrentHashMap<Method, boolean[]>();
+		new ConcurrentHashMap<>();
 
 	private Object[] _arguments;
 	private boolean _hasReturnValue;

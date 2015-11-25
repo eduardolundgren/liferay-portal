@@ -31,6 +31,7 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.plugin.ModuleId;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.webserver.WebServerServletTokenUtil;
 import com.liferay.portlet.softwarecatalog.DuplicateProductEntryModuleIdException;
@@ -79,7 +80,6 @@ public class SCProductEntryLocalServiceImpl
 		tags = getTags(tags);
 		repoGroupId = StringUtil.toLowerCase(repoGroupId.trim());
 		repoArtifactId = StringUtil.toLowerCase(repoArtifactId.trim());
-		Date now = new Date();
 
 		validate(
 			0, name, type, shortDescription, pageURL, author, repoGroupId,
@@ -94,8 +94,6 @@ public class SCProductEntryLocalServiceImpl
 		productEntry.setCompanyId(user.getCompanyId());
 		productEntry.setUserId(user.getUserId());
 		productEntry.setUserName(user.getFullName());
-		productEntry.setCreateDate(now);
-		productEntry.setModifiedDate(now);
 		productEntry.setName(name);
 		productEntry.setType(type);
 		productEntry.setTags(tags);
@@ -119,8 +117,7 @@ public class SCProductEntryLocalServiceImpl
 		}
 		else {
 			addProductEntryResources(
-				productEntry, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
+				productEntry, serviceContext.getModelPermissions());
 		}
 
 		// Licenses
@@ -158,15 +155,13 @@ public class SCProductEntryLocalServiceImpl
 
 	@Override
 	public void addProductEntryResources(
-			long productEntryId, String[] groupPermissions,
-			String[] guestPermissions)
+			long productEntryId, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		SCProductEntry productEntry =
 			scProductEntryPersistence.findByPrimaryKey(productEntryId);
 
-		addProductEntryResources(
-			productEntry, groupPermissions, guestPermissions);
+		addProductEntryResources(productEntry, modelPermissions);
 	}
 
 	@Override
@@ -184,15 +179,13 @@ public class SCProductEntryLocalServiceImpl
 
 	@Override
 	public void addProductEntryResources(
-			SCProductEntry productEntry, String[] groupPermissions,
-			String[] guestPermissions)
+			SCProductEntry productEntry, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		resourceLocalService.addModelResources(
 			productEntry.getCompanyId(), productEntry.getGroupId(),
 			productEntry.getUserId(), SCProductEntry.class.getName(),
-			productEntry.getProductEntryId(), groupPermissions,
-			guestPermissions);
+			productEntry.getProductEntryId(), modelPermissions);
 	}
 
 	@Override
@@ -409,7 +402,6 @@ public class SCProductEntryLocalServiceImpl
 		tags = getTags(tags);
 		repoGroupId = StringUtil.toLowerCase(repoGroupId.trim());
 		repoArtifactId = StringUtil.toLowerCase(repoArtifactId.trim());
-		Date now = new Date();
 
 		validate(
 			productEntryId, name, type, shortDescription, pageURL, author,
@@ -418,7 +410,6 @@ public class SCProductEntryLocalServiceImpl
 		SCProductEntry productEntry =
 			scProductEntryPersistence.findByPrimaryKey(productEntryId);
 
-		productEntry.setModifiedDate(now);
 		productEntry.setName(name);
 		productEntry.setType(type);
 		productEntry.setTags(tags);

@@ -90,7 +90,7 @@ public class RuntimeVariables {
 				String[] arguments = StringUtil.split(
 					statementMatcher.group(3), "'");
 
-				List<String> argumentsList = new ArrayList<String>();
+				List<String> argumentsList = new ArrayList<>();
 
 				for (int i = 1; i < arguments.length; i++) {
 					if ((i % 2) == 1) {
@@ -220,6 +220,9 @@ public class RuntimeVariables {
 
 			_sourceDir = absolutePath;
 		}
+		else {
+			_sourceDir = null;
+		}
 	}
 
 	private String _getValue(String key) {
@@ -297,16 +300,15 @@ public class RuntimeVariables {
 		_contextReplace = new ContextReplace(_runtimeVariables);
 	}
 
-	private static RuntimeVariables _instance = new RuntimeVariables();
+	private static final RuntimeVariables _instance = new RuntimeVariables();
 
-	private static Pattern _variablePattern = Pattern.compile(
+	private static final Pattern _variablePattern = Pattern.compile(
 		"\\$\\{([^}]*?)\\}");
-	private static Pattern _variableStatementPattern = Pattern.compile(
+	private static final Pattern _variableStatementPattern = Pattern.compile(
 		"(.*)\\?(.*)\\(([^\\)]*?)\\)");
 
 	private ContextReplace _contextReplace;
-	private Map<String, String> _runtimeVariables =
-		new HashMap<String, String>();
-	private String _sourceDir;
+	private final Map<String, String> _runtimeVariables = new HashMap<>();
+	private final String _sourceDir;
 
 }

@@ -15,7 +15,8 @@
 package com.liferay.portal.kernel.io;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
@@ -59,7 +60,7 @@ public class DeserializerTest {
 
 	@Before
 	public void setUp() {
-		Class<?> clazz =  getClass();
+		Class<?> clazz = getClass();
 
 		PortalClassLoaderUtil.setClassLoader(clazz.getClassLoader());
 	}
@@ -331,7 +332,7 @@ public class DeserializerTest {
 	}
 
 	@Test
-	public void testReadObjectClass() throws Exception {
+	public void testReadObjectClassWithBlankContextName() throws Exception {
 		Class<?> clazz = getClass();
 
 		String className = clazz.getName();
@@ -341,6 +342,39 @@ public class DeserializerTest {
 		byteBuffer.put(SerializationConstants.TC_CLASS);
 		byteBuffer.put((byte)1);
 		byteBuffer.putInt(0);
+		byteBuffer.put((byte)1);
+		byteBuffer.putInt(className.length());
+		byteBuffer.put(className.getBytes(StringPool.UTF8));
+
+		byteBuffer.flip();
+
+		Deserializer deserializer = new Deserializer(byteBuffer);
+
+		ClassLoaderPool.register(StringPool.BLANK, clazz.getClassLoader());
+
+		try {
+			Assert.assertSame(clazz, deserializer.readObject());
+		}
+		finally {
+			ClassLoaderPool.unregister(clazz.getClassLoader());
+		}
+	}
+
+	@Test
+	public void testReadObjectClassWithNullContextName() throws Exception {
+		Class<?> clazz = getClass();
+
+		String className = clazz.getName();
+
+		String contextName = StringPool.NULL;
+
+		ByteBuffer byteBuffer = ByteBuffer.allocate(
+			className.length() + contextName.length() + 11);
+
+		byteBuffer.put(SerializationConstants.TC_CLASS);
+		byteBuffer.put((byte)1);
+		byteBuffer.putInt(contextName.length());
+		byteBuffer.put(contextName.getBytes(StringPool.UTF8));
 		byteBuffer.put((byte)1);
 		byteBuffer.putInt(className.length());
 		byteBuffer.put(className.getBytes(StringPool.UTF8));
@@ -647,6 +681,6 @@ public class DeserializerTest {
 
 	private static final int _COUNT = 1024;
 
-	private Random _random = new Random();
+	private final Random _random = new Random();
 
 }

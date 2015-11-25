@@ -89,12 +89,15 @@ public class TrashUtil {
 	}
 
 	public static void deleteEntriesAttachments(
-			long companyId, long repositoryId, Date date,
-			String[] attachmentFileNames)
-		throws PortalException {
+		long companyId, long repositoryId, Date date,
+		String[] attachmentFileNames) {
 
 		getTrash().deleteEntriesAttachments(
 			companyId, repositoryId, date, attachmentFileNames);
+	}
+
+	public static Group disableTrash(Group group) {
+		return getTrash().disableTrash(group);
 	}
 
 	public static List<TrashEntry> getEntries(Hits hits)
@@ -148,10 +151,23 @@ public class TrashUtil {
 	}
 
 	public static PortletURL getViewContentURL(
+			HttpServletRequest request, long trashEntryId)
+		throws PortalException {
+
+		return getTrash().getViewContentURL(request, trashEntryId);
+	}
+
+	public static PortletURL getViewContentURL(
 			HttpServletRequest request, String className, long classPK)
 		throws PortalException {
 
 		return getTrash().getViewContentURL(request, className, classPK);
+	}
+
+	public static PortletURL getViewURL(HttpServletRequest request)
+		throws PortalException {
+
+		return getTrash().getViewURL(request);
 	}
 
 	public static boolean isInTrash(String className, long classPK)
@@ -166,6 +182,10 @@ public class TrashUtil {
 
 	public static boolean isTrashEnabled(long groupId) throws PortalException {
 		return getTrash().isTrashEnabled(groupId);
+	}
+
+	public static boolean isValidTrashTitle(String title) {
+		return getTrash().isValidTrashTitle(title);
 	}
 
 	public void setTrash(Trash trash) {

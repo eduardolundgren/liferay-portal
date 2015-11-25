@@ -34,6 +34,23 @@ public interface Layout extends LayoutModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.LayoutImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public static final Accessor<Layout, Long> PLID_ACCESSOR = new Accessor<Layout, Long>() {
+			@Override
+			public Long get(Layout layout) {
+				return layout.getPlid();
+			}
+
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
+
+			@Override
+			public Class<Layout> getTypeClass() {
+				return Layout.class;
+			}
+		};
+
 	public static final Accessor<Layout, Long> LAYOUT_ID_ACCESSOR = new Accessor<Layout, Long>() {
 			@Override
 			public Long get(Layout layout) {
@@ -65,7 +82,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* the current layout.
 	*
 	* @return the ID of the topmost parent layout of the current layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	public long getAncestorLayoutId()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -75,7 +91,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* of the current layout.
 	*
 	* @return the plid of the topmost parent layout of the current layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	public long getAncestorPlid()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -86,7 +101,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* parent listed last.
 	*
 	* @return the current layout's list of parent layouts
-	* @throws PortalException if a matching layout could not be found
 	*/
 	public java.util.List<com.liferay.portal.model.Layout> getAncestors()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -106,7 +120,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* @param permissionChecker the user-specific context to check permissions
 	* @return the list of all child layouts that the user has permission to
 	access
-	* @throws PortalException if a portal exception occurred
 	*/
 	public java.util.List<com.liferay.portal.model.Layout> getChildren(
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
@@ -120,7 +133,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* @return the color scheme that is configured for the current layout, or
 	the color scheme  of the layout set that contains the current
 	layout if no color scheme is configured
-	* @throws PortalException if a portal exception occurred
 	*/
 	public com.liferay.portal.model.ColorScheme getColorScheme()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -136,13 +148,17 @@ public interface Layout extends LayoutModel, PersistedModel {
 	*
 	* @return the CSS text for the current layout, or for the layout set if no
 	CSS text is configured in the current layout
-	* @throws PortalException if a portal exception occurred
 	*/
 	public java.lang.String getCssText()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public java.lang.String getDefaultThemeSetting(java.lang.String key,
 		java.lang.String device, boolean inheritLookAndFeel);
+
+	public java.util.List<com.liferay.portal.model.Portlet> getEmbeddedPortlets();
+
+	public java.util.List<com.liferay.portal.model.Portlet> getEmbeddedPortlets(
+		long groupId);
 
 	/**
 	* Returns the layout's friendly URL for the given locale.
@@ -169,8 +185,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* </p>
 	*
 	* @return the current layout's group
-	* @throws PortalException if a group with the primary key could not be
-	found
 	*/
 	public com.liferay.portal.model.Group getGroup()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -210,7 +224,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* Returns the current layout's {@link LayoutSet}.
 	*
 	* @return the current layout's layout set
-	* @throws PortalException if a portal exception occurred
 	*/
 	public com.liferay.portal.model.LayoutSet getLayoutSet()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -235,7 +248,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	*
 	* @return the current layout's parent plid, or <code>0</code> if the
 	current layout is the topmost parent layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	public long getParentPlid()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -263,7 +275,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	*
 	* @return the current layout's theme, or the layout set's theme if no
 	layout theme is configured
-	* @throws PortalException if a portal exception occurred
 	*/
 	public com.liferay.portal.model.Theme getTheme()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -296,8 +307,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	* @return <code>true</code> if the given layout ID matches one of the
 	current layout's hierarchical parents; <code>false</code>
 	otherwise
-	* @throws PortalException if any one of the current layout's acestors could
-	not be retrieved
 	*/
 	public boolean hasAncestor(long layoutId)
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -312,6 +321,8 @@ public interface Layout extends LayoutModel, PersistedModel {
 
 	public boolean hasScopeGroup()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public boolean hasSetModifiedDate();
 
 	public boolean includeLayoutContent(
 		javax.servlet.http.HttpServletRequest request,
@@ -412,6 +423,10 @@ public interface Layout extends LayoutModel, PersistedModel {
 	*/
 	public boolean isSupportsEmbeddedPortlets();
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	*/
+	@java.lang.Deprecated()
 	public boolean isTypeArticle();
 
 	public boolean isTypeControlPanel();

@@ -102,9 +102,8 @@ public class SelectorIntraband extends BaseIntraband {
 
 		selectableChannel.configureBlocking(false);
 
-		FutureTask<RegistrationReference> registerFutureTask =
-			new FutureTask<RegistrationReference>(
-				new RegisterCallable(selectableChannel, selectableChannel));
+		FutureTask<RegistrationReference> registerFutureTask = new FutureTask<>(
+			new RegisterCallable(selectableChannel, selectableChannel));
 
 		registerQueue.offer(registerFutureTask);
 
@@ -212,20 +211,21 @@ public class SelectorIntraband extends BaseIntraband {
 	protected void registerChannels() {
 		FutureTask<RegistrationReference> registerFuturetask = null;
 
-		while ((registerFuturetask = registerQueue.poll()) != null) {
-			registerFuturetask.run();
+		synchronized (selector) {
+			while ((registerFuturetask = registerQueue.poll()) != null) {
+				registerFuturetask.run();
+			}
 		}
 	}
 
-	protected static final ThreadFactory threadFactory =
-		new NamedThreadFactory(
-			SelectorIntraband.class + ".threadFactory", Thread.NORM_PRIORITY,
-			SelectorIntraband.class.getClassLoader());
+	protected static final ThreadFactory threadFactory = new NamedThreadFactory(
+		SelectorIntraband.class + ".threadFactory", Thread.NORM_PRIORITY,
+		SelectorIntraband.class.getClassLoader());
 
 	protected final Thread pollingThread = threadFactory.newThread(
 		new PollingJob());
 	protected final Queue<FutureTask<RegistrationReference>> registerQueue =
-		new ConcurrentLinkedQueue<FutureTask<RegistrationReference>>();
+		new ConcurrentLinkedQueue<>();
 	protected final Selector selector = Selector.open();
 
 	protected class RegisterCallable
@@ -362,7 +362,8 @@ public class SelectorIntraband extends BaseIntraband {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SelectorIntraband.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SelectorIntraband.class);
 
 	private class PollingJob implements Runnable {
 

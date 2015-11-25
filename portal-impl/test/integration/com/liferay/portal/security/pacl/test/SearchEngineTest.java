@@ -15,7 +15,7 @@
 package com.liferay.portal.security.pacl.test;
 
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.test.PACLTestRule;
+import com.liferay.portal.test.rule.PACLTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -44,12 +44,7 @@ public class SearchEngineTest {
 
 	@Test
 	public void test2() throws Exception {
-		try {
-			SearchEngineUtil.getSearchEngine("SYSTEM_ENGINE");
-		}
-		catch (SecurityException se) {
-			Assert.fail();
-		}
+		SearchEngineUtil.getSearchEngine("SYSTEM_ENGINE");
 	}
 
 }

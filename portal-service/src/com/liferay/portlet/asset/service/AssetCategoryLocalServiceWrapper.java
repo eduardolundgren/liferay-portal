@@ -74,23 +74,23 @@ public class AssetCategoryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portlet.asset.model.AssetCategory addCategory(
-		long userId, long parentCategoryId,
+		long userId, long groupId, long parentCategoryId,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		long vocabularyId, java.lang.String[] categoryProperties,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _assetCategoryLocalService.addCategory(userId, parentCategoryId,
-			titleMap, descriptionMap, vocabularyId, categoryProperties,
-			serviceContext);
+		return _assetCategoryLocalService.addCategory(userId, groupId,
+			parentCategoryId, titleMap, descriptionMap, vocabularyId,
+			categoryProperties, serviceContext);
 	}
 
 	@Override
 	public com.liferay.portlet.asset.model.AssetCategory addCategory(
-		long userId, java.lang.String title, long vocabularyId,
+		long userId, long groupId, java.lang.String title, long vocabularyId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _assetCategoryLocalService.addCategory(userId, title,
+		return _assetCategoryLocalService.addCategory(userId, groupId, title,
 			vocabularyId, serviceContext);
 	}
 
@@ -106,10 +106,10 @@ public class AssetCategoryLocalServiceWrapper
 	@Override
 	public void addCategoryResources(
 		com.liferay.portlet.asset.model.AssetCategory category,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_assetCategoryLocalService.addCategoryResources(category,
-			groupPermissions, guestPermissions);
+			modelPermissions);
 	}
 
 	@Override
@@ -475,16 +475,6 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.getAssetEntryPrimaryKeys(categoryId);
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _assetCategoryLocalService.getBeanIdentifier();
-	}
-
 	@Override
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories() {
 		return _assetCategoryLocalService.getCategories();
@@ -500,6 +490,13 @@ public class AssetCategoryLocalServiceWrapper
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories(
 		long classNameId, long classPK) {
 		return _assetCategoryLocalService.getCategories(classNameId, classPK);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories(
+		com.liferay.portal.kernel.search.Hits hits)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetCategoryLocalService.getCategories(hits);
 	}
 
 	@Override
@@ -564,8 +561,23 @@ public class AssetCategoryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _assetCategoryLocalService.getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _assetCategoryLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _assetCategoryLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -677,6 +689,16 @@ public class AssetCategoryLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portlet.asset.model.AssetCategory> searchCategories(
 		long companyId, long[] groupIds, java.lang.String title,
+		long[] vocabularyIds, long[] parentCategoryIds, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetCategoryLocalService.searchCategories(companyId, groupIds,
+			title, vocabularyIds, parentCategoryIds, start, end, sort);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portlet.asset.model.AssetCategory> searchCategories(
+		long companyId, long[] groupIds, java.lang.String title,
 		long[] vocabularyIds, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetCategoryLocalService.searchCategories(companyId, groupIds,
@@ -687,16 +709,6 @@ public class AssetCategoryLocalServiceWrapper
 	public void setAssetEntryAssetCategories(long entryId, long[] categoryIds) {
 		_assetCategoryLocalService.setAssetEntryAssetCategories(entryId,
 			categoryIds);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_assetCategoryLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**

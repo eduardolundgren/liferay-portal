@@ -24,39 +24,39 @@ import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
+import com.liferay.portal.kernel.scheduler.SchedulerEntry;
 import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
+import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.util.Date;
 
 /**
  * @author Shuyang Zhou
  */
-public class SchedulerEventMessageListenerWrapper implements MessageListener {
+public class SchedulerEventMessageListenerWrapper
+	implements SchedulerEventMessageListener {
 
-	public void afterPropertiesSet() {
-		if (_messageListenerUUID == null) {
-			_messageListenerUUID = PortalUUIDUtil.generate();
-		}
-	}
-
-	public String getMessageListenerUUID() {
-		return _messageListenerUUID;
+	@Override
+	public SchedulerEntry getSchedulerEntry() {
+		return _schedulerEntry;
 	}
 
 	@Override
 	public void receive(Message message) throws MessageListenerException {
 		String destinationName = GetterUtil.getString(
 			message.getString(SchedulerEngine.DESTINATION_NAME));
+		String jobName = message.getString(SchedulerEngine.JOB_NAME);
+		String groupName = message.getString(SchedulerEngine.GROUP_NAME);
 
 		if (destinationName.equals(DestinationNames.SCHEDULER_DISPATCH)) {
-			String messageListenerUUID = message.getString(
-				SchedulerEngine.MESSAGE_LISTENER_UUID);
+			Trigger trigger = _schedulerEntry.getTrigger();
 
-			if (!_messageListenerUUID.equals(messageListenerUUID)) {
+			if (!jobName.equals(trigger.getJobName()) ||
+				!groupName.equals(trigger.getGroupName())) {
+
 				return;
 			}
 		}
@@ -87,9 +87,6 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 						destinationName, this);
 				}
 
-				String jobName = message.getString(SchedulerEngine.JOB_NAME);
-				String groupName = message.getString(
-					SchedulerEngine.GROUP_NAME);
 				StorageType storageType = (StorageType)message.get(
 					SchedulerEngine.STORAGE_TYPE);
 
@@ -123,17 +120,9 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #setGroupName(String)}
-	 */
-	@Deprecated
-	public void setClassName(String className) {
-		_groupName = className;
-		_jobName = className;
-	}
-
-	/**
 	 * @deprecated As of 7.0.0
 	 */
+	@Deprecated
 	public void setGroupName(String groupName) {
 		_groupName = groupName;
 	}
@@ -141,6 +130,7 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 	/**
 	 * @deprecated As of 7.0.0
 	 */
+	@Deprecated
 	public void setJobName(String jobName) {
 		_jobName = jobName;
 	}
@@ -149,8 +139,8 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 		_messageListener = messageListener;
 	}
 
-	public void setMessageListenerUUID(String messageListenerUUID) {
-		_messageListenerUUID = messageListenerUUID;
+	public void setSchedulerEntry(SchedulerEntry schedulerEntry) {
+		_schedulerEntry = schedulerEntry;
 	}
 
 	protected void handleException(Message message, Exception exception) {
@@ -167,16 +157,18 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 	/**
 	 * @deprecated As of 7.0.0
 	 */
+	@Deprecated
 	@SuppressWarnings("unused")
 	private String _groupName;
 
 	/**
 	 * @deprecated As of 7.0.0
 	 */
+	@Deprecated
 	@SuppressWarnings("unused")
 	private String _jobName;
 
 	private MessageListener _messageListener;
-	private String _messageListenerUUID;
+	private SchedulerEntry _schedulerEntry;
 
 }

@@ -46,8 +46,7 @@ public class ASMUtil {
 		int sort = returnType.getSort();
 
 		if ((sort == Type.BOOLEAN) || (sort == Type.CHAR) ||
-			(sort == Type.BYTE) || (sort == Type.INT) ||
-			(sort == Type.SHORT)) {
+			(sort == Type.BYTE) || (sort == Type.INT) || (sort == Type.SHORT)) {
 
 			methodVisitor.visitInsn(Opcodes.ICONST_0);
 			methodVisitor.visitInsn(Opcodes.IRETURN);
@@ -76,7 +75,7 @@ public class ASMUtil {
 	public static List<FieldNode> addFieldNodes(
 		List<FieldNode> fieldNodes, List<FieldNode> newFieldNodes) {
 
-		List<FieldNode> addedFieldNodes = new ArrayList<FieldNode>();
+		List<FieldNode> addedFieldNodes = new ArrayList<>();
 
 		newFieldNode:
 		for (FieldNode newFieldNode : newFieldNodes) {
@@ -213,7 +212,7 @@ public class ASMUtil {
 	public static List<MethodNode> removeMethodNodes(
 		List<MethodNode> methodNodes, int access) {
 
-		List<MethodNode> removedMethodNodes = new ArrayList<MethodNode>();
+		List<MethodNode> removedMethodNodes = new ArrayList<>();
 
 		for (MethodNode methodNode : methodNodes) {
 			if ((access & methodNode.access) != 0) {
@@ -229,7 +228,7 @@ public class ASMUtil {
 	public static List<MethodNode> removeMethodNodes(
 		List<MethodNode> methodNodes, Set<String> annotations) {
 
-		List<MethodNode> removedMethodNodes = new ArrayList<MethodNode>();
+		List<MethodNode> removedMethodNodes = new ArrayList<>();
 
 		for (MethodNode methodNode : methodNodes) {
 			List<AnnotationNode> annotationNodes =
@@ -254,7 +253,7 @@ public class ASMUtil {
 	public static List<MethodNode> removeMethodNodes(
 		List<MethodNode> methodNodes, String name) {
 
-		List<MethodNode> removedMethodNodes = new ArrayList<MethodNode>();
+		List<MethodNode> removedMethodNodes = new ArrayList<>();
 
 		for (MethodNode methodNode : methodNodes) {
 			if (name.equals(methodNode.name)) {

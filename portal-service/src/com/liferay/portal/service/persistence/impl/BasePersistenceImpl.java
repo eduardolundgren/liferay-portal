@@ -15,6 +15,7 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.portal.NoSuchModelException;
+import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Dialect;
@@ -28,8 +29,11 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.NullSafeStringComparator;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.BaseModel;
@@ -43,6 +47,7 @@ import com.liferay.portal.service.persistence.BasePersistence;
 import java.io.Serializable;
 
 import java.sql.Connection;
+import java.sql.Types;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -200,6 +205,11 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	@Override
+	public Set<String> getBadColumnNames() {
+		return Collections.emptySet();
+	}
+
+	@Override
 	public Session getCurrentSession() throws ORMException {
 		return _sessionFactory.getCurrentSession();
 	}
@@ -293,7 +303,12 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		_sessionFactory = sessionFactory;
 		_dialect = _sessionFactory.getDialect();
-		_db = DBFactoryUtil.getDB(_dialect);
+		_db = DBFactoryUtil.getDB(_dialect, getDataSource());
+
+		_databaseOrderByMaxColumns = GetterUtil.getInteger(
+			PropsUtil.get(
+				PropsKeys.DATABASE_ORDER_BY_MAX_COLUMNS,
+				new Filter(_db.getType())));
 	}
 
 	@Override
@@ -424,19 +439,19 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 		String[] orderByFields = orderByComparator.getOrderByFields();
 
-		for (int i = 0; i < orderByFields.length; i++) {
-			query.append(entityAlias);
-			query.append(orderByFields[i]);
+		int length = orderByFields.length;
 
-			if (sqlQuery) {
-				Set<String> badColumnNames = getBadColumnNames();
+		if ((_databaseOrderByMaxColumns > 0) &&
+			(_databaseOrderByMaxColumns < length)) {
 
-				if (badColumnNames.contains(orderByFields[i])) {
-					query.append(StringPool.UNDERLINE);
-				}
-			}
+			length = _databaseOrderByMaxColumns;
+		}
 
-			if ((i + 1) < orderByFields.length) {
+		for (int i = 0; i < length; i++) {
+			query.append(
+				getColumnName(entityAlias, orderByFields[i], sqlQuery));
+
+			if ((i + 1) < length) {
 				if (orderByComparator.isAscending(orderByFields[i])) {
 					query.append(ORDER_BY_ASC_HAS_NEXT);
 				}
@@ -455,14 +470,48 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		}
 	}
 
-	protected Set<String> getBadColumnNames() {
-		return Collections.emptySet();
-	}
-
 	protected ClassLoader getClassLoader() {
 		Class<?> clazz = getClass();
 
 		return clazz.getClassLoader();
+	}
+
+	protected String getColumnName(
+		String entityAlias, String fieldName, boolean sqlQuery) {
+
+		String columnName = fieldName;
+
+		Set<String> badColumnNames = getBadColumnNames();
+
+		if (badColumnNames.contains(fieldName)) {
+			columnName = columnName.concat(StringPool.UNDERLINE);
+		}
+
+		if (sqlQuery) {
+			fieldName = columnName;
+		}
+
+		fieldName = entityAlias.concat(fieldName);
+
+		Map<String, Integer> tableColumnsMap = getTableColumnsMap();
+
+		Integer type = tableColumnsMap.get(columnName);
+
+		if (type == null) {
+			throw new IllegalArgumentException(
+				"Unknown column name " + columnName);
+		}
+
+		if (type == Types.CLOB) {
+			fieldName = CAST_CLOB_TEXT_OPEN.concat(fieldName).concat(
+				StringPool.CLOSE_PARENTHESIS);
+		}
+
+		return fieldName;
+	}
+
+	protected Map<String, Integer> getTableColumnsMap() {
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -501,6 +550,8 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		return updateImpl(model);
 	}
 
+	protected static final String CAST_CLOB_TEXT_OPEN = "CAST_CLOB_TEXT(";
+
 	protected static final Object[] FINDER_ARGS_EMPTY = new Object[0];
 
 	protected static final Comparator<String> NULL_SAFE_STRING_COMPARATOR =
@@ -534,8 +585,10 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	@Deprecated
 	protected ModelListener<T>[] listeners = new ModelListener[0];
 
-	private static Log _log = LogFactoryUtil.getLog(BasePersistenceImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		BasePersistenceImpl.class);
 
+	private int _databaseOrderByMaxColumns;
 	private DataSource _dataSource;
 	private DB _db;
 	private Dialect _dialect;

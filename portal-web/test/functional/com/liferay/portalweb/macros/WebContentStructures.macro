@@ -1,0 +1,340 @@
+<definition>
+	<command name="addCP">
+		<execute function="Click" locator1="Button#PLUS" />
+		<execute function="SelectFrame" />
+
+		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
+		<execute function="Type#clickAtSendKeys" locator1="TextInput#NAME" value1="${structureName}" />
+
+		<if>
+			<isset var="localization1NameKey" />
+			<then>
+				<var name="key_localizationName" value="${localization1NameKey}" />
+
+				<execute function="Click" locator1="Translation#LOCALIZATION_NAME" />
+				<execute function="Type#clickAtSendKeys" locator1="TextInput#NAME" value1="${localization1Name}" />
+
+				<if>
+					<isset var="localization2NameKey" />
+					<then>
+						<var name="key_localizationName" value="${localization2NameKey}" />
+
+						<execute function="Click" locator1="Translation#LOCALIZATION_NAME" />
+						<execute function="Type#clickAtSendKeys" locator1="TextInput#NAME" value1="${localization2Name}" />
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<execute macro="WebContentNavigator#showStructureDetails" />
+
+		<if>
+			<isset var="structureDescription" />
+			<then>
+				<execute function="Type" locator1="TextInput#DESCRIPTION" value1="${structureDescription}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${substructure}" arg2="true" />
+			<then>
+				<execute function="AssertClick" locator1="DDMEditStructure#DETAILS_PARENT_SELECT_BUTTON" value1="Select" />
+				<execute function="SelectFrame" value1="relative=top" />
+
+				<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+
+				<var name="key_ddlDataDefinitionName" value="${parentStructureName}" />
+
+				<execute function="AssertClick" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_CHOOSE_BUTTON" value1="Choose" />
+				<execute function="SelectFrame" value1="relative=top" />
+
+				<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
+			</then>
+		</if>
+
+		<execute function="SelectFrame" value1="relative=top" />
+	</command>
+
+	<command name="addNullCP">
+		<execute function="Click" locator1="Button#PLUS" />
+		<execute function="SelectFrame" value1="relative=top" />
+
+		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
+		<execute function="AssertElementNotPresent" locator1="TextInput#REQUIRED_ALERT" />
+		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+		<execute function="AssertTextEquals" locator1="Message#ERROR_FIELD_REQUIRED" value1="This field is required." />
+
+		<execute function="SelectFrame" value1="relative=top" />
+	</command>
+
+	<command name="addPGViaWCD">
+		<execute function="Click" locator1="WCD#ADD_WEB_CONTENT" />
+		<execute function="AssertClick" locator1="WCD#ADD_BASIC_WEB_CONTENT" value1="Basic Web Content" />
+
+		<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
+		<execute function="AssertClick" locator1="Button#SELECT" value1="Select" />
+		<execute function="SelectFrame" />
+
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+		<execute function="Click" locator1="Button#PLUS" />
+		<execute function="SelectFrame" />
+
+		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
+		<execute function="Type#clickAtSendKeys" locator1="TextInput#NAME" value1="${structureName}" />
+
+		<for list="${structureFieldNames}" param="structureFieldName">
+			<execute macro="DynamicDataMapping#addField">
+				<var name="field" value="${structureFieldName}" />
+				<var name="fieldFieldLabel" value="${structureFieldName}" />
+				<var method="StringUtil#replace(${structureFieldName}, ' ', '')" name="fieldName" />
+			</execute>
+		</for>
+
+		<execute macro="DDLDataDefinition#saveCP" />
+
+		<execute function="SelectFrame" locator1="IFrame#STRUCTURES" />
+
+		<var name="key_ddlDataDefinitionName" value="${structureName}" />
+
+		<execute function="AssertClickNoError" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_CHOOSE_BUTTON" value1="Choose" />
+		<execute function="Confirm" value1="Selecting a new structure changes the available input fields and available templates. Do you want to proceed?" />
+		<execute function="SelectFrame" value1="relative=top" />
+
+		<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
+		<execute function="Type" locator1="TextInput#TITLE" value1="${webContentTitle}" />
+	</command>
+
+	<command name="advancedSearchCP">
+		<var name="key_ddlDataDefinitionName" value="${structureName}" />
+
+		<execute function="AssertTextEquals" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME" value1="${structureName}" />
+		<execute function="Click" locator1="Icon#ADVANCED_SEARCH" />
+
+		<if>
+			<isset var="structureName" />
+			<then>
+				<execute function="Type" locator1="TextInput#NAME" value1="${structureName}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="structureDescription" />
+			<then>
+				<execute function="Type" locator1="TextInput#DESCRIPTION" value1="${structureDescription}" />
+			</then>
+		</if>
+
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+		<execute function="AssertTextEquals" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME" value1="${structureName}" />
+		<execute function="AssertTextEquals" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_DESCRIPTION" value1="${structureDescription}" />
+	</command>
+
+	<command name="deleteCP">
+		<var name="key_ddlDataDefinitionName" value="${structureName}" />
+
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${structureName}" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+		<execute function="Click" locator1="DDMSelectStructure#DDM_STRUCTURE_ELLIPSIS" />
+		<execute function="AssertClickNoError" locator1="MenuItem#DELETE" value1="Delete" />
+
+		<if>
+			<equals arg1="${webContentHasReference}" arg2="true" />
+			<then>
+				<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+				<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
+				<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="The structure cannot be deleted because it is required by one or more templates." />
+			</then>
+			<else>
+				<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+			</else>
+		</if>
+	</command>
+
+	<command name="editFieldSettingCP">
+		<var name="key_ddlDataDefinitionName" value="${structureName}" />
+
+		<execute function="AssertClick" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME" value1="${structureName}" />
+
+		<execute function="SelectFrame" value1="relative=top" />
+
+		<if>
+			<equals arg1="${indexable}" arg2="false" />
+			<then>
+				<for list="${structureFieldNames}" param="structureFieldName">
+					<execute macro="DynamicDataMapping#editFieldIndexable">
+						<var name="fieldFieldLabel" value="${structureFieldName}" />
+					</execute>
+				</for>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${localizable}" arg2="false" />
+			<then>
+				<for list="${structureFieldNames}" param="structureFieldName">
+					<execute macro="DynamicDataMapping#editFieldLocalizable">
+						<var name="fieldFieldLabel" value="${structureFieldName}" />
+					</execute>
+				</for>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${width}" arg2="true" />
+			<then>
+				<for list="${structureFieldNames}" param="structureFieldName">
+					<execute macro="DynamicDataMapping#editFieldWidth">
+						<var name="fieldFieldLabel" value="${structureFieldName}" />
+						<var name="widthSize" value="${widthSize}" />
+					</execute>
+				</for>
+			</then>
+		</if>
+
+		<execute macro="DDLDataDefinition#saveCP" />
+	</command>
+
+	<command name="editSubstructureDefaultValuesCP">
+		<var name="key_ddlDataDefinitionName" value="${substructureName}" />
+
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${substructureName}" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+
+		<var name="key_listEntry" value="${substructureName}" />
+
+		<execute function="Click" locator1="Icon#LIST_VERTICAL_ELLIPSIS" />
+		<execute function="AssertClick" locator1="MenuItem#EDIT_DEFAULT_VALUES" value1="Edit Default Values" />
+
+		<execute function="SelectFrameTop" />
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+
+		<for list="${editSubstructureFieldNames}" param="structureFieldName">
+			<var name="key_fieldDefaultValue" value="${structureFieldName}" />
+			<var method="StringUtil#replace('${structureFieldName}', ' ', '')" name="structureFieldName" />
+
+			<execute function="Type" locator1="DDMField#DDM_INPUT" value1="Edited ${structureFieldName} Field" />
+		</for>
+
+		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+
+		<execute function="SelectFrame" value1="relative=top" />
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+		<execute function="Click" locator1="Icon#LIST_VERTICAL_ELLIPSIS" />
+		<execute function="AssertClick" locator1="MenuItem#EDIT_DEFAULT_VALUES" value1="Edit Default Values" />
+
+		<execute function="SelectFrameTop" />
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+
+		<for list="${editSubstructureFieldNames}" param="structureFieldName">
+			<var name="key_fieldDefaultValue" value="${structureFieldName}" />
+
+			<execute function="AssertTextEquals" locator1="DDMField#DDM_INPUT" value1="Edited ${structureFieldName} Field" />
+		</for>
+	</command>
+
+	<command name="gotoCP">
+		<execute function="Click" locator1="Icon#HEADER_VERTICAL_ELLIPSIS" />
+		<execute function="AssertClick" locator1="MenuItem#STRUCTURES" value1="Structures" />
+
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+	</command>
+
+	<command name="saveCP">
+		<execute macro="DDLDataDefinition#saveCP" />
+
+		<if>
+			<isset var="addRoleViewPermissions" />
+			<then>
+				<execute function="SelectFrame" locator1="IFrame#STRUCTURES" />
+
+				<var name="key_listEntry" value="${structureName}" />
+
+				<execute function="Click" locator1="Icon#LIST_VERTICAL_ELLIPSIS" />
+				<execute function="AssertClick" locator1="MenuItem#PERMISSIONS_LEXICON" value1="Permissions" />
+
+				<execute macro="PermissionsInline#addOrRemoveViewPermissionFromAllRoles">
+					<var name="addOrRemoveViewPermission" value="Add" />
+					<var name="roleList" value="${addRoleViewPermissions}" />
+				</execute>
+
+				<execute function="SelectFrameTop" />
+			</then>
+		</if>
+	</command>
+
+	<command name="tearDownCP">
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="WebContentNavigator#gotoManageStructures" />
+
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="2" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+
+		<while>
+			<condition function="IsElementNotPresent" locator1="Message#EMPTY_INFO" />
+			<then>
+				<execute function="Check#checkAll" locator1="Checkbox#SELECT_ALL" />
+				<execute function="ClickNoError" locator1="Icon#DELETE" />
+				<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+				<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+			</then>
+		</while>
+
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="Structure" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+
+		<while>
+			<condition function="IsElementNotPresent" locator1="Message#EMPTY_INFO" />
+			<then>
+				<execute function="Check#checkAll" locator1="Checkbox#SELECT_ALL" />
+				<execute function="ClickNoError" locator1="Icon#DELETE" />
+				<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+				<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+			</then>
+		</while>
+
+		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="There are no results." />
+	</command>
+
+	<command name="viewCP">
+		<var name="key_ddlDataDefinitionName" value="${structureName}" />
+
+		<if>
+			<isset var="structureName" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME" value1="${structureName}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="structureDescription" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_DESCRIPTION" value1="${structureDescription}" />
+			</then>
+		</if>
+
+		<execute function="AssertClick" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME" value1="${structureName}" />
+
+		<execute function="SelectFrameTop" />
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+
+		<execute macro="WebContentNavigator#showStructureDetails" />
+
+		<if>
+			<isset var="structureDescription" />
+			<then>
+				<execute function="AssertTextEquals" locator1="TextInput#DESCRIPTION" value1="${structureDescription}" />
+			</then>
+		</if>
+
+		<execute function="SelectFrame" value1="relative=top" />
+	</command>
+
+	<command name="viewTemplateValidation">
+		<execute function="Confirm" value1="Please add a template to render this structure." />
+	</command>
+</definition>

@@ -21,11 +21,12 @@ import com.liferay.portal.LayoutParentLayoutIdException;
 import com.liferay.portal.LayoutTypeException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -46,6 +47,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalService;
 import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.persistence.LayoutFriendlyURLPersistence;
 import com.liferay.portal.service.persistence.LayoutPersistence;
 import com.liferay.portal.service.persistence.LayoutSetPersistence;
@@ -63,12 +65,7 @@ import java.util.Map;
 /**
  * @author Raymond Augé
  */
-public class LayoutLocalServiceHelper implements IdentifiableBean {
-
-	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
+public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 
 	public String getFriendlyURL(
 			long groupId, boolean privateLayout, long layoutId, String name,
@@ -118,11 +115,9 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			Map<Locale, String> friendlyURLMap)
 		throws PortalException {
 
-		Map<Locale, String> newFriendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> newFriendlyURLMap = new HashMap<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 			String friendlyURL = friendlyURLMap.get(locale);
 
 			if (Validator.isNotNull(friendlyURL)) {
@@ -183,6 +178,11 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 		}
 	}
 
+	@Override
+	public String getOSGiServiceIdentifier() {
+		return LayoutLocalServiceHelper.class.getName();
+	}
+
 	public long getParentLayoutId(
 		long groupId, boolean privateLayout, long parentLayoutId) {
 
@@ -215,15 +215,10 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 		return false;
 	}
 
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
-	}
-
 	public void validate(
 			long groupId, boolean privateLayout, long layoutId,
 			long parentLayoutId, String name, String type, boolean hidden,
-			Map<Locale, String> friendlyURLMap)
+			Map<Locale, String> friendlyURLMap, ServiceContext serviceContext)
 		throws PortalException {
 
 		validateName(name);
@@ -250,10 +245,15 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			// Layout cannot become a child of a layout that is not sortable
 			// because it is linked to a layout set prototype
 
+			Layout layout = layoutPersistence.fetchByG_P_L(
+				groupId, privateLayout, layoutId);
 			Layout parentLayout = layoutPersistence.findByG_P_L(
 				groupId, privateLayout, parentLayoutId);
 
-			if (!SitesUtil.isLayoutSortable(parentLayout)) {
+			if (((layout == null) ||
+				 Validator.isNull(layout.getSourcePrototypeLayoutUuid())) &&
+				!SitesUtil.isLayoutSortable(parentLayout)) {
+
 				throw new LayoutParentLayoutIdException(
 					LayoutParentLayoutIdException.NOT_SORTABLE);
 			}
@@ -265,6 +265,16 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 
 		LayoutTypeController layoutTypeController =
 			LayoutTypeControllerTracker.getLayoutTypeController(type);
+
+		if (!layoutTypeController.isInstanceable()) {
+			boolean layoutInstanceableAllowed = GetterUtil.getBoolean(
+				serviceContext.getAttribute("layout.instanceable.allowed"));
+
+			if (!layoutInstanceableAllowed) {
+				throw new LayoutTypeException(
+					LayoutTypeException.NOT_INSTANCEABLE);
+			}
+		}
 
 		if (!layoutTypeController.isParentable()) {
 			if (layoutPersistence.countByG_P_P(
@@ -376,9 +386,7 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			}
 		}
 
-		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : availableLocales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			String languageId = StringUtil.toLowerCase(
 				LocaleUtil.toLanguageId(locale));
 
@@ -501,7 +509,9 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 		// Layout cannot become a child of a layout that is not sortable because
 		// it is linked to a layout set prototype
 
-		if (!SitesUtil.isLayoutSortable(parentLayout)) {
+		if (Validator.isNull(layout.getSourcePrototypeLayoutUuid()) &&
+			!SitesUtil.isLayoutSortable(parentLayout)) {
+
 			throw new LayoutParentLayoutIdException(
 				LayoutParentLayoutIdException.NOT_SORTABLE);
 		}
@@ -568,7 +578,5 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
 	private static final int _PRIORITY_BUFFER = 1000000;
-
-	private String _beanIdentifier;
 
 }

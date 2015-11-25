@@ -31,8 +31,8 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.trash.TrashEntryConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.model.TrashEntryConstants;
 import com.liferay.portlet.trash.model.TrashEntryList;
 import com.liferay.portlet.trash.model.TrashEntrySoap;
 import com.liferay.portlet.trash.model.impl.TrashEntryImpl;
@@ -55,8 +55,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 * Deletes the trash entries with the matching group ID considering
 	 * permissions.
 	 *
-	 * @param  groupId the primary key of the group
-	 * @throws PortalException if a portal exception occurred
+	 * @param groupId the primary key of the group
 	 */
 	@Override
 	@Transactional(noRollbackFor = {TrashPermissionException.class})
@@ -105,10 +104,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	/**
 	 * Deletes the trash entries with the primary keys.
 	 *
-	 * @param  entryIds the primary keys of the trash entries
-	 * @throws PortalException if a trash entry with the primary key could not
-	 *         be found or if the user did not have permission to delete any one
-	 *         of the trash entries
+	 * @param entryIds the primary keys of the trash entries
 	 */
 	@Override
 	@Transactional(noRollbackFor = {TrashPermissionException.class})
@@ -139,10 +135,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 * delete the trash entry.
 	 * </p>
 	 *
-	 * @param  entryId the primary key of the trash entry
-	 * @throws PortalException if a trash entry with the primary key could not
-	 *         be found or if the user did not have permission to delete the
-	 *         trash entry
+	 * @param entryId the primary key of the trash entry
 	 */
 	@Override
 	public void deleteEntry(long entryId) throws PortalException {
@@ -160,11 +153,8 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 * delete the trash entry.
 	 * </p>
 	 *
-	 * @param  className the class name of the entity
-	 * @param  classPK the primary key of the entity
-	 * @throws PortalException if a trash entry with the entity class name and
-	 *         primary key could not be found or if the user did not have
-	 *         permission to delete the entry
+	 * @param className the class name of the entity
+	 * @param classPK the primary key of the entity
 	 */
 	@Override
 	public void deleteEntry(String className, long classPK)
@@ -188,7 +178,6 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 *
 	 * @param  groupId the primary key of the group
 	 * @return the matching trash entries
-	 * @throws PrincipalException if a principal exception occurred
 	 */
 	@Override
 	public TrashEntryList getEntries(long groupId) throws PrincipalException {
@@ -206,7 +195,6 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 *         <code>null</code>)
 	 * @return the range of matching trash entries ordered by comparator
 	 *         <code>obc</code>
-	 * @throws PrincipalException if a system exception occurred
 	 */
 	@Override
 	public TrashEntryList getEntries(
@@ -224,28 +212,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		List<TrashEntry> entries = trashEntryPersistence.findByGroupId(
 			groupId, 0, end + PropsValues.TRASH_SEARCH_LIMIT, obc);
 
-		List<TrashEntry> filteredEntries = new ArrayList<TrashEntry>();
-
-		PermissionChecker permissionChecker = getPermissionChecker();
-
-		for (TrashEntry entry : entries) {
-			String className = entry.getClassName();
-			long classPK = entry.getClassPK();
-
-			try {
-				TrashHandler trashHandler =
-					TrashHandlerRegistryUtil.getTrashHandler(className);
-
-				if (trashHandler.hasTrashPermission(
-						permissionChecker, 0, classPK, ActionKeys.VIEW)) {
-
-					filteredEntries.add(entry);
-				}
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
+		List<TrashEntry> filteredEntries = filterEntries(entries);
 
 		int total = filteredEntries.size();
 
@@ -266,6 +233,18 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		trashEntriesList.setCount(total);
 
 		return trashEntriesList;
+	}
+
+	@Override
+	public List<TrashEntry> getEntries(long groupId, String className)
+		throws PrincipalException {
+
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		List<TrashEntry> entries = trashEntryPersistence.findByG_C(
+			groupId, classNameId);
+
+		return filterEntries(entries);
 	}
 
 	/**
@@ -291,16 +270,11 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 * </li>
 	 * </ul>
 	 *
-	 * @param  className the class name of the entity
-	 * @param  classPK the primary key of the entity
-	 * @param  destinationContainerModelId the primary key of the new location
-	 * @param  serviceContext the service context to be applied (optionally
-	 *         <code>null</code>)
-	 * @throws PortalException if a matching trash entry could not be found, if
-	 *         the user did not have permission to move the trash entry to the
-	 *         new location, if the user did not have permission to restore the
-	 *         trash entry, if a duplicate trash entry exists at the new
-	 *         location, or if a portal exception occurred
+	 * @param className the class name of the entity
+	 * @param classPK the primary key of the entity
+	 * @param destinationContainerModelId the primary key of the new location
+	 * @param serviceContext the service context to be applied (optionally
+	 *        <code>null</code>)
 	 */
 	@Override
 	public void moveEntry(
@@ -391,10 +365,6 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 * @param  name a new name to give to the trash entry being restored
 	 *         (optionally <code>null</code>)
 	 * @return the restored trash entry
-	 * @throws PortalException if a matching trash entry could not be found, if
-	 *         the user did not have permission to overwrite an existing trash
-	 *         entry, to rename the trash entry being restored, or to restore
-	 *         the trash entry in general
 	 */
 	@Override
 	public TrashEntry restoreEntry(
@@ -485,6 +455,35 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		}
 
 		trashHandler.deleteTrashEntry(entry.getClassPK());
+	}
+
+	protected List<TrashEntry> filterEntries(List<TrashEntry> entries)
+		throws PrincipalException {
+
+		List<TrashEntry> filteredEntries = new ArrayList<>();
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		for (TrashEntry entry : entries) {
+			String className = entry.getClassName();
+			long classPK = entry.getClassPK();
+
+			try {
+				TrashHandler trashHandler =
+					TrashHandlerRegistryUtil.getTrashHandler(className);
+
+				if (trashHandler.hasTrashPermission(
+						permissionChecker, 0, classPK, ActionKeys.VIEW)) {
+
+					filteredEntries.add(entry);
+				}
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+
+		return filteredEntries;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

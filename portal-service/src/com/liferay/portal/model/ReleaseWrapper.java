@@ -56,6 +56,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("servletContextName", getServletContextName());
+		attributes.put("schemaVersion", getSchemaVersion());
 		attributes.put("buildNumber", getBuildNumber());
 		attributes.put("buildDate", getBuildDate());
 		attributes.put("verified", getVerified());
@@ -95,6 +96,12 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 
 		if (servletContextName != null) {
 			setServletContextName(servletContextName);
+		}
+
+		String schemaVersion = (String)attributes.get("schemaVersion");
+
+		if (schemaVersion != null) {
+			setSchemaVersion(schemaVersion);
 		}
 
 		Integer buildNumber = (Integer)attributes.get("buildNumber");
@@ -144,7 +151,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	* @return the build date of this release
 	*/
 	@Override
-	public java.util.Date getBuildDate() {
+	public Date getBuildDate() {
 		return _release.getBuildDate();
 	}
 
@@ -158,13 +165,18 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 		return _release.getBuildNumber();
 	}
 
+	@Override
+	public java.lang.String getBundleSymbolicName() {
+		return _release.getBundleSymbolicName();
+	}
+
 	/**
 	* Returns the create date of this release.
 	*
 	* @return the create date of this release
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _release.getCreateDate();
 	}
 
@@ -179,7 +191,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	* @return the modified date of this release
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _release.getModifiedDate();
 	}
 
@@ -216,6 +228,16 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	@Override
 	public long getReleaseId() {
 		return _release.getReleaseId();
+	}
+
+	/**
+	* Returns the schema version of this release.
+	*
+	* @return the schema version of this release
+	*/
+	@Override
+	public java.lang.String getSchemaVersion() {
+		return _release.getSchemaVersion();
 	}
 
 	/**
@@ -299,7 +321,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	* @param buildDate the build date of this release
 	*/
 	@Override
-	public void setBuildDate(java.util.Date buildDate) {
+	public void setBuildDate(Date buildDate) {
 		_release.setBuildDate(buildDate);
 	}
 
@@ -324,13 +346,12 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	* @param createDate the create date of this release
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_release.setCreateDate(createDate);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_release.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -352,7 +373,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	* @param modifiedDate the modified date of this release
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_release.setModifiedDate(modifiedDate);
 	}
 
@@ -397,6 +418,16 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	}
 
 	/**
+	* Sets the schema version of this release.
+	*
+	* @param schemaVersion the schema version of this release
+	*/
+	@Override
+	public void setSchemaVersion(java.lang.String schemaVersion) {
+		_release.setSchemaVersion(schemaVersion);
+	}
+
+	/**
 	* Sets the servlet context name of this release.
 	*
 	* @param servletContextName the servlet context name of this release
@@ -437,7 +468,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Release> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Release> toCacheModel() {
 		return _release.toCacheModel();
 	}
 

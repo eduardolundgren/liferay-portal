@@ -57,9 +57,11 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 		attributes.put("name", getName());
 		attributes.put("scope", getScope());
 		attributes.put("primKey", getPrimKey());
+		attributes.put("primKeyId", getPrimKeyId());
 		attributes.put("roleId", getRoleId());
 		attributes.put("ownerId", getOwnerId());
 		attributes.put("actionIds", getActionIds());
+		attributes.put("viewActionId", getViewActionId());
 
 		return attributes;
 	}
@@ -102,6 +104,12 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 			setPrimKey(primKey);
 		}
 
+		Long primKeyId = (Long)attributes.get("primKeyId");
+
+		if (primKeyId != null) {
+			setPrimKeyId(primKeyId);
+		}
+
 		Long roleId = (Long)attributes.get("roleId");
 
 		if (roleId != null) {
@@ -119,6 +127,18 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 		if (actionIds != null) {
 			setActionIds(actionIds);
 		}
+
+		Boolean viewActionId = (Boolean)attributes.get("viewActionId");
+
+		if (viewActionId != null) {
+			setViewActionId(viewActionId);
+		}
+	}
+
+	@Override
+	public void addResourceAction(java.lang.String actionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_resourcePermission.addResourceAction(actionId);
 	}
 
 	@Override
@@ -198,6 +218,16 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 	}
 
 	/**
+	* Returns the prim key ID of this resource permission.
+	*
+	* @return the prim key ID of this resource permission
+	*/
+	@Override
+	public long getPrimKeyId() {
+		return _resourcePermission.getPrimKeyId();
+	}
+
+	/**
 	* Returns the primary key of this resource permission.
 	*
 	* @return the primary key of this resource permission
@@ -242,6 +272,22 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 		return _resourcePermission.getScope();
 	}
 
+	/**
+	* Returns the view action ID of this resource permission.
+	*
+	* @return the view action ID of this resource permission
+	*/
+	@Override
+	public boolean getViewActionId() {
+		return _resourcePermission.getViewActionId();
+	}
+
+	@Override
+	public boolean hasAction(
+		com.liferay.portal.model.ResourceAction resourceAction) {
+		return _resourcePermission.hasAction(resourceAction);
+	}
+
 	@Override
 	public boolean hasActionId(java.lang.String actionId) {
 		return _resourcePermission.hasActionId(actionId);
@@ -267,9 +313,25 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 		return _resourcePermission.isNew();
 	}
 
+	/**
+	* Returns <code>true</code> if this resource permission is view action ID.
+	*
+	* @return <code>true</code> if this resource permission is view action ID; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isViewActionId() {
+		return _resourcePermission.isViewActionId();
+	}
+
 	@Override
 	public void persist() {
 		_resourcePermission.persist();
+	}
+
+	@Override
+	public void removeResourceAction(java.lang.String actionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_resourcePermission.removeResourceAction(actionId);
 	}
 
 	/**
@@ -298,8 +360,7 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_resourcePermission.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -361,6 +422,16 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 	}
 
 	/**
+	* Sets the prim key ID of this resource permission.
+	*
+	* @param primKeyId the prim key ID of this resource permission
+	*/
+	@Override
+	public void setPrimKeyId(long primKeyId) {
+		_resourcePermission.setPrimKeyId(primKeyId);
+	}
+
+	/**
 	* Sets the primary key of this resource permission.
 	*
 	* @param primaryKey the primary key of this resource permission
@@ -405,8 +476,18 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 		_resourcePermission.setScope(scope);
 	}
 
+	/**
+	* Sets whether this resource permission is view action ID.
+	*
+	* @param viewActionId the view action ID of this resource permission
+	*/
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.ResourcePermission> toCacheModel() {
+	public void setViewActionId(boolean viewActionId) {
+		_resourcePermission.setViewActionId(viewActionId);
+	}
+
+	@Override
+	public CacheModel<com.liferay.portal.model.ResourcePermission> toCacheModel() {
 		return _resourcePermission.toCacheModel();
 	}
 

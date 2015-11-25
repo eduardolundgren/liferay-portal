@@ -15,11 +15,11 @@
 package com.liferay.portal.kernel.repository.model;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -123,6 +123,11 @@ public class FolderWrapper implements Folder, ModelWrapper<Folder> {
 	@Override
 	public Date getLastPostDate() {
 		return _folder.getLastPostDate();
+	}
+
+	@Override
+	public Date getLastPublishDate() {
+		return _folder.getLastPublishDate();
 	}
 
 	@Override
@@ -281,8 +286,8 @@ public class FolderWrapper implements Folder, ModelWrapper<Folder> {
 	}
 
 	@Override
-	public void setCreateDate(Date date) {
-		_folder.setCreateDate(date);
+	public void setCreateDate(Date createDate) {
+		_folder.setCreateDate(createDate);
 	}
 
 	@Override
@@ -291,8 +296,13 @@ public class FolderWrapper implements Folder, ModelWrapper<Folder> {
 	}
 
 	@Override
-	public void setModifiedDate(Date date) {
-		_folder.setModifiedDate(date);
+	public void setLastPublishDate(Date lastPublishDate) {
+		_folder.setLastPublishDate(lastPublishDate);
+	}
+
+	@Override
+	public void setModifiedDate(Date modifiedDate) {
+		_folder.setModifiedDate(modifiedDate);
 	}
 
 	@Override

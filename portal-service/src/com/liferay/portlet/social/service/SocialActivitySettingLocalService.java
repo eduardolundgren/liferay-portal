@@ -78,7 +78,7 @@ public interface SocialActivitySettingLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the social activity setting with the primary key from the database. Also notifies the appropriate model listeners.
@@ -89,8 +89,7 @@ public interface SocialActivitySettingLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.social.model.SocialActivitySetting deleteSocialActivitySetting(
-		long activitySettingId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activitySettingId) throws PortalException;
 
 	/**
 	* Deletes the social activity setting from the database. Also notifies the appropriate model listeners.
@@ -186,18 +185,20 @@ public interface SocialActivitySettingLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.portlet.social.model.SocialActivitySetting> getActivitySettings(
 		long groupId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Returns the social activity setting with the primary key.
@@ -208,8 +209,7 @@ public interface SocialActivitySettingLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.social.model.SocialActivitySetting getSocialActivitySetting(
-		long activitySettingId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activitySettingId) throws PortalException;
 
 	/**
 	* Returns a range of all the social activity settings.
@@ -240,30 +240,21 @@ public interface SocialActivitySettingLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isEnabled(long groupId, long classNameId, long classPK);
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
 	public void updateActivitySetting(long groupId, java.lang.String className,
 		int activityType,
 		com.liferay.portlet.social.model.SocialActivityCounterDefinition activityCounterDefinition)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	public void updateActivitySetting(long groupId, java.lang.String className,
-		long classPK, boolean enabled)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long classPK, boolean enabled) throws PortalException;
 
 	public void updateActivitySetting(long groupId, java.lang.String className,
-		boolean enabled)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		boolean enabled) throws PortalException;
 
 	public void updateActivitySettings(long groupId,
 		java.lang.String className, int activityType,
 		java.util.List<com.liferay.portlet.social.model.SocialActivityCounterDefinition> activityCounterDefinitions)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Updates the social activity setting in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

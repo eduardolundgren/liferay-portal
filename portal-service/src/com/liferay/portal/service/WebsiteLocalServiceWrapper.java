@@ -38,7 +38,7 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 	@Override
 	public com.liferay.portal.model.Website addWebsite(long userId,
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary)
+		long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _websiteLocalService.addWebsite(userId, className, classPK, url,
 			typeId, primary);
@@ -47,7 +47,7 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 	@Override
 	public com.liferay.portal.model.Website addWebsite(long userId,
 		java.lang.String className, long classPK, java.lang.String url,
-		int typeId, boolean primary,
+		long typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _websiteLocalService.addWebsite(userId, className, classPK, url,
@@ -226,20 +226,25 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 		return _websiteLocalService.getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
 	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _websiteLocalService.getBeanIdentifier();
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
+		return _websiteLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
-		return _websiteLocalService.getExportActionableDynamicQuery(portletDataContext);
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _websiteLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _websiteLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
@@ -316,16 +321,6 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_websiteLocalService.setBeanIdentifier(beanIdentifier);
-	}
-
-	/**
 	* Updates the website in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param website the website
@@ -339,7 +334,7 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 
 	@Override
 	public com.liferay.portal.model.Website updateWebsite(long websiteId,
-		java.lang.String url, int typeId, boolean primary)
+		java.lang.String url, long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _websiteLocalService.updateWebsite(websiteId, url, typeId,
 			primary);

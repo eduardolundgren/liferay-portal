@@ -14,19 +14,44 @@
 
 package com.liferay.portal.kernel.repository.registry;
 
+import com.liferay.portal.kernel.repository.DocumentRepository;
+import com.liferay.portal.kernel.repository.RepositoryConfiguration;
+import com.liferay.portal.kernel.repository.RepositoryConfigurationBuilder;
+import com.liferay.portal.security.permission.ResourceActionsUtil;
+
+import java.util.Locale;
+
 /**
  * @author Adolfo Pérez
  */
 public abstract class BaseRepositoryDefiner implements RepositoryDefiner {
 
+	public BaseRepositoryDefiner() {
+		RepositoryConfigurationBuilder repositoryConfigurationBuilder =
+			new RepositoryConfigurationBuilder();
+
+		_repositoryConfiguration = repositoryConfigurationBuilder.build();
+	}
+
 	@Override
 	public abstract String getClassName();
+
+	@Override
+	public RepositoryConfiguration getRepositoryConfiguration() {
+		return _repositoryConfiguration;
+	}
+
+	@Override
+	public String getRepositoryTypeLabel(Locale locale) {
+		return ResourceActionsUtil.getModelResource(locale, getClassName());
+	}
 
 	@Override
 	public abstract boolean isExternalRepository();
 
 	@Override
-	public void registerCapabilities(CapabilityRegistry capabilityRegistry) {
+	public void registerCapabilities(
+		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
 	}
 
 	@Override
@@ -37,5 +62,7 @@ public abstract class BaseRepositoryDefiner implements RepositoryDefiner {
 	@Override
 	public abstract void registerRepositoryFactory(
 		RepositoryFactoryRegistry repositoryFactoryRegistry);
+
+	private final RepositoryConfiguration _repositoryConfiguration;
 
 }

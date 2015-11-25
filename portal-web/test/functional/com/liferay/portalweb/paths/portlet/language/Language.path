@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>Language</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Language</td></tr>
+</thead>
+<tbody>
+<!--LANGUAGE_MENU-->
+<tr>
+	<td>LANGUAGE_MENU_ARABIC</td>
+	<td>//a[@lang='ar-SA']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_CHINESE</td>
+	<td>//a[@lang='zh-CN']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_ENGLISH</td>
+	<td>//img[@title='English']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_FINNISH</td>
+	<td>//img[@title='suomi']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_FRENCH</td>
+	<td>//img[@title='français']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_GERMAN</td>
+	<td>//img[@title='Deutsch']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_HUNGARIAN</td>
+	<td>//img[@title='magyar']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_JAPANESE</td>
+	<td>//a[@lang='ja-JP']/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_PORTUGUESE</td>
+	<td>//img[@title='português']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_SPANISH</td>
+	<td>//img[@title='español']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ICON_MENU_DROPDOWN</td>
+	<td>//a[i[contains(@class,'icon-globe')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ICON_MENU_LANGUAGE</td>
+	<td>//a[contains(.,'${key_language}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MENU_SELECT</td>
+	<td>//select[contains(@title,'Language')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LONG_TEXT_LINK</td>
+	<td>//a[contains(@class,'long-text') and contains(.,'${key_language}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SHORT_TEXT_LINK</td>
+	<td>//a[contains(@class,'short-text') and contains(.,'${key_languageKey}')]</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

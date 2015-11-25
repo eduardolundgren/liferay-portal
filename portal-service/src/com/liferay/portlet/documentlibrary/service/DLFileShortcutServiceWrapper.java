@@ -35,27 +35,17 @@ public class DLFileShortcutServiceWrapper implements DLFileShortcutService,
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
-		long groupId, long folderId, long toFileEntryId,
+		long groupId, long repositoryId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _dlFileShortcutService.addFileShortcut(groupId, folderId,
-			toFileEntryId, serviceContext);
+		return _dlFileShortcutService.addFileShortcut(groupId, repositoryId,
+			folderId, toFileEntryId, serviceContext);
 	}
 
 	@Override
 	public void deleteFileShortcut(long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileShortcutService.deleteFileShortcut(fileShortcutId);
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _dlFileShortcutService.getBeanIdentifier();
 	}
 
 	@Override
@@ -66,22 +56,30 @@ public class DLFileShortcutServiceWrapper implements DLFileShortcutService,
 	}
 
 	/**
-	* Sets the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @param beanIdentifier the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
 	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_dlFileShortcutService.setBeanIdentifier(beanIdentifier);
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _dlFileShortcutService.getOSGiServiceIdentifier();
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
-		long fileShortcutId, long folderId, long toFileEntryId,
+		long fileShortcutId, long repositoryId, long folderId,
+		long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcutService.updateFileShortcut(fileShortcutId,
-			folderId, toFileEntryId, serviceContext);
+			repositoryId, folderId, toFileEntryId, serviceContext);
+	}
+
+	@Override
+	public void updateFileShortcuts(long oldToFileEntryId, long newToFileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_dlFileShortcutService.updateFileShortcuts(oldToFileEntryId,
+			newToFileEntryId);
 	}
 
 	/**

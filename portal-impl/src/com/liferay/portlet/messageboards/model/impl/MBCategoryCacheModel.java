@@ -16,6 +16,7 @@ package com.liferay.portlet.messageboards.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MBCategoryCacheModel)) {
+			return false;
+		}
+
+		MBCategoryCacheModel mbCategoryCacheModel = (MBCategoryCacheModel)obj;
+
+		if (categoryId == mbCategoryCacheModel.categoryId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, categoryId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(39);
+		StringBundler sb = new StringBundler(41);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -73,6 +98,8 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 		sb.append(messageCount);
 		sb.append(", lastPostDate=");
 		sb.append(lastPostDate);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -156,6 +183,13 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 			mbCategoryImpl.setLastPostDate(new Date(lastPostDate));
 		}
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			mbCategoryImpl.setLastPublishDate(null);
+		}
+		else {
+			mbCategoryImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		mbCategoryImpl.setStatus(status);
 		mbCategoryImpl.setStatusByUserId(statusByUserId);
 
@@ -195,6 +229,7 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 		threadCount = objectInput.readInt();
 		messageCount = objectInput.readInt();
 		lastPostDate = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 		status = objectInput.readInt();
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
@@ -251,6 +286,7 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 		objectOutput.writeInt(threadCount);
 		objectOutput.writeInt(messageCount);
 		objectOutput.writeLong(lastPostDate);
+		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeInt(status);
 		objectOutput.writeLong(statusByUserId);
 
@@ -279,6 +315,7 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 	public int threadCount;
 	public int messageCount;
 	public long lastPostDate;
+	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

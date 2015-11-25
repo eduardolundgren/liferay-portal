@@ -44,7 +44,7 @@ public class PortletBeanLocatorUtil {
 					servletContextName);
 
 			throw new BeanLocatorException(
-				"BeanLocator has not been set for servlet context " +
+				"BeanLocator is not set for servlet context " +
 					servletContextName);
 		}
 		else {
@@ -78,6 +78,6 @@ public class PortletBeanLocatorUtil {
 		PortletBeanLocatorUtil.class);
 
 	private static final Map<String, BeanLocator> _beanLocators =
-		new HashMap<String, BeanLocator>();
+		new HashMap<>();
 
 }

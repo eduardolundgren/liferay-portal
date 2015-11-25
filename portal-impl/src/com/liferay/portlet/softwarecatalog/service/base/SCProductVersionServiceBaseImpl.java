@@ -15,12 +15,12 @@
 package com.liferay.portlet.softwarecatalog.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
@@ -47,7 +47,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class SCProductVersionServiceBaseImpl extends BaseServiceImpl
-	implements SCProductVersionService, IdentifiableBean {
+	implements SCProductVersionService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -78,7 +78,7 @@ public abstract class SCProductVersionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the s c product version remote service
 	 */
-	public com.liferay.portlet.softwarecatalog.service.SCProductVersionService getSCProductVersionService() {
+	public SCProductVersionService getSCProductVersionService() {
 		return scProductVersionService;
 	}
 
@@ -88,7 +88,7 @@ public abstract class SCProductVersionServiceBaseImpl extends BaseServiceImpl
 	 * @param scProductVersionService the s c product version remote service
 	 */
 	public void setSCProductVersionService(
-		com.liferay.portlet.softwarecatalog.service.SCProductVersionService scProductVersionService) {
+		SCProductVersionService scProductVersionService) {
 		this.scProductVersionService = scProductVersionService;
 	}
 
@@ -325,23 +325,13 @@ public abstract class SCProductVersionServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return SCProductVersionService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -379,7 +369,7 @@ public abstract class SCProductVersionServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portlet.softwarecatalog.service.SCProductVersionLocalService.class)
 	protected com.liferay.portlet.softwarecatalog.service.SCProductVersionLocalService scProductVersionLocalService;
 	@BeanReference(type = com.liferay.portlet.softwarecatalog.service.SCProductVersionService.class)
-	protected com.liferay.portlet.softwarecatalog.service.SCProductVersionService scProductVersionService;
+	protected SCProductVersionService scProductVersionService;
 	@BeanReference(type = SCProductVersionPersistence.class)
 	protected SCProductVersionPersistence scProductVersionPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -404,5 +394,4 @@ public abstract class SCProductVersionServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portlet.softwarecatalog.service.SCProductEntryService scProductEntryService;
 	@BeanReference(type = SCProductEntryPersistence.class)
 	protected SCProductEntryPersistence scProductEntryPersistence;
-	private String _beanIdentifier;
 }

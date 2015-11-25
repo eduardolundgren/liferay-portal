@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.RepositoryService;
@@ -41,6 +41,7 @@ import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryFinder
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypeFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypePersistence;
+import com.liferay.portlet.documentlibrary.service.persistence.DLFileShortcutPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileVersionPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderPersistence;
@@ -61,7 +62,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
-	implements RepositoryService, IdentifiableBean {
+	implements RepositoryService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -92,7 +93,7 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the repository remote service
 	 */
-	public com.liferay.portal.service.RepositoryService getRepositoryService() {
+	public RepositoryService getRepositoryService() {
 		return repositoryService;
 	}
 
@@ -101,8 +102,7 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param repositoryService the repository remote service
 	 */
-	public void setRepositoryService(
-		com.liferay.portal.service.RepositoryService repositoryService) {
+	public void setRepositoryService(RepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
 
@@ -577,6 +577,63 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the document library file shortcut local service.
+	 *
+	 * @return the document library file shortcut local service
+	 */
+	public com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalService getDLFileShortcutLocalService() {
+		return dlFileShortcutLocalService;
+	}
+
+	/**
+	 * Sets the document library file shortcut local service.
+	 *
+	 * @param dlFileShortcutLocalService the document library file shortcut local service
+	 */
+	public void setDLFileShortcutLocalService(
+		com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalService dlFileShortcutLocalService) {
+		this.dlFileShortcutLocalService = dlFileShortcutLocalService;
+	}
+
+	/**
+	 * Returns the document library file shortcut remote service.
+	 *
+	 * @return the document library file shortcut remote service
+	 */
+	public com.liferay.portlet.documentlibrary.service.DLFileShortcutService getDLFileShortcutService() {
+		return dlFileShortcutService;
+	}
+
+	/**
+	 * Sets the document library file shortcut remote service.
+	 *
+	 * @param dlFileShortcutService the document library file shortcut remote service
+	 */
+	public void setDLFileShortcutService(
+		com.liferay.portlet.documentlibrary.service.DLFileShortcutService dlFileShortcutService) {
+		this.dlFileShortcutService = dlFileShortcutService;
+	}
+
+	/**
+	 * Returns the document library file shortcut persistence.
+	 *
+	 * @return the document library file shortcut persistence
+	 */
+	public DLFileShortcutPersistence getDLFileShortcutPersistence() {
+		return dlFileShortcutPersistence;
+	}
+
+	/**
+	 * Sets the document library file shortcut persistence.
+	 *
+	 * @param dlFileShortcutPersistence the document library file shortcut persistence
+	 */
+	public void setDLFileShortcutPersistence(
+		DLFileShortcutPersistence dlFileShortcutPersistence) {
+		this.dlFileShortcutPersistence = dlFileShortcutPersistence;
+	}
+
+	/**
 	 * Returns the document library file version local service.
 	 *
 	 * @return the document library file version local service
@@ -940,23 +997,13 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return RepositoryService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -994,7 +1041,7 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.RepositoryLocalService.class)
 	protected com.liferay.portal.service.RepositoryLocalService repositoryLocalService;
 	@BeanReference(type = com.liferay.portal.service.RepositoryService.class)
-	protected com.liferay.portal.service.RepositoryService repositoryService;
+	protected RepositoryService repositoryService;
 	@BeanReference(type = RepositoryPersistence.class)
 	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -1045,6 +1092,12 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	protected DLFileEntryTypePersistence dlFileEntryTypePersistence;
 	@BeanReference(type = DLFileEntryTypeFinder.class)
 	protected DLFileEntryTypeFinder dlFileEntryTypeFinder;
+	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalService.class)
+	protected com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalService dlFileShortcutLocalService;
+	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileShortcutService.class)
+	protected com.liferay.portlet.documentlibrary.service.DLFileShortcutService dlFileShortcutService;
+	@BeanReference(type = DLFileShortcutPersistence.class)
+	protected DLFileShortcutPersistence dlFileShortcutPersistence;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileVersionLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFileVersionLocalService dlFileVersionLocalService;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileVersionService.class)
@@ -1083,5 +1136,4 @@ public abstract class RepositoryServiceBaseImpl extends BaseServiceImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-	private String _beanIdentifier;
 }

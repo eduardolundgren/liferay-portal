@@ -49,21 +49,13 @@ public class OrganizationLocalServiceUtil {
 		getService().addGroupOrganization(groupId, organizationId);
 	}
 
-	/**
-	* @throws PortalException
-	*/
 	public static void addGroupOrganizations(long groupId,
-		java.util.List<com.liferay.portal.model.Organization> Organizations)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		java.util.List<com.liferay.portal.model.Organization> Organizations) {
 		getService().addGroupOrganizations(groupId, Organizations);
 	}
 
-	/**
-	* @throws PortalException
-	*/
 	public static void addGroupOrganizations(long groupId,
-		long[] organizationIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		long[] organizationIds) {
 		getService().addGroupOrganizations(groupId, organizationIds);
 	}
 
@@ -95,9 +87,6 @@ public class OrganizationLocalServiceUtil {
 	* @param site whether the organization is to be associated with a main
 	site
 	* @return the organization
-	* @throws PortalException if a creator or parent organization with the
-	primary key could not be found or if the organization's
-	information was invalid
 	*/
 	public static com.liferay.portal.model.Organization addOrganization(
 		long userId, long parentOrganizationId, java.lang.String name,
@@ -135,9 +124,6 @@ public class OrganizationLocalServiceUtil {
 	<code>null</code>). Can set asset category IDs, asset tag
 	names, and expando bridge attributes for the organization.
 	* @return the organization
-	* @throws PortalException if a creator or parent organization with the
-	primary key could not be found or if the organization's
-	information was invalid
 	* @deprecated As of 6.2.0, replaced by {@link #addOrganization(long, long,
 	String, String, long, long, int, String, boolean,
 	ServiceContext)}
@@ -146,7 +132,7 @@ public class OrganizationLocalServiceUtil {
 	public static com.liferay.portal.model.Organization addOrganization(
 		long userId, long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -180,13 +166,10 @@ public class OrganizationLocalServiceUtil {
 	<code>null</code>). Can set asset category IDs, asset tag names,
 	and expando bridge attributes for the organization.
 	* @return the organization
-	* @throws PortalException if a creator or parent organization with the
-	primary key could not be found or if the organization's
-	information was invalid
 	*/
 	public static com.liferay.portal.model.Organization addOrganization(
 		long userId, long parentOrganizationId, java.lang.String name,
-		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String type, long regionId, long countryId, long statusId,
 		java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -201,7 +184,6 @@ public class OrganizationLocalServiceUtil {
 	*
 	* @param userId the primary key of the creator/owner of the organization
 	* @param organization the organization
-	* @throws PortalException if a portal exception occurred
 	*/
 	public static void addOrganizationResources(long userId,
 		com.liferay.portal.model.Organization organization)
@@ -282,9 +264,6 @@ public class OrganizationLocalServiceUtil {
 	* Deletes the organization's logo.
 	*
 	* @param organizationId the primary key of the organization
-	* @throws PortalException if an organization or parent organization with
-	the primary key could not be found or if the organization's logo
-	could not be found
 	*/
 	public static void deleteLogo(long organizationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -457,17 +436,8 @@ public class OrganizationLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -508,8 +478,21 @@ public class OrganizationLocalServiceUtil {
 		return getService().getGroupUserOrganizations(groupId, userId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.portal.model.Organization> getNoAssetOrganizations() {
 		return getService().getNoAssetOrganizations();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	/**
@@ -518,8 +501,6 @@ public class OrganizationLocalServiceUtil {
 	* @param companyId the primary key of the organization's company
 	* @param name the organization's name
 	* @return the organization with the name
-	* @throws PortalException if the organization with the name could not be
-	found
 	*/
 	public static com.liferay.portal.model.Organization getOrganization(
 		long companyId, java.lang.String name)
@@ -588,8 +569,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -614,8 +594,6 @@ public class OrganizationLocalServiceUtil {
 	*
 	* @param organizationIds the primary keys of the organizations
 	* @return the organizations with the primary keys
-	* @throws PortalException if any one of the organizations could not be
-	found
 	*/
 	public static java.util.List<com.liferay.portal.model.Organization> getOrganizations(
 		long[] organizationIds)
@@ -675,8 +653,6 @@ public class OrganizationLocalServiceUtil {
 	*
 	* @param organizationId the primary key of the organization
 	* @return the parent organizations in order by closest ancestor
-	* @throws PortalException if an organization with the primary key could not
-	be found
 	*/
 	public static java.util.List<com.liferay.portal.model.Organization> getParentOrganizations(
 		long organizationId)
@@ -744,19 +720,23 @@ public class OrganizationLocalServiceUtil {
 	}
 
 	/**
-	* Returns all the organization IDs associated with the user. If
-	* <code>includeAdministrative</code> is <code>true</code>, the result
-	* includes those organization IDs that are indirectly associated to the
-	* user because he is an administrator or owner of the organization.
+	* Returns all the IDs of organizations with which the user is explicitly
+	* associated, optionally including the IDs of organizations that the user
+	* administers or owns.
+	*
+	* <p>
+	* A user is considered to be <i>explicitly</i> associated with an
+	* organization if his account is individually created within the
+	* organization or if the user is later added to it.
+	* </p>
 	*
 	* @param userId the primary key of the user
-	* @param includeAdministrative whether to include organizations that are
-	indirectly associated to the user because he is an administrator
-	or owner of the organization
-	* @return the organization IDs of organizations associated with the user
-	* @throws PortalException if a user with the primary key could not be found
-	or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
+	* @param includeAdministrative whether to include the IDs of organizations
+	that the user administers or owns, even if he's not a member of
+	the organizations
+	* @return the IDs of organizations with which the user is explicitly
+	associated, optionally including the IDs of organizations that
+	the user administers or owns
 	*/
 	public static long[] getUserOrganizationIds(long userId,
 		boolean includeAdministrative)
@@ -770,17 +750,23 @@ public class OrganizationLocalServiceUtil {
 	}
 
 	/**
-	* Returns all the organizations associated with the user. If
-	* <code>includeAdministrative</code> is <code>true</code>, the result
-	* includes those organizations that are indirectly associated to the user
-	* because he is an administrator or owner of the organization.
+	* Returns all the organizations with which the user is explicitly
+	* associated, optionally including the organizations that the user
+	* administers or owns.
+	*
+	* <p>
+	* A user is considered to be <i>explicitly</i> associated with an
+	* organization if his account is individually created within the
+	* organization or if the user is later added as a member.
+	* </p>
 	*
 	* @param userId the primary key of the user
-	* @param includeAdministrative whether to include organizations that are
-	indirectly associated to the user because he is an administrator
-	or owner of the organization
-	* @return the organizations associated with the user
-	* @throws PortalException if a user with the primary key could not be found
+	* @param includeAdministrative whether to include the IDs of organizations
+	that the user administers or owns, even if he's not a member of
+	the organizations
+	* @return the organizations with which the user is explicitly associated,
+	optionally including the organizations that the user administers
+	or owns
 	*/
 	public static java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
 		long userId, boolean includeAdministrative)
@@ -886,8 +872,6 @@ public class OrganizationLocalServiceUtil {
 	considered in the determination
 	* @return <code>true</code> if the user has access to the organization;
 	<code>false</code> otherwise
-	* @throws PortalException if an organization with the primary key could not
-	be found
 	* @see com.liferay.portal.service.persistence.OrganizationFinder
 	*/
 	public static boolean hasUserOrganization(long userId, long organizationId,
@@ -912,8 +896,6 @@ public class OrganizationLocalServiceUtil {
 	* </p>
 	*
 	* @param companyId the primary key of the organization's company
-	* @throws PortalException if an organization with the primary key could not
-	be found
 	*/
 	public static void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -930,8 +912,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -973,8 +954,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1021,8 +1001,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1070,8 +1049,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1125,8 +1103,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1180,8 +1157,7 @@ public class OrganizationLocalServiceUtil {
 	* start</code> instances. <code>start</code> and <code>end</code> are not
 	* primary keys, they are indexes in the result set. Thus, <code>0</code>
 	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	* result set.
 	* </p>
 	*
@@ -1320,21 +1296,8 @@ public class OrganizationLocalServiceUtil {
 			end, sort);
 	}
 
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
-	}
-
-	/**
-	* @throws PortalException
-	*/
 	public static void setGroupOrganizations(long groupId,
-		long[] organizationIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		long[] organizationIds) {
 		getService().setGroupOrganizations(groupId, organizationIds);
 	}
 
@@ -1347,11 +1310,9 @@ public class OrganizationLocalServiceUtil {
 	*
 	* @param groupId the primary key of the group
 	* @param organizationIds the primary keys of the organizations
-	* @throws PortalException if a portal exception occurred
 	*/
 	public static void unsetGroupOrganizations(long groupId,
-		long[] organizationIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		long[] organizationIds) {
 		getService().unsetGroupOrganizations(groupId, organizationIds);
 	}
 
@@ -1375,7 +1336,6 @@ public class OrganizationLocalServiceUtil {
 	* @param organization the organization
 	* @param assetCategoryIds the primary keys of the asset categories
 	* @param assetTagNames the asset tag names
-	* @throws PortalException if a user with the primary key could not be found
 	*/
 	public static void updateAsset(long userId,
 		com.liferay.portal.model.Organization organization,
@@ -1407,9 +1367,6 @@ public class OrganizationLocalServiceUtil {
 	names for the organization, and merge expando bridge
 	attributes for the organization.
 	* @return the organization
-	* @throws PortalException if an organization or parent organization
-	with the primary key could not be found or if the new
-	information was invalid
 	* @deprecated As of 6.2.0, replaced by {@link #updateOrganization(long,
 	long, long, String, String, long, long, int, String, boolean,
 	byte[], boolean, ServiceContext)}
@@ -1418,8 +1375,9 @@ public class OrganizationLocalServiceUtil {
 	public static com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, boolean recursable,
-		long regionId, long countryId, int statusId, java.lang.String comments,
-		boolean site, com.liferay.portal.service.ServiceContext serviceContext)
+		long regionId, long countryId, long statusId,
+		java.lang.String comments, boolean site,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateOrganization(companyId, organizationId,
@@ -1449,14 +1407,11 @@ public class OrganizationLocalServiceUtil {
 	names for the organization, and merge expando bridge attributes
 	for the organization.
 	* @return the organization
-	* @throws PortalException if an organization or parent organization with
-	the primary key could not be found or if the new information was
-	invalid
 	*/
 	public static com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean logo,
+		long countryId, long statusId, java.lang.String comments, boolean logo,
 		byte[] logoBytes, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1486,18 +1441,15 @@ public class OrganizationLocalServiceUtil {
 	names for the organization, and merge expando bridge
 	attributes for the organization.
 	* @return the organization
-	* @throws PortalException if an organization or parent organization
-	with the primary key could not be found or if the new
-	information was invalid
 	* @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
 	long, long, String, String, long, long, int, String, boolean,
-	boolean, byte[], ServiceContext)}
+	byte[], boolean, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		long countryId, long statusId, java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()

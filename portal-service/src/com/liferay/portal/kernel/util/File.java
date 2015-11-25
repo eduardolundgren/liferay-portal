@@ -27,6 +27,8 @@ import java.util.Properties;
  */
 public interface File {
 
+	public String appendParentheticalSuffix(String fileName, String suffix);
+
 	public void copyDirectory(java.io.File source, java.io.File destination)
 		throws IOException;
 
@@ -61,7 +63,7 @@ public interface File {
 
 	public String createTempFileName(String prefix, String extension);
 
-	public java.io.File createTempFolder();
+	public java.io.File createTempFolder() throws IOException;
 
 	public String decodeSafeFileName(String fileName);
 
@@ -122,6 +124,8 @@ public interface File {
 
 	public String[] listFiles(String fileName);
 
+	public void mkdirs(java.io.File file) throws IOException;
+
 	public void mkdirs(String pathName);
 
 	public boolean move(java.io.File source, java.io.File destination);
@@ -139,6 +143,8 @@ public interface File {
 	public java.io.File[] sortFiles(java.io.File[] files);
 
 	public String stripExtension(String fileName);
+
+	public String stripParentheticalSuffix(String fileName);
 
 	public List<String> toList(Reader reader);
 

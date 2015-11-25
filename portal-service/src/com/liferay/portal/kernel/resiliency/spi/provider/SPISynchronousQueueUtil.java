@@ -26,7 +26,7 @@ import java.util.concurrent.SynchronousQueue;
 public class SPISynchronousQueueUtil {
 
 	public static SynchronousQueue<SPI> createSynchronousQueue(String spiUUID) {
-		SynchronousQueue<SPI> synchronousQueue = new SynchronousQueue<SPI>();
+		SynchronousQueue<SPI> synchronousQueue = new SynchronousQueue<>();
 
 		_synchronousQueues.put(spiUUID, synchronousQueue);
 
@@ -52,6 +52,6 @@ public class SPISynchronousQueueUtil {
 	}
 
 	private static final Map<String, SynchronousQueue<SPI>> _synchronousQueues =
-		new ConcurrentHashMap<String, SynchronousQueue<SPI>>();
+		new ConcurrentHashMap<>();
 
 }

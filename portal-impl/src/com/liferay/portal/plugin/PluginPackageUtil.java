@@ -254,8 +254,8 @@ public class PluginPackageUtil {
 
 	private PluginPackageUtil() {
 		_installedPluginPackages = new LocalPluginPackageRepository();
-		_repositoryCache = new HashMap<String, RemotePluginPackageRepository>();
-		_availableTagsCache = new TreeSet<String>();
+		_repositoryCache = new HashMap<>();
+		_availableTagsCache = new TreeSet<>();
 	}
 
 	private void _checkRepositories(String repositoryURL)
@@ -299,7 +299,7 @@ public class PluginPackageUtil {
 	private List<PluginPackage> _getAllAvailablePluginPackages()
 		throws PortalException {
 
-		List<PluginPackage> pluginPackages = new ArrayList<PluginPackage>();
+		List<PluginPackage> pluginPackages = new ArrayList<>();
 
 		String[] repositoryURLs = _getRepositoryURLs();
 
@@ -331,7 +331,7 @@ public class PluginPackageUtil {
 			String groupId, String artifactId)
 		throws PortalException {
 
-		List<PluginPackage> pluginPackages = new ArrayList<PluginPackage>();
+		List<PluginPackage> pluginPackages = new ArrayList<>();
 
 		String[] repositoryURLs = _getRepositoryURLs();
 
@@ -485,7 +485,8 @@ public class PluginPackageUtil {
 	private void _indexPluginPackage(PluginPackage pluginPackage)
 		throws PortalException {
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(PluginPackage.class);
+		Indexer<PluginPackage> indexer = IndexerRegistryUtil.getIndexer(
+			PluginPackage.class);
 
 		indexer.reindex(pluginPackage);
 	}
@@ -797,7 +798,7 @@ public class PluginPackageUtil {
 	}
 
 	private List<License> _readLicenseList(Element parentElement, String name) {
-		List<License> licenses = new ArrayList<License>();
+		List<License> licenses = new ArrayList<>();
 
 		for (Element licenseElement : parentElement.elements(name)) {
 			License license = new License();
@@ -824,7 +825,7 @@ public class PluginPackageUtil {
 	}
 
 	private List<String> _readList(Element parentElement, String name) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		if (parentElement == null) {
 			return list;
@@ -913,11 +914,11 @@ public class PluginPackageUtil {
 
 		String author = GetterUtil.getString(properties.getProperty("author"));
 
-		List<String> types = new ArrayList<String>();
+		List<String> types = new ArrayList<>();
 
 		types.add(pluginType);
 
-		List<License> licenses = new ArrayList<License>();
+		List<License> licenses = new ArrayList<>();
 
 		String[] licensesArray = StringUtil.split(
 			properties.getProperty("licenses"));
@@ -931,7 +932,7 @@ public class PluginPackageUtil {
 			licenses.add(license);
 		}
 
-		List<String> liferayVersions = new ArrayList<String>();
+		List<String> liferayVersions = new ArrayList<>();
 
 		String[] liferayVersionsArray = StringUtil.split(
 			properties.getProperty("liferay-versions"));
@@ -944,7 +945,7 @@ public class PluginPackageUtil {
 			liferayVersions.add(ReleaseInfo.getVersion() + "+");
 		}
 
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 
 		String[] tagsArray = StringUtil.split(properties.getProperty("tags"));
 
@@ -1219,7 +1220,7 @@ public class PluginPackageUtil {
 	}
 
 	private List<Screenshot> _readScreenshots(Element parentElement) {
-		List<Screenshot> screenshots = new ArrayList<Screenshot>();
+		List<Screenshot> screenshots = new ArrayList<>();
 
 		if (parentElement == null) {
 			return screenshots;
@@ -1288,7 +1289,8 @@ public class PluginPackageUtil {
 			}
 		}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(PluginPackage.class);
+		Indexer<PluginPackage> indexer = IndexerRegistryUtil.getIndexer(
+			PluginPackage.class);
 
 		indexer.reindex(new String[0]);
 
@@ -1304,8 +1306,7 @@ public class PluginPackageUtil {
 
 		SearchContext searchContext = new SearchContext();
 
-		Map<String, Serializable> attributes =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> attributes = new HashMap<>();
 
 		attributes.put("license", license);
 		attributes.put("repositoryURL", repositoryURL);
@@ -1328,7 +1329,8 @@ public class PluginPackageUtil {
 
 		searchContext.setStart(start);
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(PluginPackage.class);
+		Indexer<PluginPackage> indexer = IndexerRegistryUtil.getIndexer(
+			PluginPackage.class);
 
 		return indexer.search(searchContext);
 	}
@@ -1364,14 +1366,15 @@ public class PluginPackageUtil {
 			pluginPackage);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PluginPackageUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PluginPackageUtil.class);
 
-	private static PluginPackageUtil _instance = new PluginPackageUtil();
+	private static final PluginPackageUtil _instance = new PluginPackageUtil();
 
-	private Set<String> _availableTagsCache;
-	private LocalPluginPackageRepository _installedPluginPackages;
+	private final Set<String> _availableTagsCache;
+	private final LocalPluginPackageRepository _installedPluginPackages;
 	private Date _lastUpdateDate;
-	private Map<String, RemotePluginPackageRepository> _repositoryCache;
+	private final Map<String, RemotePluginPackageRepository> _repositoryCache;
 	private boolean _settingUpdateAvailable;
 	private Boolean _updateAvailable;
 

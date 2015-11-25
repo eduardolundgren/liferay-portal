@@ -15,7 +15,7 @@
 package com.liferay.portal.kernel.process;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.Random;
 
@@ -60,16 +60,6 @@ public class CollectorOutputProcessorTest extends BaseOutputProcessorTestCase {
 		Assert.assertArrayEquals(
 			stdOutData,
 			collectorOutputProcessor.processStdErr(
-				new UnsyncByteArrayInputStream(stdOutData)));
-		Assert.assertArrayEquals(
-			stdErrData,
-			invokeProcessStdErr(
-				collectorOutputProcessor,
-				new UnsyncByteArrayInputStream(stdErrData)));
-		Assert.assertArrayEquals(
-			stdOutData,
-			invokeProcessStdOut(
-				collectorOutputProcessor,
 				new UnsyncByteArrayInputStream(stdOutData)));
 	}
 

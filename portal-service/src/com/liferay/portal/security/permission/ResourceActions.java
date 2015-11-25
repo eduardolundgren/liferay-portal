@@ -78,11 +78,21 @@ public interface ResourceActions {
 
 	public String getActionNamePrefix();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public List<String> getActionsNames(
 		HttpServletRequest request, List<String> actions);
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public List<String> getActionsNames(
 		HttpServletRequest request, String name, long actionIds);
+
+	public String getCompositeModelNameSeparator();
 
 	public List<String> getModelNames();
 
@@ -161,6 +171,10 @@ public interface ResourceActions {
 			String servletContextName, ClassLoader classLoader, String source)
 		throws Exception;
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public void read(String servletContextName, InputStream inputStream)
 		throws Exception;
 

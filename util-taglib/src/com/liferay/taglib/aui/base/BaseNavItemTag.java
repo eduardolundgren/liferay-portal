@@ -255,6 +255,8 @@ public abstract class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag 
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_anchorCssClass = null;
 		_anchorData = null;
 		_anchorId = null;
@@ -282,11 +284,6 @@ public abstract class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag 
 	@Override
 	protected String getEndPage() {
 		return _END_PAGE;
-	}
-
-	@Override
-	protected String getStartPage() {
-		return _START_PAGE;
 	}
 
 	@Override
@@ -319,9 +316,6 @@ public abstract class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag 
 
 	private static final String _END_PAGE =
 		"/html/taglib/aui/nav_item/end.jsp";
-
-	private static final String _START_PAGE =
-		"/html/taglib/aui/nav_item/start.jsp";
 
 	private java.lang.String _anchorCssClass = null;
 	private java.lang.Object _anchorData = null;

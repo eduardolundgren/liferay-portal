@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -39,8 +40,32 @@ import java.util.Date;
 @ProviderType
 public class DLFolderCacheModel implements CacheModel<DLFolder>, Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DLFolderCacheModel)) {
+			return false;
+		}
+
+		DLFolderCacheModel dlFolderCacheModel = (DLFolderCacheModel)obj;
+
+		if (folderId == dlFolderCacheModel.folderId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, folderId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(45);
+		StringBundler sb = new StringBundler(47);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -78,6 +103,8 @@ public class DLFolderCacheModel implements CacheModel<DLFolder>, Externalizable 
 		sb.append(hidden);
 		sb.append(", restrictionType=");
 		sb.append(restrictionType);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -163,6 +190,14 @@ public class DLFolderCacheModel implements CacheModel<DLFolder>, Externalizable 
 		dlFolderImpl.setDefaultFileEntryTypeId(defaultFileEntryTypeId);
 		dlFolderImpl.setHidden(hidden);
 		dlFolderImpl.setRestrictionType(restrictionType);
+
+		if (lastPublishDate == Long.MIN_VALUE) {
+			dlFolderImpl.setLastPublishDate(null);
+		}
+		else {
+			dlFolderImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		dlFolderImpl.setStatus(status);
 		dlFolderImpl.setStatusByUserId(statusByUserId);
 
@@ -205,6 +240,7 @@ public class DLFolderCacheModel implements CacheModel<DLFolder>, Externalizable 
 		defaultFileEntryTypeId = objectInput.readLong();
 		hidden = objectInput.readBoolean();
 		restrictionType = objectInput.readInt();
+		lastPublishDate = objectInput.readLong();
 		status = objectInput.readInt();
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
@@ -264,6 +300,7 @@ public class DLFolderCacheModel implements CacheModel<DLFolder>, Externalizable 
 		objectOutput.writeLong(defaultFileEntryTypeId);
 		objectOutput.writeBoolean(hidden);
 		objectOutput.writeInt(restrictionType);
+		objectOutput.writeLong(lastPublishDate);
 		objectOutput.writeInt(status);
 		objectOutput.writeLong(statusByUserId);
 
@@ -295,6 +332,7 @@ public class DLFolderCacheModel implements CacheModel<DLFolder>, Externalizable 
 	public long defaultFileEntryTypeId;
 	public boolean hidden;
 	public int restrictionType;
+	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

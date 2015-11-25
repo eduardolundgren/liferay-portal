@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.InputStream;
@@ -155,7 +155,7 @@ public class JavadocManagerImpl implements JavadocManager {
 
 			inputStream = url.openStream();
 
-			return SAXReaderUtil.read(inputStream, true);
+			return UnsecureSAXReaderUtil.read(inputStream, true);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -330,11 +330,10 @@ public class JavadocManagerImpl implements JavadocManager {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JavadocManagerImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		JavadocManagerImpl.class);
 
-	private Map<Class<?>, JavadocClass> _javadocClasses =
-		new HashMap<Class<?>, JavadocClass>();
-	private Map<Method, JavadocMethod> _javadocMethods =
-		new HashMap<Method, JavadocMethod>();
+	private final Map<Class<?>, JavadocClass> _javadocClasses = new HashMap<>();
+	private final Map<Method, JavadocMethod> _javadocMethods = new HashMap<>();
 
 }

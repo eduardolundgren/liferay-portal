@@ -18,8 +18,6 @@ import com.liferay.portal.cache.key.HashCodeCacheKeyGenerator;
 import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.minifier.GoogleJavaScriptMinifier;
 import com.liferay.portal.minifier.MinifierUtil;
 
@@ -32,33 +30,22 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.mockito.Mockito;
-
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Shuyang Zhou
  * @author Miguel Pastor
  */
-@PrepareForTest({CacheKeyGeneratorUtil.class, PropsUtil.class})
-@RunWith(PowerMockRunner.class)
-public class StripFilterTest extends PowerMockito {
+public class StripFilterTest {
 
-	@Before
-	public void setUp() {
-		mockStatic(PropsUtil.class);
+	@BeforeClass
+	public static void setUpClass() {
+		CacheKeyGeneratorUtil cacheKeyGeneratorUtil =
+			new CacheKeyGeneratorUtil();
 
-		when(
-			PropsUtil.get(PropsKeys.TCK_URL)
-		).thenReturn(
-			PropsKeys.TCK_URL
-		);
+		cacheKeyGeneratorUtil.setDefaultCacheKeyGenerator(
+			new HashCodeCacheKeyGenerator());
 	}
 
 	@Test
@@ -106,18 +93,16 @@ public class StripFilterTest extends PowerMockito {
 	public void testProcessCSS() throws Exception {
 		StripFilter stripFilter = new StripFilter();
 
-		_mockCacheGenerationUtil();
-
 		// Missing close tag
 
 		CharBuffer charBuffer = CharBuffer.wrap("style type=\"text/css\">abc");
 
 		StringWriter stringWriter = new StringWriter();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			StripFilter.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					StripFilter.class.getName(), Level.WARNING)) {
 
-		try {
 			stripFilter.processCSS(null, null, charBuffer, stringWriter);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -127,9 +112,6 @@ public class StripFilterTest extends PowerMockito {
 			LogRecord logRecord = logRecords.get(0);
 
 			Assert.assertEquals("Missing </style>", logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		Assert.assertEquals(
@@ -188,15 +170,11 @@ public class StripFilterTest extends PowerMockito {
 			"style type=\"text/css\">" + minifiedCode + "</style> ",
 			stringWriter.toString());
 		Assert.assertEquals(code.length() + 34, charBuffer.position());
-
-		verifyStatic(Mockito.times(3));
 	}
 
 	@Test
 	public void testProcessJavaScript() throws Exception {
 		StripFilter stripFilter = new StripFilter();
-
-		_mockCacheGenerationUtil();
 
 		// Missing close tag
 
@@ -204,10 +182,10 @@ public class StripFilterTest extends PowerMockito {
 
 		StringWriter stringWriter = new StringWriter();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			StripFilter.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					StripFilter.class.getName(), Level.WARNING)) {
 
-		try {
 			stripFilter.processJavaScript(
 				"test.js", charBuffer, stringWriter, "script".toCharArray());
 
@@ -219,9 +197,6 @@ public class StripFilterTest extends PowerMockito {
 
 			Assert.assertEquals("Missing </script>", logRecord.getMessage());
 			Assert.assertEquals("script>", stringWriter.toString());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		Assert.assertEquals(7, charBuffer.position());
@@ -252,10 +227,10 @@ public class StripFilterTest extends PowerMockito {
 
 		String code = "function(){ var abcd; var efgh; }";
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			GoogleJavaScriptMinifier.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					GoogleJavaScriptMinifier.class.getName(), Level.SEVERE)) {
 
-		try {
 			String minifiedCode = MinifierUtil.minifyJavaScript(
 				"test.js", code);
 
@@ -313,13 +288,8 @@ public class StripFilterTest extends PowerMockito {
 				"script>" + minifiedCode + "</script> ",
 				stringWriter.toString());
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		Assert.assertEquals(code.length() + 20, charBuffer.position());
-
-		verifyStatic(Mockito.times(5));
 	}
 
 	@Test
@@ -332,10 +302,10 @@ public class StripFilterTest extends PowerMockito {
 
 		StringWriter stringWriter = new StringWriter();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			StripFilter.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					StripFilter.class.getName(), Level.WARNING)) {
 
-		try {
 			stripFilter.processPre(charBuffer, stringWriter);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -347,9 +317,6 @@ public class StripFilterTest extends PowerMockito {
 			Assert.assertEquals("Missing </pre>", logRecord.getMessage());
 			Assert.assertEquals("pre", stringWriter.toString());
 			Assert.assertEquals(3, charBuffer.position());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Without trailing spaces
@@ -385,10 +352,10 @@ public class StripFilterTest extends PowerMockito {
 
 		StringWriter stringWriter = new StringWriter();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			StripFilter.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					StripFilter.class.getName(), Level.WARNING)) {
 
-		try {
 			stripFilter.processTextArea(charBuffer, stringWriter);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -400,9 +367,6 @@ public class StripFilterTest extends PowerMockito {
 			Assert.assertEquals("Missing </textArea>", logRecord.getMessage());
 			Assert.assertEquals("textarea ", stringWriter.toString());
 			Assert.assertEquals(9, charBuffer.position());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Without trailing spaces
@@ -498,17 +462,6 @@ public class StripFilterTest extends PowerMockito {
 
 		Assert.assertEquals(" ", stringWriter.toString());
 		Assert.assertEquals(4, charBuffer.position());
-	}
-
-	private void _mockCacheGenerationUtil() {
-		mockStatic(CacheKeyGeneratorUtil.class);
-
-		when(
-			CacheKeyGeneratorUtil.getCacheKeyGenerator(
-				StripFilter.class.getName())
-		).thenReturn(
-			new HashCodeCacheKeyGenerator()
-		);
 	}
 
 }

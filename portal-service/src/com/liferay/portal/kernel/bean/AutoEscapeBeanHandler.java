@@ -26,14 +26,6 @@ import java.lang.reflect.Method;
  * Wraps a bean so that all strings returned from <code>@AutoEscape</code>
  * annotated methods are automatically HTML escaped.
  *
- * <p>
- * For a usage example see {@link
- * com.liferay.portlet.shopping.util.ShoppingUtil#getBreadcrumbs(
- * com.liferay.portlet.shopping.model.ShoppingCategory,
- * javax.servlet.jsp.PageContext, javax.portlet.RenderRequest,
- * javax.portlet.RenderResponse) ShoppingUtil.getBreadcrumbs} .
- * </p>
- *
  * @author Shuyang Zhou
  * @see    AutoEscape
  */

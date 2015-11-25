@@ -9,18 +9,8 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>BasePortletConfiguration</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>CONFIGURATION_IFRAME</td>
-	<td>//iframe[@class='dialog-iframe-node ']</td>
+	<td>//iframe[contains(@id,'configurationIframeDialog_iframe') and @class='dialog-iframe-node ']</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,0 +1,76 @@
+import com.liferay.gradle.util.FileUtil
+
+buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins", version: "1.0.39"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.alloy.taglib", version: "1.0.1"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.cache", version: "1.0.1"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.maven.plugin.builder", version: "1.0.2"
+	}
+
+	repositories {
+		if (!Boolean.getBoolean("maven.local.ignore")) {
+			mavenLocal()
+		}
+
+		maven {
+			url System.properties["repository.url"] ?: "http://cdn.repository.liferay.com/nexus/content/groups/public"
+		}
+	}
+}
+
+buildDir = new File(rootDir.parentFile, "build")
+
+gradle.beforeProject {
+	Project project ->
+
+	if (FileUtil.exists(project, "bnd.bnd") && FileUtil.exists(project, "build.gradle") && project.parent) {
+		project.apply from: rootProject.file("build-module.gradle")
+	}
+}
+
+gradle.taskGraph.useFilter {
+	Task task ->
+
+	if (task.name == "compileJSP") {
+		FileTree jspFileTree = fileTree(dir: task.project.projectDir, excludes: ["**/custom_jsps/**/*", "**/dependencies/**/*"], includes: ["docroot/**/*.jsp", "src/main/resources/META-INF/resources/**/*.jsp"])
+
+		if (jspFileTree.empty) {
+			return false
+		}
+	}
+	else if (task.name == "test") {
+		if (!_hasTestClasses(task.project, "src/test/java") && !_hasTestClasses(task.project, "test/unit")) {
+			return false
+		}
+	}
+	else if (task.name == "testIntegration") {
+		if (!_hasTestClasses(task.project, "src/testIntegration/java") && !_hasTestClasses(task.project, "test/integration")) {
+			return false
+		}
+	}
+
+	return true
+}
+
+private boolean _hasTestClasses(Project project, String testClassesDirName) {
+	File testClassesDir = project.file(testClassesDirName)
+
+	if (!testClassesDir.exists()) {
+		return false
+	}
+
+	if (project.gradle.hasProperty("testClassGroupIndex")) {
+		List<String> testJavaClasses = project.gradle.testClasses.collect {
+			it.replace ".class", ".java"
+		}
+
+		FileTree testJavaClassesFileTree = project.fileTree(dir: testClassesDir, includes: testJavaClasses)
+
+		if (testJavaClassesFileTree.empty) {
+			return false
+		}
+	}
+
+	return true
+}

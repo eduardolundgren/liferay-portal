@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.PortletService;
@@ -51,7 +51,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class PortletServiceBaseImpl extends BaseServiceImpl
-	implements PortletService, IdentifiableBean {
+	implements PortletService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -82,7 +82,7 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the portlet remote service
 	 */
-	public com.liferay.portal.service.PortletService getPortletService() {
+	public PortletService getPortletService() {
 		return portletService;
 	}
 
@@ -91,8 +91,7 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param portletService the portlet remote service
 	 */
-	public void setPortletService(
-		com.liferay.portal.service.PortletService portletService) {
+	public void setPortletService(PortletService portletService) {
 		this.portletService = portletService;
 	}
 
@@ -498,23 +497,13 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return PortletService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -552,7 +541,7 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.PortletLocalService.class)
 	protected com.liferay.portal.service.PortletLocalService portletLocalService;
 	@BeanReference(type = com.liferay.portal.service.PortletService.class)
-	protected com.liferay.portal.service.PortletService portletService;
+	protected PortletService portletService;
 	@BeanReference(type = PortletPersistence.class)
 	protected PortletPersistence portletPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -595,5 +584,4 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = RoleFinder.class)
 	protected RoleFinder roleFinder;
-	private String _beanIdentifier;
 }

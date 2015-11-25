@@ -22,23 +22,29 @@ String var = (String)request.getAttribute("liferay-ui:toolbar-item:var");
 %>
 
 <c:choose>
-	<c:when test="<%= toolbarItem instanceof JavascriptToolbarItem %>">
+	<c:when test="<%= toolbarItem instanceof JavaScriptToolbarItem %>">
 
 		<%
-		JavascriptToolbarItem javascriptToolbarItem = (JavascriptToolbarItem)toolbarItem;
+		JavaScriptToolbarItem javaScriptToolbarItem = (JavaScriptToolbarItem)toolbarItem;
 		%>
 
 		<%= var %>.push(
 			{
-				icon: '<%= javascriptToolbarItem.getIcon() %>',
-				label: '<%= javascriptToolbarItem.getLabel() %>',
+				icon: '<%= javaScriptToolbarItem.getIcon() %>',
+				label: '<%= UnicodeFormatter.toString(javaScriptToolbarItem.getLabel()) %>',
 				on: {
 					click: function(event) {
-						<%= javascriptToolbarItem.getOnClick() %>
+						<%= javaScriptToolbarItem.getOnClick() %>
 					}
 				}
 			}
 		);
+
+		<c:if test="<%= Validator.isNotNull(javaScriptToolbarItem.getJavaScript()) %>">
+			<aui:script>
+				<%= javaScriptToolbarItem.getJavaScript() %>
+			</aui:script>
+		</c:if>
 	</c:when>
 	<c:when test="<%= toolbarItem instanceof URLToolbarItem %>">
 
@@ -49,7 +55,7 @@ String var = (String)request.getAttribute("liferay-ui:toolbar-item:var");
 		<%= var %>.push(
 			{
 				icon: '<%= urlToolbarItem.getIcon() %>',
-				label: '<%= urlToolbarItem.getLabel() %>',
+				label: '<%= UnicodeFormatter.toString(urlToolbarItem.getLabel()) %>',
 				on: {
 					click: function(event) {
 						window.open('<%= urlToolbarItem.getURL() %>', '<%= urlToolbarItem.getTarget() %>');

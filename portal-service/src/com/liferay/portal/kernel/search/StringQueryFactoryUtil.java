@@ -17,9 +17,11 @@ package com.liferay.portal.kernel.search;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 /**
- * @author Raymond Augé
- * @author Brian Wing Shun Chan
+ * @author     Raymond Augé
+ * @author     Brian Wing Shun Chan
+ * @deprecated As of 7.0.0
  */
+@Deprecated
 public class StringQueryFactoryUtil {
 
 	public static Query create(String query) {

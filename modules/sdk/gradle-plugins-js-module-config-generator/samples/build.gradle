@@ -1,0 +1,22 @@
+buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.js.module.config.generator", version: "latest.release"
+	}
+
+	repositories {
+		mavenLocal()
+
+		maven {
+			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+		}
+	}
+}
+
+apply plugin: "java"
+
+apply plugin: "com.liferay.js.module.config.generator"
+
+configJSModules {
+	include "**/*.js"
+	sourceDir = "src/main/resources"
+}

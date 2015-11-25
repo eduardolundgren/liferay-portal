@@ -17,12 +17,12 @@ package com.liferay.portal.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.ThemeLocalService;
@@ -45,7 +45,7 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class ThemeLocalServiceBaseImpl extends BaseLocalServiceImpl
-	implements ThemeLocalService, IdentifiableBean {
+	implements ThemeLocalService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -57,7 +57,7 @@ public abstract class ThemeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the theme local service
 	 */
-	public com.liferay.portal.service.ThemeLocalService getThemeLocalService() {
+	public ThemeLocalService getThemeLocalService() {
 		return themeLocalService;
 	}
 
@@ -66,8 +66,7 @@ public abstract class ThemeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param themeLocalService the theme local service
 	 */
-	public void setThemeLocalService(
-		com.liferay.portal.service.ThemeLocalService themeLocalService) {
+	public void setThemeLocalService(ThemeLocalService themeLocalService) {
 		this.themeLocalService = themeLocalService;
 	}
 
@@ -192,23 +191,13 @@ public abstract class ThemeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return ThemeLocalService.class.getName();
 	}
 
 	/**
@@ -236,7 +225,7 @@ public abstract class ThemeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	@BeanReference(type = com.liferay.portal.service.ThemeLocalService.class)
-	protected com.liferay.portal.service.ThemeLocalService themeLocalService;
+	protected ThemeLocalService themeLocalService;
 	@BeanReference(type = com.liferay.portal.service.ThemeService.class)
 	protected com.liferay.portal.service.ThemeService themeService;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -249,5 +238,4 @@ public abstract class ThemeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected com.liferay.portal.service.PluginSettingService pluginSettingService;
 	@BeanReference(type = PluginSettingPersistence.class)
 	protected PluginSettingPersistence pluginSettingPersistence;
-	private String _beanIdentifier;
 }

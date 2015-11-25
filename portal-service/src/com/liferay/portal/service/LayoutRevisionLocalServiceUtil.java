@@ -224,6 +224,11 @@ public class LayoutRevisionLocalServiceUtil {
 		return getService().fetchLastLayoutRevision(plid, head);
 	}
 
+	public static com.liferay.portal.model.LayoutRevision fetchLatestLayoutRevision(
+		long layoutSetBranchId, long plid) {
+		return getService().fetchLatestLayoutRevision(layoutSetBranchId, plid);
+	}
+
 	public static com.liferay.portal.model.LayoutRevision fetchLayoutRevision(
 		long layoutRevisionId) {
 		return getService().fetchLayoutRevision(layoutRevisionId);
@@ -236,15 +241,6 @@ public class LayoutRevisionLocalServiceUtil {
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
 	}
 
 	public static java.util.List<com.liferay.portal.model.LayoutRevision> getChildLayoutRevisions(
@@ -268,6 +264,10 @@ public class LayoutRevisionLocalServiceUtil {
 		return getService()
 				   .getChildLayoutRevisionsCount(layoutSetBranchId,
 			parentLayoutRevision, plid);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -370,19 +370,19 @@ public class LayoutRevisionLocalServiceUtil {
 			plid);
 	}
 
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
+	}
+
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	/**

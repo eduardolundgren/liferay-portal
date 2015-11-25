@@ -15,7 +15,6 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.cache.CacheRegistryItem;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -53,13 +52,6 @@ public class ClassNameLocalServiceImpl
 	}
 
 	@Override
-	public void afterPropertiesSet() {
-		super.afterPropertiesSet();
-
-		CacheRegistryUtil.register(this);
-	}
-
-	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void checkClassNames() {
 		List<ClassName> classNames = classNamePersistence.findAll();
@@ -76,7 +68,6 @@ public class ClassNameLocalServiceImpl
 	}
 
 	@Override
-	@Skip
 	public ClassName fetchClassName(String value) {
 		if (Validator.isNull(value)) {
 			return _nullClassName;
@@ -99,26 +90,6 @@ public class ClassNameLocalServiceImpl
 
 	@Override
 	@Skip
-	public long fetchClassNameId(Class<?> clazz) {
-		return fetchClassNameId(clazz.getName());
-	}
-
-	@Override
-	@Skip
-	public long fetchClassNameId(String value) {
-		try {
-			ClassName className = fetchClassName(value);
-
-			return className.getClassNameId();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(
-				"Unable to get class name from value " + value, e);
-		}
-	}
-
-	@Override
-	@Skip
 	public ClassName getClassName(String value) {
 		if (Validator.isNull(value)) {
 			return _nullClassName;
@@ -130,9 +101,18 @@ public class ClassNameLocalServiceImpl
 		ClassName className = _classNames.get(value);
 
 		if (className == null) {
-			className = classNameLocalService.addClassName(value);
+			try {
+				className = classNameLocalService.addClassName(value);
 
-			_classNames.put(value, className);
+				_classNames.put(value, className);
+			}
+			catch (Throwable t) {
+				className = classNameLocalService.fetchClassName(value);
+
+				if (className == _nullClassName) {
+					throw t;
+				}
+			}
 		}
 
 		return className;
@@ -147,15 +127,9 @@ public class ClassNameLocalServiceImpl
 	@Override
 	@Skip
 	public long getClassNameId(String value) {
-		try {
-			ClassName className = getClassName(value);
+		ClassName className = getClassName(value);
 
-			return className.getClassNameId();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(
-				"Unable to get class name from value " + value, e);
-		}
+		return className.getClassNameId();
 	}
 
 	@Override
@@ -169,7 +143,7 @@ public class ClassNameLocalServiceImpl
 	}
 
 	private static final Map<String, ClassName> _classNames =
-		new ConcurrentHashMap<String, ClassName>();
+		new ConcurrentHashMap<>();
 	private static final ClassName _nullClassName = new ClassNameImpl();
 
 }

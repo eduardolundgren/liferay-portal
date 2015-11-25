@@ -18,8 +18,14 @@ import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -35,16 +41,10 @@ import com.liferay.portal.service.RepositoryLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.spring.hibernate.LastSessionRecorderUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
+import com.liferay.portal.test.randomizerbumpers.TikaSafeRandomizerBumper;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
@@ -124,8 +124,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusAny() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -134,8 +133,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusAnyByMimeType() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -145,8 +143,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusAnyByUserId() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -160,8 +157,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusAnyByUserIdAndMimeType()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -174,8 +170,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusApproved() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -184,8 +179,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusApprovedByMimeType() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -198,8 +192,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusApprovedByMimeType_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -213,8 +206,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusApprovedByMimeType_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -228,8 +220,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusApprovedByMimeType_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -243,8 +234,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusApprovedByMimeType_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -256,8 +246,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusApprovedByUserId() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -271,8 +260,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusApprovedByUserIdAndMimeType()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -285,8 +273,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusInTrash() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -295,8 +282,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusInTrashByMimeType() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -307,8 +293,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testCountByG_U_F_M_StatusInTrashByUserId() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -322,8 +307,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_F_M_StatusInTrashByUserIdAndMimeType()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -338,8 +322,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAny_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -351,8 +334,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAny_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -364,8 +346,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAny_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -377,8 +358,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAny_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -390,8 +370,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByMimeType_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -405,8 +384,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByMimeType_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -420,8 +398,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByMimeType_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -435,8 +412,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByMimeType_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -450,8 +426,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByUserId_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -465,8 +440,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByUserId_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -480,8 +454,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByUserId_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -495,8 +468,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusAnyByUserId_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -511,8 +483,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusAnyByUserIdAndMimeType_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -528,8 +499,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusAnyByUserIdAndMimeType_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -545,8 +515,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusAnyByUserIdAndMimeType_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -562,8 +531,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusAnyByUserIdAndMimeType_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -578,8 +546,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApproved_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -591,8 +558,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApproved_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -604,8 +570,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApproved_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -617,8 +582,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApproved_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -630,8 +594,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApprovedByUserId_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -645,8 +608,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApprovedByUserId_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -660,8 +622,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApprovedByUserId_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -675,8 +636,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusApprovedByUserId_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -691,8 +651,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusApprovedByUserIdAndMimeType_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -708,8 +667,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusApprovedByUserIdAndMimeType_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -725,8 +683,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusApprovedByUserIdAndMimeType_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -742,8 +699,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusApprovedByUserIdAndMimeType_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -758,8 +714,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrash_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -771,8 +726,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrash_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -784,8 +738,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrash_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -797,8 +750,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrash_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -810,8 +762,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByMimeType_BothRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -825,8 +776,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByMimeType_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -840,8 +790,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByMimeType_EmptyRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -855,8 +804,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByMimeType_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -870,8 +818,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByUserId_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -885,8 +832,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByUserId_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -900,8 +846,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByUserId_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -915,8 +860,7 @@ public class DLFileEntryFinderTest {
 	public void testCountByG_U_R_F_M_StatusInTrashByUserId_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -931,8 +875,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusInTrashByUserIdAndMimeType_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -948,8 +891,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusInTrashByUserIdAndMimeType_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -965,8 +907,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusInTrashByUserIdAndMimeType_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -982,8 +923,7 @@ public class DLFileEntryFinderTest {
 			testCountByG_U_R_F_M_StatusInTrashByUserIdAndMimeType_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -1000,13 +940,15 @@ public class DLFileEntryFinderTest {
 			DLFileEntryLocalServiceUtil.fetchFileEntryByAnyImageId(
 				_SMALL_IMAGE_ID);
 
-		Assert.assertEquals("FE1.txt", dlFileEntry.getTitle());
+		String title = dlFileEntry.getTitle();
+
+		Assert.assertTrue(
+			title.equals("FE1.txt") || title.equals("FE1.txt-NewRepository"));
 	}
 
 	@Test
 	public void testFindByG_U_F_M_StatusAny() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -1025,8 +967,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusAny_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -1041,8 +982,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusAny_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -1061,8 +1001,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusAny_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -1075,8 +1014,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testFindByG_U_F_M_StatusAny_NewRepository() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -1093,8 +1031,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testFindByG_U_F_M_StatusApproved() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -1112,8 +1049,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusApproved_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -1127,8 +1063,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusApproved_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -1146,8 +1081,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusApproved_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -1161,8 +1095,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusApproved_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -1178,8 +1111,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testFindByG_U_F_M_StatusInTrash() throws Exception {
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -1197,8 +1129,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusInTrash_BothRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -1212,8 +1143,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusInTrash_DefaultRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -1231,8 +1161,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusInTrash_EmptyRepositories()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -1246,8 +1175,7 @@ public class DLFileEntryFinderTest {
 	public void testFindByG_U_F_M_StatusInTrash_NewRepository()
 		throws Exception {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>();
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
@@ -1263,7 +1191,7 @@ public class DLFileEntryFinderTest {
 
 	@Test
 	public void testFindByMisversioned() throws Exception {
-		long oldFileEntryId =  _defaultRepositoryDLFileVersion.getFileEntryId();
+		long oldFileEntryId = _defaultRepositoryDLFileVersion.getFileEntryId();
 
 		try {
 			_defaultRepositoryDLFileVersion.setFileEntryId(
@@ -1308,21 +1236,19 @@ public class DLFileEntryFinderTest {
 	}
 
 	protected static FileEntry addFileEntry(
-			long repositoryId, Folder folder, String titleSuffix)
+			long userId, long repositoryId, long folderId, String fileName,
+			String titleSuffix, String contentType, long fileEntryTypeId)
 		throws Exception {
 
 		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), userId);
 
-		serviceContext.setAttribute(
-			"fileEntryTypeId",
-			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
-		serviceContext.setCommand(Constants.ADD);
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+		DLAppTestUtil.populateServiceContext(serviceContext, fileEntryTypeId);
 
 		return DLAppLocalServiceUtil.addFileEntry(
-			_user.getUserId(), repositoryId, folder.getFolderId(), "FE1.txt",
-			ContentTypes.TEXT_PLAIN, "FE1.txt".concat(titleSuffix), null, null,
+			userId, repositoryId, folderId, fileName, contentType,
+			fileName.concat(titleSuffix), StringPool.BLANK, StringPool.BLANK,
 			(byte[])null, serviceContext);
 	}
 
@@ -1367,7 +1293,7 @@ public class DLFileEntryFinderTest {
 		List<Long> folderIds = ListUtil.toList(
 			new long[] {
 				_defaultRepositoryFolder.getFolderId(),
-				_newRepositoryFolder.getFolderId(),
+				_newRepositoryFolder.getFolderId()
 			});
 
 		return doCountBy_G_U_R_F_M(
@@ -1379,8 +1305,8 @@ public class DLFileEntryFinderTest {
 			QueryDefinition<DLFileEntry> queryDefinition)
 		throws Exception {
 
-		List<Long> repositoryIds = new ArrayList<Long>();
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> repositoryIds = new ArrayList<>();
+		List<Long> folderIds = new ArrayList<>();
 
 		return doCountBy_G_U_R_F_M(
 			userId, repositoryIds, folderIds, mimeType, queryDefinition);
@@ -1461,7 +1387,7 @@ public class DLFileEntryFinderTest {
 		List<Long> folderIds = ListUtil.toList(
 			new long[] {
 				_defaultRepositoryFolder.getFolderId(),
-				_newRepositoryFolder.getFolderId(),
+				_newRepositoryFolder.getFolderId()
 			});
 
 		return doFindBy_G_U_R_F_M(
@@ -1473,8 +1399,8 @@ public class DLFileEntryFinderTest {
 			QueryDefinition<DLFileEntry> queryDefinition)
 		throws Exception {
 
-		List<Long> repositoryIds = new ArrayList<Long>();
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> repositoryIds = new ArrayList<>();
+		List<Long> folderIds = new ArrayList<>();
 
 		return doFindBy_G_U_R_F_M(
 			userId, repositoryIds, folderIds, mimeType, queryDefinition);
@@ -1516,7 +1442,10 @@ public class DLFileEntryFinderTest {
 
 		DLAppServiceUtil.moveFolderToTrash(folderC.getFolderId());
 
-		FileEntry fileEntry = addFileEntry(repositoryId, folder, titleSuffix);
+		FileEntry fileEntry = addFileEntry(
+			_user.getUserId(), repositoryId, folder.getFolderId(), "FE1.txt",
+			titleSuffix, ContentTypes.TEXT_PLAIN,
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
 
 		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)fileEntry;
 
@@ -1530,19 +1459,22 @@ public class DLFileEntryFinderTest {
 
 		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
 
-		DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), repositoryId, folder.getFolderId(), "FE2.pdf",
-			ContentTypes.APPLICATION_PDF, "FE2.pdf".concat(titleSuffix), null,
-			WorkflowConstants.ACTION_PUBLISH);
+		addFileEntry(
+			TestPropsValues.getUserId(), repositoryId, folder.getFolderId(),
+			"FE2.pdf", titleSuffix, ContentTypes.APPLICATION_PDF,
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL);
 
-		fileEntry = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), repositoryId, folder.getFolderId(), "FE3.txt",
-			ContentTypes.TEXT_PLAIN, "FE3.txt".concat(titleSuffix), null,
-			WorkflowConstants.ACTION_PUBLISH);
+		fileEntry = addFileEntry(
+			TestPropsValues.getUserId(), repositoryId, folder.getFolderId(),
+			"FE3.txt", titleSuffix, ContentTypes.TEXT_PLAIN,
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL);
 
-		fileEntry = DLAppTestUtil.updateFileEntry(
-			_group.getGroupId(), fileEntry.getFileEntryId(), "FE3.txt",
-			"FE3.txt".concat(titleSuffix));
+		fileEntry = DLAppServiceUtil.updateFileEntry(
+			fileEntry.getFileEntryId(), "FE3.txt", ContentTypes.TEXT_PLAIN,
+			"FE3.txt".concat(titleSuffix), StringPool.BLANK, StringPool.BLANK,
+			false,
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
+			serviceContext);
 
 		dlFileEntry = ((LiferayFileEntry)fileEntry).getDLFileEntry();
 

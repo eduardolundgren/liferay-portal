@@ -55,6 +55,7 @@ public class MBStatsUserWrapper implements MBStatsUser,
 
 		attributes.put("statsUserId", getStatsUserId());
 		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
 		attributes.put("messageCount", getMessageCount());
 		attributes.put("lastPostDate", getLastPostDate());
@@ -74,6 +75,12 @@ public class MBStatsUserWrapper implements MBStatsUser,
 
 		if (groupId != null) {
 			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long userId = (Long)attributes.get("userId");
@@ -106,6 +113,16 @@ public class MBStatsUserWrapper implements MBStatsUser,
 		return _mbStatsUser.compareTo(mbStatsUser);
 	}
 
+	/**
+	* Returns the company ID of this message boards stats user.
+	*
+	* @return the company ID of this message boards stats user
+	*/
+	@Override
+	public long getCompanyId() {
+		return _mbStatsUser.getCompanyId();
+	}
+
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
 		return _mbStatsUser.getExpandoBridge();
@@ -127,7 +144,7 @@ public class MBStatsUserWrapper implements MBStatsUser,
 	* @return the last post date of this message boards stats user
 	*/
 	@Override
-	public java.util.Date getLastPostDate() {
+	public Date getLastPostDate() {
 		return _mbStatsUser.getLastPostDate();
 	}
 
@@ -226,6 +243,16 @@ public class MBStatsUserWrapper implements MBStatsUser,
 		_mbStatsUser.setCachedModel(cachedModel);
 	}
 
+	/**
+	* Sets the company ID of this message boards stats user.
+	*
+	* @param companyId the company ID of this message boards stats user
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_mbStatsUser.setCompanyId(companyId);
+	}
+
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.model.BaseModel<?> baseModel) {
@@ -260,7 +287,7 @@ public class MBStatsUserWrapper implements MBStatsUser,
 	* @param lastPostDate the last post date of this message boards stats user
 	*/
 	@Override
-	public void setLastPostDate(java.util.Date lastPostDate) {
+	public void setLastPostDate(Date lastPostDate) {
 		_mbStatsUser.setLastPostDate(lastPostDate);
 	}
 

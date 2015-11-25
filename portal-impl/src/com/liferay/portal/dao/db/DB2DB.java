@@ -14,7 +14,6 @@
 
 package com.liferay.portal.dao.db;
 
-import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
@@ -41,8 +40,8 @@ import java.util.Set;
  */
 public class DB2DB extends BaseDB {
 
-	public static DB getInstance() {
-		return _instance;
+	public DB2DB(int majorVersion, int minorVersion) {
+		super(TYPE_DB2, majorVersion, minorVersion);
 	}
 
 	@Override
@@ -99,10 +98,6 @@ public class DB2DB extends BaseDB {
 		reorgTables(templates);
 	}
 
-	protected DB2DB() {
-		super(TYPE_DB2);
-	}
-
 	@Override
 	protected String buildCreateFileContent(
 			String sqlDir, String databaseName, int population)
@@ -110,14 +105,15 @@ public class DB2DB extends BaseDB {
 
 		String suffix = getSuffix(population);
 
-		StringBundler sb = new StringBundler(14);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("drop database ");
 		sb.append(databaseName);
 		sb.append(";\n");
 		sb.append("create database ");
 		sb.append(databaseName);
-		sb.append(" pagesize 8192;\n");
+		sb.append(" pagesize 32768 temporary tablespace managed by automatic ");
+		sb.append("storage;\n");
 
 		if (population != BARE) {
 			sb.append("connect to ");
@@ -200,7 +196,7 @@ public class DB2DB extends BaseDB {
 	}
 
 	protected void reorgTables(String[] templates) throws SQLException {
-		Set<String> tableNames = new HashSet<String>();
+		Set<String> tableNames = new HashSet<>();
 
 		for (String template : templates) {
 			if (template.startsWith("alter table")) {
@@ -242,12 +238,10 @@ public class DB2DB extends BaseDB {
 					line = StringUtil.replace(
 						"alter table @table@ add column @new-column@ @type@;\n",
 						REWORD_TEMPLATE, template);
-
-					line = line + StringUtil.replace(
+					line += StringUtil.replace(
 						"update @table@ set @new-column@ = @old-column@;\n",
 						REWORD_TEMPLATE, template);
-
-					line = line + StringUtil.replace(
+					line += StringUtil.replace(
 						"alter table @table@ drop column @old-column@",
 						REWORD_TEMPLATE, template);
 				}
@@ -276,7 +270,7 @@ public class DB2DB extends BaseDB {
 	private static final String[] _DB2 = {
 		"--", "1", "0", "'1970-01-01-00.00.00.000000'", "current timestamp",
 		" blob", " blob", " smallint", " timestamp", " double", " integer",
-		" bigint", " varchar(750)", " clob", " varchar",
+		" bigint", " varchar(4000)", " clob", " varchar",
 		" generated always as identity", "commit"
 	};
 
@@ -285,7 +279,5 @@ public class DB2DB extends BaseDB {
 	private static final boolean _SUPPORTS_INLINE_DISTINCT = false;
 
 	private static final boolean _SUPPORTS_SCROLLABLE_RESULTS = false;
-
-	private static final DB2DB _instance = new DB2DB();
 
 }

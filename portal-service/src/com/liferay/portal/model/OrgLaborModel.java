@@ -36,7 +36,8 @@ import java.io.Serializable;
  * @generated
  */
 @ProviderType
-public interface OrgLaborModel extends BaseModel<OrgLabor>, MVCCModel {
+public interface OrgLaborModel extends BaseModel<OrgLabor>, MVCCModel,
+	ShardedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -88,6 +89,22 @@ public interface OrgLaborModel extends BaseModel<OrgLabor>, MVCCModel {
 	public void setOrgLaborId(long orgLaborId);
 
 	/**
+	 * Returns the company ID of this org labor.
+	 *
+	 * @return the company ID of this org labor
+	 */
+	@Override
+	public long getCompanyId();
+
+	/**
+	 * Sets the company ID of this org labor.
+	 *
+	 * @param companyId the company ID of this org labor
+	 */
+	@Override
+	public void setCompanyId(long companyId);
+
+	/**
 	 * Returns the organization ID of this org labor.
 	 *
 	 * @return the organization ID of this org labor
@@ -106,14 +123,14 @@ public interface OrgLaborModel extends BaseModel<OrgLabor>, MVCCModel {
 	 *
 	 * @return the type ID of this org labor
 	 */
-	public int getTypeId();
+	public long getTypeId();
 
 	/**
 	 * Sets the type ID of this org labor.
 	 *
 	 * @param typeId the type ID of this org labor
 	 */
-	public void setTypeId(int typeId);
+	public void setTypeId(long typeId);
 
 	/**
 	 * Returns the sun open of this org labor.

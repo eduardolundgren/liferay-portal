@@ -49,7 +49,7 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 	 */
 	public void addActivityAchievement(long userId, long groupId,
 		com.liferay.portlet.social.model.SocialAchievement achievement)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Adds the social activity achievement to the database. Also notifies the appropriate model listeners.
@@ -76,7 +76,7 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the social activity achievement with the primary key from the database. Also notifies the appropriate model listeners.
@@ -87,8 +87,7 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portlet.social.model.SocialActivityAchievement deleteSocialActivityAchievement(
-		long activityAchievementId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activityAchievementId) throws PortalException;
 
 	/**
 	* Deletes the social activity achievement from the database. Also notifies the appropriate model listeners.
@@ -176,13 +175,6 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public java.lang.String getBeanIdentifier();
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.social.model.SocialActivityAchievement> getGroupAchievements(
 		long groupId);
@@ -204,11 +196,20 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupFirstAchievementsCount(long groupId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	/**
 	* Returns the social activity achievement with the primary key.
@@ -219,8 +220,7 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.social.model.SocialActivityAchievement getSocialActivityAchievement(
-		long activityAchievementId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long activityAchievementId) throws PortalException;
 
 	/**
 	* Returns a range of all the social activity achievements.
@@ -251,13 +251,6 @@ public interface SocialActivityAchievementLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserAchievementsCount(long userId, long groupId);
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	/**
 	* Updates the social activity achievement in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

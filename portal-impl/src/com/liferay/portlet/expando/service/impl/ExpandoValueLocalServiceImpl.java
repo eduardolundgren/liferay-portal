@@ -1065,6 +1065,10 @@ public class ExpandoValueLocalServiceImpl
 			else if (type == ExpandoColumnConstants.STRING_ARRAY) {
 				value.setStringArray((String[])attributeValue);
 			}
+			else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
+				value.setStringMap(
+					(Map<Locale, String>)attributeValue, Locale.getDefault());
+			}
 			else {
 				value.setString((String)attributeValue);
 			}
@@ -1361,8 +1365,8 @@ public class ExpandoValueLocalServiceImpl
 		List<ExpandoColumn> columns = expandoColumnLocalService.getColumns(
 			companyId, className, tableName, columnNames);
 
-		Map<String, Serializable> attributeValues =
-			new HashMap<String, Serializable>((int)(columnNames.size() * 1.4));
+		Map<String, Serializable> attributeValues = new HashMap<>(
+			(int)(columnNames.size() * 1.4));
 
 		ExpandoValue value = new ExpandoValueImpl();
 

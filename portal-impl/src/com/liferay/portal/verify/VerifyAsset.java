@@ -15,10 +15,14 @@
 package com.liferay.portal.verify;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
-import com.liferay.portal.upgrade.util.UpgradeAssetPublisherManualEntries;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -27,22 +31,55 @@ import java.sql.ResultSet;
  */
 public class VerifyAsset extends VerifyProcess {
 
-	@Override
-	protected void doVerify() throws Exception {
-		rebuildTree();
-
-		upgradeAssetPublisherManualEntries();
-	}
-
-	protected void rebuildTree() throws Exception {
-		Connection con = null;
+	protected void deleteOrphanedAssetEntries() throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
+			long classNameId = PortalUtil.getClassNameId(
+				DLFileEntryConstants.getClassName());
 
-			ps = con.prepareStatement(
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("select classPK, entryId from AssetEntry where ");
+			sb.append("classNameId = ");
+			sb.append(classNameId);
+			sb.append(" and classPK not in (select fileVersionId from ");
+			sb.append("DLFileVersion)");
+
+			ps = connection.prepareStatement(sb.toString());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long classPK = rs.getLong("classPK");
+				long entryId = rs.getLong("entryId");
+
+				DLFileEntry dlFileEntry =
+					DLFileEntryLocalServiceUtil.fetchDLFileEntry(classPK);
+
+				if (dlFileEntry == null) {
+					AssetEntryLocalServiceUtil.deleteAssetEntry(entryId);
+				}
+			}
+		}
+		finally {
+			DataAccess.cleanUp(null, ps, rs);
+		}
+	}
+
+	@Override
+	protected void doVerify() throws Exception {
+		deleteOrphanedAssetEntries();
+		rebuildTree();
+	}
+
+	protected void rebuildTree() throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = connection.prepareStatement(
 				"select distinct groupId from AssetCategory where " +
 					"(leftCategoryId is null) or (rightCategoryId is null)");
 
@@ -55,15 +92,8 @@ public class VerifyAsset extends VerifyProcess {
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
-	}
-
-	protected void upgradeAssetPublisherManualEntries() throws Exception {
-		UpgradeAssetPublisherManualEntries upgradeAssetPublisherManualEntries =
-			new UpgradeAssetPublisherManualEntries();
-
-		upgradeAssetPublisherManualEntries.upgrade();
 	}
 
 }

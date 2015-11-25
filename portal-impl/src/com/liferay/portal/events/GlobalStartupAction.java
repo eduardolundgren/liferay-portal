@@ -16,7 +16,6 @@ package com.liferay.portal.events;
 
 import com.liferay.portal.deploy.DeployUtil;
 import com.liferay.portal.deploy.RequiredPluginsUtil;
-import com.liferay.portal.jcr.JCRFactoryUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployDir;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployUtil;
@@ -32,7 +31,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.PortalLifecycle;
@@ -40,13 +39,10 @@ import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.pop.POPServerUtil;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.struts.AuthPublicPathRegistry;
 import com.liferay.portal.util.BrowserLauncher;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -57,8 +53,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
-
-import org.jamwiki.Environment;
 
 /**
  * @author Brian Wing Shun Chan
@@ -72,8 +66,7 @@ public class GlobalStartupAction extends SimpleAction {
 			return _autoDeployListeners;
 		}
 
-		List<AutoDeployListener> autoDeployListeners =
-			new ArrayList<AutoDeployListener>();
+		List<AutoDeployListener> autoDeployListeners = new ArrayList<>();
 
 		String[] autoDeployListenerClassNames = PropsUtil.getArray(
 			PropsKeys.AUTO_DEPLOY_LISTENERS);
@@ -107,8 +100,7 @@ public class GlobalStartupAction extends SimpleAction {
 			return _hotDeployListeners;
 		}
 
-		List<HotDeployListener> hotDeployListeners =
-			new ArrayList<HotDeployListener>();
+		List<HotDeployListener> hotDeployListeners = new ArrayList<>();
 
 		String[] hotDeployListenerClassNames = PropsUtil.getArray(
 			PropsKeys.HOT_DEPLOY_LISTENERS);
@@ -136,8 +128,7 @@ public class GlobalStartupAction extends SimpleAction {
 	}
 
 	public static List<SandboxDeployListener> getSandboxDeployListeners() {
-		List<SandboxDeployListener> sandboxDeployListeners =
-			new ArrayList<SandboxDeployListener>();
+		List<SandboxDeployListener> sandboxDeployListeners = new ArrayList<>();
 
 		String[] sandboxDeployListenerClassNames = PropsUtil.getArray(
 			PropsKeys.SANDBOX_DEPLOY_LISTENERS);
@@ -259,38 +250,12 @@ public class GlobalStartupAction extends SimpleAction {
 
 		AuthPublicPathRegistry.register(PropsValues.AUTH_PUBLIC_PATHS);
 
-		// JAMWiki
-
-		try {
-			String tmpDir = SystemProperties.get(SystemProperties.TMP_DIR);
-
-			Environment.setValue(Environment.PROP_BASE_FILE_DIR, tmpDir);
-		}
-		catch (Throwable t) {
-			_log.error(t);
-		}
-
 		// Javadoc
 
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
 		JavadocManagerUtil.load(StringPool.BLANK, contextClassLoader);
-
-		// JCR
-
-		try {
-			JCRFactoryUtil.prepare();
-
-			if (GetterUtil.getBoolean(
-					PropsUtil.get(PropsKeys.JCR_INITIALIZE_ON_STARTUP))) {
-
-				JCRFactoryUtil.initialize();
-			}
-		}
-		catch (Exception e) {
-			_log.error(e);
-		}
 
 		// JNDI
 
@@ -335,12 +300,6 @@ public class GlobalStartupAction extends SimpleAction {
 
 			},
 			PortalLifecycle.METHOD_INIT);
-
-		// POP server
-
-		if (PropsValues.POP_SERVER_NOTIFICATIONS_ENABLED) {
-			POPServerUtil.start();
-		}
 
 		// Launch browser
 

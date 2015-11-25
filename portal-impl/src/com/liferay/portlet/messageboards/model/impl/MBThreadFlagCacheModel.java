@@ -16,6 +16,7 @@ package com.liferay.portlet.messageboards.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class MBThreadFlagCacheModel implements CacheModel<MBThreadFlag>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof MBThreadFlagCacheModel)) {
+			return false;
+		}
+
+		MBThreadFlagCacheModel mbThreadFlagCacheModel = (MBThreadFlagCacheModel)obj;
+
+		if (threadFlagId == mbThreadFlagCacheModel.threadFlagId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, threadFlagId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -61,6 +86,8 @@ public class MBThreadFlagCacheModel implements CacheModel<MBThreadFlag>,
 		sb.append(modifiedDate);
 		sb.append(", threadId=");
 		sb.append(threadId);
+		sb.append(", lastPublishDate=");
+		sb.append(lastPublishDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -105,6 +132,13 @@ public class MBThreadFlagCacheModel implements CacheModel<MBThreadFlag>,
 
 		mbThreadFlagImpl.setThreadId(threadId);
 
+		if (lastPublishDate == Long.MIN_VALUE) {
+			mbThreadFlagImpl.setLastPublishDate(null);
+		}
+		else {
+			mbThreadFlagImpl.setLastPublishDate(new Date(lastPublishDate));
+		}
+
 		mbThreadFlagImpl.resetOriginalValues();
 
 		return mbThreadFlagImpl;
@@ -121,6 +155,7 @@ public class MBThreadFlagCacheModel implements CacheModel<MBThreadFlag>,
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 		threadId = objectInput.readLong();
+		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
@@ -148,6 +183,7 @@ public class MBThreadFlagCacheModel implements CacheModel<MBThreadFlag>,
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 		objectOutput.writeLong(threadId);
+		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public String uuid;
@@ -159,4 +195,5 @@ public class MBThreadFlagCacheModel implements CacheModel<MBThreadFlag>,
 	public long createDate;
 	public long modifiedDate;
 	public long threadId;
+	public long lastPublishDate;
 }

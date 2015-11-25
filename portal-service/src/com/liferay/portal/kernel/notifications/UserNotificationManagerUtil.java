@@ -28,6 +28,7 @@ import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
+import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
@@ -141,8 +142,6 @@ public class UserNotificationManagerUtil {
 			new UserNotificationHandlerServiceTrackerCustomizer());
 
 		_userNotificationHandlerServiceTracker.open();
-
-		_userNotificationDefinitions.open();
 	}
 
 	private void _addUserNotificationDefinition(
@@ -151,7 +150,7 @@ public class UserNotificationManagerUtil {
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("javax.portlet.name", portletId);
 
@@ -303,18 +302,18 @@ public class UserNotificationManagerUtil {
 		new UserNotificationManagerUtil();
 
 	private final ServiceTrackerMap<String, List<UserNotificationDefinition>>
-		_userNotificationDefinitions = ServiceTrackerCollections.multiValueMap(
-			UserNotificationDefinition.class, "javax.portlet.name");
-	private final ConcurrentHashMap<
-		String, List<ServiceRegistration<UserNotificationDefinition>>>
-		_userNotificationDefinitionServiceRegistrations =
-			new ConcurrentHashMap<>();
+		_userNotificationDefinitions =
+			ServiceTrackerCollections.openMultiValueMap(
+				UserNotificationDefinition.class, "javax.portlet.name");
+	private final ConcurrentHashMap
+		<String, List<ServiceRegistration<UserNotificationDefinition>>>
+			_userNotificationDefinitionServiceRegistrations =
+				new ConcurrentHashMap<>();
 	private final Map<String, Map<String, UserNotificationHandler>>
-		_userNotificationHandlers = new ConcurrentHashMap
-			<String, Map<String, UserNotificationHandler>>();
+		_userNotificationHandlers = new ConcurrentHashMap<>();
 	private final ServiceRegistrationMap<UserNotificationHandler>
 		_userNotificationHandlerServiceRegistrations =
-			new ServiceRegistrationMap<UserNotificationHandler>();
+			new ServiceRegistrationMapImpl<>();
 	private final
 		ServiceTracker<UserNotificationHandler, UserNotificationHandler>
 			_userNotificationHandlerServiceTracker;
@@ -338,8 +337,7 @@ public class UserNotificationManagerUtil {
 				_userNotificationHandlers.get(selector);
 
 			if (userNotificationHandlers == null) {
-				userNotificationHandlers =
-					new HashMap<String, UserNotificationHandler>();
+				userNotificationHandlers = new HashMap<>();
 
 				_userNotificationHandlers.put(
 					selector, userNotificationHandlers);

@@ -63,8 +63,8 @@ public class PortletContainerUtil {
 				throw new PortletContainerException(se);
 			}
 
-			List<LayoutTypePortlet> layoutTypePortlets =
-				new ArrayList<LayoutTypePortlet>(layouts.size());
+			List<LayoutTypePortlet> layoutTypePortlets = new ArrayList<>(
+				layouts.size());
 
 			for (Layout curLayout : layouts) {
 				LayoutTypePortlet layoutTypePortlet =
@@ -77,8 +77,7 @@ public class PortletContainerUtil {
 		}
 
 		if (layout.isTypePortlet()) {
-			List<LayoutTypePortlet> layoutTypePortlets =
-				new ArrayList<LayoutTypePortlet>(1);
+			List<LayoutTypePortlet> layoutTypePortlets = new ArrayList<>(1);
 
 			LayoutTypePortlet layoutTypePortlet =
 				(LayoutTypePortlet)layout.getLayoutType();
@@ -287,9 +286,7 @@ public class PortletContainerUtil {
 		}
 	}
 
-	private static final boolean _LAYOUT_PARALLEL_RENDER_ENABLE =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.LAYOUT_PARALLEL_RENDER_ENABLE));
+	private static final boolean _LAYOUT_PARALLEL_RENDER_ENABLE = false;
 
 	private static final boolean _PORTLET_CONTAINER_RESTRICT =
 		GetterUtil.getBoolean(

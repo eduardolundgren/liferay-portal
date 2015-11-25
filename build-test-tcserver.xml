@@ -44,7 +44,7 @@
 			set JAVA_OPTS=
 
 			call tcruntime-ctl install
-			call tcruntime-ctl start
+			call tcruntime-ctl run
 
 			set JAVA_OPTS=%JAVA_OPTS_TEMP%
 
@@ -81,7 +81,7 @@
 		<antcall target="start-selenium" />
 
 		<antcall target="run-tcserver" inheritAll="false">
-			<param name="test.class" value="${test.name}" />
+			<param name="test.class" value="${test.class}" />
 		</antcall>
 
 		<antcall target="stop-selenium" />
@@ -89,7 +89,5 @@
 
 	<target name="run-tcserver">
 		<antcall target="run-simple-server" />
-
-		<antcall target="evaluate-logs" />
 	</target>
 </project>

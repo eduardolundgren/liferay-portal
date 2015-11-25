@@ -15,12 +15,12 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.LayoutSetService;
@@ -50,7 +50,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class LayoutSetServiceBaseImpl extends BaseServiceImpl
-	implements LayoutSetService, IdentifiableBean {
+	implements LayoutSetService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -81,7 +81,7 @@ public abstract class LayoutSetServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the layout set remote service
 	 */
-	public com.liferay.portal.service.LayoutSetService getLayoutSetService() {
+	public LayoutSetService getLayoutSetService() {
 		return layoutSetService;
 	}
 
@@ -90,8 +90,7 @@ public abstract class LayoutSetServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param layoutSetService the layout set remote service
 	 */
-	public void setLayoutSetService(
-		com.liferay.portal.service.LayoutSetService layoutSetService) {
+	public void setLayoutSetService(LayoutSetService layoutSetService) {
 		this.layoutSetService = layoutSetService;
 	}
 
@@ -496,23 +495,13 @@ public abstract class LayoutSetServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return LayoutSetService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -550,7 +539,7 @@ public abstract class LayoutSetServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portal.service.LayoutSetLocalService.class)
 	protected com.liferay.portal.service.LayoutSetLocalService layoutSetLocalService;
 	@BeanReference(type = com.liferay.portal.service.LayoutSetService.class)
-	protected com.liferay.portal.service.LayoutSetService layoutSetService;
+	protected LayoutSetService layoutSetService;
 	@BeanReference(type = LayoutSetPersistence.class)
 	protected LayoutSetPersistence layoutSetPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -593,5 +582,4 @@ public abstract class LayoutSetServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.service.VirtualHostLocalService virtualHostLocalService;
 	@BeanReference(type = VirtualHostPersistence.class)
 	protected VirtualHostPersistence virtualHostPersistence;
-	private String _beanIdentifier;
 }

@@ -15,12 +15,12 @@
 package com.liferay.portlet.expando.service.base;
 
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.persistence.ClassNamePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
@@ -49,7 +49,7 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
-	implements ExpandoColumnService, IdentifiableBean {
+	implements ExpandoColumnService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -80,7 +80,7 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the expando column remote service
 	 */
-	public com.liferay.portlet.expando.service.ExpandoColumnService getExpandoColumnService() {
+	public ExpandoColumnService getExpandoColumnService() {
 		return expandoColumnService;
 	}
 
@@ -90,7 +90,7 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 	 * @param expandoColumnService the expando column remote service
 	 */
 	public void setExpandoColumnService(
-		com.liferay.portlet.expando.service.ExpandoColumnService expandoColumnService) {
+		ExpandoColumnService expandoColumnService) {
 		this.expandoColumnService = expandoColumnService;
 	}
 
@@ -422,23 +422,13 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the Spring bean ID for this bean.
+	 * Returns the OSGi service identifier.
 	 *
-	 * @return the Spring bean ID for this bean
+	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getBeanIdentifier() {
-		return _beanIdentifier;
-	}
-
-	/**
-	 * Sets the Spring bean ID for this bean.
-	 *
-	 * @param beanIdentifier the Spring bean ID for this bean
-	 */
-	@Override
-	public void setBeanIdentifier(String beanIdentifier) {
-		_beanIdentifier = beanIdentifier;
+	public String getOSGiServiceIdentifier() {
+		return ExpandoColumnService.class.getName();
 	}
 
 	protected Class<?> getModelClass() {
@@ -476,7 +466,7 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoColumnLocalService.class)
 	protected com.liferay.portlet.expando.service.ExpandoColumnLocalService expandoColumnLocalService;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoColumnService.class)
-	protected com.liferay.portlet.expando.service.ExpandoColumnService expandoColumnService;
+	protected ExpandoColumnService expandoColumnService;
 	@BeanReference(type = ExpandoColumnPersistence.class)
 	protected ExpandoColumnPersistence expandoColumnPersistence;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoRowLocalService.class)
@@ -511,5 +501,4 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-	private String _beanIdentifier;
 }

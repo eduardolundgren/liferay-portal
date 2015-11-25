@@ -71,7 +71,7 @@ public interface VirtualHostLocalService extends BaseLocalService,
 	@Override
 	public com.liferay.portal.model.PersistedModel deletePersistedModel(
 		com.liferay.portal.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		throws PortalException;
 
 	/**
 	* Deletes the virtual host from the database. Also notifies the appropriate model listeners.
@@ -92,8 +92,7 @@ public interface VirtualHostLocalService extends BaseLocalService,
 	*/
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.liferay.portal.model.VirtualHost deleteVirtualHost(
-		long virtualHostId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long virtualHostId) throws PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -175,28 +174,28 @@ public interface VirtualHostLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
-	* Returns the Spring bean ID for this bean.
+	* Returns the OSGi service identifier.
 	*
-	* @return the Spring bean ID for this bean
+	* @return the OSGi service identifier
 	*/
-	public java.lang.String getBeanIdentifier();
+	public java.lang.String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.io.Serializable primaryKeyObj) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.VirtualHost getVirtualHost(long companyId,
-		long layoutSetId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long layoutSetId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.VirtualHost getVirtualHost(
-		java.lang.String hostname)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		java.lang.String hostname) throws PortalException;
 
 	/**
 	* Returns the virtual host with the primary key.
@@ -207,8 +206,7 @@ public interface VirtualHostLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.VirtualHost getVirtualHost(
-		long virtualHostId)
-		throws com.liferay.portal.kernel.exception.PortalException;
+		long virtualHostId) throws PortalException;
 
 	/**
 	* Returns a range of all the virtual hosts.
@@ -232,13 +230,6 @@ public interface VirtualHostLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getVirtualHostsCount();
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	public com.liferay.portal.model.VirtualHost updateVirtualHost(
 		long companyId, long layoutSetId, java.lang.String hostname);

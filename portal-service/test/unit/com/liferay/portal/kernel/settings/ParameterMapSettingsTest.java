@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.powermock.api.mockito.PowerMockito;
@@ -27,7 +28,8 @@ import org.powermock.api.mockito.PowerMockito;
  */
 public class ParameterMapSettingsTest extends PowerMockito {
 
-	public ParameterMapSettingsTest() {
+	@Before
+	public void setUp() {
 		_parameterMapSettings = new ParameterMapSettings(
 			_parameterMap, _parentSettings);
 	}
@@ -37,6 +39,20 @@ public class ParameterMapSettingsTest extends PowerMockito {
 		String[] values = {"requestValue1", "requestValue2"};
 
 		_parameterMap.put("preferences--key--", values);
+
+		Assert.assertArrayEquals(
+			values,
+			_parameterMapSettings.getValues(
+				"key", new String[] {"defaultValue"}));
+	}
+
+	@Test
+	public void testGetValuesWhenFoundInParameterMapWithParameterNamePrefix() {
+		String[] values = {"requestValue1", "requestValue2"};
+
+		_parameterMap.put("prefix--key", values);
+
+		_parameterMapSettings.setParameterNamePrefix("prefix--");
 
 		Assert.assertArrayEquals(
 			values,
@@ -68,6 +84,17 @@ public class ParameterMapSettingsTest extends PowerMockito {
 	}
 
 	@Test
+	public void testGetValueWhenFoundInParameterMapWithParameterNamePrefix() {
+		_parameterMap.put("prefix--key", new String[] {"requestValue"});
+
+		_parameterMapSettings.setParameterNamePrefix("prefix--");
+
+		Assert.assertEquals(
+			"requestValue",
+			_parameterMapSettings.getValue("key", "defaultValue"));
+	}
+
+	@Test
 	public void testGetValueWhenFoundInSettings() {
 		_parentSettings.setValue("key", "settingsValue");
 
@@ -76,9 +103,8 @@ public class ParameterMapSettingsTest extends PowerMockito {
 			_parameterMapSettings.getValue("key", "defaultValue"));
 	}
 
-	private Map<String, String[]> _parameterMap =
-		new HashMap<String, String[]>();
+	private final Map<String, String[]> _parameterMap = new HashMap<>();
 	private ParameterMapSettings _parameterMapSettings;
-	private MemorySettings _parentSettings = new MemorySettings();
+	private final MemorySettings _parentSettings = new MemorySettings();
 
 }

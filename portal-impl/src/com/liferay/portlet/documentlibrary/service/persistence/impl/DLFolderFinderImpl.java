@@ -27,9 +27,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
+import com.liferay.portlet.documentlibrary.model.DLFileShortcutConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutImpl;
@@ -50,7 +49,7 @@ import java.util.List;
  * @author Shuyang Zhou
  */
 public class DLFolderFinderImpl
-	extends BasePersistenceImpl<DLFolder> implements DLFolderFinder {
+	extends DLFolderFinderBaseImpl implements DLFolderFinder {
 
 	public static final String COUNT_F_BY_G_M_F =
 		DLFolderFinder.class.getName() + ".countF_ByG_M_F";
@@ -78,6 +77,9 @@ public class DLFolderFinderImpl
 
 	public static final String JOIN_FS_BY_DL_FILE_ENTRY =
 		DLFolderFinder.class.getName() + ".joinFS_ByDLFileEntry";
+
+	public static final String JOIN_AE_BY_DL_FOLDER =
+		DLFolderFinder.class.getName() + ".joinAE_ByDLFolder";
 
 	@Override
 	public int countF_FE_FS_ByG_F_M_M(
@@ -488,7 +490,7 @@ public class DLFolderFinderImpl
 				qPos.add(mimeTypes);
 			}
 
-			List<Object> models = new ArrayList<Object>();
+			List<Object> models = new ArrayList<>();
 
 			Iterator<Object[]> itr = (Iterator<Object[]>)QueryUtil.iterate(
 				q, getDialect(), queryDefinition.getStart(),
@@ -577,7 +579,7 @@ public class DLFolderFinderImpl
 			qPos.add(queryDefinition.getStatus());
 			qPos.add(folderId);
 
-			List<Object> models = new ArrayList<Object>();
+			List<Object> models = new ArrayList<>();
 
 			Iterator<Object[]> itr = (Iterator<Object[]>)QueryUtil.iterate(
 				q, getDialect(), queryDefinition.getStart(),
@@ -660,7 +662,7 @@ public class DLFolderFinderImpl
 
 		if (inlineSQLHelper) {
 			sql = InlineSQLHelperUtil.replacePermissionCheck(
-				sql, DLFileShortcut.class.getName(),
+				sql, DLFileShortcutConstants.getClassName(),
 				"DLFileShortcut.fileShortcutId", groupId);
 		}
 

@@ -1,0 +1,734 @@
+<definition>
+	<var name="ddlDataDefinitionDescription" value="Data Definition Description" />
+	<var name="ddlDataDefinitionName" value="Data Definition Name" />
+	<var name="ddlListName" value="List Name" />
+
+	<command name="addCP">
+		<var name="key_ddlListName" value="${ddlListName}" />
+
+		<execute function="AssertClick" locator1="DDL#LIST_TABLE_NAME" value1="${ddlListName}" />
+
+		<execute function="AssertTextEquals" locator1="Home#SITE_ADMINISTRATION_PORTLET_TITLE" value1="${ddlListName}" />
+		<execute function="Click" locator1="Button#PLUS" />
+	</command>
+
+	<command name="addRepeatableField">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Click" locator1="DDLEditRecord#FIELD_ADD" />
+	</command>
+
+	<command name="addTranslation">
+		<execute function="AssertClick" locator1="Translation#ADD" value1="Add Translation" />
+
+		<var name="key_localizedLanguage" value="${localizedLanguage}" />
+
+		<execute function="AssertClick" locator1="Translation#ADD_MENULIST_LANGUAGE" value1="${localizedLanguage}" />
+	</command>
+
+	<command name="addViaDDLDisplayPG">
+		<var name="key_ddlDataDefinitionName" value="Add ${ddlDataDefinitionName}" />
+
+		<execute function="AssertClick" locator1="DDL#TOOLBAR_ADD" value1="Add ${ddlDataDefinitionName}" />
+	</command>
+
+	<command name="deleteCP">
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${ddlListName}" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+		<execute function="AssertTextEquals" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+		<execute function="Click" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+
+		<execute function="AssertElementPresent#assertVisible" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="AssertClickNoError" locator1="MenuItem#DELETE" value1="Delete" />
+		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#EMPTY_INFO" value1="No" />
+	</command>
+
+	<command name="deleteRepeatableField">
+		<var name="key_fieldName" value="${fieldName}" />
+		<var name="key_fieldNumber" value="${fieldNumber}" />
+
+		<execute function="Click" locator1="DDLEditRecord#FIELD_DELETE" />
+	</command>
+
+	<command name="deleteViaDDLDisplayPG">
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="AssertClickNoError" locator1="MenuItem#DELETE" value1="Delete" />
+		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="No ${ddlDataDefinitionName} records were found" />
+	</command>
+
+	<command name="editCP">
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${ddlListName}" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+		<execute function="AssertTextEquals" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+		<execute function="Click" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+
+		<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_COLUMN_ONE_RECORD_1" value1="${ddlRecordFieldData}" />
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
+	</command>
+
+	<command name="editPG">
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
+	</command>
+
+	<command name="editTranslation">
+		<var name="key_localizedLanguage" value="${localizedLanguage}" />
+
+		<execute function="AssertClick" locator1="Translation#AVAILABLE_TRANSLATION" value1="${localizedLanguage}" />
+	</command>
+
+	<command name="editViaRecordViewCP">
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${ddlListName}" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+		<execute function="AssertTextEquals" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+		<execute function="Click" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+
+		<execute function="AssertElementPresent#assertVisible" locator1="DDL#RECORD_TABLE_COLUMN_ONE_RECORD_1" />
+
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="AssertClick" locator1="MenuItem#VIEW" value1="View" />
+
+		<execute function="AssertClick" locator1="Button#EDIT" value1="Edit" />
+	</command>
+
+	<command name="editViaRecordViewPG">
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="AssertClick" locator1="MenuItem#VIEW" value1="View" />
+
+		<execute function="AssertClick" locator1="Button#EDIT" value1="Edit" />
+	</command>
+
+	<command name="gotoRecordPreview">
+		<execute function="AssertClick" locator1="DDL#RECORD_TABLE_COLUMN_ONE_PREVIEW_1" value1="(Preview)" />
+	</command>
+
+	<command name="populateFieldBoolean">
+		<execute macro="DDLRecord#viewFieldLabel">
+			<var name="fieldFieldLabel" value="${fieldFieldLabel}" />
+			<var name="fieldName" value="${fieldName}" />
+			<var name="fieldShowLabel" value="${fieldShowLabel}" />
+		</execute>
+
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<if>
+			<equals arg1="${ddlRecordFieldData}" arg2="No" />
+			<then>
+				<if>
+					<equals arg1="${fieldShowLabel}" arg2="No" />
+					<then>
+						<execute function="Uncheck" locator1="DDLEditRecord#BOOLEAN_LABEL_HIDDEN_CHECKBOX" />
+					</then>
+					<else>
+						<execute function="Uncheck" locator1="DDLEditRecord#BOOLEAN_CHECKBOX" />
+					</else>
+				</if>
+			</then>
+			<elseif>
+				<equals arg1="${ddlRecordFieldData}" arg2="Yes" />
+				<then>
+					<if>
+						<equals arg1="${fieldShowLabel}" arg2="No" />
+						<then>
+							<execute function="Check" locator1="DDLEditRecord#BOOLEAN_LABEL_HIDDEN_CHECKBOX" />
+						</then>
+						<else>
+							<execute function="Check" locator1="DDLEditRecord#BOOLEAN_CHECKBOX" />
+						</else>
+					</if>
+				</then>
+			</elseif>
+			<else>
+				<fail message="Invalid var recordFieldData. Must be (Yes|No)." />
+			</else>
+		</if>
+	</command>
+
+	<command name="populateFieldDate">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type#clickAtSendKeys" locator1="DDLEditRecord#DATE_FIELD" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldDecimal">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="DDLEditRecord#DECIMAL_FIELD" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldDocumentsAndMediaChooseFromDocumentLibrary">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="AssertClick" locator1="DDLEditRecord#DOCUMENTS_AND_MEDIA_CHOOSE_FROM_DOCUMENT_LIBRARY_BUTTON" value1="Choose from Document Library" />
+
+		<execute function="SelectFrame" locator1="DocumentsAndMediaSelectDocument#SELECT_DOCUMENT_IFRAME" />
+
+		<execute function="UploadCommonFile#uploadCommonFileHidden" locator1="DocumentsAndMediaSelectDocument#SELECT_FILE_BUTTON" value1="${document}" />
+
+		<execute function="Pause" locator1="1000" />
+
+		<execute function="SelectFrameTop" value1="relative=top" />
+
+		<execute function="AssertClick" locator1="Button#ADD" value1="Add" />
+	</command>
+
+	<command name="populateFieldGeolocation">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="AssertClick" locator1="DDLEditRecord#FIELD_LABEL" value1="${fieldName}" />
+
+		<execute function="Pause" locator1="2000" />
+
+		<execute function="AssertElementPresent" locator1="DDLEditRecord#GEOLOCATION_GOOGLE_MAP" />
+	</command>
+
+	<command name="populateFieldHTML">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type#typeAlloyEditor" locator1="DDLEditRecord#HTML_FIELD" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldInteger">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="DDLEditRecord#INTEGER_FIELD" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldLinkToPage">
+		<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Select" locator1="DDLEditRecord#LINK_TO_PAGE_SELECT" value1="regexp:–\s+${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldNumber">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="DDLEditRecord#NUMBER_FIELD" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldRadio">
+		<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="AssertTextEquals" locator1="DDLEditRecord#RADIO_OPTION_LABEL" value1="${ddlRecordFieldData}" />
+		<execute function="Click" locator1="DDLEditRecord#RADIO_OPTION_RADIO" />
+	</command>
+
+	<command name="populateFieldSelect">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Select" locator1="DDLEditRecord#SELECT_SELECT" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldSelectViaSpreadsheetView">
+		<var name="key_ddlRecordRow" value="${ddlRecordRow}" />
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="DoubleClick" locator1="DDLSpreadsheet#RECORD_TABLE_FIELD_ENTRY" />
+		<execute function="Select" locator1="DDLSpreadsheet#CELL_EDITOR_SELECT" value1="${ddlRecordFieldData}" />
+		<execute function="Click" locator1="Button#SAVE" value1="Save" />
+		<execute function="AssertTextEquals" locator1="DDLSpreadsheet#RECORD_TABLE_FIELD_ENTRY" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldText">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="DDLEditRecord#TEXT_FIELD" value1="${ddlRecordFieldData}" />
+
+		<var name="i" value="1" />
+
+		<while>
+			<condition function="IsElementPresent" locator1="xpath=(//div[@data-fieldname='${key_fieldName}']/a[contains(@class,'ddm-repeatable-add-button')])[${i}]" />
+			<then>
+				<var method="MathUtil#sum('${i}', '1')" name="i" />
+
+				<if>
+					<condition function="IsElementPresent" locator1="xpath=(//div[@data-fieldname='${key_fieldName}']/a[contains(@class,'ddm-repeatable-add-button')])[${i}]" />
+					<then>
+						<execute function="Type" locator1="xpath=(//div[@data-fieldname='${key_fieldName}'][${i}]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)" value1="${ddlRecordFieldData} ${i}" />
+					</then>
+				</if>
+			</then>
+		</while>
+	</command>
+
+	<command name="populateFieldTextBox">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="DDLEditRecord#TEXT_BOX_FIELD" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateFieldTextViaSpreadsheetView">
+		<execute macro="DDLRecord#populateFieldTextViaSpreadsheetViewCmd">
+			<var name="ddlRecordFieldData" value="${ddlRecordFieldData}" />
+			<var name="ddlRecordRow" value="${ddlRecordRow}" />
+			<var name="fieldName" value="${fieldName}" />
+		</execute>
+	</command>
+
+	<command name="populateFieldTextViaSpreadsheetViewCmd">
+		<var name="key_ddlRecordRow" value="${ddlRecordRow}" />
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="DoubleClick" locator1="DDLSpreadsheet#RECORD_TABLE_FIELD_ENTRY" />
+		<execute function="Type" locator1="DDLSpreadsheet#CELL_EDITOR_FIELD" value1="${ddlRecordFieldData}" />
+		<execute function="Click" locator1="Button#SAVE" value1="Save" />
+		<execute function="AssertTextEquals" locator1="DDLSpreadsheet#RECORD_TABLE_FIELD_ENTRY" value1="${ddlRecordFieldData}" />
+	</command>
+
+	<command name="populateTranslationFieldText">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="DDLEditRecord#TEXT_FIELD" value1="${ddlRecordFieldData}" />
+
+		<var name="i" value="1" />
+
+		<while>
+			<condition function="IsElementPresent" locator1="xpath=(//div[@data-fieldname='Text']//input)[${i}]" />
+			<then>
+				<var method="MathUtil#sum('${i}', '1')" name="i" />
+
+				<if>
+					<condition function="IsElementPresent" locator1="xpath=(//div[@data-fieldname='Text']//input)[${i}]" />
+					<then>
+						<execute function="Type" locator1="xpath=(//div[@data-fieldname='Text']//input)[${i}]" value1="${ddlRecordFieldData} ${i}" />
+					</then>
+				</if>
+			</then>
+		</while>
+	</command>
+
+	<command name="publishCP">
+		<if>
+			<isset var="workflowDefinition" />
+			<then>
+				<execute function="AssertClick" locator1="Button#SUBMIT_FOR_PUBLICATION" value1="Submit for Publication" />
+			</then>
+			<else>
+				<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
+			</else>
+		</if>
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+	</command>
+
+	<command name="publishViaDDLDisplayPG">
+		<if>
+			<isset var="workflowDefinition" />
+			<then>
+				<execute function="AssertClick" locator1="Button#SUBMIT_FOR_PUBLICATION" value1="Submit for Publication" />
+			</then>
+			<else>
+				<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
+			</else>
+		</if>
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+	</command>
+
+	<command name="saveAsDraftCP">
+		<execute function="AssertClick" locator1="Button#SAVE_AS_DRAFT" value1="Save as Draft" />
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+	</command>
+
+	<command name="viewCP">
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${ddlListName}" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+		<execute function="AssertTextEquals" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+		<execute function="Click" locator1="DDL#LIST_TABLE_NAME_1" value1="${ddlListName}" />
+
+		<execute function="AssertTextEquals" locator1="Home#SITE_ADMINISTRATION_PORTLET_TITLE" value1="${ddlListName}" />
+	</command>
+
+	<command name="viewFieldCP">
+		<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
+		<var name="key_fieldFieldLabel" value="${fieldFieldLabel}" />
+
+		<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_ENTRY" value1="${ddlRecordFieldData}" />
+
+		<if>
+			<isset var="ddlRecordNestedFieldData" />
+			<then>
+				<var name="key_ddlRecordFieldData" value="${ddlRecordNestedFieldData}" />
+				<var name="key_fieldFieldLabel" value="${nestedFieldFieldLabel}" />
+
+				<execute function="AssertElementNotPresent" locator1="DDL#RECORD_TABLE_ENTRY" value1="${ddlRecordFieldData}" />
+			</then>
+		</if>
+
+		<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
+		<var name="key_fieldFieldLabel" value="${fieldFieldLabel}" />
+		<var name="key_listEntry" value="${ddlRecordFieldData}" />
+
+		<execute function="Click" locator1="Icon#LIST_VERTICAL_ELLIPSIS" />
+		<execute function="AssertClick" locator1="MenuItem#VIEW" value1="View" />
+
+		<if>
+			<equals arg1="${fieldBlank}" arg2="true" />
+			<then>
+				<execute function="AssertTextEquals#assertPartialText" locator1="DDLRecord#FIELD" value1="${fieldFieldLabel}${ddlRecordFieldData}" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals#assertPartialText" locator1="DDLRecord#FIELD" value1="${fieldFieldLabel} ${ddlRecordFieldData}" />
+			</else>
+		</if>
+
+		<if>
+			<isset var="ddlRecordNestedFieldData" />
+			<then>
+				<var name="key_ddlRecordFieldData" value="${ddlRecordNestedFieldData}" />
+				<var name="key_fieldFieldLabel" value="${nestedFieldFieldLabel}" />
+
+				<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_NESTED" value1="${nestedFieldFieldLabel} ${ddlRecordNestedFieldData}" />
+				<execute function="AssertCssValue" locator1="DDLRecord#FIELD_NESTED" locator2="margin-left" value1="15px" />
+			</then>
+		</if>
+	</command>
+
+	<command name="viewFieldFormTemplateSpecific">
+		<if>
+			<equals arg1="${field}" arg2="Paragraph" />
+			<then>
+				<var name="key_fieldText" value="${fieldText}" />
+
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#PARAGRAPH_FIELD" value1="${fieldText}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Separator" />
+			<then>
+				<execute function="AssertElementPresent" locator1="DDLEditRecord#SEPARATOR_FIELD" />
+			</then>
+		</if>
+	</command>
+
+	<command name="viewFieldLabel">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<if>
+			<equals arg1="${fieldShowLabel}" arg2="No" />
+			<then>
+				<execute function="AssertNotVisible" locator1="DDLEditRecord#FIELD_LABEL_HIDDEN" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#FIELD_LABEL" value1="${fieldFieldLabel}" />
+			</else>
+		</if>
+	</command>
+
+	<command name="viewFieldPredefinedValue">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<if>
+			<not>
+				<equals arg1="${fieldShowLabel}" arg2="No" />
+			</not>
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#FIELD_LABEL" value1="${fieldFieldLabel}" />
+			</then>
+			<else>
+				<execute function="AssertElementNotPresent" locator1="DDLEditRecord#FIELD_LABEL" />
+			</else>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Boolean" />
+			<then>
+				<if>
+					<equals arg1="${fieldPredefinedValue}" arg2="Yes" />
+					<then>
+						<execute function="AssertChecked" locator1="DDLEditRecord#BOOLEAN_CHECKBOX" />
+					</then>
+					<elseif>
+						<equals arg1="${fieldPredefinedValue}" arg2="No" />
+						<then>
+							<execute function="AssertNotChecked" locator1="DDLEditRecord#BOOLEAN_CHECKBOX" />
+						</then>
+					</elseif>
+				</if>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Date" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#DATE_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Decimal" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#DECIMAL_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Documents and Media" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#DECIMAL_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="HTML" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#HTML_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Integer" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#INTEGER_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Link to Page" />
+			<then>
+				<execute function="AssertSelectedLabel" locator1="DDLEditRecord#LINK_TO_PAGE_SELECT" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Number" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#NUMBER_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Radio" />
+			<then>
+				<var name="key_ddlRecordFieldData" value="${fieldPredefinedValue}" />
+
+				<execute function="AssertChecked" locator1="DDLEditRecord#RADIO_OPTION_RADIO" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Select" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#SELECT_SELECT" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Text" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#TEXT_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Text Box" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLEditRecord#TEXT_BOX_FIELD" value1="${fieldPredefinedValue}" />
+			</then>
+		</if>
+	</command>
+
+	<command name="viewFirstFieldCP">
+		<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_COLUMN_ONE_NAME" value1="${fieldFieldLabel}" />
+
+		<if>
+			<isset var="workflowStatus" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_COLUMN_TWO_RECORD_1_WORKFLOW_STATUS" value1="Pending" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="HTML" />
+			<then>
+				<execute macro="DDLRecord#gotoRecordPreview" />
+
+				<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_PREVIEW" value1="${ddlRecordFieldData}" />
+
+				<execute function="Click" locator1="DDL#RECORD_TABLE_PREVIEW_CLOSE" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_COLUMN_ONE_RECORD_1" value1="${ddlRecordFieldData}" />
+			</else>
+		</if>
+
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+		<execute function="Click" locator1="MenuItem#VIEW" />
+
+		<if>
+			<isset var="workflowStatus" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLRecord#WORKFLOW_STATUS" value1="Pending (${workflowStatus})" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals" locator1="DDLRecord#WORKFLOW_STATUS" value1="Approved" />
+			</else>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Boolean" />
+			<then>
+				<if>
+					<equals arg1="${ddlRecordFieldData}" arg2="true" />
+					<then>
+						<var name="ddlRecordFieldData" value="Yes" />
+					</then>
+					<elseif>
+						<equals arg1="${ddlRecordFieldData}" arg2="false" />
+						<then>
+							<var name="ddlRecordFieldData" value="No" />
+						</then>
+					</elseif>
+				</if>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${fieldShowLabel}" arg2="No" />
+			<then>
+				<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_1" value1="${ddlRecordFieldData}" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_1" value1="${fieldFieldLabel} ${ddlRecordFieldData}" />
+			</else>
+		</if>
+	</command>
+
+	<command name="viewFirstRecordSearchResult">
+		<execute function="AssertTextEquals" locator1="Portlet#H3_HEADER" value1="New Data Definition Name for List: ${ddlListName}" />
+		<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_1" value1="${field} ${ddlRecordFieldData}" />
+	</command>
+
+	<command name="viewFirstRecordViaDDLDisplayTemplate">
+		<execute function="AssertTextEquals" locator1="Portlet#H3_HEADER" value1="New Data Definition Name for List: ${ddlListName}" />
+		<execute function="AssertTextEquals" locator1="PGDynamicdatalists#RECORD_TABLE_COLUMN_ONE_NAME" value1="${fieldFieldLabel}" />
+
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+
+		<execute function="AssertClick" locator1="PGDynamicdatalists#RECORD_MENULIST_VIEW" value1="View" />
+
+		<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_1" value1="${fieldFieldLabel} ${ddlRecordFieldData}" />
+	</command>
+
+	<command name="viewGeolocationRecord">
+		<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_COLUMN_ONE_NAME" value1="${fieldFieldLabel}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DDL#RECORD_TABLE_COLUMN_ONE_RECORD_1" value1="Latitude:" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DDL#RECORD_TABLE_COLUMN_ONE_RECORD_1" value1="Longitude:" />
+	</command>
+
+	<command name="viewInvalidHTMLfield">
+		<execute function="AssertElementPresent" locator1="DDL#RECORD_TABLE_PREVIEW_INVALID_IMG" />
+	</command>
+
+	<command name="viewRepeatableNestedFieldsVisualGrouping">
+		<execute function="SikuliAssertElementPresent" locator1="DDLRecord#NESTED_FIELD_REPEATABLE_VISUAL_GROUPING_PNG" />
+	</command>
+
+	<command name="viewSecondFieldCP">
+		<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
+		<var name="key_fieldFieldLabel" value="${fieldFieldLabel}" />
+
+		<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_ENTRY_2" value1="${ddlRecordFieldData}" />
+
+		<var name="key_listEntry" value="${ddlRecordFieldData}" />
+
+		<execute function="Click" locator1="Icon#LIST_VERTICAL_ELLIPSIS" />
+		<execute function="AssertClick" locator1="MenuItem#VIEW" value1="View" />
+
+		<if>
+			<equals arg1="${ddlRecordFieldData}" arg2="" />
+			<then>
+				<execute function="AssertTextEquals#assertPartialText" locator1="DDLRecord#FIELD" value1="${fieldFieldLabel}${ddlRecordFieldData}" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals#assertPartialText" locator1="DDLRecord#FIELD" value1="${fieldFieldLabel} ${ddlRecordFieldData}" />
+			</else>
+		</if>
+	</command>
+
+	<command name="viewSecondRecordSearchResult">
+		<execute function="AssertTextEquals" locator1="Portlet#H3_HEADER" value1="New Data Definition Name for List: ${ddlListName}" />
+		<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_2" value1="${field} ${ddlRecordFieldData}" />
+	</command>
+
+	<command name="viewSecondRecordViaDDLDisplayTemplate">
+		<execute function="AssertTextEquals" locator1="Portlet#H3_HEADER" value1="${ddlListName}" />
+		<execute function="AssertTextEquals" locator1="PGDynamicdatalists#RECORD_TABLE_COLUMN_TWO_NAME" value1="${fieldFieldLabel}" />
+
+		<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
+
+		<execute function="AssertClick" locator1="PGDynamicdatalists#RECORD_MENULIST_VIEW" value1="View" />
+
+		<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_2" value1="${fieldFieldLabel} ${ddlRecordFieldData}" />
+	</command>
+
+	<command name="viewTextFieldRepeated">
+		<execute function="AssertTextEquals" locator1="xpath=(//div[@data-fieldname='Text'][1]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)" value1="${ddlRecordFieldData1}" />
+		<execute function="AssertTextEquals" locator1="xpath=(//div[@data-fieldname='Text'][2]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)" value1="${ddlRecordFieldData2}" />
+		<execute function="AssertTextEquals" locator1="xpath=(//div[@data-fieldname='Text'][3]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)" value1="${ddlRecordFieldData3}" />
+	</command>
+
+	<command name="viewViaDDLDisplayPG">
+		<execute function="AssertTextEquals" locator1="Portlet#H2_HEADER" value1="${ddlListName}" />
+		<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_COLUMN_ONE_NAME" value1="${fieldFieldLabel}" />
+
+		<var name="key_ddlRecordFieldData" value="${key_ddlRecordFieldData}" />
+		<var name="key_fieldFieldLabel" value="${fieldFieldLabel}" />
+
+		<if>
+			<isset var="ddlRecordFieldDataTableDisplay" />
+			<then>
+				<var name="key_ddlRecordFieldData" value="${ddlRecordFieldDataTableDisplay}" />
+
+				<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_ENTRY" value1="${ddlRecordFieldDataTableDisplay}" />
+			</then>
+			<else>
+				<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
+
+				<execute function="AssertTextEquals" locator1="DDL#RECORD_TABLE_ENTRY" value1="${ddlRecordFieldData}" />
+			</else>
+		</if>
+
+		<if>
+			<equals arg1="${userRole}" arg2="Guest" />
+			<then>
+				<execute function="AssertClick" locator1="DDL#RECORD_TABLE_GUEST_VIEW_LINK" value1="View" />
+			</then>
+			<else>
+				<execute function="Click" locator1="DDL#RECORD_TABLE_ELLIPSIS" />
+				<execute function="AssertClick" locator1="DDL#MENULIST_VIEW_SPECIFIC_RECORD" value1="View" />
+			</else>
+		</if>
+
+		<if>
+			<equals arg1="${field}" arg2="Boolean" />
+			<then>
+				<if>
+					<equals arg1="${ddlRecordFieldData}" arg2="true" />
+					<then>
+						<var name="ddlRecordFieldData" value="Yes" />
+					</then>
+					<elseif>
+						<equals arg1="${ddlRecordFieldData}" arg2="false" />
+						<then>
+							<var name="ddlRecordFieldData" value="No" />
+						</then>
+					</elseif>
+				</if>
+			</then>
+		</if>
+
+		<execute function="AssertTextEquals" locator1="DDLRecord#FIELD_1" value1="${fieldFieldLabel} ${ddlRecordFieldData}" />
+	</command>
+</definition>

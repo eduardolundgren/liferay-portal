@@ -61,11 +61,10 @@ public class SCFrameworkVersionLocalServiceUtil {
 
 	public static void addFrameworkVersionResources(
 		com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion frameworkVersion,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
-			.addFrameworkVersionResources(frameworkVersion, groupPermissions,
-			guestPermissions);
+			.addFrameworkVersionResources(frameworkVersion, modelPermissions);
 	}
 
 	public static void addFrameworkVersionResources(long frameworkVersionId,
@@ -77,11 +76,10 @@ public class SCFrameworkVersionLocalServiceUtil {
 	}
 
 	public static void addFrameworkVersionResources(long frameworkVersionId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
-			.addFrameworkVersionResources(frameworkVersionId, groupPermissions,
-			guestPermissions);
+			.addFrameworkVersionResources(frameworkVersionId, modelPermissions);
 	}
 
 	/**
@@ -305,15 +303,6 @@ public class SCFrameworkVersionLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	public static java.lang.String getBeanIdentifier() {
-		return getService().getBeanIdentifier();
-	}
-
 	public static com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion getFrameworkVersion(
 		long frameworkVersionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -341,6 +330,19 @@ public class SCFrameworkVersionLocalServiceUtil {
 
 	public static int getFrameworkVersionsCount(long groupId, boolean active) {
 		return getService().getFrameworkVersionsCount(groupId, active);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
@@ -440,15 +442,6 @@ public class SCFrameworkVersionLocalServiceUtil {
 		long productVersionId) {
 		return getService()
 				   .hasSCProductVersionSCFrameworkVersions(productVersionId);
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
-		getService().setBeanIdentifier(beanIdentifier);
 	}
 
 	public static void setSCProductVersionSCFrameworkVersions(

@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.Increment;
 import com.liferay.portal.kernel.increment.IncrementFactory;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
 
@@ -109,7 +109,7 @@ public class BufferedIncrementAdvice
 		final BufferedIncreasableEntry bufferedIncreasableEntry =
 			new BufferedIncreasableEntry(methodInvocation, batchKey, increment);
 
-		TransactionCommitCallbackRegistryUtil.registerCallback(
+		TransactionCommitCallbackUtil.registerCallback(
 			new Callable<Void>() {
 
 				@Override
@@ -138,7 +138,7 @@ public class BufferedIncrementAdvice
 		return _nullBufferedIncrement;
 	}
 
-	private static BufferedIncrement _nullBufferedIncrement =
+	private static final BufferedIncrement _nullBufferedIncrement =
 		new BufferedIncrement() {
 
 			@Override
@@ -158,11 +158,9 @@ public class BufferedIncrementAdvice
 
 		};
 
-	private Map<String, BufferedIncrementConfiguration>
-		_bufferedIncrementConfigurations =
-			new ConcurrentHashMap<String, BufferedIncrementConfiguration>();
-	private ConcurrentMap<Method, BufferedIncrementProcessor>
-		_bufferedIncrementProcessors =
-			new ConcurrentHashMap<Method, BufferedIncrementProcessor>();
+	private final Map<String, BufferedIncrementConfiguration>
+		_bufferedIncrementConfigurations = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Method, BufferedIncrementProcessor>
+		_bufferedIncrementProcessors = new ConcurrentHashMap<>();
 
 }

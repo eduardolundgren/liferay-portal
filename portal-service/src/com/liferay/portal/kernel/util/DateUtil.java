@@ -35,57 +35,38 @@ public class DateUtil {
 	public static final String ISO_8601_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
 
 	public static int compareTo(Date date1, Date date2) {
-		return compareTo(date1, date2, false);
-	}
-
-	public static int compareTo(
-		Date date1, Date date2, boolean ignoreMilliseconds) {
-
-		// Workaround for bug in JDK 1.5.x. This bug is fixed in JDK 1.5.07. See
-		// http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=6207898 for
-		// more information.
-
-		if ((date1 != null) && (date2 == null)) {
-			return -1;
-		}
-		else if ((date1 == null) && (date2 != null)) {
-			return 1;
-		}
-		else if ((date1 == null) && (date2 == null)) {
+		if (date1 == date2) {
 			return 0;
 		}
 
-		long time1 = date1.getTime();
-		long time2 = date2.getTime();
-
-		if (ignoreMilliseconds) {
-			time1 = time1 / Time.SECOND;
-			time2 = time2 / Time.SECOND;
-		}
-
-		if (time1 == time2) {
-			return 0;
-		}
-		else if (time1 < time2) {
-			return -1;
-		}
-		else {
+		if (date1 == null) {
 			return 1;
 		}
+
+		if (date2 == null) {
+			return -1;
+		}
+
+		return Long.compare(date1.getTime(), date2.getTime());
 	}
 
 	public static boolean equals(Date date1, Date date2) {
-		return equals(date1, date2, false);
-	}
-
-	public static boolean equals(
-		Date date1, Date date2, boolean ignoreMilliseconds) {
-
-		if (compareTo(date1, date2, ignoreMilliseconds) == 0) {
+		if (compareTo(date1, date2) == 0) {
 			return true;
 		}
 
 		return false;
+	}
+
+	public static String formatDate(
+			String fromPattern, String dateString, Locale locale)
+		throws ParseException {
+
+		Date dateValue = parseDate(fromPattern, dateString, locale);
+
+		Format dateFormat = FastDateFormatFactoryUtil.getDate(locale);
+
+		return dateFormat.format(dateValue);
 	}
 
 	public static String getCurrentDate(String pattern, Locale locale) {
@@ -131,7 +112,8 @@ public class DateUtil {
 		Calendar startCal = null;
 		Calendar endCal = null;
 
-		int offset = 0;
+		int offsetDate1 = 0;
+		int offsetDate2 = 0;
 
 		if (timeZone == null) {
 			startCal = new GregorianCalendar();
@@ -141,16 +123,17 @@ public class DateUtil {
 			startCal = new GregorianCalendar(timeZone);
 			endCal = new GregorianCalendar(timeZone);
 
-			offset = timeZone.getRawOffset();
+			offsetDate1 = timeZone.getOffset(date1.getTime());
+			offsetDate2 = timeZone.getOffset(date2.getTime());
 		}
 
 		startCal.setTime(date1);
 
-		startCal.add(Calendar.MILLISECOND, offset);
+		startCal.add(Calendar.MILLISECOND, offsetDate1);
 
 		endCal.setTime(date2);
 
-		endCal.add(Calendar.MILLISECOND, offset);
+		endCal.add(Calendar.MILLISECOND, offsetDate2);
 
 		int daysBetween = 0;
 
@@ -264,13 +247,26 @@ public class DateUtil {
 	public static Date parseDate(String dateString, Locale locale)
 		throws ParseException {
 
-		DateFormat dateFormat = DateFormat.getDateInstance(
-			DateFormat.SHORT, locale);
+		return parseDate(null, dateString, locale);
+	}
+
+	public static Date parseDate(
+			String pattern, String dateString, Locale locale)
+		throws ParseException {
+
+		DateFormat dateFormat = null;
+
+		if (Validator.isNull(pattern)) {
+			dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale);
+		}
+		else {
+			dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+				pattern, locale);
+		}
 
 		return dateFormat.parse(dateString);
 	}
 
-	private static Map<Locale, Boolean> _formatAmPmMap =
-		new HashMap<Locale, Boolean>();
+	private static final Map<Locale, Boolean> _formatAmPmMap = new HashMap<>();
 
 }

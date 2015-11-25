@@ -14,8 +14,6 @@
 
 package com.liferay.portal.json;
 
-import com.liferay.portal.dao.orm.common.EntityCacheImpl;
-import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.test.AssertUtils;
@@ -121,7 +119,7 @@ public class JSONFactoryTest {
 	@Test
 	public void testLooseDeserialize() {
 		Object object = JSONFactoryUtil.looseDeserialize(
-			"{\"class\":\"" + EntityCacheUtil.class.getName() + "\"}");
+			"{\"class\":\"" + JSONFactoryUtil.class.getName() + "\"}");
 
 		Assert.assertTrue(object instanceof Map);
 
@@ -144,40 +142,34 @@ public class JSONFactoryTest {
 		Assert.assertEquals(HashMap.class, object.getClass());
 		Assert.assertTrue(((Map<?, ?>)object).containsKey("class"));
 
-		try {
-			JSONFactoryUtil.looseDeserialize(
-				"{\"class\":\"" + EntityCacheUtil.class.getName() + "\"}");
-		}
-		catch (Exception e) {
-			Assert.fail(e.toString());
-		}
+		JSONFactoryUtil.looseDeserialize(
+			"{\"class\":\"" + JSONFactoryUtil.class.getName() + "\"}");
 
 		Map<?, ?> map = (Map<?, ?>)JSONFactoryUtil.looseDeserialize(
-			"{\"class\":\"" + EntityCacheUtil.class.getName() +
+			"{\"class\":\"" + JSONFactoryUtil.class.getName() +
 				"\",\"foo\": \"boo\"}");
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(2, map.size());
 		Assert.assertEquals(
-			"com.liferay.portal.kernel.dao.orm.EntityCacheUtil",
-			map.get("class"));
+			"com.liferay.portal.kernel.json.JSONFactoryUtil", map.get("class"));
 		Assert.assertEquals("boo", map.get("foo"));
 
 		map = (Map<?, ?>)JSONFactoryUtil.looseDeserialize(
-			"{\"class\":\"" + EntityCacheUtil.class.getName() +
-				"\",\"foo\": \"boo\",\"entityCache\":{\"class\":\"" +
-				EntityCacheImpl.class.getName() + "\"}}");
+			"{\"class\":\"" + JSONFactoryUtil.class.getName() +
+				"\",\"foo\": \"boo\",\"jsonFactory\":{\"class\":\"" +
+				JSONFactoryImpl.class.getName() + "\"}}");
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(3, map.size());
-		Assert.assertEquals( EntityCacheUtil.class.getName(), map.get("class"));
+		Assert.assertEquals( JSONFactoryUtil.class.getName(), map.get("class"));
 		Assert.assertEquals("boo", map.get("foo"));
 
-		map = (Map<?, ?>)map.get("entityCache");
+		map = (Map<?, ?>)map.get("jsonFactory");
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(1, map.size());
-		Assert.assertEquals(EntityCacheImpl.class.getName(), map.get("class"));
+		Assert.assertEquals(JSONFactoryImpl.class.getName(), map.get("class"));
 	}
 
 	@Test
@@ -232,16 +224,7 @@ public class JSONFactoryTest {
 
 		initializePrimitiveArrays(fooBean3);
 
-		String json = null;
-
-		try {
-			json = JSONFactoryUtil.serialize(fooBean3);
-		}
-		catch (IllegalArgumentException iae) {
-			Assert.fail("Unable to serialize " + fooBean3);
-		}
-
-		return json;
+		return JSONFactoryUtil.serialize(fooBean3);
 	}
 
 	protected String buildPrimitiveArraysSerializableJSON() {
@@ -249,16 +232,7 @@ public class JSONFactoryTest {
 
 		initializePrimitiveArrays(fooBean4);
 
-		String json = null;
-
-		try {
-			json = JSONFactoryUtil.serialize(fooBean4);
-		}
-		catch (IllegalArgumentException iae) {
-			Assert.fail("Unable to serialize " + fooBean4);
-		}
-
-		return json;
+		return JSONFactoryUtil.serialize(fooBean4);
 	}
 
 	protected String buildPrimitivesJSON() {
@@ -266,16 +240,7 @@ public class JSONFactoryTest {
 
 		initializePrimitives(fooBean5);
 
-		String json = null;
-
-		try {
-			json = JSONFactoryUtil.serialize(fooBean5);
-		}
-		catch (IllegalArgumentException iae) {
-			Assert.fail("Unable to serialize " + fooBean5);
-		}
-
-		return json;
+		return JSONFactoryUtil.serialize(fooBean5);
 	}
 
 	protected String buildPrimitivesSerializableJSON() {
@@ -283,16 +248,7 @@ public class JSONFactoryTest {
 
 		initializePrimitives(fooBean6);
 
-		String json = null;
-
-		try {
-			json = JSONFactoryUtil.serialize(fooBean6);
-		}
-		catch (IllegalArgumentException iae) {
-			Assert.fail("Unable to serialize " + fooBean6);
-		}
-
-		return json;
+		return JSONFactoryUtil.serialize(fooBean6);
 	}
 
 	protected void checkJSONPrimitiveArrays(String json) {

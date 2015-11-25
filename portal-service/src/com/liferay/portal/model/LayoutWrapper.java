@@ -16,8 +16,9 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -85,6 +86,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 			getLayoutPrototypeLinkEnabled());
 		attributes.put("sourcePrototypeLayoutUuid",
 			getSourcePrototypeLayoutUuid());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -279,6 +281,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 		if (sourcePrototypeLayoutUuid != null) {
 			setSourcePrototypeLayoutUuid(sourcePrototypeLayoutUuid);
 		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
 	}
 
 	@Override
@@ -308,7 +316,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* the current layout.
 	*
 	* @return the ID of the topmost parent layout of the current layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public long getAncestorLayoutId()
@@ -321,7 +328,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* of the current layout.
 	*
 	* @return the plid of the topmost parent layout of the current layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public long getAncestorPlid()
@@ -335,7 +341,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* parent listed last.
 	*
 	* @return the current layout's list of parent layouts
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getAncestors()
@@ -366,7 +371,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param permissionChecker the user-specific context to check permissions
 	* @return the list of all child layouts that the user has permission to
 	access
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getChildren(
@@ -383,7 +387,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the color scheme that is configured for the current layout, or
 	the color scheme  of the layout set that contains the current
 	layout if no color scheme is configured
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ColorScheme getColorScheme()
@@ -417,7 +420,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the create date of this layout
 	*/
 	@Override
-	public java.util.Date getCreateDate() {
+	public Date getCreateDate() {
 		return _layout.getCreateDate();
 	}
 
@@ -442,7 +445,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*
 	* @return the CSS text for the current layout, or for the layout set if no
 	CSS text is configured in the current layout
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public java.lang.String getCssText()
@@ -535,8 +537,19 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the locales and localized descriptions of this layout
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+	public Map<java.util.Locale, java.lang.String> getDescriptionMap() {
 		return _layout.getDescriptionMap();
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Portlet> getEmbeddedPortlets() {
+		return _layout.getEmbeddedPortlets();
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Portlet> getEmbeddedPortlets(
+		long groupId) {
+		return _layout.getEmbeddedPortlets(groupId);
 	}
 
 	@Override
@@ -571,7 +584,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the friendly URLs for all configured locales
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getFriendlyURLMap() {
+	public Map<java.util.Locale, java.lang.String> getFriendlyURLMap() {
 		return _layout.getFriendlyURLMap();
 	}
 
@@ -588,8 +601,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* </p>
 	*
 	* @return the current layout's group
-	* @throws PortalException if a group with the primary key could not be
-	found
 	*/
 	@Override
 	public com.liferay.portal.model.Group getGroup()
@@ -741,8 +752,18 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the locales and localized keywordses of this layout
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getKeywordsMap() {
+	public Map<java.util.Locale, java.lang.String> getKeywordsMap() {
 		return _layout.getKeywordsMap();
+	}
+
+	/**
+	* Returns the last publish date of this layout.
+	*
+	* @return the last publish date of this layout
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _layout.getLastPublishDate();
 	}
 
 	/**
@@ -779,7 +800,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* Returns the current layout's {@link LayoutSet}.
 	*
 	* @return the current layout's layout set
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.LayoutSet getLayoutSet()
@@ -814,7 +834,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the modified date of this layout
 	*/
 	@Override
-	public java.util.Date getModifiedDate() {
+	public Date getModifiedDate() {
 		return _layout.getModifiedDate();
 	}
 
@@ -901,7 +921,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the locales and localized names of this layout
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getNameMap() {
+	public Map<java.util.Locale, java.lang.String> getNameMap() {
 		return _layout.getNameMap();
 	}
 
@@ -920,7 +940,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*
 	* @return the current layout's parent plid, or <code>0</code> if the
 	current layout is the topmost parent layout
-	* @throws PortalException if a matching layout could not be found
 	*/
 	@Override
 	public long getParentPlid()
@@ -1068,7 +1087,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the locales and localized robotses of this layout
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getRobotsMap() {
+	public Map<java.util.Locale, java.lang.String> getRobotsMap() {
 		return _layout.getRobotsMap();
 	}
 
@@ -1099,7 +1118,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*
 	* @return the current layout's theme, or the layout set's theme if no
 	layout theme is configured
-	* @throws PortalException if a portal exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.Theme getTheme()
@@ -1202,7 +1220,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return the locales and localized titles of this layout
 	*/
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getTitleMap() {
+	public Map<java.util.Locale, java.lang.String> getTitleMap() {
 		return _layout.getTitleMap();
 	}
 
@@ -1323,8 +1341,6 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @return <code>true</code> if the given layout ID matches one of the
 	current layout's hierarchical parents; <code>false</code>
 	otherwise
-	* @throws PortalException if any one of the current layout's acestors could
-	not be retrieved
 	*/
 	@Override
 	public boolean hasAncestor(long layoutId)
@@ -1347,6 +1363,11 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	public boolean hasScopeGroup()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.hasScopeGroup();
+	}
+
+	@Override
+	public boolean hasSetModifiedDate() {
+		return _layout.hasSetModifiedDate();
 	}
 
 	@Override
@@ -1537,6 +1558,10 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 		return _layout.isSupportsEmbeddedPortlets();
 	}
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	*/
+	@Deprecated
 	@Override
 	public boolean isTypeArticle() {
 		return _layout.isTypeArticle();
@@ -1627,7 +1652,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param createDate the create date of this layout
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_layout.setCreateDate(createDate);
 	}
 
@@ -1688,7 +1713,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		Map<java.util.Locale, java.lang.String> descriptionMap) {
 		_layout.setDescriptionMap(descriptionMap);
 	}
 
@@ -1700,14 +1725,13 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*/
 	@Override
 	public void setDescriptionMap(
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.util.Locale defaultLocale) {
 		_layout.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
+	public void setExpandoBridgeAttributes(BaseModel<?> baseModel) {
 		_layout.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -1809,7 +1833,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*/
 	@Override
 	public void setKeywordsMap(
-		java.util.Map<java.util.Locale, java.lang.String> keywordsMap) {
+		Map<java.util.Locale, java.lang.String> keywordsMap) {
 		_layout.setKeywordsMap(keywordsMap);
 	}
 
@@ -1821,9 +1845,19 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*/
 	@Override
 	public void setKeywordsMap(
-		java.util.Map<java.util.Locale, java.lang.String> keywordsMap,
+		Map<java.util.Locale, java.lang.String> keywordsMap,
 		java.util.Locale defaultLocale) {
 		_layout.setKeywordsMap(keywordsMap, defaultLocale);
+	}
+
+	/**
+	* Sets the last publish date of this layout.
+	*
+	* @param lastPublishDate the last publish date of this layout
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_layout.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
@@ -1868,7 +1902,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param modifiedDate the modified date of this layout
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_layout.setModifiedDate(modifiedDate);
 	}
 
@@ -1927,8 +1961,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param nameMap the locales and localized names of this layout
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap) {
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap) {
 		_layout.setNameMap(nameMap);
 	}
 
@@ -1939,8 +1972,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param defaultLocale the default locale
 	*/
 	@Override
-	public void setNameMap(
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+	public void setNameMap(Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Locale defaultLocale) {
 		_layout.setNameMap(nameMap, defaultLocale);
 	}
@@ -2050,8 +2082,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param robotsMap the locales and localized robotses of this layout
 	*/
 	@Override
-	public void setRobotsMap(
-		java.util.Map<java.util.Locale, java.lang.String> robotsMap) {
+	public void setRobotsMap(Map<java.util.Locale, java.lang.String> robotsMap) {
 		_layout.setRobotsMap(robotsMap);
 	}
 
@@ -2063,7 +2094,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	*/
 	@Override
 	public void setRobotsMap(
-		java.util.Map<java.util.Locale, java.lang.String> robotsMap,
+		Map<java.util.Locale, java.lang.String> robotsMap,
 		java.util.Locale defaultLocale) {
 		_layout.setRobotsMap(robotsMap, defaultLocale);
 	}
@@ -2134,8 +2165,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param titleMap the locales and localized titles of this layout
 	*/
 	@Override
-	public void setTitleMap(
-		java.util.Map<java.util.Locale, java.lang.String> titleMap) {
+	public void setTitleMap(Map<java.util.Locale, java.lang.String> titleMap) {
 		_layout.setTitleMap(titleMap);
 	}
 
@@ -2146,8 +2176,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* @param defaultLocale the default locale
 	*/
 	@Override
-	public void setTitleMap(
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+	public void setTitleMap(Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Locale defaultLocale) {
 		_layout.setTitleMap(titleMap, defaultLocale);
 	}
@@ -2239,7 +2268,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.portal.model.Layout> toCacheModel() {
+	public CacheModel<com.liferay.portal.model.Layout> toCacheModel() {
 		return _layout.toCacheModel();
 	}
 
