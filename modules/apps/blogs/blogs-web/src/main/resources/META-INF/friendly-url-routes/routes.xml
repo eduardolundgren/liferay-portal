@@ -31,6 +31,12 @@
 		<implicit-parameter name="tag"></implicit-parameter>
 	</route>
 	<route>
+		<pattern>/maximized/edit/{entryId:\d+}</pattern>
+		<implicit-parameter name="mvcRenderCommandName">/blogs/edit_entry</implicit-parameter>
+		<implicit-parameter name="p_p_lifecycle">0</implicit-parameter>
+		<implicit-parameter name="p_p_state">maximized</implicit-parameter>
+	</route>
+	<route>
 		<pattern>/trackback/{entryId:\d+}</pattern>
 		<implicit-parameter name="javax.portlet.action">/blogs/trackback</implicit-parameter>
 		<implicit-parameter name="p_p_lifecycle">1</implicit-parameter>
