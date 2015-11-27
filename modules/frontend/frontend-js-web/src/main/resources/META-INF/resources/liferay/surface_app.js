@@ -91,7 +91,10 @@ AUI.add(
 						},
 						{
 							path: function(url) {
-								return url.search(Surface.getPatternFriendlyURL(url)) > -1;
+								var currentURL = new A.Url(A.config.win.location.href);
+								var isFriendlyURL = url.search(Surface.getPatternFriendlyURL(url)) > -1;
+
+								return isFriendlyURL && currentURL.getParameter('p_p_state') != 'maximized';
 							},
 							screen: Surface.RenderURLScreen
 						},
@@ -187,6 +190,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['liferay-surface']
+		requires: ['aui-url', 'liferay-surface']
 	}
 );

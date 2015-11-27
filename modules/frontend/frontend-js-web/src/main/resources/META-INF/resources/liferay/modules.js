@@ -785,6 +785,7 @@
 						},
 						path: 'surface_app.js',
 						requires: [
+							'aui-url',
 							'liferay-surface'
 						]
 					},
