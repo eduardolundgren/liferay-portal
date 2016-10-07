@@ -14,11 +14,11 @@
 
 package com.liferay.portal.util.mail;
 
-import com.liferay.portal.kernel.mail.MailMessage;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.SynchronousMailTestRule;
+import com.liferay.mail.kernel.model.MailMessage;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portal.util.test.MailServiceTestUtil;
 import com.liferay.util.mail.MailEngine;
 
@@ -34,14 +34,14 @@ import org.junit.Test;
 /**
  * @author Manuel de la Peña
  */
+@Sync
 public class MailEngineTest {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			SynchronousMailTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), SynchronousMailTestRule.INSTANCE);
 
 	@Test
 	public void testSendMail() throws Exception {

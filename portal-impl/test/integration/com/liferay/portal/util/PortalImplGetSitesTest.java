@@ -14,20 +14,20 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.UserTestUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,8 +48,7 @@ public class PortalImplGetSitesTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -74,6 +73,7 @@ public class PortalImplGetSitesTest {
 		_group = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		_groups.add(_group);
+
 		_groups.add(parentGroup);
 		_groups.add(grandparentGroup);
 
@@ -151,7 +151,7 @@ public class PortalImplGetSitesTest {
 
 		long[] groupIds = getSharedContentSiteGroupIds();
 
-		Set<Long> set = new HashSet<Long>(ListUtil.toList(groupIds));
+		Set<Long> set = new HashSet<>(ListUtil.toList(groupIds));
 
 		Assert.assertFalse(set.size() < groupIds.length);
 	}
@@ -164,11 +164,11 @@ public class PortalImplGetSitesTest {
 	private Group _group;
 
 	@DeleteAfterTestRun
-	private final List<Group> _groups = new ArrayList<Group>();
+	private final List<Group> _groups = new ArrayList<>();
 
 	private User _user;
 
 	@DeleteAfterTestRun
-	private final List<User> _users = new ArrayList<User>();
+	private final List<User> _users = new ArrayList<>();
 
 }

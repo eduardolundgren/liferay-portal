@@ -16,31 +16,37 @@ package com.liferay.portlet.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.ResourceAction;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.ResourceTypePermission;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.RolePermissions;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourceTypePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.GroupFinderUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ResourcePermissionTestUtil;
+import com.liferay.portal.kernel.test.util.ResourceTypePermissionTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.GroupConstants;
-import com.liferay.portal.model.ResourceAction;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.ResourcePermission;
-import com.liferay.portal.model.ResourceTypePermission;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.ResourceActionLocalServiceUtil;
-import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.service.ResourceTypePermissionLocalServiceUtil;
-import com.liferay.portal.service.persistence.GroupFinderUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.comparator.GroupNameComparator;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ResourcePermissionTestUtil;
-import com.liferay.portal.util.test.ResourceTypePermissionTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -63,8 +69,7 @@ public class GroupFinderTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			TransactionalTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), TransactionalTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -98,17 +103,24 @@ public class GroupFinderTest {
 	@AfterClass
 	public static void tearDownClass() throws Exception {
 		GroupLocalServiceUtil.deleteGroup(_group);
+		GroupLocalServiceUtil.deleteGroup(_userGroupGroup);
 
 		ResourcePermissionLocalServiceUtil.deleteResourcePermission(
 			_resourcePermission);
 
 		ResourceTypePermissionLocalServiceUtil.deleteResourceTypePermission(
 			_resourceTypePermission);
+
+		UserLocalServiceUtil.deleteUser(_userGroupUser);
+
+		UserGroupLocalServiceUtil.deleteUserGroup(_userGroup);
 	}
 
 	@Test
 	public void testFindByC_C_N_DJoinByRoleResourcePermissions()
 		throws Exception {
+
+		boolean exists = false;
 
 		List<Group> groups = findByC_C_N_D(
 			_arbitraryResourceAction.getActionId(),
@@ -116,13 +128,16 @@ public class GroupFinderTest {
 
 		for (Group group : groups) {
 			if (group.getGroupId() == _group.getGroupId()) {
-				return;
+				exists = true;
+
+				break;
 			}
 		}
 
-		Assert.fail(
+		Assert.assertTrue(
 			"The method findByC_C_N_D should have returned the group " +
-				_group.getGroupId());
+				_group.getGroupId(),
+			exists);
 	}
 
 	@Test
@@ -134,21 +149,25 @@ public class GroupFinderTest {
 			_resourceTypePermission.getName(),
 			_resourceTypePermission.getRoleId());
 
+		boolean exists = false;
+
 		for (Group group : groups) {
 			if (group.getGroupId() == _group.getGroupId()) {
-				return;
+				exists = true;
+
+				break;
 			}
 		}
 
-		Assert.fail(
+		Assert.assertTrue(
 			"The method findByC_C_N_D should have returned the group " +
-				_group.getGroupId());
+				_group.getGroupId(),
+			exists);
 	}
 
 	@Test
 	public void testFindByCompanyId() throws Exception {
-		LinkedHashMap<String, Object> groupParams =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
 
 		groupParams.put("inherit", Boolean.TRUE);
 		groupParams.put("site", Boolean.TRUE);
@@ -159,6 +178,44 @@ public class GroupFinderTest {
 			QueryUtil.ALL_POS, new GroupNameComparator(true));
 
 		Assert.assertFalse(groups.isEmpty());
+	}
+
+	@Test
+	public void testFindByCompanyIdByUserGroupGroup() throws Exception {
+		_userGroup = UserGroupTestUtil.addUserGroup();
+		_userGroupGroup = GroupTestUtil.addGroup();
+		_userGroupUser = UserTestUtil.addUser();
+
+		GroupLocalServiceUtil.addUserGroupGroup(
+			_userGroup.getUserGroupId(), _userGroupGroup.getGroupId());
+
+		UserGroupLocalServiceUtil.addUserUserGroup(
+			_userGroupUser.getUserId(), _userGroup);
+
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
+
+		groupParams.put("inherit", Boolean.TRUE);
+		groupParams.put("site", Boolean.TRUE);
+		groupParams.put("usersGroups", _userGroupUser.getUserId());
+
+		List<Group> groups = GroupFinderUtil.findByCompanyId(
+			TestPropsValues.getCompanyId(), groupParams, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, new GroupNameComparator(true));
+
+		boolean exists = false;
+
+		for (Group group : groups) {
+			if (group.getGroupId() == _userGroupGroup.getGroupId()) {
+				exists = true;
+
+				break;
+			}
+		}
+
+		Assert.assertTrue(
+			"The method findByCompanyId should have returned the group " +
+				_userGroupGroup.getGroupId(),
+			exists);
 	}
 
 	@Test
@@ -200,7 +257,7 @@ public class GroupFinderTest {
 
 		String name = RandomTestUtil.randomString() + "Model";
 
-		List<String> actionIds = new ArrayList<String>();
+		List<String> actionIds = new ArrayList<>();
 
 		actionIds.add(ActionKeys.UPDATE);
 		actionIds.add(ActionKeys.VIEW);
@@ -222,15 +279,10 @@ public class GroupFinderTest {
 			String actionId, String name, long roleId)
 		throws Exception {
 
-		LinkedHashMap<String, Object> groupParams =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
 
-		List<Object> rolePermissions = new ArrayList<Object>();
-
-		rolePermissions.add(name);
-		rolePermissions.add(new Integer(ResourceConstants.SCOPE_GROUP));
-		rolePermissions.add(actionId);
-		rolePermissions.add(roleId);
+		RolePermissions rolePermissions = new RolePermissions(
+			name, ResourceConstants.SCOPE_GROUP, actionId, roleId);
 
 		groupParams.put("rolePermissions", rolePermissions);
 
@@ -255,5 +307,8 @@ public class GroupFinderTest {
 	private static ResourceAction _modelResourceAction;
 	private static ResourcePermission _resourcePermission;
 	private static ResourceTypePermission _resourceTypePermission;
+	private static UserGroup _userGroup;
+	private static Group _userGroupGroup;
+	private static User _userGroupUser;
 
 }

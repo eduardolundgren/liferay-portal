@@ -14,17 +14,21 @@
 
 package com.liferay.portlet.documentlibrary.model.impl;
 
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructureLink;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructureLinkManagerUtil;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructureManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PredicateFilter;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,8 +40,12 @@ public class DLFileEntryTypeImpl extends DLFileEntryTypeBaseImpl {
 
 	@Override
 	public List<DDMStructure> getDDMStructures() {
-		return DDMStructureLocalServiceUtil.getDLFileEntryTypeStructures(
-			getFileEntryTypeId());
+		List<DDMStructureLink> ddmStructureLinks =
+			DDMStructureLinkManagerUtil.getStructureLinks(
+				PortalUtil.getClassNameId(DLFileEntryType.class),
+				getFileEntryTypeId());
+
+		return getDDMStructures(ddmStructureLinks);
 	}
 
 	@Override
@@ -59,7 +67,7 @@ public class DLFileEntryTypeImpl extends DLFileEntryTypeBaseImpl {
 			final Locale locale)
 		throws PortalException {
 
-		if (getGroupId() == groupId ) {
+		if (getGroupId() == groupId) {
 			return getName(locale);
 		}
 
@@ -80,6 +88,7 @@ public class DLFileEntryTypeImpl extends DLFileEntryTypeBaseImpl {
 
 					return false;
 				}
+
 			});
 
 		if (hasAmbiguousName) {
@@ -100,6 +109,23 @@ public class DLFileEntryTypeImpl extends DLFileEntryTypeBaseImpl {
 		}
 
 		return true;
+	}
+
+	protected List<DDMStructure> getDDMStructures(
+		List<DDMStructureLink> ddmStructureLinks) {
+
+		List<DDMStructure> ddmStructures = new ArrayList<>();
+
+		for (DDMStructureLink ddmStructureLink : ddmStructureLinks) {
+			DDMStructure ddmStructure = DDMStructureManagerUtil.fetchStructure(
+				ddmStructureLink.getStructureId());
+
+			if (ddmStructure != null) {
+				ddmStructures.add(ddmStructure);
+			}
+		}
+
+		return ddmStructures;
 	}
 
 }

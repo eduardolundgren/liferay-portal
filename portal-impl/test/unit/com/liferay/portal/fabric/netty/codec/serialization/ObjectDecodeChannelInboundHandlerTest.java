@@ -15,13 +15,13 @@
 package com.liferay.portal.fabric.netty.codec.serialization;
 
 import com.liferay.portal.fabric.netty.util.NettyUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.test.aspects.ReflectionUtilAdvice;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -69,6 +69,7 @@ public class ObjectDecodeChannelInboundHandlerTest {
 
 		Assert.assertSame(
 			uuid, dateChannelHandler.channelRead(null, uuid, null));
+
 		Assert.assertNull(dateChannelHandler.getDate());
 
 		Date date = new Date();
@@ -145,6 +146,7 @@ public class ObjectDecodeChannelInboundHandlerTest {
 
 		Assert.assertEquals(1, map.size());
 		Assert.assertTrue(map.containsValue(annotatedObjectDecoder));
+
 		Assert.assertSame(
 			dateChannelHandler, annotatedObjectDecoder.removeLast());
 	}

@@ -14,10 +14,13 @@
 
 package com.liferay.portal.repository.capabilities;
 
-import com.liferay.portal.NoSuchModelException;
+import com.liferay.document.library.kernel.exception.NoSuchFolderException;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.capabilities.BulkOperationCapability;
 import com.liferay.portal.kernel.repository.capabilities.ConfigurationCapability;
@@ -26,14 +29,13 @@ import com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesSco
 import com.liferay.portal.kernel.repository.model.BaseRepositoryModelOperation;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,6 +68,10 @@ public class TemporaryFileEntriesCapabilityImpl
 		File file = null;
 
 		try {
+			if (inputStream == null) {
+				inputStream = new UnsyncByteArrayInputStream(new byte[0]);
+			}
+
 			file = FileUtil.createTempFile(inputStream);
 
 			ServiceContext serviceContext = new ServiceContext();
@@ -285,7 +291,24 @@ public class TemporaryFileEntriesCapabilityImpl
 
 		@Override
 		public void execute(FileEntry fileEntry) throws PortalException {
+			Folder folder = fileEntry.getFolder();
+
 			_documentRepository.deleteFileEntry(fileEntry.getFileEntryId());
+
+			Folder mountFolder = _documentRepository.getFolder(
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+			while ((folder.getFolderId() != mountFolder.getFolderId()) &&
+				   (_documentRepository.getFileEntriesCount(
+					   folder.getFolderId(),
+					   WorkflowConstants.STATUS_ANY) == 0)) {
+
+				long folderId = folder.getFolderId();
+
+				folder = folder.getParentFolder();
+
+				_documentRepository.deleteFolder(folderId);
+			}
 		}
 
 	}

@@ -1,0 +1,14 @@
+import com.liferay.gradle.plugins.gulp.ExecuteGulpTask;
+
+task gulpBuild(type: ExecuteGulpTask)
+
+configJSModules {
+	dependsOn gulpBuild
+
+	include "**/*.js*"
+}
+
+gulpBuild {
+	dependsOn npmInstall
+	gulpCommand "bundle"
+}

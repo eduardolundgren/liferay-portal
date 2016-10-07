@@ -1,30 +1,14 @@
 <?xml version="1.0"?>
 
-<project name="support-websphere" basedir="." default="compile" xmlns:antelope="antlib:ise.antelope.tasks">
+<project basedir="." default="compile" name="support-websphere" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="../build-common-java.xml" />
 
+	<property name="artifact.version" value="1.0.0" />
 	<property name="deploy.dir" value="${app.server.lib.global.dir}" />
 	<property name="jar.file" value="${ant.project.name}" />
 	<property name="javac.classpathref" value="web.classpath" />
-	<property name="javac.destdir" value="classes" />
-	<property name="javac.srcdir" value="src" />
-	<property name="release.info.version" value="1.0.0" />
 
 	<path id="web-lib.classpath">
 		<fileset dir="${app.server.websphere.dir}/plugins" includes="com.ibm.ws.runtime.jar" />
 	</path>
-
-	<target name="clean">
-		<antcall target="build-common-java.clean" />
-
-		<delete file="${deploy.dir}/${jar.file}.jar" />
-	</target>
-
-	<target name="compile" depends="compile-java" />
-
-	<target name="deploy" depends="jar">
-		<delete file="${deploy.dir}/${ant.project.name}.jar" />
-
-		<antcall target="build-common-java.deploy" />
-	</target>
 </project>

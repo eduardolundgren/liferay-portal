@@ -14,15 +14,14 @@
 
 package com.liferay.portlet.asset.model.impl;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portlet.asset.model.AssetCategory;
-import com.liferay.portlet.asset.model.AssetCategoryConstants;
-import com.liferay.portlet.asset.model.AssetVocabulary;
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetCategoryConstants;
+import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.asset.util.test.AssetTestUtil;
 
 import org.junit.Assert;
@@ -39,8 +38,7 @@ public class AssetVocabularyImplTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -83,6 +81,7 @@ public class AssetVocabularyImplTest {
 				new long[] {
 					category21.getCategoryId(), category22.getCategoryId()
 				}));
+
 		Assert.assertFalse(
 			vocabulary2.hasMoreThanOneCategorySelected(new long[0]));
 		Assert.assertFalse(
@@ -122,7 +121,7 @@ public class AssetVocabularyImplTest {
 
 		Assert.assertFalse(
 			vocabulary.isMissingRequiredCategory(
-				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[]{1}));
+				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[] {1}));
 
 		vocabulary = AssetTestUtil.addVocabulary(
 			_group.getGroupId(), 1, AssetCategoryConstants.ALL_CLASS_TYPE_PK,
@@ -130,7 +129,7 @@ public class AssetVocabularyImplTest {
 
 		Assert.assertTrue(
 			vocabulary.isMissingRequiredCategory(
-				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[]{1}));
+				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[] {1}));
 		Assert.assertFalse(
 			vocabulary.isMissingRequiredCategory(
 				2, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[0]));
@@ -140,11 +139,11 @@ public class AssetVocabularyImplTest {
 
 		Assert.assertTrue(
 			vocabulary.isMissingRequiredCategory(
-				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[]{1}));
+				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK, new long[] {1}));
 		Assert.assertFalse(
 			vocabulary.isMissingRequiredCategory(
 				1, AssetCategoryConstants.ALL_CLASS_TYPE_PK,
-				new long[]{category.getCategoryId()}));
+				new long[] {category.getCategoryId()}));
 	}
 
 	@Test

@@ -20,7 +20,7 @@ import com.liferay.portal.fabric.netty.fileserver.FileResponse;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.StreamUtil;
 
 import io.netty.channel.DefaultFileRegion;
@@ -181,7 +181,7 @@ public class FileRequestChannelHandlerTest {
 			Path expectedRootFolder, InputStream inputStream)
 		throws IOException {
 
-		final List<Path> files = new ArrayList<Path>();
+		final List<Path> files = new ArrayList<>();
 
 		try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
 			ZipEntry zipEntry = null;
@@ -203,6 +203,7 @@ public class FileRequestChannelHandlerTest {
 				Assert.assertEquals(
 					"Last modified time mismatch", fileTime.toMillis(),
 					BigEndianCodec.getLong(zipEntry.getExtra(), 0));
+
 				Assert.assertEquals(
 					"File size mismatch", Files.size(expectedFile),
 					BigEndianCodec.getLong(zipEntry.getExtra(), 8));
@@ -235,8 +236,8 @@ public class FileRequestChannelHandlerTest {
 	private byte[] _readFileRegion(FileRegion fileRegion) throws IOException {
 		try (UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 				new UnsyncByteArrayOutputStream();
-			WritableByteChannel writableByteChannel = Channels.newChannel(
-				unsyncByteArrayOutputStream)) {
+			WritableByteChannel writableByteChannel =
+				Channels.newChannel(unsyncByteArrayOutputStream)) {
 
 			while (fileRegion.transfered() < fileRegion.count()) {
 				fileRegion.transferTo(

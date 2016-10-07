@@ -1,0 +1,12 @@
+{
+  "name": "asset-tags-admin-soy-web",
+  "version": "1.0.0",
+  "dependencies": {
+    "lexicon-breadcrumbs": "0.0.1",
+    "lexicon-button": "0.0.3"
+  },
+  "devDependencies": {
+    "liferay-module-config-generator": "^1.1.10",
+    "metal-cli": "^2.1.1"
+  }
+}

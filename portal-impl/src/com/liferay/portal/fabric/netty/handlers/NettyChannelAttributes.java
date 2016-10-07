@@ -46,7 +46,7 @@ public class NettyChannelAttributes {
 		AsyncBroker<Long, Serializable> asyncBroker = attribute.get();
 
 		if (asyncBroker == null) {
-			asyncBroker = new AsyncBroker<Long, Serializable>();
+			asyncBroker = new AsyncBroker<>();
 
 			AsyncBroker<Long, Serializable> previousAsyncBroker =
 				attribute.setIfAbsent(asyncBroker);
@@ -115,7 +115,7 @@ public class NettyChannelAttributes {
 		Map<Long, FabricWorker<?>> fabricWorkers = attribute.get();
 
 		if (fabricWorkers == null) {
-			fabricWorkers = new ConcurrentHashMap<Long, FabricWorker<?>>();
+			fabricWorkers = new ConcurrentHashMap<>();
 
 			Map<Long, FabricWorker<?>> previousFabricWorkers =
 				attribute.setIfAbsent(fabricWorkers);

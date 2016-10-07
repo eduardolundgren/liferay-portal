@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = be34e7f319228d477169ddca7c88bc3688a5a78b
+	mode = push
+	parent = 14a9fdf9cbe6855e82cbae2cdf058214012fbc52
+	remote = git@github.com:liferay/com-liferay-expando.git

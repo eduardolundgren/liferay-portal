@@ -15,18 +15,17 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.kernel.configuration.Filter;
-import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -42,24 +41,14 @@ public class UpgradeRatings extends UpgradeProcess {
 	}
 
 	protected void upgradeRatingsEntry() throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			PreparedStatement ps = connection.prepareStatement(
 				"select distinct classNameId from RatingsEntry");
-
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
 				upgradeRatingsEntry(rs.getLong("classNameId"));
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
@@ -93,38 +82,23 @@ public class UpgradeRatings extends UpgradeProcess {
 			long classNameId, int normalizationFactor)
 		throws Exception {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
+		try (PreparedStatement ps = connection.prepareStatement(
 				"update RatingsEntry set score = score / ? where classNameId " +
-					"= ?");
+					"= ?")) {
 
 			ps.setInt(1, normalizationFactor);
 			ps.setLong(2, classNameId);
 
 			ps.executeUpdate();
 		}
-		finally {
-			DataAccess.cleanUp(con, ps);
-		}
 	}
 
 	protected void upgradeRatingsEntryThumbs(long classNameId)
 		throws Exception {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
+		try (PreparedStatement ps = connection.prepareStatement(
 				"update RatingsEntry set score = ? where score = ? and " +
-					"classNameId = ?");
+					"classNameId = ?")) {
 
 			ps.setDouble(1, 0);
 			ps.setDouble(2, -1);
@@ -132,24 +106,10 @@ public class UpgradeRatings extends UpgradeProcess {
 
 			ps.executeUpdate();
 		}
-		finally {
-			DataAccess.cleanUp(con, ps);
-		}
 	}
 
 	protected void upgradeRatingsStats() throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			DatabaseMetaData databaseMetaData = con.getMetaData();
-
-			boolean supportsBatchUpdates =
-				databaseMetaData.supportsBatchUpdates();
-
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("select classNameId, classPK, count(1) as ");
@@ -157,46 +117,30 @@ public class UpgradeRatings extends UpgradeProcess {
 			sb.append("sum(RatingsEntry.score) / count(1) as averageScore ");
 			sb.append("from RatingsEntry group by classNameId, classPK");
 
-			ps = con.prepareStatement(sb.toString());
+			String selectSQL = sb.toString();
 
-			rs = ps.executeQuery();
-
-			ps = con.prepareStatement(
+			String updateSQL =
 				"update RatingsStats set totalEntries = ?, totalScore = ?, " +
-					"averageScore = ? where classNameId = ? and classPK = ?");
+					"averageScore = ? where classNameId = ? and classPK = ?";
 
-			int count = 0;
+			try (PreparedStatement ps1 = connection.prepareStatement(selectSQL);
+				ResultSet rs = ps1.executeQuery();
+				PreparedStatement ps2 =
+					AutoBatchPreparedStatementUtil.autoBatch(
+						connection.prepareStatement(updateSQL))) {
 
-			while (rs.next()) {
-				ps.setInt(1, rs.getInt("totalEntries"));
-				ps.setDouble(2, rs.getDouble("totalScore"));
-				ps.setDouble(3, rs.getDouble("averageScore"));
-				ps.setLong(4, rs.getLong("classNameId"));
-				ps.setLong(5, rs.getLong("classPK"));
+				while (rs.next()) {
+					ps2.setInt(1, rs.getInt("totalEntries"));
+					ps2.setDouble(2, rs.getDouble("totalScore"));
+					ps2.setDouble(3, rs.getDouble("averageScore"));
+					ps2.setLong(4, rs.getLong("classNameId"));
+					ps2.setLong(5, rs.getLong("classPK"));
 
-				if (supportsBatchUpdates) {
-					ps.addBatch();
-
-					if (count == PropsValues.HIBERNATE_JDBC_BATCH_SIZE) {
-						ps.executeBatch();
-
-						count = 0;
-					}
-					else {
-						count++;
-					}
+					ps2.addBatch();
 				}
-				else {
-					ps.executeUpdate();
-				}
-			}
 
-			if (supportsBatchUpdates && (count > 0)) {
-				ps.executeBatch();
+				ps2.executeBatch();
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 

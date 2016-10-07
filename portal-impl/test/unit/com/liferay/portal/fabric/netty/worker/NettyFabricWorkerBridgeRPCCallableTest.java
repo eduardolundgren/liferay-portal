@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import io.netty.channel.embedded.EmbeddedChannel;
 
@@ -86,7 +86,8 @@ public class NettyFabricWorkerBridgeRPCCallableTest {
 							return null;
 						}
 
-					}, 0);
+					},
+					0);
 
 		NoticeableFuture<Serializable> noticeableFuture =
 			nettyFabricWorkerBridgeRPCCallable.call();
@@ -102,14 +103,14 @@ public class NettyFabricWorkerBridgeRPCCallableTest {
 				new EmbeddedProcessChannel<Serializable>(
 					new DefaultNoticeableFuture<Serializable>()) {
 
-						@Override
-						public <V extends Serializable> NoticeableFuture<V>
-							write(ProcessCallable<V> processCallable) {
+					@Override
+					public <V extends Serializable> NoticeableFuture<V>
+						write(ProcessCallable<V> processCallable) {
 
-							return new DefaultNoticeableFuture<V>();
-						}
+						return new DefaultNoticeableFuture<>();
+					}
 
-					});
+				});
 
 		NettyChannelAttributes.putFabricWorker(
 			_embeddedChannel, 0, fabricWorker);
@@ -125,7 +126,8 @@ public class NettyFabricWorkerBridgeRPCCallableTest {
 							return null;
 						}
 
-					}, 0);
+					},
+					0);
 
 		NoticeableFuture<Serializable> noticeableFuture =
 			nettyFabricWorkerBridgeRPCCallable.call();
@@ -147,7 +149,8 @@ public class NettyFabricWorkerBridgeRPCCallableTest {
 							return null;
 						}
 
-					}, 0);
+					},
+					0);
 
 		try {
 			nettyFabricWorkerBridgeRPCCallable.call();

@@ -1,0 +1,23 @@
+import com.liferay.gradle.util.copy.StripPathSegmentsAction
+
+task buildMetalComponents(type: Copy)
+
+buildMetalComponents {
+	eachFile new StripPathSegmentsAction(2)
+
+	from {
+		new File("node_modules", "liferay-metal-components")
+	}
+
+	include "build/amd-jquery/liferay*/**/*"
+	include "build/soy/liferay*/**/*"
+
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+}
+
+configJSModules {
+	dependsOn buildMetalComponents
+
+	include "**/*.js*"
+}

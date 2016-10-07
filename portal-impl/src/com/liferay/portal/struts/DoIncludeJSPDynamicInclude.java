@@ -15,39 +15,38 @@
 package com.liferay.portal.struts;
 
 import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.taglib.tiles.ComponentConstants;
 import org.apache.struts.tiles.ComponentContext;
+import org.apache.struts.tiles.taglib.ComponentConstants;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Raymond Augé
  */
-@OSGiBeanProperties(
-	property = {"key=com.liferay.taglib.util.ThemeUtil#doIncludeJSP"}
-)
+@Component
 public class DoIncludeJSPDynamicInclude extends BaseDynamicInclude {
 
 	@Override
 	public void include(
 		HttpServletRequest request, HttpServletResponse response, String key) {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		ComponentContext componentContext =
 			(ComponentContext)request.getAttribute(
 				ComponentConstants.COMPONENT_CONTEXT);
 
 		if (componentContext == null) {
-			return;
+			themeDisplay.setTilesSelectable(true);
 		}
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
 
 		String tilesContent = (String)componentContext.getAttribute("content");
 
@@ -61,6 +60,12 @@ public class DoIncludeJSPDynamicInclude extends BaseDynamicInclude {
 		String tilesTitle = (String)componentContext.getAttribute("title");
 
 		themeDisplay.setTilesTitle(tilesTitle);
+	}
+
+	@Override
+	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
+		dynamicIncludeRegistry.register(
+			"com.liferay.taglib.util.ThemeUtil#doIncludeJS");
 	}
 
 }

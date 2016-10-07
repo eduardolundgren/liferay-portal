@@ -1,0 +1,185 @@
+{namespace AssetTagsAdminSoyListTags}
+
+/**
+ * Prints the Tags view page
+ *
+ * @param breadcrumbs
+ * @param id
+ * @param themeDisplay
+ */
+{template .render}
+	<div id="{$id}">
+		{call .aui_nav_bar /}
+
+		{call LexiconBreadcrumbs.render}
+			{param items: $breadcrumbs /}
+			{param ref: 'breadcrumbs' /}
+		{/call}
+
+		<div class="management-bar-container" data-qa-id="managementBar">
+			/*
+			{call Lexicon_ManagementBar.render}
+				{param buttons: $managementBar.buttons /}
+				{param filters: $managementBar.filters /}
+				{param showCheckbox: $managementBar.showCheckbox /}
+				{param spritesheet: $spritesheet /}
+			{/call}
+			*/
+		</div>
+
+		/*
+		{call SearchContainer.render data="all"}
+			{param contentTemplate: 'AssetTagsAdminSoyListTags' /}
+			{param displayStyle: $displayStyle /}
+			{param items: $tags /}
+			{param key: $id + 'SearchContainer' /}
+		{/call}
+		*/
+		{call LexiconButton.render data="all"}
+			{param elementClasses: 'btn-action btn-bottom-right' /}
+			{param icon: 'plus' /}
+			{param level: 'primary' /}
+			{param spritemap: $themeDisplay.pathThemeImages +'/lexicon/icons.svg' /}
+		{/call}
+	</div>
+{/template}
+
+/**
+ *
+ */
+{template .aui_nav_bar}
+	<div class="navbar navbar-default collapse-basic-search">
+		<div class="container-fluid-1280">
+			<div class="navbar-header visible-xs">
+				<button class=" navbar-toggle navbar-toggle-left navbar-toggle-page-name" data-target="" data-toggle="" type="button">
+					<span class="sr-only">Toggle Navigation</span>
+					<span class="page-name">Tags</span>
+				</button>
+			</div>
+
+			// <aui:nav>
+			<div class="collapse navbar-collapse">
+				<ul aria-label="Tags" class="lfr-nav nav navbar-nav" role="menubar">
+
+					// <aui:nav-item>
+					<li class="active" role="presentation">
+						<a class="" href="http://localhost:8080/group/guest/~/control_panel/manage/-/tags_admin/tags" role="menuitem" title="Tags">
+							<span class="nav-item-label">Tags</span>
+						</a>
+					</li>
+					// </aui:nav-item>
+
+				</ul>
+			</div>
+			// </aui:nav>
+
+			{call .aui_nav_bar_search /}
+		</div>
+	</div>
+{/template}
+
+/**
+ *
+ */
+{template .aui_nav_bar_search}
+	<div class="navbar-header navbar-header-right" data-toggle="collapsible-search">
+		{call .aui_form /}
+	</div>
+{/template}
+
+/**
+ *
+ */
+{template .aui_form}
+	<form action="http://localhost:8080/group/guest/~/control_panel/manage/-/tags_admin/tags" class="form" data-fm-namespace="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_" method="post" name="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_searchFm">
+		<input class="field form-control" name="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_formDate" type="hidden" value="1471608469009"></input>
+
+		{call .liferay_ui_input_search /}
+	</form>
+{/template}
+
+/**
+ *
+ */
+{template .liferay_ui_input_search}
+	<div class="basic-search input-group">
+		<div class="input-group-input">
+			<label class="hide-accessible" for="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_keywords">Search</label>
+			<div class="basic-search-slider">
+				<button class="basic-search-close btn btn-default" type="button">
+					<span class="" id="">
+						<svg class="lexicon-icon lexicon-icon-times" role="img" title="" viewBox="0 0 512 512">
+							<path class="lexicon-icon-outline" d="M295.781 256l205.205-205.205c10.998-10.998 10.998-28.814 0-39.781-10.998-10.998-28.815-10.998-39.781 0l-205.205 205.205-205.205-205.238c-10.966-10.998-28.814-10.998-39.781 0-10.998 10.998-10.998 28.814 0 39.781l205.205 205.238-205.205 205.205c-10.998 10.998-10.998 28.815 0 39.781 5.467 5.531 12.671 8.265 19.874 8.265s14.407-2.734 19.907-8.233l205.205-205.238 205.205 205.205c5.5 5.5 12.703 8.233 19.906 8.233s14.407-2.734 19.906-8.233c10.998-10.998 10.998-28.815 0-39.781l-205.238-205.205z"></path>
+						</svg>
+						<span class="taglib-icon-label"></span>
+					</span>
+					<span class="sr-only">Search</span>
+				</button>
+				<input class="form-control search-query" data-qa-id="searchInput" id="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_keywords" name="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_keywords" placeholder="Search" title="Search" type="text" value=""></input>
+			</div>
+		</div>
+		<div class="input-group-btn">
+			<button class="btn btn-default" data-qa-id="searchButton" type="submit">
+				<span class="" id="">
+					<svg class="lexicon-icon lexicon-icon-search" role="img" title="" viewBox="0 0 512 512">
+						<path class="lexicon-icon-outline" d="M503.254 467.861l-133.645-133.645c27.671-35.13 44.344-79.327 44.344-127.415 0-113.784-92.578-206.362-206.362-206.362s-206.362 92.578-206.362 206.362 92.578 206.362 206.362 206.362c47.268 0 90.735-16.146 125.572-42.969l133.851 133.851c5.002 5.002 11.554 7.488 18.106 7.488s13.104-2.486 18.106-7.488c10.004-10.003 10.004-26.209 0.029-36.183zM52.446 206.801c0-85.558 69.616-155.173 155.173-155.173s155.174 69.616 155.174 155.173-69.616 155.173-155.173 155.173-155.173-69.616-155.173-155.173z"></path>
+					</svg>
+					<span class="taglib-icon-label"></span>
+				</span>
+			</button>
+		</div>
+	</div>
+{/template}
+
+/**
+ *
+ * @param item
+ */
+{deltemplate SearchContainer.RowContent variant="'AssetTagsAdminSoyListTagsDescriptive'"}
+	<div class="list-group-item-field">
+	/*
+		{call SearchContainerIcon.render data="all"}
+			{param clickSelector: true /}
+			{param icon: 'tag' /}
+		{/call}
+	*/
+	</div>
+
+	<div class="list-group-item-content">
+		<h5>{$item.name}</h5>
+
+		<h6 class="text-default">
+			<strong>usages</strong>: <span>0</span>
+		</h6>
+	</div>
+{/deltemplate}
+
+/**
+ *
+ * @param item
+ */
+{deltemplate SearchContainer.RowContent variant="'AssetTagsAdminSoyListTagsIcon'"}
+	<div class="taglib-vertical-card selectable">
+		<div class="checkbox checkbox-card checkbox-top-left">
+			<label>
+				<input class="" name="_com_liferay_asset_tags_admin_web_portlet_AssetTagsAdminPortlet_rowIds" title="Select" type="checkbox" value="33550">
+			</label>
+
+			<div class="card">
+				<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover icon-vertical-card-container">
+				</div>
+
+				<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top taglib-vertical-card-footer">
+					<div class="card-col-content lfr-card-details-column">
+						<span class="lfr-card-title-text truncate-text">
+							<span title="tag1"> tag1 </span>
+						</span>
+						<span class="lfr-card-workflow-text truncate-text">
+							<strong>Usages</strong>: <span>0</span>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{/deltemplate}

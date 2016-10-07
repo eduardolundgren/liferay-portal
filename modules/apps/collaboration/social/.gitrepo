@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = e27c0b0730a60be46d2bd7468c0893bd56d8f14e
+	mode = push
+	parent = 533bb193bd2e21b824dcade2bf1cb474e3daf050
+	remote = git@github.com:liferay/com-liferay-social.git

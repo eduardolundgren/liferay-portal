@@ -1,0 +1,8 @@
+Bundle-Name: Liferay Asset Tags Admin Soy Web
+Bundle-SymbolicName: com.liferay.asset.tags.admin.soy.web
+Bundle-Version: 1.0.0
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Asset
+Require-Capability: soy;filter:="(type=metal)"
+Require-Capability: soy;filter:="(type=lexicon-components)"
+Web-ContextPath: /asset-tags-admin-soy-web

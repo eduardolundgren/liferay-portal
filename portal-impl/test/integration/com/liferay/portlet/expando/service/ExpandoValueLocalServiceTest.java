@@ -14,20 +14,21 @@
 
 package com.liferay.portlet.expando.service;
 
-import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.blogs.kernel.model.BlogsEntry;
+import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
+import com.liferay.expando.kernel.exception.ValueDataException;
+import com.liferay.expando.kernel.model.ExpandoColumn;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.model.ExpandoTable;
+import com.liferay.expando.kernel.model.ExpandoValue;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portlet.blogs.model.BlogsEntry;
-import com.liferay.portlet.expando.ValueDataException;
-import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.expando.model.ExpandoColumnConstants;
-import com.liferay.portlet.expando.model.ExpandoTable;
-import com.liferay.portlet.expando.model.ExpandoValue;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.expando.util.test.ExpandoTestUtil;
 
 import java.io.Serializable;
@@ -51,8 +52,7 @@ public class ExpandoValueLocalServiceTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -72,7 +72,7 @@ public class ExpandoValueLocalServiceTest {
 			_expandoTable, "Test Column",
 			ExpandoColumnConstants.STRING_ARRAY_LOCALIZED);
 
-		Map<Locale, String[]> dataMap = new HashMap<Locale, String[]>();
+		Map<Locale, String[]> dataMap = new HashMap<>();
 
 		dataMap.put(_enLocale, new String[] {"one", "two", "three"});
 		dataMap.put(_ptLocale, new String[] {"um", "dois", "tres"});
@@ -102,7 +102,7 @@ public class ExpandoValueLocalServiceTest {
 			_expandoTable, "Test Column",
 			ExpandoColumnConstants.STRING_LOCALIZED);
 
-		Map<Locale, String> dataMap = new HashMap<Locale, String>();
+		Map<Locale, String> dataMap = new HashMap<>();
 
 		dataMap.put(_enLocale, "Test");
 		dataMap.put(_ptLocale, "Teste");
@@ -142,7 +142,7 @@ public class ExpandoValueLocalServiceTest {
 		ExpandoColumn column = ExpandoTestUtil.addColumn(
 			_expandoTable, "Test Column", ExpandoColumnConstants.STRING);
 
-		Map<Locale, String> dataMap = new HashMap<Locale, String>();
+		Map<Locale, String> dataMap = new HashMap<>();
 
 		dataMap.put(_enLocale, "one");
 		dataMap.put(_ptLocale, "um");
@@ -159,7 +159,7 @@ public class ExpandoValueLocalServiceTest {
 
 	@Test
 	public void testGetDefaultColumnValue() throws Exception {
-		Map<Locale, String> defaultData = new HashMap<Locale, String>();
+		Map<Locale, String> defaultData = new HashMap<>();
 
 		defaultData.put(_enLocale, "Test");
 
@@ -181,7 +181,7 @@ public class ExpandoValueLocalServiceTest {
 			_expandoTable, "Test Column",
 			ExpandoColumnConstants.STRING_LOCALIZED);
 
-		Map<Locale, String> dataMap = new HashMap<Locale, String>();
+		Map<Locale, String> dataMap = new HashMap<>();
 
 		dataMap.put(_enLocale, "one");
 		dataMap.put(_ptLocale, "um");
@@ -198,9 +198,10 @@ public class ExpandoValueLocalServiceTest {
 
 		Assert.assertEquals(_ptLocale, availableLocales.get(0));
 		Assert.assertEquals(_enLocale, availableLocales.get(1));
-		Assert.assertEquals("um" , value.getString(_ptLocale));
-		Assert.assertEquals("one" , value.getString(_enLocale));
-		Assert.assertEquals("um" , value.getString(_frLocale));
+
+		Assert.assertEquals("um", value.getString(_ptLocale));
+		Assert.assertEquals("one", value.getString(_enLocale));
+		Assert.assertEquals("um", value.getString(_frLocale));
 	}
 
 	@Test
@@ -209,7 +210,7 @@ public class ExpandoValueLocalServiceTest {
 			_expandoTable, "Test Column",
 			ExpandoColumnConstants.STRING_ARRAY_LOCALIZED);
 
-		Map<Locale, String[]> dataMap = new HashMap<Locale, String[]>();
+		Map<Locale, String[]> dataMap = new HashMap<>();
 
 		dataMap.put(_enLocale, new String[] {"Hello, Joe", "Hi, Joe"});
 		dataMap.put(_ptLocale, new String[] {"Ola, Joao", "Oi, Joao"});

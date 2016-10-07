@@ -1,61 +1,33 @@
-alter table AssetEntry add listable BOOLEAN;
-
-COMMIT_TRANSACTION;
-
-update AssetEntry set listable = TRUE;
-
 alter table BlogsEntry add subtitle STRING null;
+alter table BlogsEntry add coverImageCaption STRING null;
 alter table BlogsEntry add coverImageFileEntryId LONG;
 alter table BlogsEntry add coverImageURL STRING null;
 alter table BlogsEntry add smallImageFileEntryId LONG;
 
-alter table DDMStructure add version VARCHAR(75) null;
+alter table Contact_ drop column aimSn;
+alter table Contact_ drop column icqSn;
+alter table Contact_ drop column msnSn;
+alter table Contact_ drop column mySpaceSn;
+alter table Contact_ drop column ymSn;
 
-update DDMStructure set version = '1.0';
+drop table CyrusUser;
 
-create table DDMStructureVersion (
-	structureVersionId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	structureId LONG,
-	version VARCHAR(75) null,
-	name STRING null,
-	description STRING null,
-	definition TEXT null,
-	storageType VARCHAR(75) null,
-	type_ INTEGER
-);
+drop table CyrusVirtual;
 
-alter table DDMTemplate add version VARCHAR(75) null;
+drop index IX_C803899D on DDMStructureLink;
 
-update DDMTemplate set version = '1.0';
+drop index IX_F8E90438 on DLFileEntryMetadata;
 
-create table DDMTemplateVersion (
-	templateVersionId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	templateId LONG,
-	version VARCHAR(75) null,
-	name STRING null,
-	description STRING null,
-	language VARCHAR(75) null,
-	script TEXT null
-);
+alter table DLFileEntryMetadata drop column fileEntryTypeId;
 
 alter table DLFolder add restrictionType INTEGER;
 
-update DLFolder set restrictionType = 1 where overrideFileEntryTypes = 1;
+update DLFolder set restrictionType = 1 where overrideFileEntryTypes = TRUE;
 
 alter table DLFolder drop column overrideFileEntryTypes;
 
 create table ExportImportConfiguration (
-	mvccVersion LONG default 0,
+	mvccVersion LONG default 0 not null,
 	exportImportConfigurationId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -63,7 +35,7 @@ create table ExportImportConfiguration (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
-	name VARCHAR(75) null,
+	name VARCHAR(200) null,
 	description STRING null,
 	type_ INTEGER,
 	settings_ TEXT null,
@@ -73,27 +45,49 @@ create table ExportImportConfiguration (
 	statusDate DATE null
 );
 
-alter table Group_ add inheritContent BOOLEAN;
-
-alter table JournalFolder add restrictionType INTEGER;
-
-create table JournalFolders_DDMStructures (
-	structureId LONG not null,
-	folderId LONG not null,
-	primary key (structureId, folderId)
-);
-
 alter table Layout drop column iconImage;
+alter table Layout drop column wapThemeId;
+alter table Layout drop column wapColorSchemeId;
 
 alter table LayoutRevision drop column iconImage;
-
-alter table LayoutSet drop column logo;
-
-alter table LayoutSetBranch drop column logo;
+alter table LayoutRevision drop column wapThemeId;
+alter table LayoutRevision drop column wapColorSchemeId;
 
 alter table Organization_ add logoId LONG;
 
 alter table RatingsEntry add uuid_ VARCHAR(75) null;
+
+create table RecentLayoutBranch (
+	mvccVersion LONG default 0 not null,
+	recentLayoutBranchId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	layoutBranchId LONG,
+	layoutSetBranchId LONG,
+	plid LONG
+);
+
+create table RecentLayoutRevision (
+	mvccVersion LONG default 0 not null,
+	recentLayoutRevisionId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	layoutRevisionId LONG,
+	layoutSetBranchId LONG,
+	plid LONG
+);
+
+create table RecentLayoutSetBranch (
+	mvccVersion LONG default 0 not null,
+	recentLayoutSetBranchId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	layoutSetBranchId LONG,
+	layoutSetId LONG
+);
 
 insert into Region (regionId, countryId, regionCode, name, active_) values (33001, 33, 'AT-1', 'Burgenland', TRUE);
 insert into Region (regionId, countryId, regionCode, name, active_) values (33002, 33, 'AT-2', 'Kärnten', TRUE);
@@ -108,4 +102,14 @@ insert into Region (regionId, countryId, regionCode, name, active_) values (3300
 update Region set regionCode = 'BB' where regionId = 4004 and regionCode = 'BR';
 update Region set name = 'Monza e Brianza', regionCode = 'MB' where regionId = 8060 and regionCode = 'MZ';
 
+alter table ResourcePermission add primKeyId LONG;
+alter table ResourcePermission add viewActionId BOOLEAN;
+
+alter table Subscription add groupId LONG;
+
+alter table Team add uuid_ VARCHAR(75);
+
+alter table User_ add googleUserId VARCHAR(75) null;
+
+alter table UserNotificationEvent add deliveryType INTEGER;
 alter table UserNotificationEvent add actionRequired BOOLEAN;

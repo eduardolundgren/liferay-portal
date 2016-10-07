@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = a76c487a18b7c099a8903089f2033d2e69210ab4
+	mode = push
+	parent = 31c343af01c099db5853e4e504f5dc8e6257676d
+	remote = git@github.com:liferay/com-liferay-microblogs.git

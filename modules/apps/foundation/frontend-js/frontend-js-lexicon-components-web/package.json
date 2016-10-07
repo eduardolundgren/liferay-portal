@@ -1,0 +1,54 @@
+{
+  "name": "liferay-lexicon-components",
+  "version": "1.0.0",
+  "description": "A collection of UI components built on top of Metal.js (JavaScript) and Bootstrap 3 (HTML/CSS)",
+  "license": "BSD",
+  "repository": "metal/liferay-lexicon-components",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "lexicon",
+    "lexiconjs",
+    "metal",
+    "metaljs"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "bootstrap-sass": "^3.3.6",
+    "lexicon-breadcrumbs": "0.0.1",
+    "lexicon-button": "0.0.2",
+    "lexicon-icon": "0.0.5"
+  },
+  "devDependencies": {
+    "babel-preset-metal": "^3.0.0",
+    "chai": "^3.4.1",
+    "gulp": "^3.8.11",
+    "gulp-metal": "^1.0.0",
+    "isparta": "^4.0.0",
+    "karma": "^0.13.9",
+    "karma-babel-preprocessor": "^6.0.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-commonjs": "0.0.13",
+    "karma-coverage": "^0.5.1",
+    "karma-mocha": "^0.2.0",
+    "karma-scss-preprocessor": "^1.0.0",
+    "karma-sinon": "^1.0.4",
+    "karma-source-map-support": "^1.1.0",
+    "liferay-gulp-tasks": "^0.2.1",
+    "liferay-module-config-generator": "^1.1.10",
+    "merge": "^1.2.0",
+    "metal-cli": "^2.0.2",
+    "mocha": "^2.3.4",
+    "run-sequence": "^1.1.5",
+    "sinon": "^1.17.2"
+  }
+}

@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 5a4dd1a51bdef722de0da5a992a5d37d4c2a57b7
+	mode = push
+	parent = 895dfcb590ef0de4c5825eed01a669dbb60f487f
+	remote = git@github.com:liferay/com-liferay-roles.git

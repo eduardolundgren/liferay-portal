@@ -16,19 +16,18 @@ package com.liferay.portal.spring.hibernate;
 
 import com.liferay.portal.dao.orm.hibernate.event.MVCCSynchronizerPostUpdateEventListener;
 import com.liferay.portal.dao.orm.hibernate.event.NestableAutoFlushEventListener;
-import com.liferay.portal.dao.shard.ShardSpringSessionContext;
-import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.dao.orm.hibernate.event.NestableFlushEventListener;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.Converter;
 import com.liferay.portal.kernel.util.PreloadClassLoader;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -51,6 +50,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.event.AutoFlushEventListener;
 import org.hibernate.event.EventListeners;
+import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.PostUpdateEventListener;
 
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
@@ -87,13 +87,9 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		_mvccEnabled = mvccEnabled;
 	}
 
-	public void setShardEnabled(boolean shardEnabled) {
-		_shardEnabled = shardEnabled;
-	}
-
 	protected static Map<String, Class<?>> getPreloadClassLoaderClasses() {
 		try {
-			Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
+			Map<String, Class<?>> classes = new HashMap<>();
 
 			for (String className : _PRELOAD_CLASS_NAMES) {
 				ClassLoader portalClassLoader =
@@ -111,10 +107,6 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		}
 	}
 
-	protected Dialect determineDialect() {
-		return DialectDetector.getDialect(getDataSource());
-	}
-
 	protected ClassLoader getConfigurationClassLoader() {
 		Class<?> clazz = getClass();
 
@@ -128,6 +120,39 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 	@Override
 	protected Configuration newConfiguration() {
 		Configuration configuration = new Configuration();
+
+		Properties properties = PropsUtil.getProperties();
+
+		Properties hibernateProperties = getHibernateProperties();
+
+		for (Map.Entry<Object, Object> entry : hibernateProperties.entrySet()) {
+			String key = (String)entry.getKey();
+			String value = (String)entry.getValue();
+
+			properties.setProperty(key, value);
+		}
+
+		Dialect dialect = DialectDetector.getDialect(getDataSource());
+
+		if (DBManagerUtil.getDBType(dialect) == DBType.SYBASE) {
+			properties.setProperty(PropsKeys.HIBERNATE_JDBC_BATCH_SIZE, "0");
+		}
+
+		if (Validator.isNull(PropsValues.HIBERNATE_DIALECT)) {
+			DBManagerUtil.setDB(dialect, getDataSource());
+
+			Class<?> clazz = dialect.getClass();
+
+			properties.setProperty("hibernate.dialect", clazz.getName());
+		}
+
+		properties.setProperty("hibernate.cache.use_query_cache", "false");
+		properties.setProperty(
+			"hibernate.cache.use_second_level_cache", "false");
+
+		properties.remove("hibernate.cache.region.factory_class");
+
+		configuration.setProperties(properties);
 
 		try {
 			String[] resources = getConfigurationResources();
@@ -143,37 +168,6 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 				}
 			}
 
-			Properties properties = PropsUtil.getProperties();
-
-			if (SPIUtil.isSPI()) {
-				properties.put(
-					"hibernate.cache.use_query_cache",
-					Boolean.FALSE.toString());
-				properties.put(
-					"hibernate.cache.use_second_level_cache",
-					Boolean.FALSE.toString());
-			}
-
-			configuration.setProperties(properties);
-
-			if (Validator.isNull(PropsValues.HIBERNATE_DIALECT)) {
-				Dialect dialect = determineDialect();
-
-				setDB(dialect);
-
-				Class<?> clazz = dialect.getClass();
-
-				configuration.setProperty("hibernate.dialect", clazz.getName());
-			}
-
-			DB db = DBFactoryUtil.getDB();
-
-			String dbType = db.getType();
-
-			if (dbType.equals(DB.TYPE_HYPERSONIC)) {
-				//configuration.setProperty("hibernate.jdbc.batch_size", "0");
-			}
-
 			if (_mvccEnabled) {
 				EventListeners eventListeners =
 					configuration.getEventListeners();
@@ -181,6 +175,10 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 				eventListeners.setAutoFlushEventListeners(
 					new AutoFlushEventListener[] {
 						NestableAutoFlushEventListener.INSTANCE
+					});
+				eventListeners.setFlushEventListeners(
+					new FlushEventListener[] {
+						NestableFlushEventListener.INSTANCE
 					});
 				eventListeners.setPostUpdateEventListeners(
 					new PostUpdateEventListener[] {
@@ -190,21 +188,6 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		}
 		catch (Exception e1) {
 			_log.error(e1, e1);
-		}
-
-		Properties hibernateProperties = getHibernateProperties();
-
-		if (_shardEnabled) {
-			hibernateProperties.setProperty(
-				Environment.CURRENT_SESSION_CONTEXT_CLASS,
-				ShardSpringSessionContext.class.getName());
-		}
-
-		for (Map.Entry<Object, Object> entry : hibernateProperties.entrySet()) {
-			String key = (String)entry.getKey();
-			String value = (String)entry.getValue();
-
-			configuration.setProperty(key, value);
 		}
 
 		return configuration;
@@ -245,7 +228,7 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 				configurationString.getBytes());
 		}
 
-		configuration = configuration.addInputStream(inputStream);
+		configuration.addInputStream(inputStream);
 
 		inputStream.close();
 	}
@@ -279,10 +262,6 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		}
 	}
 
-	protected void setDB(Dialect dialect) {
-		DBFactoryUtil.setDB(dialect);
-	}
-
 	private static final String[] _PRELOAD_CLASS_NAMES =
 		PropsValues.SPRING_HIBERNATE_CONFIGURATION_PROXY_FACTORY_PRELOAD_CLASSLOADER_CLASSES;
 
@@ -290,8 +269,7 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		PortalHibernateConfiguration.class);
 
 	private static final Map<ProxyFactory, ClassLoader>
-		_proxyFactoryClassLoaders =
-			new WeakHashMap<ProxyFactory, ClassLoader>();
+		_proxyFactoryClassLoaders = new WeakHashMap<>();
 
 	static {
 		ProxyFactory.classLoaderProvider =
@@ -330,6 +308,5 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 
 	private Converter<String> _hibernateConfigurationConverter;
 	private boolean _mvccEnabled = true;
-	private boolean _shardEnabled;
 
 }

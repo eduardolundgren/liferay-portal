@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = fda6a2e64dc946be004fdc37f263af6d88413ab0
+	mode = push
+	parent = 7488d6b7744363a9f210cc34b24ed101e6adb471
+	remote = git@github.com:liferay/com-liferay-license-manager.git

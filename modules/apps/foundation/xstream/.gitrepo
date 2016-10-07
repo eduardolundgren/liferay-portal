@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 24cc3ff00815ff66912dbeeda1df504d258189b6
+	mode = push
+	parent = 3a0247253f44346204af78ed988e4c78e10a3788
+	remote = git@github.com:liferay/com-liferay-xstream.git

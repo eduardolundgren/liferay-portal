@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = ca6b7f12e1b75e2b9baea6ac921d8d0c7f61696f
+	mode = push
+	parent = 512cd091cbaea340a295c1fa5924eb064218407c
+	remote = git@github.com:liferay/com-liferay-product-navigation.git
