@@ -14,26 +14,28 @@
 
 package com.liferay.portal.repository.temporaryrepository;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.capabilities.BulkOperationCapability;
+import com.liferay.portal.kernel.repository.capabilities.PortalCapabilityLocator;
 import com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesCapability;
 import com.liferay.portal.kernel.repository.capabilities.WorkflowCapability;
 import com.liferay.portal.kernel.repository.registry.BaseRepositoryDefiner;
 import com.liferay.portal.kernel.repository.registry.CapabilityRegistry;
 import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
-import com.liferay.portal.repository.capabilities.LiferayBulkOperationCapability;
-import com.liferay.portal.repository.capabilities.MinimalWorkflowCapability;
-import com.liferay.portal.repository.capabilities.TemporaryFileEntriesCapabilityImpl;
 
 /**
  * @author Iván Zaera
  */
 public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 
+	public static final String CLASS_NAME =
+		TemporaryFileEntryRepository.class.getName();
+
 	@Override
 	public String getClassName() {
-		return TemporaryFileEntryRepository.class.getName();
+		return CLASS_NAME;
 	}
 
 	@Override
@@ -42,20 +44,24 @@ public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 	}
 
 	@Override
-	public void registerCapabilities(CapabilityRegistry capabilityRegistry) {
-		DocumentRepository documentRepository =
-			capabilityRegistry.getDocumentRepository();
+	public void registerCapabilities(
+		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
+
+		DocumentRepository documentRepository = capabilityRegistry.getTarget();
 
 		capabilityRegistry.addExportedCapability(
 			BulkOperationCapability.class,
-			new LiferayBulkOperationCapability(
-				documentRepository.getRepositoryId()));
+			portalCapabilityLocator.getBulkOperationCapability(
+				documentRepository));
 		capabilityRegistry.addExportedCapability(
 			TemporaryFileEntriesCapability.class,
-			new TemporaryFileEntriesCapabilityImpl(documentRepository));
+			portalCapabilityLocator.getTemporaryFileEntriesCapability(
+				documentRepository));
 
 		capabilityRegistry.addSupportedCapability(
-			WorkflowCapability.class, new MinimalWorkflowCapability());
+			WorkflowCapability.class,
+			portalCapabilityLocator.getWorkflowCapability(
+				documentRepository, WorkflowCapability.OperationMode.MINIMAL));
 	}
 
 	@Override
@@ -68,6 +74,9 @@ public class TemporaryFileEntryRepositoryDefiner extends BaseRepositoryDefiner {
 	public void setRepositoryFactory(RepositoryFactory repositoryFactory) {
 		_repositoryFactory = repositoryFactory;
 	}
+
+	@BeanReference(type = PortalCapabilityLocator.class)
+	protected PortalCapabilityLocator portalCapabilityLocator;
 
 	private RepositoryFactory _repositoryFactory;
 

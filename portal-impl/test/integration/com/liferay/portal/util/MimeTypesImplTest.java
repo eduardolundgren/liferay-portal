@@ -14,10 +14,9 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.InputStream;
 
@@ -35,8 +34,7 @@ public class MimeTypesImplTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testDoc() throws Exception {
@@ -52,8 +50,8 @@ public class MimeTypesImplTest {
 	@Test
 	public void testDocx() throws Exception {
 		String validContentType =
-			"application/" +
-				"vnd.openxmlformats-officedocument.wordprocessingml.document";
+			"application" +
+				"/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 		String contentTypeStream = getContentType("test-2007.docx", true);
 		String contentTypeName = getContentType("test-2007.docx", false);
@@ -132,8 +130,8 @@ public class MimeTypesImplTest {
 	@Test
 	public void testPptx() throws Exception {
 		String validContentType =
-			"application/" +
-				"vnd.openxmlformats-officedocument.presentationml.presentation";
+			"application/vnd.openxmlformats-officedocument.presentationml." +
+				"presentation";
 
 		String contentTypeStream = getContentType("test-2010.pptx", true);
 		String contentTypeName = getContentType("test-2010.pptx", false);
@@ -178,8 +176,7 @@ public class MimeTypesImplTest {
 	@Test
 	public void testXlsx() throws Exception {
 		String validContentType =
-			"application/" +
-				"vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 		String contentTypeStream = getContentType("test-2010.xlsx", true);
 		String contentTypeName = getContentType("test-2010.xlsx", false);

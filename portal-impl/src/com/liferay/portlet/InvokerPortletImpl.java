@@ -17,26 +17,31 @@ package com.liferay.portlet;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.PortletConstants;
+import com.liferay.portal.kernel.portlet.InvokerFilterContainer;
+import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.LiferayPortletContext;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletFilterUtil;
+import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.tools.deploy.PortletDeployer;
-import com.liferay.portal.util.ClassLoaderUtil;
-import com.liferay.portal.util.WebKeys;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -55,11 +60,13 @@ import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.UnavailableException;
 import javax.portlet.filter.ActionFilter;
 import javax.portlet.filter.EventFilter;
 import javax.portlet.filter.FilterChain;
@@ -122,7 +129,7 @@ public class InvokerPortletImpl
 				WebKeys.CACHE_PORTLET_RESPONSES);
 
 		if (responses == null) {
-			responses = new ConcurrentHashMap<String, InvokerPortletResponse>();
+			responses = new ConcurrentHashMap<>();
 
 			session.setAttribute(WebKeys.CACHE_PORTLET_RESPONSES, responses);
 		}
@@ -138,7 +145,7 @@ public class InvokerPortletImpl
 	}
 
 	public InvokerPortletImpl(
-		com.liferay.portal.model.Portlet portletModel, Portlet portlet,
+		com.liferay.portal.kernel.model.Portlet portletModel, Portlet portlet,
 		PortletConfig portletConfig, PortletContext portletContext,
 		InvokerFilterContainer invokerFilterContainer, boolean checkAuthToken,
 		boolean facesPortlet, boolean strutsPortlet,
@@ -151,7 +158,7 @@ public class InvokerPortletImpl
 	}
 
 	public InvokerPortletImpl(
-		com.liferay.portal.model.Portlet portletModel, Portlet portlet,
+		com.liferay.portal.kernel.model.Portlet portletModel, Portlet portlet,
 		PortletContext portletContext,
 		InvokerFilterContainer invokerFilterContainer) {
 
@@ -193,11 +200,9 @@ public class InvokerPortletImpl
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
-		ClassLoader portletClassLoader = getPortletClassLoader();
-
 		try {
-			if (portletClassLoader != null) {
-				ClassLoaderUtil.setContextClassLoader(portletClassLoader);
+			if (_portletClassLoader != null) {
+				ClassLoaderUtil.setContextClassLoader(_portletClassLoader);
 			}
 
 			Closeable closeable = (Closeable)_invokerFilterContainer;
@@ -210,7 +215,7 @@ public class InvokerPortletImpl
 			_log.error(ioe, ioe);
 		}
 		finally {
-			if (portletClassLoader != null) {
+			if (_portletClassLoader != null) {
 				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
@@ -238,10 +243,15 @@ public class InvokerPortletImpl
 
 	@Override
 	public ClassLoader getPortletClassLoader() {
-		ServletContext servletContext =
-			_liferayPortletContext.getServletContext();
+		ClassLoader classLoader =
+			(ClassLoader)_liferayPortletContext.getAttribute(
+				PluginContextListener.PLUGIN_CLASS_LOADER);
 
-		return servletContext.getClassLoader();
+		if (classLoader == null) {
+			classLoader = ClassLoaderUtil.getPortalClassLoader();
+		}
+
+		return classLoader;
 	}
 
 	@Override
@@ -276,17 +286,17 @@ public class InvokerPortletImpl
 		ClassLoader contextClassLoader =
 			ClassLoaderUtil.getContextClassLoader();
 
-		ClassLoader portletClassLoader = getPortletClassLoader();
+		_portletClassLoader = getPortletClassLoader();
 
 		try {
-			if (portletClassLoader != null) {
-				ClassLoaderUtil.setContextClassLoader(portletClassLoader);
+			if (_portletClassLoader != null) {
+				ClassLoaderUtil.setContextClassLoader(_portletClassLoader);
 			}
 
 			_portlet.init(portletConfig);
 		}
 		finally {
-			if (portletClassLoader != null) {
+			if (_portletClassLoader != null) {
 				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
@@ -314,8 +324,7 @@ public class InvokerPortletImpl
 
 	@Override
 	public void processAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws IOException {
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		StopWatch stopWatch = new StopWatch();
 
@@ -324,9 +333,8 @@ public class InvokerPortletImpl
 		try {
 			invokeAction(actionRequest, actionResponse);
 		}
-		catch (PortletException pe) {
-			actionRequest.setAttribute(
-				_portletId + PortletException.class.getName(), pe);
+		catch (Exception e) {
+			processException(e, actionRequest, actionResponse);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -338,14 +346,18 @@ public class InvokerPortletImpl
 
 	@Override
 	public void processEvent(
-			EventRequest eventRequest, EventResponse eventResponse)
-		throws IOException, PortletException {
+		EventRequest eventRequest, EventResponse eventResponse) {
 
 		StopWatch stopWatch = new StopWatch();
 
 		stopWatch.start();
 
-		invokeEvent(eventRequest, eventResponse);
+		try {
+			invokeEvent(eventRequest, eventResponse);
+		}
+		catch (Exception e) {
+			processException(e, eventRequest, eventResponse);
+		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -415,6 +427,7 @@ public class InvokerPortletImpl
 				String title = invokeRender(renderRequest, renderResponse);
 
 				response.setTitle(title);
+
 				response.setContent(bufferCacheServletResponse.getString());
 				response.setTime(now + Time.SECOND * _expCache.intValue());
 			}
@@ -432,10 +445,7 @@ public class InvokerPortletImpl
 			((RenderResponseImpl)renderResponse).getProperties();
 
 		if (properties.containsKey("clear-request-parameters")) {
-			Map<String, String[]> renderParameters =
-				((RenderRequestImpl)renderRequest).getRenderParameters();
-
-			renderParameters.clear();
+			((RenderRequestImpl)renderRequest).clearRenderParameters();
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -447,8 +457,7 @@ public class InvokerPortletImpl
 
 	@Override
 	public void serveResource(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws IOException {
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
 
 		StopWatch stopWatch = new StopWatch();
 
@@ -457,9 +466,8 @@ public class InvokerPortletImpl
 		try {
 			invokeResource(resourceRequest, resourceResponse);
 		}
-		catch (PortletException pe) {
-			resourceRequest.setAttribute(
-				_portletId + PortletException.class.getName(), pe);
+		catch (Exception e) {
+			processException(e, resourceRequest, resourceResponse);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -549,7 +557,8 @@ public class InvokerPortletImpl
 				if ((expCache != null) && (expCache.length > 0) &&
 					(expCache[0] != null)) {
 
-					_expCache = new Integer(GetterUtil.getInteger(expCache[0]));
+					_expCache = Integer.valueOf(
+						GetterUtil.getInteger(expCache[0]));
 				}
 			}
 		}
@@ -592,9 +601,16 @@ public class InvokerPortletImpl
 		LiferayPortletResponse portletResponse =
 			(LiferayPortletResponse)renderResponse;
 
-		invoke(
-			portletRequest, portletResponse, PortletRequest.RENDER_PHASE,
-			_invokerFilterContainer.getRenderFilters());
+		try {
+			invoke(
+				portletRequest, portletResponse, PortletRequest.RENDER_PHASE,
+				_invokerFilterContainer.getRenderFilters());
+		}
+		catch (Exception e) {
+			processException(e, renderRequest, renderResponse);
+
+			throw e;
+		}
 
 		RenderResponseImpl renderResponseImpl =
 			(RenderResponseImpl)renderResponse;
@@ -616,8 +632,49 @@ public class InvokerPortletImpl
 			_invokerFilterContainer.getResourceFilters());
 	}
 
+	protected void processException(
+		Exception e, PortletRequest portletRequest,
+		PortletResponse portletResponse) {
+
+		if (portletResponse instanceof StateAwareResponseImpl) {
+
+			// PLT.5.4.7, TCK xxiii and PLT.15.2.6, cxlvi
+
+			StateAwareResponseImpl stateAwareResponseImpl =
+				(StateAwareResponseImpl)portletResponse;
+
+			stateAwareResponseImpl.reset();
+		}
+
+		if (e instanceof RuntimeException) {
+
+			// PLT.5.4.7, TCK xxv
+
+			e = new PortletException(e);
+		}
+
+		if (e instanceof UnavailableException) {
+
+			// PLT.5.4.7, TCK xxiv
+
+			destroy();
+
+			PortletLocalServiceUtil.deletePortlet(_portletModel);
+		}
+
+		if (e instanceof PortletException) {
+			if (!(portletRequest instanceof RenderRequest)) {
+				portletRequest.setAttribute(
+					_portletId + PortletException.class.getName(), e);
+			}
+		}
+		else {
+			ReflectionUtil.throwException(e);
+		}
+	}
+
 	private void _initialize(
-		com.liferay.portal.model.Portlet portletModel, Portlet portlet,
+		com.liferay.portal.kernel.model.Portlet portletModel, Portlet portlet,
 		PortletConfig portletConfig, PortletContext portletContext,
 		InvokerFilterContainer invokerFilterContainer, boolean checkAuthToken,
 		boolean facesPortlet, boolean strutsPortlet,
@@ -652,8 +709,9 @@ public class InvokerPortletImpl
 	private LiferayPortletConfig _liferayPortletConfig;
 	private LiferayPortletContext _liferayPortletContext;
 	private Portlet _portlet;
+	private ClassLoader _portletClassLoader;
 	private String _portletId;
-	private com.liferay.portal.model.Portlet _portletModel;
+	private com.liferay.portal.kernel.model.Portlet _portletModel;
 	private boolean _strutsBridgePortlet;
 	private boolean _strutsPortlet;
 

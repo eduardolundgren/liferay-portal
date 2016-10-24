@@ -14,18 +14,27 @@
 
 package com.liferay.portlet.messageboards.notifications;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.BaseModel;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailTestRule;
-import com.liferay.portal.util.BaseUserNotificationTestCase;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.messageboards.model.MBCategory;
-import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
+import com.liferay.message.boards.kernel.model.MBCategory;
+import com.liferay.message.boards.kernel.model.MBCategoryConstants;
+import com.liferay.message.boards.kernel.model.MBMessage;
+import com.liferay.message.boards.kernel.service.MBCategoryLocalServiceUtil;
+import com.liferay.message.boards.kernel.service.MBCategoryServiceUtil;
+import com.liferay.message.boards.kernel.service.MBMessageLocalServiceUtil;
+import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portlet.messageboards.util.test.MBTestUtil;
+import com.liferay.portlet.notifications.test.BaseUserNotificationTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -41,23 +50,45 @@ public class MBUserNotificationTest extends BaseUserNotificationTestCase {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			SynchronousMailTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), SynchronousMailTestRule.INSTANCE);
 
 	@Override
 	protected BaseModel<?> addBaseModel() throws Exception {
-		return MBTestUtil.addMessage(
-			group.getGroupId(), _category.getCategoryId(), true);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		MBTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.ADD);
+
+		MBMessage message = MBMessageLocalServiceUtil.addMessage(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			group.getGroupId(), _category.getCategoryId(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
+
+		return message;
 	}
 
 	@Override
 	protected void addContainerModel() throws Exception {
-		_category = MBTestUtil.addCategory(group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		MBTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.ADD);
+
+		_category = MBCategoryServiceUtil.addCategory(
+			TestPropsValues.getUserId(),
+			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
+			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 	}
 
 	@Override
 	protected String getPortletId() {
-		return PortletKeys.MESSAGE_BOARDS;
+		return PortletProviderUtil.getPortletId(
+			MBMessage.class.getName(), PortletProvider.Action.VIEW);
 	}
 
 	@Override
@@ -70,7 +101,20 @@ public class MBUserNotificationTest extends BaseUserNotificationTestCase {
 	protected BaseModel<?> updateBaseModel(BaseModel<?> baseModel)
 		throws Exception {
 
-		return MBTestUtil.updateMessage((MBMessage)baseModel, true);
+		MBMessage message = (MBMessage)baseModel;
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				message.getGroupId(), TestPropsValues.getUserId());
+
+		MBTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.UPDATE);
+
+		message = MBMessageLocalServiceUtil.updateMessage(
+			TestPropsValues.getUserId(), message.getMessageId(),
+			RandomTestUtil.randomString(), serviceContext);
+
+		return message;
 	}
 
 	private MBCategory _category;

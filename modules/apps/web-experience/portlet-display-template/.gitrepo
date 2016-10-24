@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 315d4c0aeef10a06c12bb70ca275fdf9ee5983d7
+	mode = push
+	parent = fda0c808b1ade66e50f78f6b26d74e92d98acc82
+	remote = git@github.com:liferay/com-liferay-portlet-display-template.git

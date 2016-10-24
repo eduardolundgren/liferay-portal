@@ -16,11 +16,34 @@ package com.liferay.portlet.blogs.linkback;
 
 /**
  * @author André de Oliveira
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.blogs.linkback.LinkbackConsumer}
  */
+@Deprecated
 public class LinkbackConsumerUtil {
 
+	public static void addNewTrackback(
+		long commentId, String url, String entryURL) {
+
+		_linkbackConsumer.addNewTrackback(commentId, url, entryURL);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static LinkbackConsumer getLinkbackConsumer() {
 		return _linkbackConsumer;
+	}
+
+	public static void verifyNewTrackbacks() {
+		_linkbackConsumer.verifyNewTrackbacks();
+	}
+
+	public static void verifyTrackback(
+		long commentId, String url, String entryURL) {
+
+		_linkbackConsumer.verifyTrackback(commentId, url, entryURL);
 	}
 
 	private static final LinkbackConsumer _linkbackConsumer =

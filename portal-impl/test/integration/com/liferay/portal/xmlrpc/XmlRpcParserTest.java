@@ -14,13 +14,12 @@
 
 package com.liferay.portal.xmlrpc;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.xmlrpc.Fault;
 import com.liferay.portal.kernel.xmlrpc.Response;
 import com.liferay.portal.kernel.xmlrpc.Success;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -36,8 +35,7 @@ public class XmlRpcParserTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testFaultResponseGenerator() throws Exception {
@@ -147,8 +145,7 @@ public class XmlRpcParserTest {
 		"</struct>" +
 		"</value>" +
 		"</fault>" +
-		"</methodResponse>"
-		,
+		"</methodResponse>",
 		"<?xml version=\"1.0\"?>" +
 		"<methodResponse>" +
 		"<fault>" +
@@ -174,8 +171,7 @@ public class XmlRpcParserTest {
 		"<methodName>noParams</methodName>" +
 		"<params>" +
 		"</params>" +
-		"</methodCall>"
-		,
+		"</methodCall>",
 		"<?xml version=\"1.0\"?>" +
 		"<methodCall>" +
 		"<methodName>noParams</methodName>" +
@@ -201,8 +197,7 @@ public class XmlRpcParserTest {
 		"<value><string>South Dakota</string></value>" +
 		"</param>" +
 		"</params>" +
-		"</methodResponse>"
-		,
+		"</methodResponse>",
 		"<?xml version=\"1.0\"?>" +
 		"<methodResponse>" +
 		"<params>" +

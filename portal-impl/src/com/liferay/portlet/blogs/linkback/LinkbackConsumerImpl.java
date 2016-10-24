@@ -14,12 +14,11 @@
 
 package com.liferay.portlet.blogs.linkback;
 
-import com.liferay.portal.kernel.comment.CommentManager;
+import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.Tuple;
-import com.liferay.portlet.blogs.util.BlogsUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +27,10 @@ import java.util.List;
 /**
  * @author Alexander Chow
  * @author André de Oliveira
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.blogs.linkback.LinkbackConsumer}
  */
+@Deprecated
 public class LinkbackConsumerImpl implements LinkbackConsumer {
 
 	@Override
@@ -66,21 +68,16 @@ public class LinkbackConsumerImpl implements LinkbackConsumer {
 		}
 
 		try {
-			_commentManager.deleteComment(commentId);
+			CommentManagerUtil.deleteComment(commentId);
 		}
 		catch (Exception e) {
 			_log.error("Unable to delete trackback comment " + commentId, e);
 		}
 	}
 
-	protected void setCommentManager(CommentManager commentManager) {
-		_commentManager = commentManager;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		LinkbackConsumerImpl.class);
 
-	private CommentManager _commentManager = BlogsUtil.getCommentManager();
 	private final List<Tuple> _trackbacks = Collections.synchronizedList(
 		new ArrayList<Tuple>());
 

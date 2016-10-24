@@ -15,7 +15,7 @@
 package com.liferay.portal.security.pacl.test;
 
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.test.PACLTestRule;
+import com.liferay.portal.test.rule.PACLTestRule;
 
 import java.net.Authenticator;
 import java.net.ProxySelector;
@@ -50,22 +50,16 @@ public class NetPermissionTest {
 
 	@Test
 	public void test2() throws Exception {
-		try {
-			new URL(
-				Http.HTTP, "localhost", 80, ".",
-				new URLStreamHandler() {
+		new URL(
+			Http.HTTP, "localhost", 80, ".",
+			new URLStreamHandler() {
 
-					@Override
-					protected URLConnection openConnection(URL url) {
-						return null;
-					}
-
+				@Override
+				protected URLConnection openConnection(URL url) {
+					return null;
 				}
-			);
-		}
-		catch (SecurityException se) {
-			Assert.fail();
-		}
+
+			});
 	}
 
 	@Test

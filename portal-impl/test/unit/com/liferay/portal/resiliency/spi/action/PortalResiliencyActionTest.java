@@ -14,25 +14,25 @@
 
 package com.liferay.portal.resiliency.spi.action;
 
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.resiliency.spi.agent.SPIAgent;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Portlet;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.model.impl.PortletImpl;
 import com.liferay.portal.resiliency.spi.agent.SPIAgentRequest;
 import com.liferay.portal.resiliency.spi.agent.SPIAgentResponse;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 import com.liferay.portal.util.PropsImpl;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.EventImpl;
 
 import java.io.IOException;
@@ -108,6 +108,7 @@ public class PortalResiliencyActionTest {
 		_mockHttpServletRequest.setAttribute(
 			WebKeys.SPI_AGENT_REQUEST,
 			new SPIAgentRequest(originalMockHttpServletRequest));
+
 		_mockHttpServletRequest.setAttribute(
 			WebKeys.SPI_AGENT_RESPONSE,
 			new SPIAgentResponse(_SERVLET_CONTEXT_NAME));
@@ -292,7 +293,8 @@ public class PortalResiliencyActionTest {
 
 		@Around(
 			"execution(* com.liferay.portal.kernel.resiliency.spi.agent." +
-				"SPIAgent$Lifecycle.values())")
+				"SPIAgent$Lifecycle.values())"
+		)
 		public SPIAgent.Lifecycle[] values(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -310,7 +312,7 @@ public class PortalResiliencyActionTest {
 
 			newLifecycles[ordinal] = ReflectionTestUtil.newEnumElement(
 				SPIAgent.Lifecycle.class, new Class<?>[] {String.class},
-					"UNKNOWN", ordinal, "UNKNOWN");
+				"UNKNOWN", ordinal, "UNKNOWN");
 
 			return newLifecycles;
 		}

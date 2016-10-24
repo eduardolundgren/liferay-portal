@@ -139,9 +139,8 @@ public class ServiceBeanAopCacheManager {
 			return;
 		}
 
-		ArrayList<MethodInterceptor> methodInterceptors =
-			new ArrayList<MethodInterceptor>(
-				methodInterceptorsBag.getMergedMethodInterceptors());
+		ArrayList<MethodInterceptor> methodInterceptors = new ArrayList<>(
+			methodInterceptorsBag.getMergedMethodInterceptors());
 
 		methodInterceptors.remove(methodInterceptor);
 
@@ -173,16 +172,15 @@ public class ServiceBeanAopCacheManager {
 	}
 
 	private static final Map<MethodInvocation, Annotation[]> _annotations =
-		new ConcurrentHashMap<MethodInvocation, Annotation[]>();
+		new ConcurrentHashMap<>();
 	private static final Annotation[] _nullAnnotations = new Annotation[0];
 
-	private
+	private final
 		Map<Class<? extends Annotation>, AnnotationChainableMethodAdvice<?>[]>
 			_annotationChainableMethodAdvices = new HashMap
 				<Class<? extends Annotation>,
-				 AnnotationChainableMethodAdvice<?>[]>();
+					AnnotationChainableMethodAdvice<?>[]>();
 	private final Map<MethodInvocation, MethodInterceptorsBag>
-		_methodInterceptorBags =
-			new ConcurrentHashMap<MethodInvocation, MethodInterceptorsBag>();
+		_methodInterceptorBags = new ConcurrentHashMap<>();
 
 }

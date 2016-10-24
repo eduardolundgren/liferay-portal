@@ -15,15 +15,16 @@
 package com.liferay.portal.verify;
 
 import com.liferay.portal.kernel.concurrent.ThrowableAwareRunnable;
+import com.liferay.portal.kernel.concurrent.ThrowableAwareRunnablesExecutorUtil;
 import com.liferay.portal.kernel.dao.db.BaseDBProcess;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.BulkException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ReleaseConstants;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.model.ReleaseConstants;
-import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.sql.Connection;
@@ -35,20 +36,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * This abstract class should be extended for startup processes that verify the
  * integrity of the database. They can be added as part of
- * <code>com.liferay.portal.verify.VerifyProcessSuite</code> or be executed
- * independently by being set in the portal.properties file. Each of these
- * processes should not cause any problems if run multiple times.
+ * <code>VerifyProcessSuite</code> or be executed independently by being set in
+ * the portal.properties file. Each of these processes should not cause any
+ * problems if run multiple times.
  *
  * @author Alexander Chow
  * @author Hugo Huijser
@@ -64,10 +60,12 @@ public abstract class VerifyProcess extends BaseDBProcess {
 	public void verify() throws VerifyException {
 		long start = System.currentTimeMillis();
 
-		try {
-			if (_log.isInfoEnabled()) {
-				_log.info("Verifying " + ClassUtil.getClassName(this));
-			}
+		if (_log.isInfoEnabled()) {
+			_log.info("Verifying " + ClassUtil.getClassName(this));
+		}
+
+		try (Connection con = DataAccess.getUpgradeOptimizedConnection()) {
+			connection = con;
 
 			doVerify();
 		}
@@ -75,6 +73,8 @@ public abstract class VerifyProcess extends BaseDBProcess {
 			throw new VerifyException(e);
 		}
 		finally {
+			connection = null;
+
 			if (_log.isInfoEnabled()) {
 				_log.info(
 					"Completed verification process " +
@@ -96,52 +96,36 @@ public abstract class VerifyProcess extends BaseDBProcess {
 				throwableAwareRunnables)
 		throws Exception {
 
-		List<Throwable> throwables = new ArrayList<Throwable>();
-
-		if (throwableAwareRunnables.size() <
-				PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD) {
+		if ((throwableAwareRunnables.size() <
+				PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD) &&
+			!isForceConcurrent(throwableAwareRunnables)) {
 
 			for (ThrowableAwareRunnable throwableAwareRunnable :
 					throwableAwareRunnables) {
 
 				throwableAwareRunnable.run();
+			}
+
+			List<Throwable> throwables = new ArrayList<>();
+
+			for (ThrowableAwareRunnable throwableAwareRunnable :
+					throwableAwareRunnables) {
 
 				if (throwableAwareRunnable.hasException()) {
 					throwables.add(throwableAwareRunnable.getThrowable());
 				}
 			}
+
+			if (!throwables.isEmpty()) {
+				Class<?> clazz = getClass();
+
+				throw new BulkException(
+					"Verification error: " + clazz.getName(), throwables);
+			}
 		}
 		else {
-			ExecutorService executorService = Executors.newFixedThreadPool(
-				throwableAwareRunnables.size());
-
-			List<Callable<Object>> jobs = new ArrayList<Callable<Object>>(
-				throwableAwareRunnables.size());
-
-			for (Runnable runnable : throwableAwareRunnables) {
-				jobs.add(Executors.callable(runnable));
-			}
-
-			try {
-				List<Future<Object>> futures = executorService.invokeAll(jobs);
-
-				for (Future<Object> future : futures) {
-					try {
-						future.get();
-					}
-					catch (ExecutionException ee) {
-						throwables.add(ee.getCause());
-					}
-				}
-			}
-			finally {
-				executorService.shutdown();
-			}
-		}
-
-		if (!throwables.isEmpty()) {
-			throw new BulkException(
-				"Verification error: " + getClass().getName(), throwables);
+			ThrowableAwareRunnablesExecutorUtil.execute(
+				throwableAwareRunnables);
 		}
 	}
 
@@ -152,27 +136,17 @@ public abstract class VerifyProcess extends BaseDBProcess {
 	 *         com.liferay.portal.kernel.util.ReleaseInfo#getBuildNumber}
 	 */
 	protected int getBuildNumber() throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
-				"select buildNumber from Release_ where servletContextName " +
-					"= ?");
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select buildNumber from Release_ where servletContextName = " +
+					"?")) {
 
 			ps.setString(1, ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
 
-			rs = ps.executeQuery();
+			try (ResultSet rs = ps.executeQuery()) {
+				rs.next();
 
-			rs.next();
-
-			return rs.getInt(1);
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
+				return rs.getInt(1);
+			}
 		}
 	}
 
@@ -189,7 +163,7 @@ public abstract class VerifyProcess extends BaseDBProcess {
 
 		Matcher matcher = _createTablePattern.matcher(sql);
 
-		Set<String> tableNames = new HashSet<String>();
+		Set<String> tableNames = new HashSet<>();
 
 		while (matcher.find()) {
 			String match = matcher.group(1);
@@ -200,6 +174,12 @@ public abstract class VerifyProcess extends BaseDBProcess {
 		_portalTableNames = tableNames;
 
 		return tableNames;
+	}
+
+	protected boolean isForceConcurrent(
+		Collection<? extends ThrowableAwareRunnable> throwableAwareRunnables) {
+
+		return false;
 	}
 
 	protected boolean isPortalTableName(String tableName) throws Exception {

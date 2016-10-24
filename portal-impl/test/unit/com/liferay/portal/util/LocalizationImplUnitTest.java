@@ -59,10 +59,10 @@ public class LocalizationImplUnitTest extends PowerMockito {
 
 	@Test
 	public void testGetDefaultImportLocaleUseCase4() {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LocalizationImpl.class.getName(), Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LocalizationImpl.class.getName(), Level.WARNING)) {
 
-		try {
 			verifyDefaultImportLocale("bg_BG", "bg_BG,fr_FR", "bg_BG", true);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -75,9 +75,6 @@ public class LocalizationImplUnitTest extends PowerMockito {
 				"Language es_ES is missing for com.liferay.portal.className " +
 					"with primary key 0. Setting default language to bg_BG.",
 				logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -92,7 +89,7 @@ public class LocalizationImplUnitTest extends PowerMockito {
 		Locale[] array = new Locale[localeIds.length];
 
 		for (int i = 0; i < localeIds.length; i++) {
-			array[i] =  LocaleUtil.fromLanguageId(localeIds[i], false);
+			array[i] = LocaleUtil.fromLanguageId(localeIds[i], false);
 		}
 
 		return array;

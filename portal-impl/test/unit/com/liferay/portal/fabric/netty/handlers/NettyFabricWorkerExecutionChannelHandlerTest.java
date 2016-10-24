@@ -45,17 +45,17 @@ import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.local.ReturnProcessCallable;
-import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.ObjectGraphUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -166,11 +166,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		ReflectionTestUtil.setFieldValue(
 			nettyFabricWorkerConfig, "_processConfig", null);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.INFO);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.INFO)) {
 
-		try {
 			String embeddedChannelToString = _embeddedChannel.toString();
 
 			_embeddedChannel.writeInbound(nettyFabricWorkerConfig);
@@ -195,9 +195,6 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 			Assert.assertEquals(
 				_embeddedChannel + " is closed", logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -228,11 +225,12 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 				nettyFabricAgentStub, "_startupNoticeableFutures");
 
 		DefaultNoticeableFuture<?> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Object>();
+			new DefaultNoticeableFuture<>();
 
 		startupNoticeableFutures.put(0L, defaultNoticeableFuture);
 
 		Assert.assertFalse(defaultNoticeableFuture.isDone());
+
 		Assert.assertNull(fabricWorkerFinishStartupProcessCallable.call());
 		Assert.assertTrue(defaultNoticeableFuture.isDone());
 	}
@@ -403,15 +401,15 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 			new URLStreamHandler() {
 
 				@Override
+				protected URLConnection openConnection(URL url) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
 				protected void parseURL(
 					URL url, String spec, int start, int limit) {
 
 					ReflectionUtil.throwException(malformedURLException);
-				}
-
-				@Override
-				protected URLConnection openConnection(URL url) {
-					throw new UnsupportedOperationException();
 				}
 
 			});
@@ -431,7 +429,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 	@Test
 	public void testLoadPaths() throws Exception {
-		final Map<Path, Path> mergedPaths = new HashMap<Path, Path>();
+		final Map<Path, Path> mergedPaths = new HashMap<>();
 
 		Path inputPath1 = Paths.get("inputPaths1");
 		Path mappedInputPath1 = Paths.get("mappedInputPath1");
@@ -466,7 +464,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		NettyFabricWorkerExecutionChannelHandler
 			nettyFabricWorkerExecutionChannelHandler =
 				new NettyFabricWorkerExecutionChannelHandler(
-					new MockRepository<Channel>() {
+					new MockRepository<Channel>("repository") {
 
 						@Override
 						public NoticeableFuture<Map<Path, Path>> getFiles(
@@ -475,17 +473,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 							DefaultNoticeableFuture<Map<Path, Path>>
 								defaultNoticeableFuture =
-									new DefaultNoticeableFuture
-										<Map<Path, Path>>();
+									new DefaultNoticeableFuture<>();
 
 							defaultNoticeableFuture.set(mergedPaths);
 
 							return defaultNoticeableFuture;
-						}
-
-						@Override
-						public Path getRepositoryPath() {
-							return Paths.get("repository");
 						}
 
 					},
@@ -515,7 +507,8 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		NoticeableFuture<LoadedPaths> noticeableFuture =
 			nettyFabricWorkerExecutionChannelHandler.loadPaths(
-				_embeddedChannel, new NettyFabricWorkerConfig<Serializable>(
+				_embeddedChannel,
+				new NettyFabricWorkerConfig<Serializable>(
 					0, processConfig, processCallable,
 					fabricPathMappingVisitor.getPathMap()));
 
@@ -530,13 +523,13 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		processConfig = loadedPaths.toProcessConfig(processConfig);
 
 		Assert.assertEquals(
-			mappedBootstrapPath1 + File.pathSeparator +
-				mappedBootstrapPath2 + File.pathSeparator +
+			mappedBootstrapPath1 + File.pathSeparator + mappedBootstrapPath2 +
+				File.pathSeparator +
 					mappedBootstrapPath3,
 			processConfig.getBootstrapClassPath());
 		Assert.assertEquals(
-			mappedRuntimePath1 + File.pathSeparator +
-				mappedRuntimePath2 + File.pathSeparator +
+			mappedRuntimePath1 + File.pathSeparator + mappedRuntimePath2 +
+				File.pathSeparator +
 					mappedRuntimePath3,
 			processConfig.getRuntimeClassPath());
 	}
@@ -546,7 +539,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		// With log
 
-		final Map<Path, Path> mergedPaths = new HashMap<Path, Path>();
+		final Map<Path, Path> mergedPaths = new HashMap<>();
 
 		Path bootstrapPath1 = Paths.get("bootstrapPath1");
 		Path mappedBootstrapPath1 = Paths.get("mappedBootstrapPath1");
@@ -558,7 +551,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		NettyFabricWorkerExecutionChannelHandler
 			nettyFabricWorkerExecutionChannelHandler =
 				new NettyFabricWorkerExecutionChannelHandler(
-					new MockRepository<Channel>() {
+					new MockRepository<Channel>("repository") {
 
 						@Override
 						public NoticeableFuture<Map<Path, Path>> getFiles(
@@ -567,17 +560,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 							DefaultNoticeableFuture<Map<Path, Path>>
 								defaultNoticeableFuture =
-									new DefaultNoticeableFuture
-										<Map<Path, Path>>();
+									new DefaultNoticeableFuture<>();
 
 							defaultNoticeableFuture.set(mergedPaths);
 
 							return defaultNoticeableFuture;
-						}
-
-						@Override
-						public Path getRepositoryPath() {
-							return Paths.get("repository");
 						}
 
 					},
@@ -593,7 +580,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		ProcessConfig processConfig = builder.build();
 
 		ProcessCallable<Serializable> processCallable =
-			new ReturnProcessCallable<Serializable>(null);
+			new ReturnProcessCallable<>(null);
 
 		FabricPathMappingVisitor fabricPathMappingVisitor =
 			new FabricPathMappingVisitor(
@@ -602,14 +589,15 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		ObjectGraphUtil.walkObjectGraph(
 			processCallable, fabricPathMappingVisitor);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.WARNING)) {
 
-		try {
 			NoticeableFuture<LoadedPaths> noticeableFuture =
 				nettyFabricWorkerExecutionChannelHandler.loadPaths(
-					_embeddedChannel, new NettyFabricWorkerConfig<Serializable>(
+					_embeddedChannel,
+					new NettyFabricWorkerConfig<Serializable>(
 						0, processConfig, processCallable,
 						fabricPathMappingVisitor.getPathMap()));
 
@@ -639,20 +627,18 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 			Assert.assertEquals(
 				StringPool.BLANK, loadedProcessConfig.getRuntimeClassPath());
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		// Without log
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.OFF)) {
 
-		try {
 			NoticeableFuture<LoadedPaths> noticeableFuture =
 				nettyFabricWorkerExecutionChannelHandler.loadPaths(
-					_embeddedChannel, new NettyFabricWorkerConfig<Serializable>(
+					_embeddedChannel,
+					new NettyFabricWorkerConfig<Serializable>(
 						0, processConfig, processCallable,
 						fabricPathMappingVisitor.getPathMap()));
 
@@ -675,14 +661,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 			Assert.assertEquals(
 				StringPool.BLANK, loadedProcessConfig.getRuntimeClassPath());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
 	public void testLoadPathsMissedInputPaths() throws InterruptedException {
-		final Map<Path, Path> mergedPaths = new HashMap<Path, Path>();
+		final Map<Path, Path> mergedPaths = new HashMap<>();
 
 		Path inputPath1 = Paths.get("inputPaths1");
 		Path mappedInputPath1 = Paths.get("mappedInputPath1");
@@ -693,7 +676,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		NettyFabricWorkerExecutionChannelHandler
 			nettyFabricWorkerExecutionChannelHandler =
 				new NettyFabricWorkerExecutionChannelHandler(
-					new MockRepository<Channel>() {
+					new MockRepository<Channel>("repository") {
 
 						@Override
 						public NoticeableFuture<Map<Path, Path>> getFiles(
@@ -702,17 +685,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 							DefaultNoticeableFuture<Map<Path, Path>>
 								defaultNoticeableFuture =
-									new DefaultNoticeableFuture
-										<Map<Path, Path>>();
+									new DefaultNoticeableFuture<>();
 
 							defaultNoticeableFuture.set(mergedPaths);
 
 							return defaultNoticeableFuture;
-						}
-
-						@Override
-						public Path getRepositoryPath() {
-							return Paths.get("repository");
 						}
 
 					},
@@ -738,7 +715,8 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		NoticeableFuture<LoadedPaths> noticeableFuture =
 			nettyFabricWorkerExecutionChannelHandler.loadPaths(
-				_embeddedChannel, new NettyFabricWorkerConfig<Serializable>(
+				_embeddedChannel,
+				new NettyFabricWorkerConfig<Serializable>(
 					0, processConfig, processCallable,
 					fabricPathMappingVisitor.getPathMap()));
 
@@ -761,7 +739,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		// With log
 
-		final Map<Path, Path> mergedPaths = new HashMap<Path, Path>();
+		final Map<Path, Path> mergedPaths = new HashMap<>();
 
 		Path runtimePath1 = Paths.get("runtimePath1");
 		Path mappedRuntimePath1 = Paths.get("mappedRuntimePath1");
@@ -775,7 +753,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		NettyFabricWorkerExecutionChannelHandler
 			nettyFabricWorkerExecutionChannelHandler =
 				new NettyFabricWorkerExecutionChannelHandler(
-					new MockRepository<Channel>() {
+					new MockRepository<Channel>("repository") {
 
 						@Override
 						public NoticeableFuture<Map<Path, Path>> getFiles(
@@ -784,17 +762,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 							DefaultNoticeableFuture<Map<Path, Path>>
 								defaultNoticeableFuture =
-									new DefaultNoticeableFuture
-										<Map<Path, Path>>();
+									new DefaultNoticeableFuture<>();
 
 							defaultNoticeableFuture.set(mergedPaths);
 
 							return defaultNoticeableFuture;
-						}
-
-						@Override
-						public Path getRepositoryPath() {
-							return Paths.get("repository");
 						}
 
 					},
@@ -810,7 +782,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		ProcessConfig processConfig = builder.build();
 
 		ProcessCallable<Serializable> processCallable =
-			new ReturnProcessCallable<Serializable>(null);
+			new ReturnProcessCallable<>(null);
 
 		FabricPathMappingVisitor fabricPathMappingVisitor =
 			new FabricPathMappingVisitor(
@@ -819,14 +791,15 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		ObjectGraphUtil.walkObjectGraph(
 			processCallable, fabricPathMappingVisitor);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.WARNING);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.WARNING)) {
 
-		try {
 			NoticeableFuture<LoadedPaths> noticeableFuture =
 				nettyFabricWorkerExecutionChannelHandler.loadPaths(
-					_embeddedChannel, new NettyFabricWorkerConfig<Serializable>(
+					_embeddedChannel,
+					new NettyFabricWorkerConfig<Serializable>(
 						0, processConfig, processCallable,
 						fabricPathMappingVisitor.getPathMap()));
 
@@ -857,20 +830,18 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 					mappedRuntimePath3,
 				loadedProcessConfig.getRuntimeClassPath());
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		// Without log
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.OFF)) {
 
-		try {
 			NoticeableFuture<LoadedPaths> noticeableFuture =
 				nettyFabricWorkerExecutionChannelHandler.loadPaths(
-					_embeddedChannel, new NettyFabricWorkerConfig<Serializable>(
+					_embeddedChannel,
+					new NettyFabricWorkerConfig<Serializable>(
 						0, processConfig, processCallable,
 						fabricPathMappingVisitor.getPathMap()));
 
@@ -893,9 +864,6 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 				mappedRuntimePath1 + File.pathSeparator +
 					mappedRuntimePath3,
 				loadedProcessConfig.getRuntimeClassPath());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -921,8 +889,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 						createNettyFabricWorkerConfig());
 
 		DefaultPromise<FabricWorker<Serializable>> defaultPromise =
-			new DefaultPromise<FabricWorker<Serializable>>(
-				_embeddedChannel.eventLoop());
+			new DefaultPromise<>(_embeddedChannel.eventLoop());
 
 		Throwable throwable = new Throwable();
 
@@ -958,11 +925,10 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 				new PostFabricWorkerExecutionFutureListener(
 					_embeddedChannel, null, createNettyFabricWorkerConfig());
 
-		defaultPromise = new DefaultPromise<FabricWorker<Serializable>>(
-			_embeddedChannel.eventLoop());
+		defaultPromise = new DefaultPromise<>(_embeddedChannel.eventLoop());
 
 		DefaultNoticeableFuture<Serializable> processNoticeableFuture =
-			new DefaultNoticeableFuture<Serializable>();
+			new DefaultNoticeableFuture<>();
 
 		FabricWorker<Serializable> fabricWorker =
 			new LocalFabricWorker<Serializable>(
@@ -975,11 +941,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		noticeableFuture = nettyFabricWorkerStub.getProcessNoticeableFuture();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.SEVERE)) {
 
-		try {
 			defaultPromise.addListener(postFabricWorkerExecutionFutureListener);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -991,9 +957,6 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 			Assert.assertEquals(
 				"Unable to finish fabric worker startup",
 				logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		Assert.assertSame(
@@ -1040,7 +1003,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		Path inputPath2 = FileServerTestUtil.createEmptyFile(
 			Paths.get("inputPath2"));
 
-		Map<Path, Path> inputPaths = new HashMap<Path, Path>();
+		Map<Path, Path> inputPaths = new HashMap<>();
 
 		inputPaths.put(inputPath1, inputPath1);
 		inputPaths.put(inputPath2, inputPath2);
@@ -1053,7 +1016,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 						new LoadedPaths(inputPaths, null, null));
 
 		DefaultNoticeableFuture<Serializable> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Serializable>();
+			new DefaultNoticeableFuture<>();
 
 		Throwable throwable = new Throwable();
 
@@ -1112,7 +1075,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 		inputPath2 = FileServerTestUtil.createEmptyFile(
 			Paths.get("inputPath2"));
 
-		inputPaths = new HashMap<Path, Path>();
+		inputPaths = new HashMap<>();
 
 		inputPaths.put(inputPath1, inputPath1);
 		inputPaths.put(inputPath2, inputPath2);
@@ -1123,7 +1086,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 					_embeddedChannel, createNettyFabricWorkerConfig(),
 					new LoadedPaths(inputPaths, null, null));
 
-		defaultNoticeableFuture = new DefaultNoticeableFuture<Serializable>();
+		defaultNoticeableFuture = new DefaultNoticeableFuture<>();
 
 		defaultNoticeableFuture.set(StringPool.BLANK);
 
@@ -1169,7 +1132,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 					channelHandlerContext, createNettyFabricWorkerConfig());
 
 		DefaultNoticeableFuture<LoadedPaths> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<LoadedPaths>();
+			new DefaultNoticeableFuture<>();
 
 		Throwable throwable = new Throwable();
 
@@ -1198,7 +1161,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		// Loaded paths
 
-		defaultNoticeableFuture = new DefaultNoticeableFuture<LoadedPaths>();
+		defaultNoticeableFuture = new DefaultNoticeableFuture<>();
 
 		defaultNoticeableFuture.set(
 			new LoadedPaths(Collections.<Path, Path>emptyMap(), null, null));
@@ -1218,6 +1181,7 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 			fabricAgent.getFabricWorkers();
 
 		Assert.assertEquals(1, fabricWorkers.size());
+
 		Assert.assertFalse(noticeableFuture.isDone());
 	}
 
@@ -1239,11 +1203,11 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 
 		channel.close();
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			NettyFabricWorkerExecutionChannelHandler.class.getName(),
-			Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					NettyFabricWorkerExecutionChannelHandler.class.getName(),
+					Level.SEVERE)) {
 
-		try {
 			nettyFabricWorkerExecutionChannelHandler.sendResult(
 				channel, 0, StringPool.BLANK, null);
 
@@ -1254,12 +1218,9 @@ public class NettyFabricWorkerExecutionChannelHandlerTest {
 			LogRecord logRecord = logRecords.get(0);
 
 			Assert.assertEquals(
-				"Unable to send back fabric worker result " +
-					"{id=0, result=, throwable=null}",
+				"Unable to send back fabric worker result {id=0, result=, " +
+					"throwable=null}",
 				logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Send back result

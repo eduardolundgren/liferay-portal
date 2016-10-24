@@ -14,7 +14,7 @@
 
 package com.liferay.portal.security.pacl.test;
 
-import com.liferay.portal.test.PACLTestRule;
+import com.liferay.portal.test.rule.PACLTestRule;
 
 import java.awt.AWTEvent;
 import java.awt.Toolkit;
@@ -46,8 +46,8 @@ public class AWTPermissionTest {
 					public void eventDispatched(AWTEvent event) {
 					}
 
-				}, AWTEvent.ACTION_EVENT_MASK
-			);
+				},
+				AWTEvent.ACTION_EVENT_MASK);
 
 			Assert.fail();
 		}
@@ -57,14 +57,9 @@ public class AWTPermissionTest {
 
 	@Test
 	public void test2() throws Exception {
-		try {
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
 
-			toolkit.getSystemEventQueue();
-		}
-		catch (SecurityException se) {
-			Assert.fail();
-		}
+		toolkit.getSystemEventQueue();
 	}
 
 }

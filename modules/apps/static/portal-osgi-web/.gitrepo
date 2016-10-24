@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 46811f10de4b7077508bd1fde4656af71fe8d0d8
+	mode = push
+	parent = 3cdd7c8b2df67bea6bbbfb5c7249acdacef5667c
+	remote = git@github.com:liferay/com-liferay-portal-osgi-web.git

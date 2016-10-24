@@ -16,8 +16,8 @@ package com.liferay.portlet.blogs.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portlet.blogs.model.BlogsEntry;
-import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
+import com.liferay.blogs.kernel.model.BlogsEntry;
+import com.liferay.blogs.kernel.service.BlogsEntryLocalServiceUtil;
 
 /**
  * The extended model base implementation for the BlogsEntry service. Represents a row in the &quot;BlogsEntry&quot; database table, with each column mapped to a property of this class.
@@ -28,9 +28,12 @@ import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
  *
  * @author Brian Wing Shun Chan
  * @see BlogsEntryImpl
- * @see com.liferay.portlet.blogs.model.BlogsEntry
+ * @see BlogsEntry
+ * @deprecated As of 7.0.0, replaced by {@link
+            com.liferay.blogs.model.impl.BlogsEntryImpl}
  * @generated
  */
+@Deprecated
 @ProviderType
 public abstract class BlogsEntryBaseImpl extends BlogsEntryModelImpl
 	implements BlogsEntry {

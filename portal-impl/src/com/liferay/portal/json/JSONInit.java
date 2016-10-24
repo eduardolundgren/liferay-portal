@@ -14,6 +14,8 @@
 
 package com.liferay.portal.json;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.portal.json.transformer.CompanyJSONTransformer;
 import com.liferay.portal.json.transformer.FileJSONTransformer;
 import com.liferay.portal.json.transformer.JSONArrayJSONTransformer;
 import com.liferay.portal.json.transformer.JSONObjectJSONTransformer;
@@ -25,12 +27,12 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.json.JSONTransformer;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletDisplayModel;
 import com.liferay.portal.kernel.repository.model.RepositoryModel;
-import com.liferay.portal.model.User;
-import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.File;
 import java.io.InputStream;
@@ -76,13 +78,12 @@ public class JSONInit {
 			PortletDisplayModel.class, PortletURL.class
 		};
 
-		JoddJson.excludedTypeNames = new String[] {
-			"javax.*"
-		};
+		JoddJson.excludedTypeNames = new String[] {"javax.*"};
 
 		TypeJsonSerializerMap typeSerializerMap = JoddJson.defaultSerializers;
 
 		Class<?>[][] classesArray = new Class<?>[][] {
+			new Class[] {Company.class, CompanyJSONTransformer.class},
 			new Class[] {File.class, FileJSONTransformer.class},
 			new Class[] {JSONArray.class, JSONArrayJSONTransformer.class},
 			new Class[] {JSONObject.class, JSONObjectJSONTransformer.class},
@@ -103,6 +104,6 @@ public class JSONInit {
 		}
 	}
 
-	private static boolean _initalized = false;
+	private static boolean _initalized;
 
 }

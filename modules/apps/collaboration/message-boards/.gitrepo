@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = da42795b30463c31fa831561c923877e365c37d0
+	mode = push
+	parent = e20e1540a36bb6cd29cdc8e355872ab52769583a
+	remote = git@github.com:liferay/com-liferay-message-boards.git

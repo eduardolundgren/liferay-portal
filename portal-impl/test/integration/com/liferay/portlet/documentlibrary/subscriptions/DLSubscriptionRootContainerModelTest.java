@@ -14,16 +14,23 @@
 
 package com.liferay.portlet.documentlibrary.subscriptions;
 
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailTestRule;
-import com.liferay.portal.util.subscriptions.BaseSubscriptionRootContainerModelTestCase;
-import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.test.randomizerbumpers.TikaSafeRandomizerBumper;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portlet.subscriptions.test.BaseSubscriptionRootContainerModelTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -40,21 +47,39 @@ public class DLSubscriptionRootContainerModelTest
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			SynchronousMailTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), SynchronousMailTestRule.INSTANCE);
 
 	@Override
-	protected long addBaseModel(long containerModelId) throws Exception {
-		FileEntry fileEntry = DLAppTestUtil.addFileEntryWithWorkflow(
-			group.getGroupId(), group.getGroupId(), containerModelId, true);
+	protected long addBaseModel(long userId, long containerModelId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), userId);
+
+		DLAppTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.ADD);
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			userId, group.getGroupId(), containerModelId,
+			RandomTestUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
+			serviceContext);
 
 		return fileEntry.getFileEntryId();
 	}
 
 	@Override
-	protected long addContainerModel(long containerModelId) throws Exception {
-		Folder folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), containerModelId);
+	protected long addContainerModel(long userId, long containerModelId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), userId);
+
+		Folder folder = DLAppServiceUtil.addFolder(
+			group.getGroupId(), containerModelId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), serviceContext);
 
 		return folder.getFolderId();
 	}
@@ -68,9 +93,22 @@ public class DLSubscriptionRootContainerModelTest
 	}
 
 	@Override
-	protected void updateBaseModel(long baseModelId) throws Exception {
-		DLAppTestUtil.updateFileEntryWithWorkflow(
-			group.getGroupId(), baseModelId, false, true);
+	protected void updateBaseModel(long userId, long baseModelId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), userId);
+
+		DLAppTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.UPDATE);
+
+		DLAppLocalServiceUtil.updateFileEntry(
+			userId, baseModelId, RandomTestUtil.randomString(),
+			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK, false,
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
+			serviceContext);
 	}
 
 }

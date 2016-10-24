@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 5ba7d1194e5344a295c4bb791fa37f78688af7fc
+	mode = push
+	parent = d2fc124ca9d79b47844def603f9eb6e62f5fb8e7
+	remote = git@github.com:liferay/com-liferay-dynamic-data-mapping.git

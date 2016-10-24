@@ -80,7 +80,8 @@ public class XmlRpcParser {
 			xmlStreamReader.next();
 
 			String methodName = xmlStreamReader.getText();
-			List<Object> arguments = new ArrayList<Object>();
+
+			List<Object> arguments = new ArrayList<>();
 
 			xmlStreamReader.nextTag();
 

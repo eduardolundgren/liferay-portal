@@ -16,16 +16,16 @@ package com.liferay.portal.dao.orm;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.TransactionalTestRule;
 
 import java.util.List;
 
@@ -64,10 +64,13 @@ import org.junit.Test;
  * 		<th>
  * 			Sybase
  * 		</th>
+ * 		<th>
+ * 			Hypersonic
+ * 		</th>
  * 	</tr>
  *
  * 	<tr>
- * 		<td colspan="5" align="center">
+ * 		<td colspan="6" align="center">
  * 			<code>''</code> comparison with <code>NULL</code>
  * 		</td>
  * 	</tr>
@@ -88,6 +91,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>FALSE</code><sup>*</sup>
  * 		</td>
+ * 	<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -105,6 +111,9 @@ import org.junit.Test;
  * 		</td>
  * 		<td>
  * 			<code>TRUE</code><sup>*</sup>
+ * 		</td>
+ * 	<td>
+ * 			<code>NULL</code><sup>*</sup>
  * 		</td>
  * 	</tr>
  *
@@ -124,6 +133,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>FALSE</code><sup>*</sup>
  * 		</td>
+ * 		<td>
+ * 			<code>FALSE</code>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -141,6 +153,9 @@ import org.junit.Test;
  * 		</td>
  * 		<td>
  * 			<code>TRUE</code><sup>*</sup>
+ * 		</td>
+ * 		<td>
+ * 			<code>TRUE</code>
  * 		</td>
  * 	</tr>
  *
@@ -160,6 +175,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>FALSE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -178,10 +196,13 @@ import org.junit.Test;
  * 		<td>
  * 			<code>TRUE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
- * 		<td colspan="5" align="center">
+ * 		<td colspan="6" align="center">
  * 			<code>NULL</code> comparison with <code>NULL</code>
  * 		</td>
  * 	</tr>
@@ -202,6 +223,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>TRUE</code><sup>*</sup>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -219,6 +243,9 @@ import org.junit.Test;
  * 		</td>
  * 		<td>
  * 			<code>FALSE</code><sup>*</sup>
+ * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
  * 		</td>
  * 	</tr>
  *
@@ -238,6 +265,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>TRUE</code><sup>*</sup>
  * 		</td>
+ * 		<td>
+ * 			<code>TRUE</code>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -255,6 +285,9 @@ import org.junit.Test;
  * 		</td>
  * 		<td>
  * 			<code>FALSE</code><sup>*</sup>
+ * 		</td>
+ * 		<td>
+ * 			<code>FALSE</code>
  * 		</td>
  * 	</tr>
  *
@@ -274,6 +307,9 @@ import org.junit.Test;
  * 		<td>
  * 		<code>FALSE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -292,10 +328,13 @@ import org.junit.Test;
  * 		<td>
  * 			<code>TRUE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
- * 		<td colspan="5" align="center">
+ * 		<td colspan="6" align="center">
  * 			<code>0</code> comparison with <code>NULL</code>
  * 		</td>
  * 	</tr>
@@ -316,6 +355,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>FALSE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -334,11 +376,17 @@ import org.junit.Test;
  * 		<td>
  * 			<code>TRUE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
  * 		<td>
  * 			<code>0</code> IS <code>NULL</code>
+ * 		</td>
+ * 		<td>
+ * 			<code>FALSE</code>
  * 		</td>
  * 		<td>
  * 			<code>FALSE</code>
@@ -370,6 +418,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>TRUE</code>
  * 		</td>
+ * 		<td>
+ * 			<code>TRUE</code>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -388,6 +439,9 @@ import org.junit.Test;
  * 		<td>
  * 			<code>FALSE</code><sup>*</sup>
  * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
+ * 		</td>
  * 	</tr>
  *
  * 	<tr>
@@ -405,6 +459,9 @@ import org.junit.Test;
  * 		</td>
  * 		<td>
  * 			<code>TRUE</code><sup>*</sup>
+ * 		</td>
+ * 		<td>
+ * 			<code>NULL</code><sup>*</sup>
  * 		</td>
  * 	</tr>
  *
@@ -444,8 +501,7 @@ public class SQLNullTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			TransactionalTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), TransactionalTestRule.INSTANCE);
 
 	@Test
 	public void testBlankStringEqualsNull() {
@@ -453,6 +509,9 @@ public class SQLNullTest {
 
 		if (isSybase()) {
 			sql = transformSybaseSQL(sql);
+		}
+		else if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
 		}
 
 		Session session = _sessionFactory.openSession();
@@ -537,11 +596,16 @@ public class SQLNullTest {
 
 	@Test
 	public void testBlankStringLikeNull() {
+		String sql = _SQL_LIKE_NULL;
+
+		if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
+
 		Session session = _sessionFactory.openSession();
 
 		try {
-			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				_SQL_LIKE_NULL);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -562,6 +626,9 @@ public class SQLNullTest {
 
 		if (isSybase()) {
 			sql = transformSybaseSQL(sql);
+		}
+		else if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
 		}
 
 		Session session = _sessionFactory.openSession();
@@ -589,11 +656,16 @@ public class SQLNullTest {
 
 	@Test
 	public void testBlankStringNotLikeNull() {
+		String sql = _SQL_NOT_LIKE_NULL;
+
+		if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
+
 		Session session = _sessionFactory.openSession();
 
 		try {
-			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				_SQL_NOT_LIKE_NULL);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -619,6 +691,9 @@ public class SQLNullTest {
 
 		if (isSybase()) {
 			sql = transformSybaseSQL(sql);
+		}
+		else if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
 		}
 
 		Session session = _sessionFactory.openSession();
@@ -698,11 +773,16 @@ public class SQLNullTest {
 
 	@Test
 	public void testNullLikeNull() {
+		String sql = _SQL_LIKE_NULL;
+
+		if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
+
 		Session session = _sessionFactory.openSession();
 
 		try {
-			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				_SQL_LIKE_NULL);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -723,6 +803,9 @@ public class SQLNullTest {
 
 		if (isSybase()) {
 			sql = transformSybaseSQL(sql);
+		}
+		else if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
 		}
 
 		Session session = _sessionFactory.openSession();
@@ -745,11 +828,16 @@ public class SQLNullTest {
 
 	@Test
 	public void testNullNotLikeNull() {
+		String sql = _SQL_NOT_LIKE_NULL;
+
+		if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
+
 		Session session = _sessionFactory.openSession();
 
 		try {
-			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				_SQL_NOT_LIKE_NULL);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -771,11 +859,16 @@ public class SQLNullTest {
 
 	@Test
 	public void testZeroEqualsNull() {
+		String sql = _SQL_EQUALS_NULL;
+
+		if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
+
 		Session session = _sessionFactory.openSession();
 
 		try {
-			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				_SQL_EQUALS_NULL);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -842,6 +935,9 @@ public class SQLNullTest {
 		else if (isSybase()) {
 			sql = transformSybaseSQL(sql);
 		}
+		else if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
 
 		Session session = _sessionFactory.openSession();
 
@@ -863,11 +959,16 @@ public class SQLNullTest {
 
 	@Test
 	public void testZeroNotEqualsNull() {
+		String sql = _SQL_NOT_EQUALS_NULL;
+
+		if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
+
 		Session session = _sessionFactory.openSession();
 
 		try {
-			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				_SQL_NOT_EQUALS_NULL);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -897,6 +998,9 @@ public class SQLNullTest {
 		else if (isSybase()) {
 			sql = transformSybaseSQL(sql);
 		}
+		else if (isHypersonic()) {
+			sql = transformHypersonicSQL(sql);
+		}
 
 		Session session = _sessionFactory.openSession();
 
@@ -921,22 +1025,34 @@ public class SQLNullTest {
 		}
 	}
 
-	protected boolean isDBType(String dBType) {
-		DB db = DBFactoryUtil.getDB();
+	protected boolean isDBType(DBType dbType) {
+		DB db = DBManagerUtil.getDB();
 
-		return dBType.equals(db.getType());
+		if (dbType == db.getDBType()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected boolean isHypersonic() {
+		return isDBType(DBType.HYPERSONIC);
 	}
 
 	protected boolean isOracle() {
-		return isDBType(DB.TYPE_ORACLE);
+		return isDBType(DBType.ORACLE);
 	}
 
 	protected boolean isPostgreSQL() {
-		return isDBType(DB.TYPE_POSTGRESQL);
+		return isDBType(DBType.POSTGRESQL);
 	}
 
 	protected boolean isSybase() {
-		return isDBType(DB.TYPE_SYBASE);
+		return isDBType(DBType.SYBASE);
+	}
+
+	protected String transformHypersonicSQL(String sql) {
+		return sql.replace("NULL", "CAST_TEXT(NULL)");
 	}
 
 	protected String transformPostgreSQL(String sql) {

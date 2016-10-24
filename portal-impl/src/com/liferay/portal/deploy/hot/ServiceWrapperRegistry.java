@@ -18,8 +18,8 @@ import com.liferay.portal.kernel.bean.BeanLocatorException;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.service.ServiceWrapper;
 import com.liferay.portal.spring.aop.ServiceBeanAopCacheManagerUtil;
 import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
 import com.liferay.registry.Registry;
@@ -58,7 +58,7 @@ public class ServiceWrapperRegistry {
 	private final ServiceTracker<ServiceWrapper<?>, ServiceBag<?>>
 		_serviceTracker;
 
-	private class ServiceWrapperServiceTrackerCustomizer
+	private static class ServiceWrapperServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<ServiceWrapper<?>, ServiceBag<?>> {
 
 		@Override
@@ -74,7 +74,10 @@ public class ServiceWrapperRegistry {
 				return _getServiceBag(serviceWrapper);
 			}
 			catch (Throwable t) {
-				_log.error(t, t);
+				_log.error(
+					"Unable to get service bag for " +
+						serviceWrapper.getClass(),
+					t);
 			}
 			finally {
 				ServiceBeanAopCacheManagerUtil.reset();
@@ -154,7 +157,7 @@ public class ServiceWrapperRegistry {
 
 			serviceWrapper.setWrappedService((T)targetSource.getTarget());
 
-			return new ServiceBag<T>(
+			return new ServiceBag<>(
 				classLoader, advisedSupport, serviceTypeClass, serviceWrapper);
 		}
 

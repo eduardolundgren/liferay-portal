@@ -17,7 +17,7 @@ package com.liferay.portal.fabric.agent.selectors;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.status.AdvancedOperatingSystemMXBean;
 import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.lang.reflect.InvocationHandler;
@@ -62,7 +62,8 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		Collection<FabricAgent> fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
 		Assert.assertEquals(1, fabricAgents.size());
 
@@ -77,7 +78,8 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
 		Assert.assertEquals(1, fabricAgents.size());
 
@@ -92,7 +94,8 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
 		Assert.assertEquals(1, fabricAgents.size());
 
@@ -107,7 +110,8 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
 		Assert.assertEquals(1, fabricAgents.size());
 

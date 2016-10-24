@@ -18,10 +18,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.service.ServiceContext;
 
 import java.io.File;
 import java.io.InputStream;
@@ -62,6 +64,16 @@ public class LocalRepositoryWrapper implements LocalRepository {
 	}
 
 	@Override
+	public FileShortcut addFileShortcut(
+			long userId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return _localRepository.addFileShortcut(
+			userId, folderId, toFileEntryId, serviceContext);
+	}
+
+	@Override
 	public Folder addFolder(
 			long userId, long parentFolderId, String name, String description,
 			ServiceContext serviceContext)
@@ -73,12 +85,12 @@ public class LocalRepositoryWrapper implements LocalRepository {
 
 	@Override
 	public void checkInFileEntry(
-			long userId, long fileEntryId, boolean major, String changeLog,
-			ServiceContext serviceContext)
+			long userId, long fileEntryId, boolean majorVersion,
+			String changeLog, ServiceContext serviceContext)
 		throws PortalException {
 
 		_localRepository.checkInFileEntry(
-			userId, fileEntryId, major, changeLog, serviceContext);
+			userId, fileEntryId, majorVersion, changeLog, serviceContext);
 	}
 
 	@Override
@@ -112,6 +124,16 @@ public class LocalRepositoryWrapper implements LocalRepository {
 	}
 
 	@Override
+	public void deleteFileShortcut(long fileShortcutId) throws PortalException {
+		_localRepository.deleteFileShortcut(fileShortcutId);
+	}
+
+	@Override
+	public void deleteFileShortcuts(long toFileEntryId) throws PortalException {
+		_localRepository.deleteFileShortcuts(toFileEntryId);
+	}
+
+	@Override
 	public void deleteFolder(long folderId) throws PortalException {
 		_localRepository.deleteFolder(folderId);
 	}
@@ -119,6 +141,53 @@ public class LocalRepositoryWrapper implements LocalRepository {
 	@Override
 	public <T extends Capability> T getCapability(Class<T> capabilityClass) {
 		return _localRepository.getCapability(capabilityClass);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+			long folderId, int status, int start, int end,
+			OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return _localRepository.getFileEntries(
+			folderId, status, start, end, obc);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+			long folderId, int start, int end, OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return _localRepository.getFileEntries(folderId, start, end, obc);
+	}
+
+	@Override
+	public List<RepositoryEntry> getFileEntriesAndFileShortcuts(
+			long folderId, int status, int start, int end)
+		throws PortalException {
+
+		return _localRepository.getFileEntriesAndFileShortcuts(
+			folderId, status, start, end);
+	}
+
+	@Override
+	public int getFileEntriesAndFileShortcutsCount(long folderId, int status)
+		throws PortalException {
+
+		return _localRepository.getFileEntriesAndFileShortcutsCount(
+			folderId, status);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId) throws PortalException {
+		return _localRepository.getFileEntriesCount(folderId);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId, int status)
+		throws PortalException {
+
+		return _localRepository.getFileEntriesCount(folderId, status);
 	}
 
 	@Override
@@ -139,6 +208,13 @@ public class LocalRepositoryWrapper implements LocalRepository {
 	}
 
 	@Override
+	public FileShortcut getFileShortcut(long fileShortcutId)
+		throws PortalException {
+
+		return _localRepository.getFileShortcut(fileShortcutId);
+	}
+
+	@Override
 	public FileVersion getFileVersion(long fileVersionId)
 		throws PortalException {
 
@@ -155,6 +231,62 @@ public class LocalRepositoryWrapper implements LocalRepository {
 		throws PortalException {
 
 		return _localRepository.getFolder(parentFolderId, name);
+	}
+
+	@Override
+	public List<Folder> getFolders(
+			long parentFolderId, boolean includeMountFolders, int start,
+			int end, OrderByComparator<Folder> obc)
+		throws PortalException {
+
+		return _localRepository.getFolders(
+			parentFolderId, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public List<Folder> getFolders(
+			long parentFolderId, int status, boolean includeMountFolders,
+			int start, int end, OrderByComparator<Folder> obc)
+		throws PortalException {
+
+		return _localRepository.getFolders(
+			parentFolderId, status, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
+			long folderId, int status, boolean includeMountFolders, int start,
+			int end, OrderByComparator<?> obc)
+		throws PortalException {
+
+		return _localRepository.getFoldersAndFileEntriesAndFileShortcuts(
+			folderId, status, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public int getFoldersAndFileEntriesAndFileShortcutsCount(
+			long folderId, int status, boolean includeMountFolders)
+		throws PortalException {
+
+		return _localRepository.getFoldersAndFileEntriesAndFileShortcutsCount(
+			folderId, status, includeMountFolders);
+	}
+
+	@Override
+	public int getFoldersCount(long parentFolderId, boolean includeMountfolders)
+		throws PortalException {
+
+		return _localRepository.getFoldersCount(
+			parentFolderId, includeMountfolders);
+	}
+
+	@Override
+	public int getFoldersCount(
+			long parentFolderId, int status, boolean includeMountfolders)
+		throws PortalException {
+
+		return _localRepository.getFoldersCount(
+			parentFolderId, status, includeMountfolders);
 	}
 
 	@Override
@@ -248,6 +380,25 @@ public class LocalRepositoryWrapper implements LocalRepository {
 		return _localRepository.updateFileEntry(
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
+	}
+
+	@Override
+	public FileShortcut updateFileShortcut(
+			long userId, long fileShortcutId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return _localRepository.updateFileShortcut(
+			userId, fileShortcutId, folderId, toFileEntryId, serviceContext);
+	}
+
+	@Override
+	public void updateFileShortcuts(
+			long oldToFileEntryId, long newToFileEntryId)
+		throws PortalException {
+
+		_localRepository.updateFileShortcuts(
+			oldToFileEntryId, newToFileEntryId);
 	}
 
 	@Override

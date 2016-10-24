@@ -14,22 +14,28 @@
 
 package com.liferay.portlet.documentlibrary.subscriptions;
 
+import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailTestRule;
-import com.liferay.portal.util.subscriptions.BaseSubscriptionClassTypeTestCase;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
-import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.test.randomizerbumpers.TikaSafeRandomizerBumper;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
+import com.liferay.portlet.subscriptions.test.BaseSubscriptionClassTypeTestCase;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -47,17 +53,26 @@ public class DLSubscriptionClassTypeTest
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			SynchronousMailTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), SynchronousMailTestRule.INSTANCE);
 
 	@Override
 	protected long addBaseModelWithClassType(
 			long containerModelId, long classTypeId)
 		throws Exception {
 
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), containerModelId, RandomTestUtil.randomString(),
-			classTypeId);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		DLAppTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.ADD);
+		DLAppTestUtil.populateServiceContext(serviceContext, classTypeId);
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), group.getGroupId(), containerModelId,
+			RandomTestUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
+			serviceContext);
 
 		return fileEntry.getFileEntryId();
 	}
@@ -65,10 +80,17 @@ public class DLSubscriptionClassTypeTest
 	@Override
 	protected long addClassType() throws Exception {
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
-			DLFileEntry.class.getName());
+			DLFileEntryMetadata.class.getName());
 
-		DLFileEntryType fileEntryType = DLAppTestUtil.addDLFileEntryType(
-			group.getGroupId(), ddmStructure.getStructureId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		DLFileEntryType fileEntryType =
+			DLFileEntryTypeLocalServiceUtil.addFileEntryType(
+				TestPropsValues.getUserId(), group.getGroupId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				new long[] {ddmStructure.getStructureId()}, serviceContext);
 
 		return fileEntryType.getFileEntryTypeId();
 	}
@@ -99,9 +121,22 @@ public class DLSubscriptionClassTypeTest
 	}
 
 	@Override
-	protected void updateBaseModel(long baseModelId) throws Exception {
-		DLAppTestUtil.updateFileEntryWithWorkflow(
-			group.getGroupId(), baseModelId, false, true);
+	protected void updateBaseModel(long userId, long baseModelId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), userId);
+
+		DLAppTestUtil.populateNotificationsServiceContext(
+			serviceContext, Constants.UPDATE);
+
+		DLAppLocalServiceUtil.updateFileEntry(
+			userId, baseModelId, RandomTestUtil.randomString(),
+			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK, false,
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
+			serviceContext);
 	}
 
 }

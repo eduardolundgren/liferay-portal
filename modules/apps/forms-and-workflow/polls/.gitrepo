@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = a9824c30cfd8335b6e8e94e691e1e88684b9aad9
+	mode = push
+	parent = db5e9f237a49f4ccf1926da67b20878d7ae892cc
+	remote = git@github.com:liferay/com-liferay-polls.git

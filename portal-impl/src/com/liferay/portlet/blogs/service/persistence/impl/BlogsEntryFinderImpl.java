@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.service.persistence.impl;
 
+import com.liferay.blogs.kernel.model.BlogsEntry;
+import com.liferay.blogs.kernel.service.persistence.BlogsEntryFinder;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -26,10 +28,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
-import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.model.impl.BlogsEntryImpl;
-import com.liferay.portlet.blogs.service.persistence.BlogsEntryFinder;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Timestamp;
@@ -41,9 +40,12 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.blogs.service.persistence.impl.BlogsEntryFinderImpl}
  */
+@Deprecated
 public class BlogsEntryFinderImpl
-	extends BasePersistenceImpl<BlogsEntry> implements BlogsEntryFinder {
+	extends BlogsEntryFinderBaseImpl implements BlogsEntryFinder {
 
 	public static final String COUNT_BY_ORGANIZATION_IDS =
 		BlogsEntryFinder.class.getName() + ".countByOrganizationIds";
@@ -51,18 +53,18 @@ public class BlogsEntryFinderImpl
 	public static final String FIND_BY_GROUP_IDS =
 		BlogsEntryFinder.class.getName() + ".findByGroupIds";
 
-	public static final String FIND_BY_ORGANIZATION_IDS =
-		BlogsEntryFinder.class.getName() + ".findByOrganizationIds";
-
 	public static final String FIND_BY_NO_ASSETS =
 		BlogsEntryFinder.class.getName() + ".findByNoAssets";
+
+	public static final String FIND_BY_ORGANIZATION_IDS =
+		BlogsEntryFinder.class.getName() + ".findByOrganizationIds";
 
 	@Override
 	public int countByOrganizationId(
 		long organizationId, Date displayDate,
 		QueryDefinition<BlogsEntry> queryDefinition) {
 
-		List<Long> organizationIds = new ArrayList<Long>();
+		List<Long> organizationIds = new ArrayList<>();
 
 		organizationIds.add(organizationId);
 
@@ -189,11 +191,34 @@ public class BlogsEntryFinderImpl
 	}
 
 	@Override
+	public List<BlogsEntry> findByNoAssets() {
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(FIND_BY_NO_ASSETS);
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			q.addEntity("BlogsEntry", BlogsEntryImpl.class);
+
+			return q.list(true);
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	@Override
 	public List<BlogsEntry> findByOrganizationId(
 		long organizationId, Date displayDate,
 		QueryDefinition<BlogsEntry> queryDefinition) {
 
-		List<Long> organizationIds = new ArrayList<Long>();
+		List<Long> organizationIds = new ArrayList<>();
 
 		organizationIds.add(organizationId);
 
@@ -253,29 +278,6 @@ public class BlogsEntryFinderImpl
 			return (List<BlogsEntry>)QueryUtil.list(
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	@Override
-	public List<BlogsEntry> findByNoAssets() {
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			String sql = CustomSQLUtil.get(FIND_BY_NO_ASSETS);
-
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
-
-			q.addEntity("BlogsEntry", BlogsEntryImpl.class);
-
-			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);

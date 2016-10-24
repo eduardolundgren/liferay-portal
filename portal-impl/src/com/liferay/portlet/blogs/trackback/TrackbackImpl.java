@@ -14,26 +14,30 @@
 
 package com.liferay.portlet.blogs.trackback;
 
+import com.liferay.blogs.kernel.model.BlogsEntry;
 import com.liferay.portal.kernel.comment.CommentManager;
+import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Function;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.Portal;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.blogs.linkback.LinkbackConsumer;
 import com.liferay.portlet.blogs.linkback.LinkbackConsumerUtil;
-import com.liferay.portlet.blogs.model.BlogsEntry;
-import com.liferay.portlet.blogs.util.BlogsUtil;
 
 /**
  * @author Alexander Chow
  * @author André de Oliveira
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.blogs.web.internal.Trackback}
  */
+@Deprecated
 public class TrackbackImpl implements Trackback {
 
 	@Override
@@ -51,31 +55,36 @@ public class TrackbackImpl implements Trackback {
 
 		String body = buildBody(themeDisplay, excerpt, url);
 
-		long commentId = _commentManager.addComment(
+		long commentId = CommentManagerUtil.addComment(
 			userId, groupId, className, classPK, blogName, title, body,
 			serviceContextFunction);
 
 		String entryURL = buildEntryURL(entry, themeDisplay);
 
-		_linkbackConsumer.addNewTrackback(commentId, url, entryURL);
+		LinkbackConsumerUtil.addNewTrackback(commentId, url, entryURL);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void setCommentManager(CommentManager commentManager) {
-		_commentManager = commentManager;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void setLinkbackConsumer(LinkbackConsumer linkbackConsumer) {
-		_linkbackConsumer = linkbackConsumer;
 	}
 
-	protected String buildBody(
+	protected String buildBBCodeBody(
 		ThemeDisplay themeDisplay, String excerpt, String url) {
 
 		url = StringUtil.replace(
-			url,
-			new String[] {StringPool.CLOSE_BRACKET, StringPool.OPEN_BRACKET},
+			url, new char[] {CharPool.CLOSE_BRACKET, CharPool.OPEN_BRACKET},
 			new String[] {"%5D", "%5B"});
 
 		StringBundler sb = new StringBundler(7);
@@ -91,6 +100,16 @@ public class TrackbackImpl implements Trackback {
 		return sb.toString();
 	}
 
+	protected String buildBody(
+		ThemeDisplay themeDisplay, String excerpt, String url) {
+
+		if (PropsValues.DISCUSSION_COMMENTS_FORMAT.equals("bbcode")) {
+			return buildBBCodeBody(themeDisplay, excerpt, url);
+		}
+
+		return buildHTMLBody(themeDisplay, excerpt, url);
+	}
+
 	protected String buildEntryURL(BlogsEntry entry, ThemeDisplay themeDisplay)
 		throws PortalException {
 
@@ -104,8 +123,20 @@ public class TrackbackImpl implements Trackback {
 		return sb.toString();
 	}
 
-	private CommentManager _commentManager = BlogsUtil.getCommentManager();
-	private LinkbackConsumer _linkbackConsumer =
-		LinkbackConsumerUtil.getLinkbackConsumer();
+	protected String buildHTMLBody(
+		ThemeDisplay themeDisplay, String excerpt, String url) {
+
+		StringBundler sb = new StringBundler(7);
+
+		sb.append("[...] ");
+		sb.append(excerpt);
+		sb.append(" [...] <a href=\"");
+		sb.append(url);
+		sb.append("\">");
+		sb.append(themeDisplay.translate("read-more"));
+		sb.append("</a>");
+
+		return sb.toString();
+	}
 
 }

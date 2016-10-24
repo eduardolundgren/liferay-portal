@@ -16,8 +16,8 @@ package com.liferay.portlet.blogs.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portlet.blogs.model.BlogsStatsUser;
-import com.liferay.portlet.blogs.service.BlogsStatsUserLocalServiceUtil;
+import com.liferay.blogs.kernel.model.BlogsStatsUser;
+import com.liferay.blogs.kernel.service.BlogsStatsUserLocalServiceUtil;
 
 /**
  * The extended model base implementation for the BlogsStatsUser service. Represents a row in the &quot;BlogsStatsUser&quot; database table, with each column mapped to a property of this class.
@@ -28,9 +28,12 @@ import com.liferay.portlet.blogs.service.BlogsStatsUserLocalServiceUtil;
  *
  * @author Brian Wing Shun Chan
  * @see BlogsStatsUserImpl
- * @see com.liferay.portlet.blogs.model.BlogsStatsUser
+ * @see BlogsStatsUser
+ * @deprecated As of 7.0.0, replaced by {@link
+            com.liferay.blogs.model.impl.BlogsStatsUserImpl}
  * @generated
  */
+@Deprecated
 @ProviderType
 public abstract class BlogsStatsUserBaseImpl extends BlogsStatsUserModelImpl
 	implements BlogsStatsUser {

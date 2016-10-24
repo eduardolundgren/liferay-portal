@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.blogs.service.persistence.impl;
 
+import com.liferay.blogs.kernel.model.BlogsStatsUser;
+import com.liferay.blogs.kernel.service.persistence.BlogsStatsUserFinder;
+import com.liferay.blogs.kernel.service.persistence.BlogsStatsUserUtil;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
@@ -24,11 +27,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
-import com.liferay.portlet.blogs.model.BlogsStatsUser;
 import com.liferay.portlet.blogs.model.impl.BlogsStatsUserImpl;
-import com.liferay.portlet.blogs.service.persistence.BlogsStatsUserFinder;
-import com.liferay.portlet.blogs.service.persistence.BlogsStatsUserUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.ArrayList;
@@ -38,10 +37,12 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.blogs.service.persistence.impl.BlogsStatsUserFinderImpl}
  */
+@Deprecated
 public class BlogsStatsUserFinderImpl
-	extends BasePersistenceImpl<BlogsStatsUser>
-	implements BlogsStatsUserFinder {
+	extends BlogsStatsUserFinderBaseImpl implements BlogsStatsUserFinder {
 
 	public static final String COUNT_BY_ORGANIZATION_IDS =
 		BlogsStatsUserFinder.class.getName() + ".countByOrganizationIds";
@@ -54,7 +55,7 @@ public class BlogsStatsUserFinderImpl
 
 	@Override
 	public int countByOrganizationId(long organizationId) {
-		List<Long> organizationIds = new ArrayList<Long>();
+		List<Long> organizationIds = new ArrayList<>();
 
 		organizationIds.add(organizationId);
 
@@ -129,7 +130,7 @@ public class BlogsStatsUserFinderImpl
 			qPos.add(groupId);
 			qPos.add(groupId);
 
-			List<BlogsStatsUser> statsUsers = new ArrayList<BlogsStatsUser>();
+			List<BlogsStatsUser> statsUsers = new ArrayList<>();
 
 			Iterator<Object[]> itr = (Iterator<Object[]>)QueryUtil.iterate(
 				q, getDialect(), start, end);
@@ -165,7 +166,7 @@ public class BlogsStatsUserFinderImpl
 		long organizationId, int start, int end,
 		OrderByComparator<BlogsStatsUser> obc) {
 
-		List<Long> organizationIds = new ArrayList<Long>();
+		List<Long> organizationIds = new ArrayList<>();
 
 		organizationIds.add(organizationId);
 

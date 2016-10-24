@@ -1,0 +1,9 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	cmdver = liferay
+	commit = a3973d77dd1d061c38d4377e89355762402f4cb5
+	mode = push
+	parent = 1f60f41a5b780a438194de01cb88de38c48dd97d
+	remote = git@github.com:liferay/com-liferay-bookmarks.git

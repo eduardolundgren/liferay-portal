@@ -14,12 +14,17 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLProcessorConstants;
+import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
+import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.document.library.kernel.util.VideoProcessor;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.fabric.InputResource;
 import com.liferay.portal.fabric.OutputResource;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -44,7 +49,6 @@ import com.liferay.portal.log.Log4jLogFactoryImpl;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.util.log4j.Log4JUtil;
 
 import java.awt.image.RenderedImage;
@@ -138,6 +142,11 @@ public class VideoProcessorImpl
 		throws Exception {
 
 		return doGetThumbnailFileSize(fileVersion, index);
+	}
+
+	@Override
+	public String getType() {
+		return DLProcessorConstants.VIDEO_PROCESSOR;
 	}
 
 	@Override
@@ -468,6 +477,9 @@ public class VideoProcessorImpl
 			}
 		}
 		catch (NoSuchFileEntryException nsfee) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfee, nsfee);
+			}
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
@@ -569,7 +581,11 @@ public class VideoProcessorImpl
 			return false;
 		}
 
-		return hasPreviews(fileVersion) && hasThumbnails(fileVersion);
+		if (hasPreviews(fileVersion) && hasThumbnails(fileVersion)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void _queueGeneration(
@@ -592,10 +608,11 @@ public class VideoProcessorImpl
 	private static final String[] _PREVIEW_TYPES =
 		PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_CONTAINERS;
 
-	private static Log _log = LogFactoryUtil.getLog(VideoProcessorImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		VideoProcessorImpl.class);
 
-	private List<Long> _fileVersionIds = new Vector<Long>();
-	private Set<String> _videoMimeTypes = SetUtil.fromArray(
+	private final List<Long> _fileVersionIds = new Vector<>();
+	private final Set<String> _videoMimeTypes = SetUtil.fromArray(
 		PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES);
 
 	private static class LiferayVideoProcessCallable
@@ -651,7 +668,7 @@ public class VideoProcessorImpl
 		private static final long serialVersionUID = 1L;
 
 		private Map<String, String> _customLogSettings;
-		private Properties _ffpresetProperties;
+		private final Properties _ffpresetProperties;
 
 		@InputResource
 		private File _inputFile;
@@ -662,8 +679,8 @@ public class VideoProcessorImpl
 		private File _outputFile;
 
 		private String _serverId;
-		private String _videoContainer;
-		private Properties _videoProperties;
+		private final String _videoContainer;
+		private final Properties _videoProperties;
 
 	}
 
@@ -696,6 +713,7 @@ public class VideoProcessorImpl
 			ClassLoader classLoader = clazz.getClassLoader();
 
 			Properties systemProperties = System.getProperties();
+
 			SystemEnv.setProperties(systemProperties);
 
 			Log4JUtil.initLog4J(
@@ -720,8 +738,8 @@ public class VideoProcessorImpl
 		private static final long serialVersionUID = 1L;
 
 		private Map<String, String> _customLogSettings;
-		private String _extension;
-		private int _height;
+		private final String _extension;
+		private final int _height;
 
 		@InputResource
 		private File _inputFile;
@@ -731,9 +749,9 @@ public class VideoProcessorImpl
 		@OutputResource
 		private File _outputFile;
 
-		private int _percentage;
+		private final int _percentage;
 		private String _serverId;
-		private int _width;
+		private final int _width;
 
 	}
 

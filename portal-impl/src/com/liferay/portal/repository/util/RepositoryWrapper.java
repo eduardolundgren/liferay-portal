@@ -15,18 +15,20 @@
 package com.liferay.portal.repository.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.model.Lock;
-import com.liferay.portal.service.ServiceContext;
 
 import java.io.File;
 import java.io.InputStream;
@@ -106,6 +108,16 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	@Override
+	public FileShortcut addFileShortcut(
+			long userId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return _repository.addFileShortcut(
+			userId, folderId, toFileEntryId, serviceContext);
+	}
+
+	@Override
 	public Folder addFolder(
 			long userId, long parentFolderId, String name, String description,
 			ServiceContext serviceContext)
@@ -144,24 +156,24 @@ public class RepositoryWrapper implements Repository {
 	@Deprecated
 	@Override
 	public void checkInFileEntry(
-			long fileEntryId, boolean major, String changeLog,
+			long fileEntryId, boolean majorVersion, String changeLog,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		_repository.checkInFileEntry(
 			com.liferay.portal.kernel.repository.util.RepositoryUserUtil.
 				getUserId(),
-			fileEntryId, major, changeLog, serviceContext);
+			fileEntryId, majorVersion, changeLog, serviceContext);
 	}
 
 	@Override
 	public void checkInFileEntry(
-			long userId, long fileEntryId, boolean major, String changeLog,
-			ServiceContext serviceContext)
+			long userId, long fileEntryId, boolean majorVersion,
+			String changeLog, ServiceContext serviceContext)
 		throws PortalException {
 
 		_repository.checkInFileEntry(
-			userId, fileEntryId, major, changeLog, serviceContext);
+			userId, fileEntryId, majorVersion, changeLog, serviceContext);
 	}
 
 	@Override
@@ -172,17 +184,6 @@ public class RepositoryWrapper implements Repository {
 
 		_repository.checkInFileEntry(
 			userId, fileEntryId, lockUuid, serviceContext);
-	}
-
-	@Deprecated
-	@Override
-	public void checkInFileEntry(long fileEntryId, String lockUuid)
-		throws PortalException {
-
-		_repository.checkInFileEntry(
-			com.liferay.portal.kernel.repository.util.RepositoryUserUtil.
-				getUserId(),
-			fileEntryId, lockUuid, new ServiceContext());
 	}
 
 	/**
@@ -264,6 +265,16 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	@Override
+	public void deleteFileShortcut(long fileShortcutId) throws PortalException {
+		_repository.deleteFileShortcut(fileShortcutId);
+	}
+
+	@Override
+	public void deleteFileShortcuts(long toFileEntryId) throws PortalException {
+		_repository.deleteFileShortcuts(toFileEntryId);
+	}
+
+	@Override
 	public void deleteFileVersion(long fileEntryId, String version)
 		throws PortalException {
 
@@ -285,6 +296,15 @@ public class RepositoryWrapper implements Repository {
 	@Override
 	public <T extends Capability> T getCapability(Class<T> capabilityClass) {
 		return _repository.getCapability(capabilityClass);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+			long folderId, int status, int start, int end,
+			OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return _repository.getFileEntries(folderId, status, start, end, obc);
 	}
 
 	@Override
@@ -315,7 +335,7 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFileEntriesAndFileShortcuts(
 			long folderId, int status, int start, int end)
 		throws PortalException {
 
@@ -343,6 +363,13 @@ public class RepositoryWrapper implements Repository {
 	@Override
 	public int getFileEntriesCount(long folderId) throws PortalException {
 		return _repository.getFileEntriesCount(folderId);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId, int status)
+		throws PortalException {
+
+		return _repository.getFileEntriesCount(folderId, status);
 	}
 
 	@Override
@@ -374,6 +401,13 @@ public class RepositoryWrapper implements Repository {
 	@Override
 	public FileEntry getFileEntryByUuid(String uuid) throws PortalException {
 		return _repository.getFileEntryByUuid(uuid);
+	}
+
+	@Override
+	public FileShortcut getFileShortcut(long fileShortcutId)
+		throws PortalException {
+
+		return _repository.getFileShortcut(fileShortcutId);
 	}
 
 	@Override
@@ -416,7 +450,7 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, boolean includeMountFolders, int start,
 			int end, OrderByComparator<?> obc)
 		throws PortalException {
@@ -426,7 +460,7 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, String[] mimetypes,
 			boolean includeMountFolders, int start, int end,
 			OrderByComparator<?> obc)
@@ -554,21 +588,6 @@ public class RepositoryWrapper implements Repository {
 		Class<T> capabilityClass) {
 
 		return _repository.isCapabilityProvided(capabilityClass);
-	}
-
-	@Deprecated
-	@Override
-	public Lock lockFileEntry(long fileEntryId) throws PortalException {
-		return _repository.lockFileEntry(fileEntryId);
-	}
-
-	@Deprecated
-	@Override
-	public Lock lockFileEntry(
-			long fileEntryId, String owner, long expirationTime)
-		throws PortalException {
-
-		return _repository.lockFileEntry(fileEntryId, owner, expirationTime);
 	}
 
 	@Override
@@ -790,6 +809,24 @@ public class RepositoryWrapper implements Repository {
 				getUserId(),
 			fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
+	}
+
+	@Override
+	public FileShortcut updateFileShortcut(
+			long userId, long fileShortcutId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return _repository.updateFileShortcut(
+			userId, fileShortcutId, folderId, toFileEntryId, serviceContext);
+	}
+
+	@Override
+	public void updateFileShortcuts(
+			long oldToFileEntryId, long newToFileEntryId)
+		throws PortalException {
+
+		_repository.updateFileShortcuts(oldToFileEntryId, newToFileEntryId);
 	}
 
 	@Override

@@ -143,6 +143,7 @@ public class FileServerTest {
 		FileTime destFileTime = Files.getLastModifiedTime(_destFile);
 
 		Assert.assertEquals(sourceFileTime.toMillis(), destFileTime.toMillis());
+
 		Assert.assertArrayEquals(data, Files.readAllBytes(_destFile));
 	}
 
@@ -282,7 +283,7 @@ public class FileServerTest {
 	private static final long _TIME_OUT = 10;
 
 	private final AsyncBroker<Path, FileResponse> _asyncBroker =
-		new AsyncBroker<Path, FileResponse>();
+		new AsyncBroker<>();
 	private Channel _clientChannel;
 	private Path _destFile;
 	private final EventExecutorGroup _fileServerEventExecutorGroup =

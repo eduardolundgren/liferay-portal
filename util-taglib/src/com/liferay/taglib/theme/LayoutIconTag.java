@@ -14,7 +14,7 @@
 
 package com.liferay.taglib.theme;
 
-import com.liferay.portal.model.Layout;
+import com.liferay.portal.kernel.model.Layout;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -24,7 +24,9 @@ import javax.servlet.jsp.tagext.BodyTag;
 
 /**
  * @author Brian Wing Shun Chan
+ * @deprecated As of 7.0.0, with no direct replacement
  */
+@Deprecated
 public class LayoutIconTag
 	extends com.liferay.taglib.util.IncludeTag implements BodyTag {
 

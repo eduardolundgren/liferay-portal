@@ -14,18 +14,19 @@
 
 package com.liferay.portal.service;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Resource;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Resource;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.model.impl.ResourceImpl;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +50,7 @@ public class ResourcePermissionLocalServiceTest {
 		@ClassRule
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
-			new AggregateTestRule(
-				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+			new LiferayIntegrationTestRule();
 
 		@Before
 		public void setUp() throws Exception {
@@ -61,7 +61,7 @@ public class ResourcePermissionLocalServiceTest {
 		public void shouldFailIfFirstResourceIsNotIndividual()
 			throws Exception {
 
-			List<Resource> resources = new ArrayList<Resource>();
+			List<Resource> resources = new ArrayList<>();
 
 			Resource firstResource = new ResourceImpl();
 
@@ -95,7 +95,7 @@ public class ResourcePermissionLocalServiceTest {
 
 		@Test
 		public void shouldFailIfLastResourceIsNotCompany() throws Exception {
-			List<Resource> resources = new ArrayList<Resource>();
+			List<Resource> resources = new ArrayList<>();
 
 			Resource firstResource = new ResourceImpl();
 
@@ -129,7 +129,7 @@ public class ResourcePermissionLocalServiceTest {
 
 		@Test
 		public void shouldFailIfResourcesIsLessThanTwo() throws Exception {
-			List<Resource> resources = new ArrayList<Resource>();
+			List<Resource> resources = new ArrayList<>();
 
 			resources.add(new ResourceImpl());
 

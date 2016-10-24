@@ -14,10 +14,11 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.portal.model.Group;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicy;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.security.membershippolicy.samples.TestSiteMembershipPolicy;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RoleTestUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
@@ -66,7 +67,7 @@ public abstract class BaseSiteMembershipPolicyTestCase
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("service.ranking", 1);
 
