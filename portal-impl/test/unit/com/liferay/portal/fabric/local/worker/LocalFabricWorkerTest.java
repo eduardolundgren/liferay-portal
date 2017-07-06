@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.concurrent.ExecutionException;
 
@@ -41,9 +41,9 @@ public class LocalFabricWorkerTest {
 	@Test
 	public void testConstructor() {
 		NoticeableFuture<String> noticeableFuture =
-			new DefaultNoticeableFuture<String>();
+			new DefaultNoticeableFuture<>();
 
-		FabricWorker<String> fabricWorker = new LocalFabricWorker<String>(
+		FabricWorker<String> fabricWorker = new LocalFabricWorker<>(
 			new EmbeddedProcessChannel<String>(noticeableFuture));
 
 		Assert.assertSame(
@@ -57,11 +57,10 @@ public class LocalFabricWorkerTest {
 	@Test
 	public void testWrite() throws Exception {
 		NoticeableFuture<String> noticeableFuture =
-			new DefaultNoticeableFuture<String>();
+			new DefaultNoticeableFuture<>();
 
-		LocalFabricWorker<String> localFabricWorker =
-			new LocalFabricWorker<String>(
-				new EmbeddedProcessChannel<String>(noticeableFuture));
+		LocalFabricWorker<String> localFabricWorker = new LocalFabricWorker<>(
+			new EmbeddedProcessChannel<String>(noticeableFuture));
 
 		final String result = "Test result";
 
@@ -85,12 +84,12 @@ public class LocalFabricWorkerTest {
 			localFabricWorker.write(
 				new ProcessCallable<String>() {
 
-				@Override
-				public String call() throws ProcessException {
-					throw processException;
-				}
+					@Override
+					public String call() throws ProcessException {
+						throw processException;
+					}
 
-			});
+				});
 
 		try {
 			exceptionNoticeableFuture.get();

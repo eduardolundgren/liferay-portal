@@ -20,7 +20,7 @@
 String facebookDisplayStyle = "button_count";
 
 if (displayStyle.equals("simple")) {
-	facebookDisplayStyle = "standard";
+	facebookDisplayStyle = "button";
 }
 else if (displayStyle.equals("vertical")) {
 	facebookDisplayStyle = "box_count";
@@ -28,11 +28,25 @@ else if (displayStyle.equals("vertical")) {
 %>
 
 <liferay-util:html-bottom outputKey="taglib_ui_social_bookmark_facebook">
-	<script src="<%= HttpUtil.getProtocol(request) %>://connect.facebook.net/<%= locale.getLanguage() %>_<%= locale.getCountry() %>/all.js#xfbml=1"></script>
+	<script data-senna-track="temporary" type="text/javascript">
+		if (window.FB) {
+			delete window.FB;
+		}
+
+		window.fbAsyncInit = function() {
+			FB.init(
+				{
+					version: 'v2.8',
+					xfbml: true
+				}
+			);
+		}
+	</script>
+
+	<script async data-senna-track="temporary" src="<%= HttpUtil.getProtocol(request) %>://connect.facebook.net/<%= locale.getLanguage() %>_<%= locale.getCountry() %>/sdk.js" type="text/javascript"></script>
 </liferay-util:html-bottom>
 
 <div id="fb-root"></div>
-
 <div class="fb-like"
 	data-font=""
 	data-height="<%= (facebookDisplayStyle.equals("standard") || facebookDisplayStyle.equals("button_count")) ? 20 : StringPool.BLANK %>"

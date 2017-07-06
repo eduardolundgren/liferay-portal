@@ -21,18 +21,23 @@
 	%>
 
 	<c:if test="<%= !themeDisplay.isSignedIn() || Validator.isNull(autoRememberMe) %>">
+
+		<%
+		boolean autoExtend = !themeDisplay.isSignedIn() || PropsValues.SESSION_TIMEOUT_AUTO_EXTEND;
+		%>
+
 		<aui:script use="liferay-session">
 			Liferay.Session = new Liferay.SessionBase(
 				{
-					autoExtend: <%= !themeDisplay.isSignedIn() || PropsValues.SESSION_TIMEOUT_AUTO_EXTEND %>,
-					sessionLength: <%= PropsValues.SESSION_TIMEOUT %>,
+					autoExtend: <%= autoExtend %>,
 					redirectOnExpire: <%= SSOUtil.isSessionRedirectOnExpire(themeDisplay.getCompanyId()) %>,
 					redirectUrl: '<%= HtmlUtil.escapeJS(SSOUtil.getSessionExpirationRedirectURL(themeDisplay.getCompanyId(), themeDisplay.getURLHome())) %>',
-					warningLength: <%= PropsValues.SESSION_TIMEOUT_WARNING %>
+					sessionLength: <%= autoExtend ? PropsValues.SESSION_TIMEOUT * 60 - PropsValues.SESSION_TIMEOUT_AUTO_EXTEND_OFFSET : PropsValues.SESSION_TIMEOUT * 60 %>,
+					warningLength: <%= autoExtend ? 0 : PropsValues.SESSION_TIMEOUT_WARNING * 60 %>
 				}
 			);
 
-			<c:if test="<%= themeDisplay.isSignedIn() && PropsValues.SESSION_TIMEOUT_WARNING > 0 %>">
+			<c:if test="<%= themeDisplay.isSignedIn() && (PropsValues.SESSION_TIMEOUT_WARNING > 0) %>">
 				Liferay.Session.plug(Liferay.SessionDisplay);
 			</c:if>
 		</aui:script>

@@ -14,9 +14,11 @@
 
 package com.liferay.portal.dao.jdbc.aop;
 
+import com.liferay.portal.kernel.dao.jdbc.aop.DynamicDataSourceTargetSource;
 import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.dao.jdbc.aop.Operation;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -56,7 +58,8 @@ public class DynamicDataSourceAdviceTest {
 	public void setUp() {
 		_dynamicDataSourceAdvice = new DynamicDataSourceAdvice();
 
-		_dynamicDataSourceTargetSource = new DynamicDataSourceTargetSource();
+		_dynamicDataSourceTargetSource =
+			new DefaultDynamicDataSourceTargetSource();
 
 		ClassLoader classLoader =
 			DynamicDataSourceAdviceTest.class.getClassLoader();
@@ -102,7 +105,9 @@ public class DynamicDataSourceAdviceTest {
 			registeredAnnotationChainableMethodAdvices.get(
 				MasterDataSource.class);
 
-		Assert.assertEquals(1, annotationChainableMethodAdvices.length);
+		Assert.assertEquals(
+			Arrays.toString(annotationChainableMethodAdvices), 1,
+			annotationChainableMethodAdvices.length);
 		Assert.assertNull(annotationChainableMethodAdvices[0]);
 		Assert.assertSame(
 			annotationChainableMethodAdvices,
@@ -143,8 +148,7 @@ public class DynamicDataSourceAdviceTest {
 		Method method = TestClass.class.getMethod(methodName);
 
 		ServiceBeanMethodInvocation serviceBeanMethodInvocation =
-			new ServiceBeanMethodInvocation(
-				testClass, TestClass.class, method, new Object[0]);
+			new ServiceBeanMethodInvocation(testClass, method, new Object[0]);
 
 		MasterDataSource masterDataSource = method.getAnnotation(
 			MasterDataSource.class);

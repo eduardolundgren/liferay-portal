@@ -14,19 +14,20 @@
 
 package com.liferay.portlet.ratings.service;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.UserTestUtil;
-import com.liferay.portlet.ratings.model.RatingsStats;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.ratings.kernel.model.RatingsStats;
+import com.liferay.ratings.kernel.service.RatingsEntryLocalServiceUtil;
+import com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,8 +43,7 @@ public class RatingsStatsLocalServiceTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -105,6 +105,29 @@ public class RatingsStatsLocalServiceTest {
 			className, classPK);
 
 		Assert.assertEquals(1.6 / 3, ratingsStats.getAverageScore(), 0.001);
+	}
+
+	@Test
+	public void testRatingsStatsDeletedWhenNoRatingsEntries() throws Exception {
+		String className = StringUtil.randomString();
+		long classPK = RandomTestUtil.randomLong();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		RatingsEntryLocalServiceUtil.updateEntry(
+			_user1.getUserId(), className, classPK, 1, serviceContext);
+
+		RatingsStats ratingsStats = RatingsStatsLocalServiceUtil.getStats(
+			className, classPK);
+
+		RatingsEntryLocalServiceUtil.deleteEntry(
+			_user1.getUserId(), className, classPK);
+
+		ratingsStats = RatingsStatsLocalServiceUtil.fetchStats(
+			className, classPK);
+
+		Assert.assertNull(ratingsStats);
 	}
 
 	@Test

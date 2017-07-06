@@ -14,9 +14,13 @@
 
 package com.liferay.portal.webserver;
 
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -24,10 +28,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webdav.methods.Method;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.webserver.test.BaseWebServerTestCase;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,8 +53,7 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testBasic() throws Exception {
@@ -88,7 +91,9 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 
 		String[] responseBodies = StringUtil.split(responseBody, boundary);
 
-		Assert.assertEquals(ranges.length + 2, responseBodies.length);
+		Assert.assertEquals(
+			Arrays.toString(responseBodies), ranges.length + 2,
+			responseBodies.length);
 		Assert.assertEquals(StringPool.DOUBLE_DASH, responseBodies[0]);
 		Assert.assertEquals(
 			StringPool.DOUBLE_DASH, responseBodies[ranges.length + 1]);
@@ -103,6 +108,7 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 			Assert.assertTrue(Validator.isNull(lines[2]));
 
 			String[] rangePair = StringUtil.split(ranges[i], StringPool.DASH);
+
 			int start = GetterUtil.getInteger(rangePair[0]);
 			int end = GetterUtil.getInteger(rangePair[1]);
 
@@ -110,6 +116,7 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 				_SAMPLE_DATA.getBytes(), start, end + 1);
 
 			Assert.assertArrayEquals(bytes, lines[3].getBytes("UTF-8"));
+
 			Assert.assertEquals(StringPool.DOUBLE_DASH, lines[4]);
 		}
 	}
@@ -175,15 +182,20 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 
 		String fileName = "Test Range.txt";
 
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), parentFolder.getFolderId(), fileName, fileName,
-			_SAMPLE_DATA.getBytes());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), group.getGroupId(),
+			parentFolder.getFolderId(), fileName, ContentTypes.TEXT_PLAIN,
+			_SAMPLE_DATA.getBytes(), serviceContext);
 
 		String path =
 			fileEntry.getGroupId() + "/" + fileEntry.getFolderId() + "/" +
 				fileEntry.getTitle();
 
-		Map<String, String> headers = new HashMap<String, String>();
+		Map<String, String> headers = new HashMap<>();
 
 		if (Validator.isNotNull(rangeHeader)) {
 			headers.put(HttpHeaders.RANGE, rangeHeader);

@@ -15,30 +15,32 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.model.ResourceAction;
+import com.liferay.portal.kernel.model.ResourceBlock;
+import com.liferay.portal.kernel.model.ResourceBlockPermission;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourceBlockLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourceBlockPermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.RoleFinderUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ResourceBlockPermissionTestUtil;
+import com.liferay.portal.kernel.test.util.ResourceBlockTestUtil;
+import com.liferay.portal.kernel.test.util.ResourcePermissionTestUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.ResourceAction;
-import com.liferay.portal.model.ResourceBlock;
-import com.liferay.portal.model.ResourceBlockPermission;
-import com.liferay.portal.model.ResourcePermission;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.service.ResourceActionLocalServiceUtil;
-import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
-import com.liferay.portal.service.ResourceBlockPermissionLocalServiceUtil;
-import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ResourceBlockPermissionTestUtil;
-import com.liferay.portal.util.test.ResourceBlockTestUtil;
-import com.liferay.portal.util.test.ResourcePermissionTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.TransactionalTestRule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -56,8 +58,7 @@ public class RoleFinderTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			TransactionalTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), TransactionalTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -98,7 +99,48 @@ public class RoleFinderTest {
 	}
 
 	@Test
+	public void testFindByC_N_S_P() throws Exception {
+		long companyId = _resourcePermission.getCompanyId();
+		String name = _resourcePermission.getName();
+		int scope = _resourcePermission.getScope();
+		String primKey = _resourcePermission.getPrimKey();
+
+		Map<String, List<String>> actionIdsLists = new HashMap<>();
+
+		List<ResourcePermission> resourcePermissions =
+			ResourcePermissionLocalServiceUtil.getResourcePermissions(
+				companyId, name, scope, primKey);
+
+		List<ResourceAction> resourceActions =
+			ResourceActionLocalServiceUtil.getResourceActions(name);
+
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			long roleId = resourcePermission.getRoleId();
+
+			Role role = RoleLocalServiceUtil.getRole(roleId);
+
+			long actionIds = resourcePermission.getActionIds();
+
+			List<String> actionIdsList = new ArrayList<>();
+
+			for (ResourceAction resourceAction : resourceActions) {
+				if ((resourceAction.getBitwiseValue() & actionIds) != 0) {
+					actionIdsList.add(resourceAction.getActionId());
+				}
+			}
+
+			actionIdsLists.put(role.getName(), actionIdsList);
+		}
+
+		Assert.assertEquals(
+			actionIdsLists,
+			RoleFinderUtil.findByC_N_S_P(companyId, name, scope, primKey));
+	}
+
+	@Test
 	public void testFindByC_N_S_P_A() throws Exception {
+		boolean exists = false;
+
 		List<Role> roles = RoleFinderUtil.findByC_N_S_P_A(
 			_resourcePermission.getCompanyId(), _resourcePermission.getName(),
 			_resourcePermission.getScope(), _resourcePermission.getPrimKey(),
@@ -106,30 +148,38 @@ public class RoleFinderTest {
 
 		for (Role role : roles) {
 			if (role.getRoleId() == _arbitraryRole.getRoleId()) {
-				return;
+				exists = true;
+
+				break;
 			}
 		}
 
-		Assert.fail(
+		Assert.assertTrue(
 			"The method findByC_N_S_P_A should have returned the role " +
-				_arbitraryRole.getRoleId());
+				_arbitraryRole.getRoleId(),
+			exists);
 	}
 
 	@Test
 	public void testFindByR_N_A() throws Exception {
+		boolean exists = false;
+
 		List<Role> roles = RoleFinderUtil.findByR_N_A(
 			_resourceBlock.getResourceBlockId(), _resourceBlock.getName(),
 			_modelResourceAction.getActionId());
 
 		for (Role role : roles) {
 			if (role.getRoleId() == _arbitraryRole.getRoleId()) {
-				return;
+				exists = true;
+
+				break;
 			}
 		}
 
-		Assert.fail(
+		Assert.assertTrue(
 			"The method findByR_N_A should have returned the role " +
-				_arbitraryRole.getRoleId());
+				_arbitraryRole.getRoleId(),
+			exists);
 	}
 
 	protected static ResourceAction getModelResourceAction()
@@ -137,7 +187,7 @@ public class RoleFinderTest {
 
 		String name = RandomTestUtil.randomString() + "Model";
 
-		List<String> actionIds = new ArrayList<String>();
+		List<String> actionIds = new ArrayList<>();
 
 		actionIds.add(ActionKeys.UPDATE);
 		actionIds.add(ActionKeys.VIEW);

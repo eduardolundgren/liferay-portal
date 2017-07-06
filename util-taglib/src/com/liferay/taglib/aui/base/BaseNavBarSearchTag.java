@@ -37,12 +37,12 @@ public abstract class BaseNavBarSearchTag extends com.liferay.taglib.util.Includ
 		return _cssClass;
 	}
 
-	public java.lang.String getId() {
-		return _id;
-	}
-
 	public java.lang.String getFile() {
 		return _file;
+	}
+
+	public java.lang.String getId() {
+		return _id;
 	}
 
 	public com.liferay.portal.kernel.dao.search.SearchContainer<?> getSearchContainer() {
@@ -51,33 +51,27 @@ public abstract class BaseNavBarSearchTag extends com.liferay.taglib.util.Includ
 
 	public void setCssClass(java.lang.String cssClass) {
 		_cssClass = cssClass;
-
-		setScopedAttribute("cssClass", cssClass);
-	}
-
-	public void setId(java.lang.String id) {
-		_id = id;
-
-		setScopedAttribute("id", id);
 	}
 
 	public void setFile(java.lang.String file) {
 		_file = file;
+	}
 
-		setScopedAttribute("file", file);
+	public void setId(java.lang.String id) {
+		_id = id;
 	}
 
 	public void setSearchContainer(com.liferay.portal.kernel.dao.search.SearchContainer<?> searchContainer) {
 		_searchContainer = searchContainer;
-
-		setScopedAttribute("searchContainer", searchContainer);
 	}
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_cssClass = null;
-		_id = null;
 		_file = null;
+		_id = null;
 		_searchContainer = null;
 	}
 
@@ -93,10 +87,10 @@ public abstract class BaseNavBarSearchTag extends com.liferay.taglib.util.Includ
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		setNamespacedAttribute(request, "cssClass", _cssClass);
-		setNamespacedAttribute(request, "id", _id);
-		setNamespacedAttribute(request, "file", _file);
-		setNamespacedAttribute(request, "searchContainer", _searchContainer);
+		request.setAttribute("aui:nav-bar-search:cssClass", _cssClass);
+		request.setAttribute("aui:nav-bar-search:file", _file);
+		request.setAttribute("aui:nav-bar-search:id", _id);
+		request.setAttribute("aui:nav-bar-search:searchContainer", _searchContainer);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:nav-bar-search:";
@@ -108,8 +102,8 @@ public abstract class BaseNavBarSearchTag extends com.liferay.taglib.util.Includ
 		"/html/taglib/aui/nav_bar_search/start.jsp";
 
 	private java.lang.String _cssClass = null;
-	private java.lang.String _id = null;
 	private java.lang.String _file = null;
+	private java.lang.String _id = null;
 	private com.liferay.portal.kernel.dao.search.SearchContainer<?> _searchContainer = null;
 
 }

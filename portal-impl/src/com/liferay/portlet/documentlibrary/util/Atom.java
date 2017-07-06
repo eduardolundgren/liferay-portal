@@ -51,9 +51,8 @@ public class Atom {
 
 	public static final String STCO = "stco";
 
-	public static final String[] TOP_LEVEL_ATOMS = {
-		FREE, FTYP, JUNK, MDAT, MOOV, PICT, PNOT, SKIP, Atom.WIDE
-	};
+	public static final String[] TOP_LEVEL_ATOMS =
+		{FREE, FTYP, JUNK, MDAT, MOOV, PICT, PNOT, SKIP, Atom.WIDE};
 
 	public static final String WIDE = "wide";
 
@@ -154,7 +153,7 @@ public class Atom {
 		long value = 0;
 
 		for (int i = 0; i < buffer.length; i++) {
-			value += ((buffer[i] & _BITMASK) << 8 * (buffer.length - i - 1));
+			value += (buffer[i] & _BITMASK) << 8 * (buffer.length - i - 1);
 		}
 
 		return value;

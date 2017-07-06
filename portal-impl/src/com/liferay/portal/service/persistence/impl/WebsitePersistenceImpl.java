@@ -16,38 +16,48 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.NoSuchWebsiteException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
+import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.NoSuchWebsiteException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Website;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.WebsitePersistence;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.Website;
 import com.liferay.portal.model.impl.WebsiteImpl;
 import com.liferay.portal.model.impl.WebsiteModelImpl;
-import com.liferay.portal.service.persistence.WebsitePersistence;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -59,7 +69,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see WebsitePersistence
- * @see WebsiteUtil
+ * @see com.liferay.portal.kernel.service.persistence.WebsiteUtil
  * @generated
  */
 @ProviderType
@@ -119,7 +129,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -136,7 +146,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -148,6 +158,26 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public List<Website> findByUuid(String uuid, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+		return findByUuid(uuid, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where uuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByUuid(String uuid, int start, int end,
+		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -163,15 +193,19 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			finderArgs = new Object[] { uuid, start, end, orderByComparator };
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if (!Validator.equals(uuid, website.getUuid())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if (!Objects.equals(uuid, website.getUuid())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -181,7 +215,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -242,10 +276,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -263,7 +297,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByUuid_First(String uuid,
@@ -312,7 +346,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByUuid_Last(String uuid,
@@ -369,7 +403,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByUuid_PrevAndNext(long websiteId, String uuid,
@@ -408,8 +442,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -546,8 +581,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		Object[] finderArgs = new Object[] { uuid };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -585,10 +619,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -642,7 +676,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -661,7 +695,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -674,6 +708,28 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public List<Website> findByUuid_C(String uuid, long companyId, int start,
 		int end, OrderByComparator<Website> orderByComparator) {
+		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -693,16 +749,20 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				};
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if (!Validator.equals(uuid, website.getUuid()) ||
-						(companyId != website.getCompanyId())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if (!Objects.equals(uuid, website.getUuid()) ||
+							(companyId != website.getCompanyId())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -712,7 +772,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -777,10 +837,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -799,7 +859,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByUuid_C_First(String uuid, long companyId,
@@ -854,7 +914,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByUuid_C_Last(String uuid, long companyId,
@@ -916,7 +976,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByUuid_C_PrevAndNext(long websiteId, String uuid,
@@ -955,11 +1015,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_WEBSITE_WHERE);
@@ -1099,8 +1160,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		Object[] finderArgs = new Object[] { uuid, companyId };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -1142,10 +1202,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1199,7 +1259,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1216,7 +1276,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1228,6 +1288,26 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public List<Website> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+		return findByCompanyId(companyId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByCompanyId(long companyId, int start, int end,
+		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1243,15 +1323,19 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			finderArgs = new Object[] { companyId, start, end, orderByComparator };
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if ((companyId != website.getCompanyId())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if ((companyId != website.getCompanyId())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -1261,7 +1345,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1308,10 +1392,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1329,7 +1413,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByCompanyId_First(long companyId,
@@ -1378,7 +1462,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByCompanyId_Last(long companyId,
@@ -1435,7 +1519,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByCompanyId_PrevAndNext(long websiteId,
@@ -1474,8 +1558,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1598,8 +1683,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		Object[] finderArgs = new Object[] { companyId };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1623,10 +1707,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1675,7 +1759,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -1692,7 +1776,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -1704,6 +1788,26 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public List<Website> findByUserId(long userId, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+		return findByUserId(userId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where userId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param userId the user ID
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByUserId(long userId, int start, int end,
+		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1719,15 +1823,19 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			finderArgs = new Object[] { userId, start, end, orderByComparator };
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if ((userId != website.getUserId())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if ((userId != website.getUserId())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -1737,7 +1845,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1784,10 +1892,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -1805,7 +1913,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByUserId_First(long userId,
@@ -1854,7 +1962,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByUserId_Last(long userId,
@@ -1911,7 +2019,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param userId the user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByUserId_PrevAndNext(long websiteId, long userId,
@@ -1950,8 +2058,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2074,8 +2183,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		Object[] finderArgs = new Object[] { userId };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -2099,10 +2207,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2153,7 +2261,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where companyId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2172,7 +2280,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where companyId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2185,6 +2293,29 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public List<Website> findByC_C(long companyId, long classNameId, int start,
 		int end, OrderByComparator<Website> orderByComparator) {
+		return findByC_C(companyId, classNameId, start, end, orderByComparator,
+			true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where companyId = &#63; and classNameId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByC_C(long companyId, long classNameId, int start,
+		int end, OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -2204,16 +2335,20 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				};
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if ((companyId != website.getCompanyId()) ||
-						(classNameId != website.getClassNameId())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if ((companyId != website.getCompanyId()) ||
+							(classNameId != website.getClassNameId())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -2223,7 +2358,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2274,10 +2409,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2296,7 +2431,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByC_C_First(long companyId, long classNameId,
@@ -2352,7 +2487,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByC_C_Last(long companyId, long classNameId,
@@ -2415,7 +2550,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByC_C_PrevAndNext(long websiteId, long companyId,
@@ -2454,11 +2589,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_WEBSITE_WHERE);
@@ -2584,8 +2720,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		Object[] finderArgs = new Object[] { companyId, classNameId };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2613,10 +2748,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2661,7 +2796,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching websites
 	 */
 	@Override
@@ -2675,12 +2810,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of websites
 	 * @param end the upper bound of the range of websites (not inclusive)
 	 * @return the range of matching websites
@@ -2695,12 +2830,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of websites
 	 * @param end the upper bound of the range of websites (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2710,6 +2845,30 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public List<Website> findByC_C_C(long companyId, long classNameId,
 		long classPK, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+		return findByC_C_C(companyId, classNameId, classPK, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where companyId = &#63; and classNameId = &#63; and classPK = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByC_C_C(long companyId, long classNameId,
+		long classPK, int start, int end,
+		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -2729,17 +2888,21 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				};
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if ((companyId != website.getCompanyId()) ||
-						(classNameId != website.getClassNameId()) ||
-						(classPK != website.getClassPK())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if ((companyId != website.getCompanyId()) ||
+							(classNameId != website.getClassNameId()) ||
+							(classPK != website.getClassPK())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -2749,7 +2912,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -2804,10 +2967,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -2824,10 +2987,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByC_C_C_First(long companyId, long classNameId,
@@ -2863,7 +3026,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
@@ -2885,10 +3048,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByC_C_C_Last(long companyId, long classNameId,
@@ -2924,7 +3087,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
@@ -2953,10 +3116,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param websiteId the primary key of the current website
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByC_C_C_PrevAndNext(long websiteId, long companyId,
@@ -2997,10 +3160,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_WEBSITE_WHERE);
@@ -3108,7 +3272,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 */
 	@Override
 	public void removeByC_C_C(long companyId, long classNameId, long classPK) {
@@ -3123,7 +3287,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching websites
 	 */
 	@Override
@@ -3132,8 +3296,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		Object[] finderArgs = new Object[] { companyId, classNameId, classPK };
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -3165,10 +3328,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -3219,7 +3382,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @return the matching websites
 	 */
@@ -3234,12 +3397,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites where companyId = &#63; and classNameId = &#63; and classPK = &#63; and primary = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param start the lower bound of the range of websites
 	 * @param end the upper bound of the range of websites (not inclusive)
@@ -3256,12 +3419,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites where companyId = &#63; and classNameId = &#63; and classPK = &#63; and primary = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param start the lower bound of the range of websites
 	 * @param end the upper bound of the range of websites (not inclusive)
@@ -3272,6 +3435,31 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public List<Website> findByC_C_C_P(long companyId, long classNameId,
 		long classPK, boolean primary, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+		return findByC_C_C_P(companyId, classNameId, classPK, primary, start,
+			end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites where companyId = &#63; and classNameId = &#63; and classPK = &#63; and primary = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param primary the primary
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching websites
+	 */
+	@Override
+	public List<Website> findByC_C_C_P(long companyId, long classNameId,
+		long classPK, boolean primary, int start, int end,
+		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -3291,18 +3479,22 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				};
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
 
-		if ((list != null) && !list.isEmpty()) {
-			for (Website website : list) {
-				if ((companyId != website.getCompanyId()) ||
-						(classNameId != website.getClassNameId()) ||
-						(classPK != website.getClassPK()) ||
-						(primary != website.getPrimary())) {
-					list = null;
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
 
-					break;
+			if ((list != null) && !list.isEmpty()) {
+				for (Website website : list) {
+					if ((companyId != website.getCompanyId()) ||
+							(classNameId != website.getClassNameId()) ||
+							(classPK != website.getClassPK()) ||
+							(primary != website.getPrimary())) {
+						list = null;
+
+						break;
+					}
 				}
 			}
 		}
@@ -3312,7 +3504,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -3371,10 +3563,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -3391,11 +3583,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByC_C_C_P_First(long companyId, long classNameId,
@@ -3435,7 +3627,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
@@ -3459,11 +3651,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a matching website could not be found
+	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
 	public Website findByC_C_C_P_Last(long companyId, long classNameId,
@@ -3503,7 +3695,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
@@ -3534,11 +3726,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param websiteId the primary key of the current website
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website[] findByC_C_C_P_PrevAndNext(long websiteId, long companyId,
@@ -3579,11 +3771,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		query.append(_SQL_SELECT_WEBSITE_WHERE);
@@ -3695,7 +3888,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 */
 	@Override
@@ -3712,7 +3905,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param primary the primary
 	 * @return the number of matching websites
 	 */
@@ -3725,8 +3918,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				companyId, classNameId, classPK, primary
 			};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(5);
@@ -3762,10 +3954,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -3784,6 +3976,23 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 	public WebsitePersistenceImpl() {
 		setModelClass(Website.class);
+
+		try {
+			Field field = ReflectionUtil.getDeclaredField(BasePersistenceImpl.class,
+					"_dbColumnNames");
+
+			Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+			dbColumnNames.put("uuid", "uuid_");
+			dbColumnNames.put("primary", "primary_");
+
+			field.set(this, dbColumnNames);
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(e, e);
+			}
+		}
 	}
 
 	/**
@@ -3793,7 +4002,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void cacheResult(Website website) {
-		EntityCacheUtil.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 			WebsiteImpl.class, website.getPrimaryKey(), website);
 
 		website.resetOriginalValues();
@@ -3807,8 +4016,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public void cacheResult(List<Website> websites) {
 		for (Website website : websites) {
-			if (EntityCacheUtil.getResult(
-						WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			if (entityCache.getResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 						WebsiteImpl.class, website.getPrimaryKey()) == null) {
 				cacheResult(website);
 			}
@@ -3822,45 +4030,41 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Clears the cache for all websites.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(WebsiteImpl.class.getName());
-		}
+		entityCache.clearCache(WebsiteImpl.class);
 
-		EntityCacheUtil.clearCache(WebsiteImpl.class);
-
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
 	 * Clears the cache for the website.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(Website website) {
-		EntityCacheUtil.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 			WebsiteImpl.class, website.getPrimaryKey());
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@Override
 	public void clearCache(List<Website> websites) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Website website : websites) {
-			EntityCacheUtil.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			entityCache.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 				WebsiteImpl.class, website.getPrimaryKey());
 		}
 	}
@@ -3882,6 +4086,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		website.setUuid(uuid);
 
+		website.setCompanyId(companyProvider.getCompanyId());
+
 		return website;
 	}
 
@@ -3890,7 +4096,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param websiteId the primary key of the website
 	 * @return the website that was removed
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website remove(long websiteId) throws NoSuchWebsiteException {
@@ -3902,7 +4108,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 *
 	 * @param primaryKey the primary key of the website
 	 * @return the website that was removed
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website remove(Serializable primaryKey)
@@ -3915,8 +4121,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			Website website = (Website)session.get(WebsiteImpl.class, primaryKey);
 
 			if (website == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchWebsiteException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -3969,7 +4175,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	}
 
 	@Override
-	public Website updateImpl(com.liferay.portal.model.Website website) {
+	public Website updateImpl(Website website) {
 		website = toUnwrappedModel(website);
 
 		boolean isNew = website.isNew();
@@ -3980,6 +4186,28 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			String uuid = PortalUUIDUtil.generate();
 
 			website.setUuid(uuid);
+		}
+
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (website.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				website.setCreateDate(now);
+			}
+			else {
+				website.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!websiteModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				website.setModifiedDate(now);
+			}
+			else {
+				website.setModifiedDate(serviceContext.getModifiedDate(now));
+			}
 		}
 
 		Session session = null;
@@ -3993,7 +4221,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				website.setNew(false);
 			}
 			else {
-				session.merge(website);
+				website = (Website)session.merge(website);
 			}
 		}
 		catch (Exception e) {
@@ -4003,10 +4231,71 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (isNew || !WebsiteModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		if (!WebsiteModelImpl.COLUMN_BITMASK_ENABLED) {
+			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+		else
+		 if (isNew) {
+			Object[] args = new Object[] { websiteModelImpl.getUuid() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+				args);
+
+			args = new Object[] {
+					websiteModelImpl.getUuid(), websiteModelImpl.getCompanyId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+				args);
+
+			args = new Object[] { websiteModelImpl.getCompanyId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_COMPANYID, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+				args);
+
+			args = new Object[] { websiteModelImpl.getUserId() };
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
+				args);
+
+			args = new Object[] {
+					websiteModelImpl.getCompanyId(),
+					websiteModelImpl.getClassNameId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C,
+				args);
+
+			args = new Object[] {
+					websiteModelImpl.getCompanyId(),
+					websiteModelImpl.getClassNameId(),
+					websiteModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C,
+				args);
+
+			args = new Object[] {
+					websiteModelImpl.getCompanyId(),
+					websiteModelImpl.getClassNameId(),
+					websiteModelImpl.getClassPK(), websiteModelImpl.getPrimary()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C_P, args);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C_P,
+				args);
+
+			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
+				FINDER_ARGS_EMPTY);
 		}
 
 		else {
@@ -4014,14 +4303,14 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] { websiteModelImpl.getOriginalUuid() };
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
 					args);
 
 				args = new Object[] { websiteModelImpl.getUuid() };
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
 					args);
 			}
 
@@ -4032,8 +4321,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getOriginalCompanyId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
 					args);
 
 				args = new Object[] {
@@ -4041,8 +4330,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getCompanyId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
 					args);
 			}
 
@@ -4052,16 +4341,14 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getOriginalCompanyId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_COMPANYID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
 					args);
 
 				args = new Object[] { websiteModelImpl.getCompanyId() };
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_COMPANYID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
 					args);
 			}
 
@@ -4071,14 +4358,14 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getOriginalUserId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
 					args);
 
 				args = new Object[] { websiteModelImpl.getUserId() };
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
 					args);
 			}
 
@@ -4089,8 +4376,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getOriginalClassNameId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C,
 					args);
 
 				args = new Object[] {
@@ -4098,8 +4385,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getClassNameId()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C,
 					args);
 			}
 
@@ -4111,8 +4398,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getOriginalClassPK()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C,
 					args);
 
 				args = new Object[] {
@@ -4121,8 +4408,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getClassPK()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C,
 					args);
 			}
 
@@ -4135,8 +4422,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getOriginalPrimary()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C_P, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C_P,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C_P, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C_P,
 					args);
 
 				args = new Object[] {
@@ -4146,13 +4433,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 						websiteModelImpl.getPrimary()
 					};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C_P, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C_P,
+				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C_P, args);
+				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C_P,
 					args);
 			}
 		}
 
-		EntityCacheUtil.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 			WebsiteImpl.class, website.getPrimaryKey(), website, false);
 
 		website.resetOriginalValues();
@@ -4183,16 +4470,17 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		websiteImpl.setUrl(website.getUrl());
 		websiteImpl.setTypeId(website.getTypeId());
 		websiteImpl.setPrimary(website.isPrimary());
+		websiteImpl.setLastPublishDate(website.getLastPublishDate());
 
 		return websiteImpl;
 	}
 
 	/**
-	 * Returns the website with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the website with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the website
 	 * @return the website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website findByPrimaryKey(Serializable primaryKey)
@@ -4200,8 +4488,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		Website website = fetchByPrimaryKey(primaryKey);
 
 		if (website == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchWebsiteException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -4212,11 +4500,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	}
 
 	/**
-	 * Returns the website with the primary key or throws a {@link com.liferay.portal.NoSuchWebsiteException} if it could not be found.
+	 * Returns the website with the primary key or throws a {@link NoSuchWebsiteException} if it could not be found.
 	 *
 	 * @param websiteId the primary key of the website
 	 * @return the website
-	 * @throws com.liferay.portal.NoSuchWebsiteException if a website with the primary key could not be found
+	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
 	public Website findByPrimaryKey(long websiteId)
@@ -4232,12 +4520,14 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public Website fetchByPrimaryKey(Serializable primaryKey) {
-		Website website = (Website)EntityCacheUtil.getResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 				WebsiteImpl.class, primaryKey);
 
-		if (website == _nullWebsite) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		Website website = (Website)serializable;
 
 		if (website == null) {
 			Session session = null;
@@ -4251,12 +4541,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 					cacheResult(website);
 				}
 				else {
-					EntityCacheUtil.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-						WebsiteImpl.class, primaryKey, _nullWebsite);
+					entityCache.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+						WebsiteImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				EntityCacheUtil.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 					WebsiteImpl.class, primaryKey);
 
 				throw processException(e);
@@ -4306,18 +4596,20 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Website website = (Website)EntityCacheUtil.getResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
 					WebsiteImpl.class, primaryKey);
 
-			if (website == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, website);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (Website)serializable);
+				}
 			}
 		}
 
@@ -4331,7 +4623,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_SQL_SELECT_WEBSITE_WHERE_PKS_IN);
 
 		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append(String.valueOf(primaryKey));
+			query.append((long)primaryKey);
 
 			query.append(StringPool.COMMA);
 		}
@@ -4358,8 +4650,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-					WebsiteImpl.class, primaryKey, _nullWebsite);
+				entityCache.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+					WebsiteImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -4386,7 +4678,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns a range of all the websites.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of websites
@@ -4402,7 +4694,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Returns an ordered range of all the websites.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of websites
@@ -4413,6 +4705,25 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public List<Website> findAll(int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+		return findAll(start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the websites.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WebsiteModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param start the lower bound of the range of websites
+	 * @param end the upper bound of the range of websites (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of websites
+	 */
+	@Override
+	public List<Website> findAll(int start, int end,
+		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -4428,8 +4739,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			finderArgs = new Object[] { start, end, orderByComparator };
 		}
 
-		List<Website> list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-				finderArgs, this);
+		List<Website> list = null;
+
+		if (retrieveFromCache) {
+			list = (List<Website>)finderCache.getResult(finderPath, finderArgs,
+					this);
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -4437,7 +4752,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_WEBSITE);
 
@@ -4476,10 +4791,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				finderCache.putResult(finderPath, finderArgs, list);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				finderCache.removeResult(finderPath, finderArgs);
 
 				throw processException(e);
 			}
@@ -4509,7 +4824,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
+		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
 				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
@@ -4522,11 +4837,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY, count);
+				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
+					count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
+				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
 					FINDER_ARGS_EMPTY);
 
 				throw processException(e);
@@ -4540,8 +4855,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	}
 
 	@Override
-	protected Set<String> getBadColumnNames() {
+	public Set<String> getBadColumnNames() {
 		return _badColumnNames;
+	}
+
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return WebsiteModelImpl.TABLE_COLUMNS_MAP;
 	}
 
 	/**
@@ -4551,12 +4871,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	}
 
 	public void destroy() {
-		EntityCacheUtil.removeCache(WebsiteImpl.class.getName());
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		entityCache.removeCache(WebsiteImpl.class.getName());
+		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
+	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
+	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_WEBSITE = "SELECT website FROM Website website";
 	private static final String _SQL_SELECT_WEBSITE_WHERE_PKS_IN = "SELECT website FROM Website website WHERE websiteId IN (";
 	private static final String _SQL_SELECT_WEBSITE_WHERE = "SELECT website FROM Website website WHERE ";
@@ -4565,39 +4889,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "website.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Website exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Website exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(WebsitePersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "primary"
 			});
-	private static final Website _nullWebsite = new WebsiteImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<Website> toCacheModel() {
-				return _nullWebsiteCacheModel;
-			}
-		};
-
-	private static final CacheModel<Website> _nullWebsiteCacheModel = new NullCacheModel();
-
-	private static class NullCacheModel implements CacheModel<Website>,
-		MVCCModel {
-		@Override
-		public long getMvccVersion() {
-			return -1;
-		}
-
-		@Override
-		public void setMvccVersion(long mvccVersion) {
-		}
-
-		@Override
-		public Website toEntityModel() {
-			return _nullWebsite;
-		}
-	}
 }

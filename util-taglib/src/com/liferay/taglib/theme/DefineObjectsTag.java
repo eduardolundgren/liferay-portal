@@ -14,8 +14,9 @@
 
 package com.liferay.taglib.theme;
 
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -34,6 +35,14 @@ public class DefineObjectsTag extends TagSupport {
 			WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay == null) {
+			return SKIP_BODY;
+		}
+
+		if (!GetterUtil.getBoolean(
+				pageContext.getAttribute(WebKeys.THEME_DEFINE_OBJECTS), true)) {
+
+			pageContext.setAttribute("themeDisplay", themeDisplay);
+
 			return SKIP_BODY;
 		}
 
@@ -58,12 +67,12 @@ public class DefineObjectsTag extends TagSupport {
 		pageContext.setAttribute("locale", themeDisplay.getLocale());
 		pageContext.setAttribute(
 			"permissionChecker", themeDisplay.getPermissionChecker());
-		pageContext.setAttribute("plid", new Long(themeDisplay.getPlid()));
+		pageContext.setAttribute("plid", Long.valueOf(themeDisplay.getPlid()));
 		pageContext.setAttribute(
 			"portletDisplay", themeDisplay.getPortletDisplay());
 		pageContext.setAttribute("realUser", themeDisplay.getRealUser());
 		pageContext.setAttribute(
-			"scopeGroupId", new Long(themeDisplay.getScopeGroupId()));
+			"scopeGroupId", Long.valueOf(themeDisplay.getScopeGroupId()));
 		pageContext.setAttribute("theme", themeDisplay.getTheme());
 		pageContext.setAttribute("themeDisplay", themeDisplay);
 		pageContext.setAttribute("timeZone", themeDisplay.getTimeZone());

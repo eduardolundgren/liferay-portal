@@ -1,0 +1,35 @@
+<definition>
+	<command name="gotoAdd">
+		<execute function="Click" locator1="Button#PLUS" />
+	</command>
+
+	<command name="gotoAddMenuItem">
+		<execute macro="LexiconEntry#gotoAdd" />
+
+		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="${menuItem}">
+			<var name="key_menuItem" value="${menuItem}" />
+		</execute>
+	</command>
+
+	<command name="gotoEntry">
+		<execute function="AssertClick" locator1="ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK" value1="${rowEntry}">
+			<var name="key_rowEntry" value="${rowEntry}" />
+		</execute>
+	</command>
+
+	<command name="gotoEntryMenuItem">
+		<execute function="Click#waitForMenuToggleJSClick" locator1="Icon#ROW_VERTICAL_ELLIPSIS">
+			<var name="key_rowEntry" value="${rowEntry}" />
+		</execute>
+
+		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="${menuItem}">
+			<var name="key_menuItem" value="${menuItem}" />
+		</execute>
+	</command>
+
+	<command name="selectEntry">
+		<execute function="Check" locator1="ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX">
+			<var name="key_rowEntry" value="${rowEntry}" />
+		</execute>
+	</command>
+</definition>

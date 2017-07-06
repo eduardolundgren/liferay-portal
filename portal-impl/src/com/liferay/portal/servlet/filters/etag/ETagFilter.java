@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ETagFilter extends BasePortalFilter {
 
 	public static final String SKIP_FILTER =
-		ETagFilter.class.getName() + "SKIP_FILTER";
+		ETagFilter.class.getName() + "#SKIP_FILTER";
 
 	@Override
 	public boolean isFilterEnabled(
@@ -84,8 +84,8 @@ public class ETagFilter extends BasePortalFilter {
 					response, PropsValues.ETAG_RESPONSE_SIZE_MAX);
 
 		processFilter(
-			ETagFilter.class, request, restrictedByteBufferCacheServletResponse,
-			filterChain);
+			ETagFilter.class.getName(), request,
+			restrictedByteBufferCacheServletResponse, filterChain);
 
 		if (!restrictedByteBufferCacheServletResponse.isOverflowed()) {
 			ByteBuffer byteBuffer =
@@ -94,8 +94,6 @@ public class ETagFilter extends BasePortalFilter {
 			if (!isEligibleForETag(
 					restrictedByteBufferCacheServletResponse.getStatus()) ||
 				!ETagUtil.processETag(request, response, byteBuffer)) {
-
-				restrictedByteBufferCacheServletResponse.finishResponse();
 
 				restrictedByteBufferCacheServletResponse.flushCache();
 			}

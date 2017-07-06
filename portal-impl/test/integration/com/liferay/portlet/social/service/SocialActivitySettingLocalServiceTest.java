@@ -14,12 +14,12 @@
 
 package com.liferay.portlet.social.service;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.social.model.SocialActivityDefinition;
-import com.liferay.portlet.social.util.SocialConfigurationUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.social.kernel.model.SocialActivityDefinition;
+import com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil;
+import com.liferay.social.kernel.util.SocialConfigurationUtil;
 
 import java.util.List;
 
@@ -37,20 +37,19 @@ public class SocialActivitySettingLocalServiceTest
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testGetActivityDefinition() throws Exception {
 		SocialActivitySettingLocalServiceUtil.updateActivitySetting(
-			_group.getGroupId(), TEST_MODEL, true);
+			group.getGroupId(), TEST_MODEL, true);
 
 		SocialActivityDefinition defaultActivityDefinition =
 			SocialConfigurationUtil.getActivityDefinition(TEST_MODEL, 1);
 
 		SocialActivityDefinition activityDefinition =
 			SocialActivitySettingLocalServiceUtil.getActivityDefinition(
-				_group.getGroupId(), TEST_MODEL, 1);
+				group.getGroupId(), TEST_MODEL, 1);
 
 		Assert.assertEquals(defaultActivityDefinition, activityDefinition);
 
@@ -62,12 +61,13 @@ public class SocialActivitySettingLocalServiceTest
 
 		List<SocialActivityDefinition> activityDefinitions =
 			SocialActivitySettingLocalServiceUtil.getActivityDefinitions(
-				_group.getGroupId(), TEST_MODEL);
+				group.getGroupId(), TEST_MODEL);
 
 		Assert.assertNotNull(activityDefinitions);
 		Assert.assertFalse(activityDefinitions.isEmpty());
 		Assert.assertEquals(
-			defaultActivityDefinitions.size(), activityDefinitions.size());
+			activityDefinitions.toString(), defaultActivityDefinitions.size(),
+			activityDefinitions.size());
 		Assert.assertTrue(
 			activityDefinitions.contains(defaultActivityDefinition));
 	}
@@ -75,30 +75,30 @@ public class SocialActivitySettingLocalServiceTest
 	@Test
 	public void testUpdateActivitySettings() throws Exception {
 		SocialActivitySettingLocalServiceUtil.updateActivitySetting(
-			_group.getGroupId(), TEST_MODEL, true);
+			group.getGroupId(), TEST_MODEL, true);
 
 		long classNameId = PortalUtil.getClassNameId(TEST_MODEL);
 
 		Assert.assertTrue(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-				_group.getGroupId(), classNameId));
+				group.getGroupId(), classNameId));
 
 		SocialActivitySettingLocalServiceUtil.updateActivitySetting(
-			_group.getGroupId(), TEST_MODEL, false);
+			group.getGroupId(), TEST_MODEL, false);
 
 		Assert.assertFalse(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-				_group.getGroupId(), classNameId));
+				group.getGroupId(), classNameId));
 		Assert.assertTrue(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-				_group.getGroupId(), classNameId, 1));
+				group.getGroupId(), classNameId, 1));
 
 		SocialActivitySettingLocalServiceUtil.updateActivitySetting(
-			_group.getGroupId(), TEST_MODEL, 1, false);
+			group.getGroupId(), TEST_MODEL, 1, false);
 
 		Assert.assertFalse(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-				_group.getGroupId(), classNameId, 1));
+				group.getGroupId(), classNameId, 1));
 	}
 
 }

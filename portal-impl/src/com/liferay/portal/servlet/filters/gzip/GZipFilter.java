@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 public class GZipFilter extends BasePortalFilter {
 
 	public static final String SKIP_FILTER =
-		GZipFilter.class.getName() + "SKIP_FILTER";
+		GZipFilter.class.getName() + "#SKIP_FILTER";
 
 	public GZipFilter() {
 
@@ -120,9 +120,10 @@ public class GZipFilter extends BasePortalFilter {
 
 		request.setAttribute(SKIP_FILTER, Boolean.TRUE);
 
-		GZipResponse gZipResponse = new GZipResponse(request, response);
+		GZipResponse gZipResponse = new GZipResponse(response);
 
-		processFilter(GZipFilter.class, request, gZipResponse, filterChain);
+		processFilter(
+			GZipFilter.class.getName(), request, gZipResponse, filterChain);
 
 		gZipResponse.finishResponse();
 	}

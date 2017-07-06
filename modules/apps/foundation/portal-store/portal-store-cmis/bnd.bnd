@@ -1,0 +1,17 @@
+Bundle-Name: Liferay Portal Store CMIS
+Bundle-SymbolicName: com.liferay.portal.store.cmis
+Bundle-Version: 2.0.9
+Import-Package:\
+	!com.sun.msv.*,\
+	!com.sun.xml.*,\
+	\
+	!org.apache.cxf.*,\
+	!org.apache.http.*,\
+	\
+	!org.json.simple.*,\
+	\
+	!org.relaxng.datatype.*,\
+	\
+	*
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Data Stores

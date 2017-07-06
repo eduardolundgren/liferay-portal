@@ -1,0 +1,26 @@
+dependencies {
+	classpath group: "com.liferay", name: "com.liferay.gradle.plugins.defaults", version: "3.8.3"
+	classpath group: "com.liferay", name: "com.liferay.gradle.plugins.lang.merger", version: "1.0.3"
+	classpath group: "com.liferay", name: "com.liferay.gradle.plugins.maven.plugin.builder", version: "1.1.2"
+	classpath group: "com.liferay", name: "org.ysb33r.gradle.gradletest", version: "1.0-beta3"
+	classpath group: "de.undercouch", name: "gradle-download-task", version: "3.2.0"
+	classpath group: "xalan", name: "xalan", version: "2.7.2"
+}
+
+repositories {
+	if (!Boolean.getBoolean("maven.local.ignore")) {
+		mavenLocal()
+
+		File tmpMavenRepositoryDir = file("../.m2-tmp")
+
+		if (tmpMavenRepositoryDir.exists()) {
+			maven {
+				url tmpMavenRepositoryDir
+			}
+		}
+	}
+
+	maven {
+		url System.properties["repository.url"] ?: "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
+	}
+}

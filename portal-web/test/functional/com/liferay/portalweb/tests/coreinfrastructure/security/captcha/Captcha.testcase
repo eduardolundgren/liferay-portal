@@ -1,0 +1,81 @@
+<definition component-name="portal-security">
+	<property name="osgi.module.configuration.file.names" value="com.liferay.captcha.configuration.CaptchaConfiguration.config" />
+	<property name="osgi.module.configurations" value="maxChallenges=&quot;0&quot;" />
+	<property name="portal.upstream" value="true" />
+	<property name="test.assert.warning.exceptions" value="true" />
+	<property name="testray.main.component.name" value="Security" />
+
+	<set-up>
+		<execute macro="TestCase#setUpPortalInstance" />
+	</set-up>
+
+	<tear-down>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="User#firstLoginPG" />
+
+				<execute macro="Page#tearDownPG" />
+			</else>
+		</if>
+	</tear-down>
+
+	<command name="ViewCaptchaEnabled" priority="4">
+		<execute macro="SignInNavigator#gotoCreateAccount" />
+
+		<execute macro="User#viewCaptchaPG">
+			<var name="captchaType" value="captcha" />
+		</execute>
+	</command>
+
+	<command name="ViewRecaptchaEnabled" priority="4">
+		<property name="test.name.skip.portal.instance" value="Captcha#ViewRecaptchaEnabled" />
+
+		<var method="TestPropsUtil#get('recaptcha.private.key')" name="recaptchaPrivateKey" />
+		<var method="TestPropsUtil#get('recaptcha.public.key')" name="recaptchaPublicKey" />
+
+		<execute macro="User#firstLoginPG" />
+
+		<execute macro="ProductMenu#gotoControlPanelConfiguration">
+			<var name="portlet" value="System Settings" />
+		</execute>
+
+		<execute macro="SystemSettings#gotoCategory">
+			<var name="category" value="Foundation" />
+		</execute>
+
+		<execute macro="SystemSettings#editConfiguration">
+			<var name="configurationName" value="CAPTCHA" />
+		</execute>
+
+		<execute macro="FormFields#selectSelectOption">
+			<var name="fieldName" value="captchaEngine" />
+			<var name="selectOption" value="reCAPTCHA" />
+		</execute>
+
+		<execute macro="SystemSettings#editTextAreaSetting">
+			<var name="settingName" value="reCaptchaPrivateKey" />
+			<var name="settingValue" value="${recaptchaPrivateKey}" />
+		</execute>
+
+		<execute macro="SystemSettings#editTextAreaSetting">
+			<var name="settingName" value="reCaptchaPublicKey" />
+			<var name="settingValue" value="${recaptchaPublicKey}" />
+		</execute>
+
+		<execute macro="SystemSettings#saveConfiguration" />
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="SignInNavigator#gotoCreateAccount" />
+
+		<execute macro="User#viewCaptchaPG">
+			<var name="captchaType" value="recaptcha" />
+		</execute>
+	</command>
+</definition>

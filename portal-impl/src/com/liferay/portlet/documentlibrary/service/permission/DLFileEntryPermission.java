@@ -14,24 +14,34 @@
 
 package com.liferay.portlet.documentlibrary.service.permission;
 
+import com.liferay.document.library.kernel.exception.NoSuchFolderException;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryConstants;
+import com.liferay.document.library.kernel.model.DLFileVersion;
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLFolderLocalServiceUtil;
+import com.liferay.exportimport.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.WorkflowInstanceLink;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.ResourcePermissionCheckerUtil;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
-import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowException;
+import com.liferay.portal.kernel.workflow.WorkflowInstance;
+import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 /**
  * @author Brian Wing Shun Chan
@@ -39,7 +49,7 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
  */
 @OSGiBeanProperties(
 	property = {
-		"model.class.name=com.liferay.portlet.documentlibrary.model.DLFileEntry"
+		"model.class.name=com.liferay.document.library.kernel.model.DLFileEntry"
 	}
 )
 public class DLFileEntryPermission implements BaseModelPermissionChecker {
@@ -50,7 +60,9 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		if (!contains(permissionChecker, dlFileEntry, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, DLFileEntry.class.getName(),
+				dlFileEntry.getFileEntryId(), actionId);
 		}
 	}
 
@@ -60,7 +72,9 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		if (!fileEntry.containsPermission(permissionChecker, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, FileEntry.class.getName(),
+				fileEntry.getFileEntryId(), actionId);
 		}
 	}
 
@@ -70,7 +84,9 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		if (!contains(permissionChecker, fileEntryId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, FileEntry.class.getName(), fileEntryId,
+				actionId);
 		}
 	}
 
@@ -79,26 +95,68 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 			String actionId)
 		throws PortalException {
 
+		String portletId = PortletProviderUtil.getPortletId(
+			FileEntry.class.getName(), PortletProvider.Action.EDIT);
+
 		Boolean hasPermission = StagingPermissionUtil.hasPermission(
 			permissionChecker, dlFileEntry.getGroupId(),
 			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId(),
-			PortletKeys.DOCUMENT_LIBRARY, actionId);
+			portletId, actionId);
 
 		if (hasPermission != null) {
 			return hasPermission.booleanValue();
 		}
 
-		DLFileVersion latestDLFileVersion = dlFileEntry.getLatestFileVersion(
-			true);
+		DLFileVersion currentDLFileVersion = dlFileEntry.getFileVersion();
 
-		if (latestDLFileVersion.isPending()) {
+		if (currentDLFileVersion.isPending()) {
 			hasPermission = WorkflowPermissionUtil.hasPermission(
 				permissionChecker, dlFileEntry.getGroupId(),
-				DLFileEntry.class.getName(), dlFileEntry.getFileEntryId(),
-				actionId);
+				DLFileEntry.class.getName(),
+				currentDLFileVersion.getFileVersionId(), actionId);
 
 			if (hasPermission != null) {
 				return hasPermission.booleanValue();
+			}
+
+			// See LPS-10500 and LPS-72547
+
+			if (actionId.equals(ActionKeys.VIEW) &&
+				_hasActiveWorkflowInstance(
+					permissionChecker.getCompanyId(), dlFileEntry.getGroupId(),
+					currentDLFileVersion.getFileVersionId())) {
+
+				return false;
+			}
+		}
+
+		if (permissionChecker.hasOwnerPermission(
+				dlFileEntry.getCompanyId(), DLFileEntry.class.getName(),
+				dlFileEntry.getFileEntryId(), dlFileEntry.getUserId(),
+				actionId)) {
+
+			return true;
+		}
+
+		String className = dlFileEntry.getClassName();
+		long classPK = dlFileEntry.getClassPK();
+
+		if (Validator.isNotNull(className) && (classPK > 0)) {
+			Boolean hasResourcePermission =
+				ResourcePermissionCheckerUtil.containsResourcePermission(
+					permissionChecker, className, classPK, actionId);
+
+			if ((hasResourcePermission != null) && !hasResourcePermission) {
+				return false;
+			}
+
+			Boolean hasBaseModelPermission =
+				BaseModelPermissionCheckerUtil.containsBaseModelPermission(
+					permissionChecker, dlFileEntry.getGroupId(), className,
+					classPK, actionId);
+
+			if ((hasBaseModelPermission != null) && !hasBaseModelPermission) {
+				return false;
 			}
 		}
 
@@ -136,14 +194,6 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 			}
 		}
 
-		if (permissionChecker.hasOwnerPermission(
-				dlFileEntry.getCompanyId(), DLFileEntry.class.getName(),
-				dlFileEntry.getFileEntryId(), dlFileEntry.getUserId(),
-				actionId)) {
-
-			return true;
-		}
-
 		return permissionChecker.hasPermission(
 			dlFileEntry.getGroupId(), DLFileEntry.class.getName(),
 			dlFileEntry.getFileEntryId(), actionId);
@@ -174,6 +224,30 @@ public class DLFileEntryPermission implements BaseModelPermissionChecker {
 		throws PortalException {
 
 		check(permissionChecker, primaryKey, actionId);
+	}
+
+	private static boolean _hasActiveWorkflowInstance(
+			long companyId, long groupId, long fileVersionId)
+		throws WorkflowException {
+
+		WorkflowInstanceLink workflowInstanceLink =
+			WorkflowInstanceLinkLocalServiceUtil.fetchWorkflowInstanceLink(
+				companyId, groupId, DLFileEntryConstants.getClassName(),
+				fileVersionId);
+
+		if (workflowInstanceLink == null) {
+			return false;
+		}
+
+		WorkflowInstance workflowInstance =
+			WorkflowInstanceManagerUtil.getWorkflowInstance(
+				companyId, workflowInstanceLink.getWorkflowInstanceId());
+
+		if (workflowInstance.isComplete()) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

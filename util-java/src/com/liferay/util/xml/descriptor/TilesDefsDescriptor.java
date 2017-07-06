@@ -43,15 +43,11 @@ public class TilesDefsDescriptor extends SimpleXMLDescriptor {
 		return _UNIQUE_ELEMENTS;
 	}
 
-	private static final ElementIdentifier[] _ELEMENTS_IDENTIFIED_BY_ATTR = {
-		new ElementIdentifier("definition", "name")
-	};
+	private static final ElementIdentifier[] _ELEMENTS_IDENTIFIED_BY_ATTR =
+		{new ElementIdentifier("definition", "name")};
 
-	private static final String[] _ROOT_CHILDREN_ORDER = {
-		"definition"
-	};
+	private static final String[] _ROOT_CHILDREN_ORDER = {"definition"};
 
-	private static final String[] _UNIQUE_ELEMENTS = {
-	};
+	private static final String[] _UNIQUE_ELEMENTS = {};
 
 }

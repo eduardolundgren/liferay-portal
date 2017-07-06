@@ -16,11 +16,12 @@ package com.liferay.portlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.servlet.PortalSessionContext;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.WebKeys;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,23 +35,39 @@ import javax.servlet.http.HttpSession;
  */
 public class PublicRenderParametersPool {
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #get(HttpServletRequest, long)}
+	 */
+	@Deprecated
 	public static Map<String, String[]> get(
+		HttpServletRequest request, long plid, boolean warFile) {
+
+		return get(request, plid);
+	}
+
+	protected static Map<String, String[]> get(
 		HttpServletRequest request, long plid) {
 
 		if (PropsValues.PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION_LAYOUT) {
-			return RenderParametersPool.get(
+			return RenderParametersPool.getOrCreate(
 				request, plid, _PUBLIC_RENDER_PARAMETERS);
 		}
 
 		HttpSession session = request.getSession();
+
+		HttpSession portalSession = PortalSessionContext.get(session.getId());
+
+		if (portalSession != null) {
+			session = portalSession;
+		}
 
 		Map<Long, Map<String, String[]>> publicRenderParametersPool =
 			(Map<Long, Map<String, String[]>>)session.getAttribute(
 				WebKeys.PUBLIC_RENDER_PARAMETERS_POOL);
 
 		if (publicRenderParametersPool == null) {
-			publicRenderParametersPool =
-				new ConcurrentHashMap<Long, Map<String, String[]>>();
+			publicRenderParametersPool = new ConcurrentHashMap<>();
 
 			session.setAttribute(
 				WebKeys.PUBLIC_RENDER_PARAMETERS_POOL,
@@ -62,24 +79,15 @@ public class PublicRenderParametersPool {
 
 			LayoutSet layoutSet = layout.getLayoutSet();
 
-			Map<String, String[]> publicRenderParameters =
-				publicRenderParametersPool.get(layoutSet.getLayoutSetId());
-
-			if (publicRenderParameters == null) {
-				publicRenderParameters = new HashMap<String, String[]>();
-
-				publicRenderParametersPool.put(
-					layoutSet.getLayoutSetId(), publicRenderParameters);
-			}
-
-			return publicRenderParameters;
+			return publicRenderParametersPool.computeIfAbsent(
+				layoutSet.getLayoutSetId(), key -> new HashMap<>());
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(e, e);
 			}
 
-			return new HashMap<String, String[]>();
+			return new HashMap<>();
 		}
 	}
 

@@ -20,9 +20,9 @@ import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import io.netty.channel.embedded.EmbeddedChannel;
 
@@ -63,7 +63,7 @@ public class RPCResponseTest {
 
 	@Test
 	public void testToString() {
-		RPCResponse<String> rpcResponse = new RPCResponse<String>(
+		RPCResponse<String> rpcResponse = new RPCResponse<>(
 			_ID, true, _RESULT, _throwable);
 
 		Assert.assertEquals(
@@ -78,18 +78,18 @@ public class RPCResponseTest {
 
 		// No future exist
 
-		RPCResponse<String> rpcResponse = new RPCResponse<String>(
+		RPCResponse<String> rpcResponse = new RPCResponse<>(
 			_ID, cancelled, result, throwable);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RPCResponse.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RPCResponse.class.getName(), Level.SEVERE)) {
 
-		try {
 			rpcResponse.execute(_embeddedChannel);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
 
 			LogRecord logRecord = logRecords.get(0);
 
@@ -113,16 +113,13 @@ public class RPCResponseTest {
 					logRecord.getMessage());
 			}
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		// Have futures, with log
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RPCResponse.class.getName(), Level.FINEST);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RPCResponse.class.getName(), Level.FINEST)) {
 
-		try {
 			AsyncBroker<Long, Serializable> asyncBroker =
 				NettyChannelAttributes.getAsyncBroker(_embeddedChannel);
 
@@ -140,7 +137,7 @@ public class RPCResponseTest {
 			}
 
 			Assert.assertTrue(noticeableFuture.isCancelled());
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
 
 			LogRecord logRecord = logRecords.remove(0);
 
@@ -148,7 +145,7 @@ public class RPCResponseTest {
 				"Cancelled future with ID " + _ID, logRecord.getMessage());
 
 			DefaultNoticeableFuture<Serializable> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<Serializable>();
+				new DefaultNoticeableFuture<>();
 
 			defaultNoticeableFuture.cancel(true);
 
@@ -160,7 +157,7 @@ public class RPCResponseTest {
 
 			rpcResponse.execute(_embeddedChannel);
 
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
 
 			logRecord = logRecords.remove(0);
 
@@ -169,16 +166,13 @@ public class RPCResponseTest {
 					" because it is already completed",
 				logRecord.getMessage());
 		}
-		finally {
-			captureHandler.close();
-		}
 
 		// Have futures, without log
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RPCResponse.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RPCResponse.class.getName(), Level.OFF)) {
 
-		try {
 			AsyncBroker<Long, Serializable> asyncBroker =
 				NettyChannelAttributes.getAsyncBroker(_embeddedChannel);
 
@@ -190,7 +184,7 @@ public class RPCResponseTest {
 			Assert.assertTrue(noticeableFuture.isCancelled());
 
 			DefaultNoticeableFuture<Serializable> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<Serializable>();
+				new DefaultNoticeableFuture<>();
 
 			defaultNoticeableFuture.cancel(true);
 
@@ -201,9 +195,6 @@ public class RPCResponseTest {
 			defaultNoticeableFutures.put(_ID, defaultNoticeableFuture);
 
 			rpcResponse.execute(_embeddedChannel);
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

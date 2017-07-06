@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Time;
 
 /**
@@ -88,7 +89,7 @@ public class PropsValues {
 
 	public static final String[] APPLICATION_STARTUP_EVENTS = PropsUtil.getArray(PropsKeys.APPLICATION_STARTUP_EVENTS);
 
-	public static final String ASSET_CATEGORIES_NAVIGATION_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.ASSET_CATEGORIES_NAVIGATION_DISPLAY_TEMPLATES_CONFIG);
+	public static final boolean ASSET_BROWSER_SEARCH_WITH_DATABASE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_BROWSER_SEARCH_WITH_DATABASE));
 
 	public static final String[] ASSET_CATEGORIES_PROPERTIES_DEFAULT = PropsUtil.getArray(PropsKeys.ASSET_CATEGORIES_PROPERTIES_DEFAULT);
 
@@ -98,55 +99,17 @@ public class PropsValues {
 
 	public static final boolean ASSET_ENTRY_BUFFERED_INCREMENT_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BUFFERED_INCREMENT_ENABLED, new Filter("AssetEntry")));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String ASSET_ENTRY_VALIDATOR = PropsUtil.get(PropsKeys.ASSET_ENTRY_VALIDATOR);
 
 	public static final int ASSET_FILTER_SEARCH_LIMIT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.ASSET_FILTER_SEARCH_LIMIT));
 
-	public static final String[] ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS = PropsUtil.getArray(PropsKeys.ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS);
-
-	public static final String ASSET_PUBLISHER_DISPLAY_STYLE_DEFAULT = PropsUtil.get(PropsKeys.ASSET_PUBLISHER_DISPLAY_STYLE_DEFAULT);
-
-	public static String[] ASSET_PUBLISHER_DISPLAY_STYLES = PropsUtil.getArray(PropsKeys.ASSET_PUBLISHER_DISPLAY_STYLES);
-
-	public static final String ASSET_PUBLISHER_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.ASSET_PUBLISHER_DISPLAY_TEMPLATES_CONFIG);
-
-	public static final int ASSET_PUBLISHER_DYNAMIC_SUBSCRIPTION_LIMIT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.ASSET_PUBLISHER_DYNAMIC_SUBSCRIPTION_LIMIT));
-
-	public static final String ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_BODY = PropsUtil.get(PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_BODY);
-
-	public static final boolean ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_ENABLED));
-
-	public static final String ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_SUBJECT = PropsUtil.get(PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_SUBJECT);
-
-	public static final String ASSET_PUBLISHER_EMAIL_FROM_ADDRESS = PropsUtil.get(PropsKeys.ASSET_PUBLISHER_EMAIL_FROM_ADDRESS);
-
-	public static final String ASSET_PUBLISHER_EMAIL_FROM_NAME = PropsUtil.get(PropsKeys.ASSET_PUBLISHER_EMAIL_FROM_NAME);
-
-	public static final boolean ASSET_PUBLISHER_PERMISSION_CHECKING_CONFIGURABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_PUBLISHER_PERMISSION_CHECKING_CONFIGURABLE));
-
-	public static String[] ASSET_PUBLISHER_QUERY_FORM_CONFIGURATION = PropsUtil.getArray(PropsKeys.ASSET_PUBLISHER_QUERY_FORM_CONFIGURATION);
-
-	public static final boolean ASSET_BROWSER_SEARCH_WITH_DATABASE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_BROWSER_SEARCH_WITH_DATABASE));
-
-	public static final boolean ASSET_PUBLISHER_SEARCH_WITH_INDEX = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_PUBLISHER_SEARCH_WITH_INDEX));
-
-	public static final boolean ASSET_TAG_PERMISSIONS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_TAG_PERMISSIONS_ENABLED));
-
-	public static final String[] ASSET_TAG_PROPERTIES_DEFAULT = PropsUtil.getArray(PropsKeys.ASSET_TAG_PROPERTIES_DEFAULT);
-
-	public static final boolean ASSET_TAG_PROPERTIES_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_TAG_PROPERTIES_ENABLED));
-
-	public static final boolean ASSET_TAG_SUGGESTIONS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_TAG_SUGGESTIONS_ENABLED));
-
-	public static final String ASSET_TAGS_NAVIGATION_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.ASSET_TAGS_NAVIGATION_DISPLAY_TEMPLATES_CONFIG);
-
 	public static final String ASSET_VOCABULARY_DEFAULT = PropsUtil.get(PropsKeys.ASSET_VOCABULARY_DEFAULT);
 
 	public static final boolean AUDIT_MESSAGE_COM_LIFERAY_PORTAL_MODEL_LAYOUT_VIEW = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUDIT_MESSAGE_COM_LIFERAY_PORTAL_MODEL_LAYOUT_VIEW));
-
-	public static final boolean AUDIT_MESSAGE_SCHEDULER_JOB = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUDIT_MESSAGE_SCHEDULER_JOB));
-
-	public static final String[] AUTH_FAILURE = PropsUtil.getArray(PropsKeys.AUTH_FAILURE);
 
 	public static boolean AUTH_FORWARD_BY_LAST_PATH = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUTH_FORWARD_BY_LAST_PATH));
 
@@ -164,13 +127,7 @@ public class PropsValues {
 
 	public static final String AUTH_LOGIN_URL = PropsUtil.get(PropsKeys.AUTH_LOGIN_URL);
 
-	public static final String[] AUTH_MAX_FAILURES = PropsUtil.getArray(PropsKeys.AUTH_MAX_FAILURES);
-
 	public static final boolean AUTH_PIPELINE_ENABLE_LIFERAY_CHECK = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK));
-
-	public static final String[] AUTH_PIPELINE_POST = PropsUtil.getArray(PropsKeys.AUTH_PIPELINE_POST);
-
-	public static final String[] AUTH_PIPELINE_PRE = PropsUtil.getArray(PropsKeys.AUTH_PIPELINE_PRE);
 
 	public static final String[] AUTH_PUBLIC_PATHS = PropsUtil.getArray(PropsKeys.AUTH_PUBLIC_PATHS);
 
@@ -187,6 +144,8 @@ public class PropsValues {
 	public static final int AUTH_TOKEN_LENGTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.AUTH_TOKEN_LENGTH));
 
 	public static final String AUTH_TOKEN_SHARED_SECRET = PropsUtil.get(PropsKeys.AUTH_TOKEN_SHARED_SECRET);
+
+	public static final boolean AUTH_USER_UUID_STORE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUTH_USER_UUID_STORE_ENABLED));
 
 	public static final boolean AUTO_DEPLOY_COPY_COMMONS_LOGGING = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.AUTO_DEPLOY_COPY_COMMONS_LOGGING));
 
@@ -226,6 +185,8 @@ public class PropsValues {
 
 	public static final String AUTO_DEPLOY_WEBSPHERE_WSADMIN_PROPERTIES_FILE = PropsUtil.get(PropsKeys.AUTO_DEPLOY_WEBSPHERE_WSADMIN_PROPERTIES_FILE);
 
+	public static final String AUTO_DEPLOY_WILDFLY_PREFIX = PropsUtil.get(PropsKeys.AUTO_DEPLOY_WILDFLY_PREFIX);
+
 	public static final boolean BASIC_AUTH_PASSWORD_REQUIRED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BASIC_AUTH_PASSWORD_REQUIRED));
 
 	public static final String BLOGS_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.BLOGS_DISPLAY_TEMPLATES_CONFIG);
@@ -235,6 +196,8 @@ public class PropsValues {
 	public static final int[] BLOGS_ENTRY_PAGE_DELTA_VALUES = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.BLOGS_ENTRY_PAGE_DELTA_VALUES));
 
 	public static final boolean BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED));
+
+	public static final long BLOGS_IMAGE_MAX_SIZE = GetterUtil.getLong(PropsUtil.get(PropsKeys.BLOGS_IMAGE_MAX_SIZE));
 
 	public static final int BLOGS_LINKBACK_EXCERPT_LENGTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.BLOGS_LINKBACK_EXCERPT_LENGTH));
 
@@ -249,16 +212,6 @@ public class PropsValues {
 	public static final int BLOGS_RSS_ABSTRACT_LENGTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.BLOGS_RSS_ABSTRACT_LENGTH));
 
 	public static final boolean BLOGS_TRACKBACK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BLOGS_TRACKBACK_ENABLED));
-
-	public static final String BREADCRUMB_DISPLAY_STYLE_DEFAULT = PropsUtil.get(PropsKeys.BREADCRUMB_DISPLAY_STYLE_DEFAULT);
-
-	public static final String[] BREADCRUMB_DISPLAY_STYLE_OPTIONS = PropsUtil.getArray(PropsKeys.BREADCRUMB_DISPLAY_STYLE_OPTIONS);
-
-	public static final String BREADCRUMB_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.BREADCRUMB_DISPLAY_TEMPLATES_CONFIG);
-
-	public static final boolean BREADCRUMB_SHOW_GUEST_GROUP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BREADCRUMB_SHOW_GUEST_GROUP));
-
-	public static final boolean BREADCRUMB_SHOW_PARENT_GROUPS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BREADCRUMB_SHOW_PARENT_GROUPS));
 
 	public static final boolean BROWSER_CACHE_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.BROWSER_CACHE_DISABLED));
 
@@ -292,40 +245,112 @@ public class PropsValues {
 
 	public static final boolean CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static boolean CAPTCHA_CHECK_PORTAL_CREATE_ACCOUNT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CAPTCHA_CHECK_PORTAL_CREATE_ACCOUNT));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean CAPTCHA_CHECK_PORTAL_SEND_PASSWORD = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CAPTCHA_CHECK_PORTAL_SEND_PASSWORD));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_CATEGORY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_CATEGORY));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CAPTCHA_ENGINE_IMPL = PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_IMPL);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CAPTCHA_ENGINE_RECAPTCHA_KEY_PRIVATE = PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_RECAPTCHA_KEY_PRIVATE);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CAPTCHA_ENGINE_RECAPTCHA_KEY_PUBLIC = PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_RECAPTCHA_KEY_PUBLIC);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CAPTCHA_ENGINE_RECAPTCHA_URL_NOSCRIPT = PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_RECAPTCHA_URL_NOSCRIPT);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CAPTCHA_ENGINE_RECAPTCHA_URL_SCRIPT = PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_RECAPTCHA_URL_SCRIPT);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String CAPTCHA_ENGINE_RECAPTCHA_URL_VERIFY = PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_RECAPTCHA_URL_VERIFY);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] CAPTCHA_ENGINE_SIMPLECAPTCHA_BACKGROUND_PRODUCERS = PropsUtil.getArray(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_BACKGROUND_PRODUCERS);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] CAPTCHA_ENGINE_SIMPLECAPTCHA_GIMPY_RENDERERS = PropsUtil.getArray(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_GIMPY_RENDERERS);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final int CAPTCHA_ENGINE_SIMPLECAPTCHA_HEIGHT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_HEIGHT));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] CAPTCHA_ENGINE_SIMPLECAPTCHA_NOISE_PRODUCERS = PropsUtil.getArray(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_NOISE_PRODUCERS);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] CAPTCHA_ENGINE_SIMPLECAPTCHA_TEXT_PRODUCERS = PropsUtil.getArray(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_TEXT_PRODUCERS);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final int CAPTCHA_ENGINE_SIMPLECAPTCHA_WIDTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_WIDTH));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] CAPTCHA_ENGINE_SIMPLECAPTCHA_WORD_RENDERERS = PropsUtil.getArray(PropsKeys.CAPTCHA_ENGINE_SIMPLECAPTCHA_WORD_RENDERERS);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final int CAPTCHA_MAX_CHALLENGES = GetterUtil.getInteger(PropsUtil.get(PropsKeys.CAPTCHA_MAX_CHALLENGES));
 
 	public static final boolean CAS_AUTH_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CAS_AUTH_ENABLED));
@@ -352,17 +377,7 @@ public class PropsValues {
 
 	public static final String CDN_HOST_HTTPS = PropsUtil.get(PropsKeys.CDN_HOST_HTTPS);
 
-	public static final boolean CLUSTER_EXECUTOR_DEBUG_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CLUSTER_EXECUTOR_DEBUG_ENABLED));
-
-	public static final String CLUSTER_LINK_AUTODETECT_ADDRESS = PropsUtil.get(PropsKeys.CLUSTER_LINK_AUTODETECT_ADDRESS);
-
-	public static final String[] CLUSTER_LINK_CHANNEL_SYSTEM_PROPERTIES = PropsUtil.getArray(PropsKeys.CLUSTER_LINK_CHANNEL_SYSTEM_PROPERTIES);
-
 	public static final boolean CLUSTER_LINK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.CLUSTER_LINK_ENABLED));
-
-	public static final long CLUSTER_LINK_NODE_BOOTUP_RESPONSE_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.CLUSTER_LINK_NODE_BOOTUP_RESPONSE_TIMEOUT));
-
-	public static final long CLUSTERABLE_ADVICE_CALL_MASTER_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.CLUSTERABLE_ADVICE_CALL_MASTER_TIMEOUT));
 
 	public static final String[] COMBO_ALLOWED_FILE_EXTENSIONS = PropsUtil.getArray(PropsKeys.COMBO_ALLOWED_FILE_EXTENSIONS);
 
@@ -392,6 +407,8 @@ public class PropsValues {
 
 	public static final boolean COMPANY_SECURITY_LOGIN_FORM_AUTOCOMPLETE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.COMPANY_SECURITY_LOGIN_FORM_AUTOCOMPLETE));
 
+	public static final boolean COMPANY_SECURITY_PASSWORD_REMINDER_QUERY_FORM_AUTOCOMPLETE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.COMPANY_SECURITY_PASSWORD_REMINDER_QUERY_FORM_AUTOCOMPLETE));
+
 	public static final boolean COMPANY_SECURITY_SEND_PASSWORD = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.COMPANY_SECURITY_SEND_PASSWORD));
 
 	public static final boolean COMPANY_SECURITY_SEND_PASSWORD_RESET_LINK = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.COMPANY_SECURITY_SEND_PASSWORD_RESET_LINK));
@@ -407,16 +424,6 @@ public class PropsValues {
 	public static final boolean COMPANY_SECURITY_STRANGERS_WITH_MX = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.COMPANY_SECURITY_STRANGERS_WITH_MX));
 
 	public static String[] COMPANY_SETTINGS_FORM_AUTHENTICATION = PropsUtil.getArray(PropsKeys.COMPANY_SETTINGS_FORM_AUTHENTICATION);
-
-	public static String[] COMPANY_SETTINGS_FORM_CONFIGURATION = PropsUtil.getArray(PropsKeys.COMPANY_SETTINGS_FORM_CONFIGURATION);
-
-	public static String[] COMPANY_SETTINGS_FORM_IDENTIFICATION = PropsUtil.getArray(PropsKeys.COMPANY_SETTINGS_FORM_IDENTIFICATION);
-
-	public static String[] COMPANY_SETTINGS_FORM_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.COMPANY_SETTINGS_FORM_MISCELLANEOUS);
-
-	public static String[] COMPANY_SETTINGS_FORM_SOCIAL = PropsUtil.getArray(PropsKeys.COMPANY_SETTINGS_FORM_SOCIAL);
-
-	public static final String CONTROL_PANEL_HOME_PORTLET_ID = PropsUtil.get(PropsKeys.CONTROL_PANEL_HOME_PORTLET_ID);
 
 	public static final String CONTROL_PANEL_LAYOUT_FRIENDLY_URL = PropsUtil.get(PropsKeys.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
 
@@ -462,10 +469,6 @@ public class PropsValues {
 
 	public static final String DEFAULT_GUEST_PUBLIC_LAYOUT_TEMPLATE_ID = PropsUtil.get(PropsKeys.DEFAULT_GUEST_PUBLIC_LAYOUT_TEMPLATE_ID);
 
-	public static final String DEFAULT_GUEST_PUBLIC_LAYOUT_WAP_COLOR_SCHEME_ID = PropsUtil.get(PropsKeys.DEFAULT_GUEST_PUBLIC_LAYOUT_WAP_COLOR_SCHEME_ID);
-
-	public static final String DEFAULT_GUEST_PUBLIC_LAYOUT_WAP_THEME_ID = PropsUtil.get(PropsKeys.DEFAULT_GUEST_PUBLIC_LAYOUT_WAP_THEME_ID);
-
 	public static final String DEFAULT_GUEST_PUBLIC_LAYOUTS_LAR = PropsUtil.get(PropsKeys.DEFAULT_GUEST_PUBLIC_LAYOUTS_LAR);
 
 	public static String DEFAULT_LANDING_PAGE_PATH = PropsUtil.get(PropsKeys.DEFAULT_LANDING_PAGE_PATH);
@@ -473,6 +476,10 @@ public class PropsValues {
 	public static final String DEFAULT_LAYOUT_TEMPLATE_ID = PropsUtil.get(PropsKeys.DEFAULT_LAYOUT_TEMPLATE_ID);
 
 	public static final String DEFAULT_LOGOUT_PAGE_PATH = PropsUtil.get(PropsKeys.DEFAULT_LOGOUT_PAGE_PATH);
+
+	public static final String DEFAULT_PORTLET_DECORATOR_CSS_CLASS = PropsUtil.get(PropsKeys.DEFAULT_PORTLET_DECORATOR_CSS_CLASS);
+
+	public static final String DEFAULT_PORTLET_DECORATOR_ID = PropsUtil.get(PropsKeys.DEFAULT_PORTLET_DECORATOR_ID);
 
 	public static final String DEFAULT_REGULAR_COLOR_SCHEME_ID = PropsUtil.get(PropsKeys.DEFAULT_REGULAR_COLOR_SCHEME_ID);
 
@@ -488,10 +495,6 @@ public class PropsValues {
 
 	public static final String DEFAULT_USER_PRIVATE_LAYOUT_TEMPLATE_ID = PropsUtil.get(PropsKeys.DEFAULT_USER_PRIVATE_LAYOUT_TEMPLATE_ID);
 
-	public static final String DEFAULT_USER_PRIVATE_LAYOUT_WAP_COLOR_SCHEME_ID = PropsUtil.get(PropsKeys.DEFAULT_USER_PRIVATE_LAYOUT_WAP_COLOR_SCHEME_ID);
-
-	public static final String DEFAULT_USER_PRIVATE_LAYOUT_WAP_THEME_ID = PropsUtil.get(PropsKeys.DEFAULT_USER_PRIVATE_LAYOUT_WAP_THEME_ID);
-
 	public static final String DEFAULT_USER_PRIVATE_LAYOUTS_LAR = PropsUtil.get(PropsKeys.DEFAULT_USER_PRIVATE_LAYOUTS_LAR);
 
 	public static final String DEFAULT_USER_PUBLIC_LAYOUT_FRIENDLY_URL = PropsUtil.get(PropsKeys.DEFAULT_USER_PUBLIC_LAYOUT_FRIENDLY_URL);
@@ -504,25 +507,23 @@ public class PropsValues {
 
 	public static final String DEFAULT_USER_PUBLIC_LAYOUT_TEMPLATE_ID = PropsUtil.get(PropsKeys.DEFAULT_USER_PUBLIC_LAYOUT_TEMPLATE_ID);
 
-	public static final String DEFAULT_USER_PUBLIC_LAYOUT_WAP_COLOR_SCHEME_ID = PropsUtil.get(PropsKeys.DEFAULT_USER_PUBLIC_LAYOUT_WAP_COLOR_SCHEME_ID);
-
-	public static final String DEFAULT_USER_PUBLIC_LAYOUT_WAP_THEME_ID = PropsUtil.get(PropsKeys.DEFAULT_USER_PUBLIC_LAYOUT_WAP_THEME_ID);
-
 	public static final String DEFAULT_USER_PUBLIC_LAYOUTS_LAR = PropsUtil.get(PropsKeys.DEFAULT_USER_PUBLIC_LAYOUTS_LAR);
-
-	public static String DEFAULT_WAP_COLOR_SCHEME_ID = PropsUtil.get(PropsKeys.DEFAULT_WAP_COLOR_SCHEME_ID);
-
-	public static String DEFAULT_WAP_THEME_ID = PropsUtil.get(PropsKeys.DEFAULT_WAP_THEME_ID);
 
 	public static final boolean DIRECT_SERVLET_CONTEXT_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DIRECT_SERVLET_CONTEXT_ENABLED));
 
 	public static final boolean DIRECT_SERVLET_CONTEXT_RELOAD = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DIRECT_SERVLET_CONTEXT_RELOAD));
 
+	public static final String DISCUSSION_COMMENTS_ALLOWED_CONTENT = PropsUtil.get(PropsKeys.DISCUSSION_COMMENTS_ALLOWED_CONTENT);
+
 	public static final boolean DISCUSSION_COMMENTS_ALWAYS_EDITABLE_BY_OWNER = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DISCUSSION_COMMENTS_ALWAYS_EDITABLE_BY_OWNER));
 
-	public static final boolean DISCUSSION_SUBSCRIBE_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DISCUSSION_SUBSCRIBE_BY_DEFAULT));
+	public static final int DISCUSSION_COMMENTS_DELTA_VALUE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DISCUSSION_COMMENTS_DELTA_VALUE));
 
-	public static final String DISCUSSION_THREAD_VIEW = PropsUtil.get(PropsKeys.DISCUSSION_THREAD_VIEW);
+	public static final String DISCUSSION_COMMENTS_FORMAT = PropsUtil.get(PropsKeys.DISCUSSION_COMMENTS_FORMAT);
+
+	public static final int DISCUSSION_MAX_COMMENTS = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DISCUSSION_MAX_COMMENTS));
+
+	public static final boolean DISCUSSION_SUBSCRIBE_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DISCUSSION_SUBSCRIBE_BY_DEFAULT));
 
 	public static final String[] DL_CHAR_BLACKLIST = PropsUtil.getArray(PropsKeys.DL_CHAR_BLACKLIST);
 
@@ -531,8 +532,6 @@ public class PropsValues {
 	public static final String[] DL_COMPARABLE_FILE_EXTENSIONS = PropsUtil.getArray(PropsKeys.DL_COMPARABLE_FILE_EXTENSIONS);
 
 	public static final String DL_DEFAULT_DISPLAY_VIEW = PropsUtil.get(PropsKeys.DL_DEFAULT_DISPLAY_VIEW);
-
-	public static final String DL_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.DL_DISPLAY_TEMPLATES_CONFIG);
 
 	public static final String[] DL_DISPLAY_VIEWS = PropsUtil.getArray(PropsKeys.DL_DISPLAY_VIEWS);
 
@@ -566,6 +565,12 @@ public class PropsValues {
 
 	public static final boolean DL_FILE_ENTRY_PREVIEW_FORK_PROCESS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_FILE_ENTRY_PREVIEW_FORK_PROCESS_ENABLED));
 
+	public static final String[] DL_FILE_ENTRY_PREVIEW_GENERATION_DECRYPT_PASSWORDS_PDFBOX = PropsUtil.getArray(PropsKeys.DL_FILE_ENTRY_PREVIEW_GENERATION_DECRYPT_PASSWORDS_PDFBOX);
+
+	public static final long DL_FILE_ENTRY_PREVIEW_GENERATION_TIMEOUT_GHOSTSCRIPT = GetterUtil.getLong(PropsUtil.get(PropsKeys.DL_FILE_ENTRY_PREVIEW_GENERATION_TIMEOUT_GHOSTSCRIPT));
+
+	public static final long DL_FILE_ENTRY_PREVIEW_GENERATION_TIMEOUT_PDFBOX = GetterUtil.getLong(PropsUtil.get(PropsKeys.DL_FILE_ENTRY_PREVIEW_GENERATION_TIMEOUT_PDFBOX));
+
 	public static final String[] DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES = PropsUtil.getArray(PropsKeys.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES);
 
 	public static final String[] DL_FILE_ENTRY_PREVIEW_VIDEO_CONTAINERS = PropsUtil.getArray(PropsKeys.DL_FILE_ENTRY_PREVIEW_VIDEO_CONTAINERS);
@@ -577,6 +582,8 @@ public class PropsValues {
 	public static final int DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH));
 
 	public static final long DL_FILE_ENTRY_PREVIEWABLE_PROCESSOR_MAX_SIZE = GetterUtil.getLong(PropsUtil.get(PropsKeys.DL_FILE_ENTRY_PREVIEWABLE_PROCESSOR_MAX_SIZE));
+
+	public static final String[] DL_FILE_ENTRY_RAW_METADATA_PROCESSOR_EXCLUDED_MIME_TYPES = PropsUtil.getArray(PropsKeys.DL_FILE_ENTRY_RAW_METADATA_PROCESSOR_EXCLUDED_MIME_TYPES);
 
 	public static final int DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT));
 
@@ -602,6 +609,8 @@ public class PropsValues {
 
 	public static final boolean DL_FILE_EXTENSIONS_STRICT_CHECK = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_FILE_EXTENSIONS_STRICT_CHECK));
 
+	public static final int DL_FILE_INDEXING_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_FILE_INDEXING_INTERVAL));
+
 	public static final int DL_FILE_INDEXING_MAX_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_FILE_INDEXING_MAX_SIZE));
 
 	public static final long DL_FILE_MAX_SIZE = GetterUtil.getLong(PropsUtil.get(PropsKeys.DL_FILE_MAX_SIZE));
@@ -610,11 +619,11 @@ public class PropsValues {
 
 	public static final int DL_FILE_RANK_MAX_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_FILE_RANK_MAX_SIZE));
 
+	public static final boolean DL_FOLDER_ICON_CHECK_COUNT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_FOLDER_ICON_CHECK_COUNT));
+
 	public static final String[] DL_NAME_BLACKLIST = PropsUtil.getArray(PropsKeys.DL_NAME_BLACKLIST);
 
 	public static final boolean DL_PUBLISH_TO_LIVE_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_PUBLISH_TO_LIVE_BY_DEFAULT));
-
-	public static final int DL_REPOSITORY_CMIS_DELETE_DEPTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_REPOSITORY_CMIS_DELETE_DEPTH));
 
 	public static final String DL_REPOSITORY_GUEST_PASSWORD = PropsUtil.get(PropsKeys.DL_REPOSITORY_GUEST_PASSWORD);
 
@@ -622,79 +631,25 @@ public class PropsValues {
 
 	public static final String[] DL_REPOSITORY_IMPL = PropsUtil.getArray(PropsKeys.DL_REPOSITORY_IMPL);
 
-	public static final boolean DL_SHOW_LIFERAY_SYNC_MESSAGE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_SHOW_LIFERAY_SYNC_MESSAGE));
-
-	public static final String DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR = PropsUtil.get(PropsKeys.DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR);
-
-	public static boolean DL_STORE_ANTIVIRUS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_STORE_ANTIVIRUS_ENABLED), false);
+	public static boolean DL_STORE_ANTIVIRUS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_STORE_ANTIVIRUS_ENABLED));
 
 	public static final String DL_STORE_ANTIVIRUS_IMPL = PropsUtil.get(PropsKeys.DL_STORE_ANTIVIRUS_IMPL);
 
-	public static final String DL_STORE_CMIS_CREDENTIALS_PASSWORD = PropsUtil.get(PropsKeys.DL_STORE_CMIS_CREDENTIALS_PASSWORD);
+	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_AMPERSAND = PropsUtil.get(PropsKeys.DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_AMPERSAND);
 
-	public static final String DL_STORE_CMIS_CREDENTIALS_USERNAME = PropsUtil.get(PropsKeys.DL_STORE_CMIS_CREDENTIALS_USERNAME);
+	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_CLOSE_PARENTHESIS = PropsUtil.get(PropsKeys.DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_CLOSE_PARENTHESIS);
 
-	public static final String DL_STORE_CMIS_REPOSITORY_URL = PropsUtil.get(PropsKeys.DL_STORE_CMIS_REPOSITORY_URL);
+	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_OPEN_PARENTHESIS = PropsUtil.get(PropsKeys.DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_OPEN_PARENTHESIS);
 
-	public static final String DL_STORE_CMIS_SYSTEM_ROOT_DIR = PropsUtil.get(PropsKeys.DL_STORE_CMIS_SYSTEM_ROOT_DIR);
-
-	public static final String DL_STORE_FILE_SYSTEM_ROOT_DIR = PropsUtil.get(PropsKeys.DL_STORE_FILE_SYSTEM_ROOT_DIR);
+	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_SEMICOLON = PropsUtil.get(PropsKeys.DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_SEMICOLON);
 
 	public static String DL_STORE_IMPL = PropsUtil.get(PropsKeys.DL_STORE_IMPL);
 
-	public static final int DL_STORE_JCR_FETCH_DELAY = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_STORE_JCR_FETCH_DELAY));
-
-	public static final int DL_STORE_JCR_FETCH_MAX_FAILURES = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_STORE_JCR_FETCH_MAX_FAILURES));
-
-	public static final boolean DL_STORE_JCR_MOVE_VERSION_LABELS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DL_STORE_JCR_MOVE_VERSION_LABELS));
-
-	public static final int DL_STORE_S3_TEMP_DIR_CLEAN_UP_EXPUNGE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_STORE_S3_TEMP_DIR_CLEAN_UP_EXPUNGE));
-
-	public static final int DL_STORE_S3_TEMP_DIR_CLEAN_UP_FREQUENCY = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DL_STORE_S3_TEMP_DIR_CLEAN_UP_FREQUENCY));
-
-	public static String[] DOCKBAR_ADD_PORTLETS = PropsUtil.getArray(PropsKeys.DOCKBAR_ADD_PORTLETS);
-
-	public static final boolean DOCKBAR_ADMINISTRATIVE_LINKS_SHOW_IN_POP_UP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DOCKBAR_ADMINISTRATIVE_LINKS_SHOW_IN_POP_UP));
-
-	public static final boolean DYNAMIC_DATA_LISTS_RECORD_SET_FORCE_AUTOGENERATE_KEY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DYNAMIC_DATA_LISTS_RECORD_SET_FORCE_AUTOGENERATE_KEY));
-
-	public static final String DYNAMIC_DATA_LISTS_STORAGE_TYPE = PropsUtil.get(PropsKeys.DYNAMIC_DATA_LISTS_STORAGE_TYPE);
-
-	public static final boolean DYNAMIC_DATA_MAPPING_STRUCTURE_FORCE_AUTOGENERATE_KEY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_FORCE_AUTOGENERATE_KEY));
-
-	public static final String[] DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES = PropsUtil.getArray(PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES);
-
-	public static final boolean DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY));
-
-	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT = PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT);
+	public static String DL_WEBDAV_SUBSTITUTION_CHAR = PropsUtil.get(PropsKeys.DL_WEBDAV_SUBSTITUTION_CHAR);
 
 	public static final String[] DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = PropsUtil.getArray(PropsKeys.DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS);
 
-	public static final boolean EDITOR_INLINE_EDITING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.EDITOR_INLINE_EDITING_ENABLED));
-
 	public static final String EDITOR_WYSIWYG_DEFAULT = PropsUtil.get(PropsKeys.EDITOR_WYSIWYG_DEFAULT);
-
-	public static final boolean EHCACHE_BLOCKING_CACHE_ALLOWED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.EHCACHE_BLOCKING_CACHE_ALLOWED));
-
-	public static final boolean EHCACHE_BOOTSTRAP_CACHE_LOADER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.EHCACHE_BOOTSTRAP_CACHE_LOADER_ENABLED));
-
-	public static final String EHCACHE_BOOTSTRAP_CACHE_LOADER_FACTORY = PropsUtil.get(PropsKeys.EHCACHE_BOOTSTRAP_CACHE_LOADER_FACTORY);
-
-	public static final String EHCACHE_CACHE_EVENT_LISTENER_FACTORY = PropsUtil.get(PropsKeys.EHCACHE_CACHE_EVENT_LISTENER_FACTORY);
-
-	public static final String EHCACHE_CACHE_MANAGER_PEER_LISTENER_FACTORY = PropsUtil.get(PropsKeys.EHCACHE_CACHE_MANAGER_PEER_LISTENER_FACTORY);
-
-	public static final String EHCACHE_CACHE_MANAGER_PEER_PROVIDER_FACTORY = PropsUtil.get(PropsKeys.EHCACHE_CACHE_MANAGER_PEER_PROVIDER_FACTORY);
-
-	public static final int EHCACHE_CACHE_MANAGER_STATISTICS_THREAD_POOL_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.EHCACHE_CACHE_MANAGER_STATISTICS_THREAD_POOL_SIZE));
-
-	public static final boolean EHCACHE_CLUSTER_LINK_REPLICATION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.EHCACHE_CLUSTER_LINK_REPLICATION_ENABLED));
-
-	public static final boolean EHCACHE_PORTAL_CACHE_MANAGER_JMX_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.EHCACHE_PORTAL_CACHE_MANAGER_JMX_ENABLED));
-
-	public static final int EHCACHE_SOCKET_SO_TIMEOUT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.EHCACHE_SOCKET_SO_TIMEOUT));
-
-	public static final int EHCACHE_SOCKET_START_PORT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.EHCACHE_SOCKET_START_PORT));
 
 	public static final int ETAG_RESPONSE_SIZE_MAX = GetterUtil.getInteger(PropsUtil.get(PropsKeys.ETAG_RESPONSE_SIZE_MAX));
 
@@ -726,26 +681,6 @@ public class PropsValues {
 
 	public static boolean FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_ORGANIZATION_STATUS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_ORGANIZATION_STATUS));
 
-	public static final boolean FLAGS_GUEST_USERS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.FLAGS_GUEST_USERS_ENABLED));
-
-	public static final String[] FLAGS_REASONS = PropsUtil.getArray(PropsKeys.FLAGS_REASONS);
-
-	public static final boolean FREEMARKER_ENGINE_LOCALIZED_LOOKUP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.FREEMARKER_ENGINE_LOCALIZED_LOOKUP));
-
-	public static final String FREEMARKER_ENGINE_MACRO_LIBRARY = PropsUtil.get(PropsKeys.FREEMARKER_ENGINE_MACRO_LIBRARY);
-
-	public static final int FREEMARKER_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.FREEMARKER_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL));
-
-	public static final String[] FREEMARKER_ENGINE_RESTRICTED_CLASSES = PropsUtil.getArray(PropsKeys.FREEMARKER_ENGINE_RESTRICTED_CLASSES);
-
-	public static final String[] FREEMARKER_ENGINE_RESTRICTED_PACKAGES = PropsUtil.getArray(PropsKeys.FREEMARKER_ENGINE_RESTRICTED_PACKAGES);
-
-	public static final String[] FREEMARKER_ENGINE_RESTRICTED_VARIABLES = PropsUtil.getArray(PropsKeys.FREEMARKER_ENGINE_RESTRICTED_VARIABLES);
-
-	public static final String FREEMARKER_ENGINE_TEMPLATE_EXCEPTION_HANDLER = PropsUtil.get(PropsKeys.FREEMARKER_ENGINE_TEMPLATE_EXCEPTION_HANDLER);
-
-	public static final String[] FREEMARKER_ENGINE_TEMPLATE_PARSERS = PropsUtil.getArray(PropsKeys.FREEMARKER_ENGINE_TEMPLATE_PARSERS);
-
 	public static final String[] GLOBAL_SHUTDOWN_EVENTS = PropsUtil.getArray(PropsKeys.GLOBAL_SHUTDOWN_EVENTS);
 
 	public static final String[] GLOBAL_STARTUP_EVENTS = PropsUtil.getArray(PropsKeys.GLOBAL_STARTUP_EVENTS);
@@ -756,13 +691,13 @@ public class PropsValues {
 
 	public static final int GZIP_COMPRESSION_LEVEL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.GZIP_COMPRESSION_LEVEL));
 
-	public static final boolean HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE));
-
 	public static final String HIBERNATE_DIALECT = PropsUtil.get(PropsKeys.HIBERNATE_DIALECT);
 
 	public static final boolean HIBERNATE_GENERATE_STATISTICS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.HIBERNATE_GENERATE_STATISTICS));
 
 	public static final int HIBERNATE_JDBC_BATCH_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.HIBERNATE_JDBC_BATCH_SIZE));
+
+	public static final String HIBERNATE_SESSION_FACTORY_IMPORTED_CLASS_NAME_REGEXP = PropsUtil.get(PropsKeys.HIBERNATE_SESSION_FACTORY_IMPORTED_CLASS_NAME_REGEXP);
 
 	public static final boolean HOT_UNDEPLOY_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.HOT_UNDEPLOY_ENABLED));
 
@@ -782,6 +717,10 @@ public class PropsValues {
 
 	public static final boolean IMAGE_IO_USE_DISK_CACHE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.IMAGE_IO_USE_DISK_CACHE));
 
+	public static final long IMAGE_TOOL_IMAGE_MAX_HEIGHT = GetterUtil.getLong(PropsUtil.get(PropsKeys.IMAGE_TOOL_IMAGE_MAX_HEIGHT));
+
+	public static final long IMAGE_TOOL_IMAGE_MAX_WIDTH = GetterUtil.getLong(PropsUtil.get(PropsKeys.IMAGE_TOOL_IMAGE_MAX_WIDTH));
+
 	public static final boolean IMAGEMAGICK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.IMAGEMAGICK_ENABLED));
 
 	public static final String INDEX_DATE_FORMAT_PATTERN = PropsUtil.get(PropsKeys.INDEX_DATE_FORMAT_PATTERN);
@@ -793,8 +732,6 @@ public class PropsValues {
 	public static final int INDEX_ON_STARTUP_DELAY = GetterUtil.getInteger(PropsUtil.get(PropsKeys.INDEX_ON_STARTUP_DELAY));
 
 	public static final boolean INDEX_ON_UPGRADE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.INDEX_ON_UPGRADE));
-
-	public static boolean INDEX_READ_ONLY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.INDEX_READ_ONLY));
 
 	public static final boolean INDEX_SEARCH_COLLATED_SPELL_CHECK_RESULT_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.INDEX_SEARCH_COLLATED_SPELL_CHECK_RESULT_ENABLED));
 
@@ -832,7 +769,7 @@ public class PropsValues {
 
 	public static final boolean JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED));
 
-	public static final boolean JCR_WRAP_SESSION = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JCR_WRAP_SESSION));
+	public static final int JAVASCRIPT_SINGLE_PAGE_APPLICATION_TIMEOUT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.JAVASCRIPT_SINGLE_PAGE_APPLICATION_TIMEOUT));
 
 	public static final String JDBC_DEFAULT_DRIVER_CLASS_NAME = PropsUtil.get(PropsKeys.JDBC_DEFAULT_DRIVER_CLASS_NAME);
 
@@ -845,74 +782,6 @@ public class PropsValues {
 	public static final String JDBC_DEFAULT_URL = PropsUtil.get(PropsKeys.JDBC_DEFAULT_URL);
 
 	public static final String JDBC_DEFAULT_USERNAME = PropsUtil.get(PropsKeys.JDBC_DEFAULT_USERNAME);
-
-	public static final int JOURNAL_ARTICLE_CHECK_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_CHECK_INTERVAL));
-
-	public static final boolean JOURNAL_ARTICLE_COMMENTS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_COMMENTS_ENABLED));
-
-	public static final String[] JOURNAL_ARTICLE_CUSTOM_TOKENS = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_CUSTOM_TOKENS);
-
-	public static final boolean JOURNAL_ARTICLE_EXPIRE_ALL_VERSIONS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_EXPIRE_ALL_VERSIONS));
-
-	public static final boolean JOURNAL_ARTICLE_FORCE_AUTOGENERATE_ID = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_FORCE_AUTOGENERATE_ID));
-
-	public static String[] JOURNAL_ARTICLE_FORM_ADD = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_ADD);
-
-	public static String[] JOURNAL_ARTICLE_FORM_DEFAULT_VALUES = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_DEFAULT_VALUES);
-
-	public static String[] JOURNAL_ARTICLE_FORM_UPDATE = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_UPDATE);
-
-	public static boolean JOURNAL_ARTICLE_INDEX_ALL_VERSIONS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_INDEX_ALL_VERSIONS));
-
-	public static final String JOURNAL_ARTICLE_STORAGE_TYPE = PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_STORAGE_TYPE);
-
-	public static final String JOURNAL_ARTICLE_TOKEN_PAGE_BREAK = PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_TOKEN_PAGE_BREAK);
-
-	public static final boolean JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED));
-
-	public static final boolean JOURNAL_ARTICLES_SEARCH_WITH_INDEX = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_ARTICLES_SEARCH_WITH_INDEX));
-
-	public static final boolean JOURNAL_CONTENT_SEARCH_SHOW_LISTED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_CONTENT_SEARCH_SHOW_LISTED));
-
-	public static final String JOURNAL_DEFAULT_DISPLAY_VIEW = PropsUtil.get(PropsKeys.JOURNAL_DEFAULT_DISPLAY_VIEW);
-
-	public static final String[] JOURNAL_DISPLAY_VIEWS = PropsUtil.getArray(PropsKeys.JOURNAL_DISPLAY_VIEWS);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_ADDED_BODY = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_ADDED_BODY);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_ADDED_SUBJECT = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_ADDED_SUBJECT);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_BODY = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_BODY);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_SUBJECT = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_SUBJECT);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_BODY = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_BODY);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_SUBJECT = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_SUBJECT);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_BODY = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_BODY);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_SUBJECT = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_SUBJECT);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_REVIEW_BODY = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_REVIEW_BODY);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_REVIEW_SUBJECT = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_REVIEW_SUBJECT);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_UPDATED_BODY = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_UPDATED_BODY);
-
-	public static final String JOURNAL_EMAIL_ARTICLE_UPDATED_SUBJECT = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_UPDATED_SUBJECT);
-
-	public static final String JOURNAL_EMAIL_FROM_ADDRESS = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_FROM_ADDRESS);
-
-	public static final String JOURNAL_EMAIL_FROM_NAME = PropsUtil.get(PropsKeys.JOURNAL_EMAIL_FROM_NAME);
-
-	public static final boolean JOURNAL_FEED_FORCE_AUTOGENERATE_ID = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_FEED_FORCE_AUTOGENERATE_ID));
-
-	public static final String JOURNAL_LAR_CREATION_STRATEGY = PropsUtil.get(PropsKeys.JOURNAL_LAR_CREATION_STRATEGY);
-
-	public static final boolean JOURNAL_PUBLISH_TO_LIVE_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_PUBLISH_TO_LIVE_BY_DEFAULT));
-
-	public static final boolean JOURNAL_PUBLISH_VERSION_HISTORY_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JOURNAL_PUBLISH_VERSION_HISTORY_BY_DEFAULT));
 
 	public static final boolean JSON_SERVICE_AUTH_TOKEN_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JSON_SERVICE_AUTH_TOKEN_ENABLED));
 
@@ -930,12 +799,6 @@ public class PropsValues {
 
 	public static final boolean JSONWS_WEB_SERVICE_STRICT_HTTP_METHOD = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JSONWS_WEB_SERVICE_STRICT_HTTP_METHOD));
 
-	public static final String LANGUAGE_DISPLAY_STYLE_DEFAULT = PropsUtil.get(PropsKeys.LANGUAGE_DISPLAY_STYLE_DEFAULT);
-
-	public static final String[] LANGUAGE_DISPLAY_STYLE_OPTIONS = PropsUtil.getArray(PropsKeys.LANGUAGE_DISPLAY_STYLE_OPTIONS);
-
-	public static final String LANGUAGE_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.LANGUAGE_DISPLAY_TEMPLATES_CONFIG);
-
 	public static final boolean LAYOUT_AJAX_RENDER_ENABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_AJAX_RENDER_ENABLE)) && !GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SESSION_DISABLED));
 
 	public static final String LAYOUT_CLONE_IMPL = PropsUtil.get(PropsKeys.LAYOUT_CLONE_IMPL);
@@ -945,10 +808,6 @@ public class PropsValues {
 	public static final boolean LAYOUT_DEFAULT_P_L_RESET = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_DEFAULT_P_L_RESET));
 
 	public static final String LAYOUT_DEFAULT_TEMPLATE_ID = PropsUtil.get(PropsKeys.LAYOUT_DEFAULT_TEMPLATE_ID);
-
-	public static String[] LAYOUT_FORM_ADD = PropsUtil.getArray(PropsKeys.LAYOUT_FORM_ADD);
-
-	public static String[] LAYOUT_FORM_UPDATE = PropsUtil.getArray(PropsKeys.LAYOUT_FORM_UPDATE);
 
 	public static final String[] LAYOUT_FRIENDLY_URL_KEYWORDS = PropsUtil.getArray(PropsKeys.LAYOUT_FRIENDLY_URL_KEYWORDS);
 
@@ -966,7 +825,7 @@ public class PropsValues {
 
 	public static final int LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN));
 
-	public static final boolean LAYOUT_PARALLEL_RENDER_ENABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_PARALLEL_RENDER_ENABLE));
+	public static final boolean LAYOUT_PARALLEL_RENDER_ENABLE = false;
 
 	public static final boolean LAYOUT_PARALLEL_RENDER_THREAD_POOL_ALLOW_CORE_THREAD_TIMEOUT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_PARALLEL_RENDER_THREAD_POOL_ALLOW_CORE_THREAD_TIMEOUT));
 
@@ -988,9 +847,9 @@ public class PropsValues {
 
 	public static final boolean LAYOUT_REMEMBER_MAXIMIZED_WINDOW_STATE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_REMEMBER_MAXIMIZED_WINDOW_STATE));
 
-	public static final String[] LAYOUT_RESET_PORTLET_IDS = PropsUtil.getArray(PropsKeys.LAYOUT_RESET_PORTLET_IDS);
+	public static final boolean LAYOUT_SCOPE_GROUP_FINDER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_SCOPE_GROUP_FINDER_ENABLED));
 
-	public static String[] LAYOUT_SET_FORM_UPDATE = PropsUtil.getArray(PropsKeys.LAYOUT_SET_FORM_UPDATE);
+	public static final int LAYOUT_SCOPE_GROUP_FINDER_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LAYOUT_SCOPE_GROUP_FINDER_THRESHOLD));
 
 	public static final int LAYOUT_SET_PROTOTYPE_MERGE_FAIL_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LAYOUT_SET_PROTOTYPE_MERGE_FAIL_THRESHOLD));
 
@@ -1020,38 +879,6 @@ public class PropsValues {
 
 	public static boolean LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED));
 
-	public static final boolean LDAP_AUTH_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_AUTH_ENABLED));
-
-	public static final boolean LDAP_EXPORT_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_EXPORT_ENABLED));
-
-	public static final boolean LDAP_EXPORT_GROUP_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_EXPORT_GROUP_ENABLED));
-
-	public static final boolean LDAP_IMPORT_CREATE_ROLE_PER_GROUP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_IMPORT_CREATE_ROLE_PER_GROUP));
-
-	public static final boolean LDAP_IMPORT_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_IMPORT_ENABLED));
-
-	public static final boolean LDAP_IMPORT_GROUP_CACHE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_IMPORT_GROUP_CACHE_ENABLED));
-
-	public static final long LDAP_IMPORT_INTERVAL = GetterUtil.getLong(PropsUtil.get(PropsKeys.LDAP_IMPORT_INTERVAL));
-
-	public static final long LDAP_IMPORT_LOCK_EXPIRATION_TIME = GetterUtil.getLong(PropsUtil.get(PropsKeys.LDAP_IMPORT_LOCK_EXPIRATION_TIME));
-
-	public static final boolean LDAP_IMPORT_USER_PASSWORD_AUTOGENERATED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_IMPORT_USER_PASSWORD_AUTOGENERATED));
-
-	public static final String LDAP_IMPORT_USER_PASSWORD_DEFAULT = GetterUtil.getString(PropsUtil.get(PropsKeys.LDAP_IMPORT_USER_PASSWORD_DEFAULT));
-
-	public static final boolean LDAP_IMPORT_USER_PASSWORD_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_IMPORT_USER_PASSWORD_ENABLED));
-
-	public static final int LDAP_PAGE_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LDAP_PAGE_SIZE));
-
-	public static final boolean LDAP_PASSWORD_POLICY_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LDAP_PASSWORD_POLICY_ENABLED));
-
-	public static final int LDAP_RANGE_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LDAP_RANGE_SIZE));
-
-	public static final String[] LDAP_USER_IGNORE_ATTRIBUTES = PropsUtil.getArray(PropsKeys.LDAP_USER_IGNORE_ATTRIBUTES);
-
-	public static final String LDAP_USER_IMPL = PropsUtil.get(PropsKeys.LDAP_USER_IMPL);
-
 	public static final String LIFERAY_HOME = PropsUtil.get(PropsKeys.LIFERAY_HOME);
 
 	public static final String LIFERAY_LIB_GLOBAL_DIR = PropsUtil.get(PropsKeys.LIFERAY_LIB_GLOBAL_DIR);
@@ -1069,6 +896,8 @@ public class PropsValues {
 	public static final boolean LOCALE_DEFAULT_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LOCALE_DEFAULT_REQUEST));
 
 	public static int LOCALE_PREPEND_FRIENDLY_URL_STYLE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE));
+
+	public static boolean LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE));
 
 	public static String[] LOCALES = PropsUtil.getArray(PropsKeys.LOCALES);
 
@@ -1092,39 +921,13 @@ public class PropsValues {
 
 	public static String[] LOGIN_FORM_NAVIGATION_PRE = PropsUtil.getArray(PropsKeys.LOGIN_FORM_NAVIGATION_PRE);
 
+	public static final boolean LOGIN_SECURE_FORGOT_PASSWORD = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LOGIN_SECURE_FORGOT_PASSWORD));
+
 	public static final String[] LOGOUT_EVENTS_POST = PropsUtil.getArray(PropsKeys.LOGOUT_EVENTS_POST);
 
 	public static final String[] LOGOUT_EVENTS_PRE = PropsUtil.getArray(PropsKeys.LOGOUT_EVENTS_PRE);
 
 	public static final boolean LOOK_AND_FEEL_MODIFIABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LOOK_AND_FEEL_MODIFIABLE));
-
-	public static final int LUCENE_ANALYZER_MAX_TOKENS = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LUCENE_ANALYZER_MAX_TOKENS));
-
-	public static final int LUCENE_BUFFER_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LUCENE_BUFFER_SIZE));
-
-	public static final long LUCENE_CLUSTER_INDEX_LOADING_SYNC_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.LUCENE_CLUSTER_INDEX_LOADING_SYNC_TIMEOUT));
-
-	public static final int LUCENE_COMMIT_BATCH_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LUCENE_COMMIT_BATCH_SIZE));
-
-	public static final int LUCENE_COMMIT_TIME_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LUCENE_COMMIT_TIME_INTERVAL));
-
-	public static final String LUCENE_DIR = PropsUtil.get(PropsKeys.LUCENE_DIR);
-
-	public static final String LUCENE_FILE_EXTRACTOR = PropsUtil.get(PropsKeys.LUCENE_FILE_EXTRACTOR);
-
-	public static final String LUCENE_FILE_EXTRACTOR_REGEXP_STRIP = PropsUtil.get(PropsKeys.LUCENE_FILE_EXTRACTOR_REGEXP_STRIP);
-
-	public static final int LUCENE_MERGE_FACTOR = GetterUtil.getInteger(PropsUtil.get(PropsKeys.LUCENE_MERGE_FACTOR));
-
-	public static String LUCENE_MERGE_POLICY = PropsUtil.get(PropsKeys.LUCENE_MERGE_POLICY);
-
-	public static String LUCENE_MERGE_SCHEDULER = PropsUtil.get(PropsKeys.LUCENE_MERGE_SCHEDULER);
-
-	public static final boolean LUCENE_REPLICATE_WRITE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LUCENE_REPLICATE_WRITE));
-
-	public static final String LUCENE_STORE_TYPE = PropsUtil.get(PropsKeys.LUCENE_STORE_TYPE);
-
-	public static final boolean LUCENE_STORE_TYPE_FILE_FORCE_MMAP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LUCENE_STORE_TYPE_FILE_FORCE_MMAP));
 
 	public static final String MAIL_AUDIT_TRAIL = PropsUtil.get(PropsKeys.MAIL_AUDIT_TRAIL);
 
@@ -1172,14 +975,16 @@ public class PropsValues {
 
 	public static final int MESSAGE_BOARDS_RSS_ABSTRACT_LENGTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.MESSAGE_BOARDS_RSS_ABSTRACT_LENGTH));
 
-	public static final boolean MESSAGE_BOARDS_THREAD_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MESSAGE_BOARDS_THREAD_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED));
-
-	public static final String[] MESSAGE_BOARDS_THREAD_VIEWS = PropsUtil.getArray(PropsKeys.MESSAGE_BOARDS_THREAD_VIEWS);
-
-	public static final String MESSAGE_BOARDS_THREAD_VIEWS_DEFAULT = PropsUtil.get(PropsKeys.MESSAGE_BOARDS_THREAD_VIEWS_DEFAULT);
-
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String MICROSOFT_TRANSLATOR_CLIENT_ID = PropsUtil.get(PropsKeys.MICROSOFT_TRANSLATOR_CLIENT_ID);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String MICROSOFT_TRANSLATOR_CLIENT_SECRET = PropsUtil.get(PropsKeys.MICROSOFT_TRANSLATOR_CLIENT_SECRET);
 
 	public static final String[] MIME_TYPES_CONTENT_DISPOSITION_INLINE = PropsUtil.getArray(PropsKeys.MIME_TYPES_CONTENT_DISPOSITION_INLINE);
@@ -1202,8 +1007,6 @@ public class PropsValues {
 
 	public static final boolean MOBILE_DEVICE_SESSION_CACHE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MOBILE_DEVICE_SESSION_CACHE_ENABLED));
 
-	public static final boolean MOBILE_DEVICE_STYLING_WAP_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MOBILE_DEVICE_STYLING_WAP_ENABLED));
-
 	public static final int MODEL_TREE_REBUILD_QUERY_RESULTS_BATCH_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.MODEL_TREE_REBUILD_QUERY_RESULTS_BATCH_SIZE));
 
 	public static final String[] MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS);
@@ -1214,7 +1017,19 @@ public class PropsValues {
 
 	public static final int MODULE_FRAMEWORK_BEGINNING_START_LEVEL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
 
+	public static final String MODULE_FRAMEWORK_CONFIGS_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_CONFIGS_DIR);
+
+	public static final int MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL));
+
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String[] MODULE_FRAMEWORK_INITIAL_BUNDLES = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_INITIAL_BUNDLES);
+
+	public static final String MODULE_FRAMEWORK_MARKETPLACE_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_MARKETPLACE_DIR);
+
+	public static final String MODULE_FRAMEWORK_MODULES_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_MODULES_DIR);
 
 	public static final String MODULE_FRAMEWORK_PORTAL_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_PORTAL_DIR);
 
@@ -1226,9 +1041,13 @@ public class PropsValues {
 
 	public static final String MODULE_FRAMEWORK_STATE_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_STATE_DIR);
 
-	public static final String[] MODULE_FRAMEWORK_SYSTEM_BUNDLE_IGNORED_FRAGMENTS = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_SYSTEM_BUNDLE_IGNORED_FRAGMENTS);
+	public static final String[] MODULE_FRAMEWORK_STATIC_JARS = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_STATIC_JARS);
+
+	public static final long MODULE_FRAMEWORK_STOP_WAIT_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_STOP_WAIT_TIMEOUT));
 
 	public static final String[] MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA);
+
+	public static final String MODULE_FRAMEWORK_WAR_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WAR_DIR);
 
 	public static final String[] MODULE_FRAMEWORK_WEB_GENERATOR_DEFAULT_SERVLET_PACKAGES = PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_DEFAULT_SERVLET_PACKAGES);
 
@@ -1237,18 +1056,6 @@ public class PropsValues {
 	public static final boolean MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE));
 
 	public static final String MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE_DIR = PropsUtil.get(PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE_DIR);
-
-	public static boolean MONITORING_PORTAL_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_PORTAL_REQUEST));
-
-	public static boolean MONITORING_PORTLET_ACTION_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_PORTLET_ACTION_REQUEST));
-
-	public static boolean MONITORING_PORTLET_EVENT_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_PORTLET_EVENT_REQUEST));
-
-	public static boolean MONITORING_PORTLET_RENDER_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_PORTLET_RENDER_REQUEST));
-
-	public static boolean MONITORING_PORTLET_RESOURCE_REQUEST = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_PORTLET_RESOURCE_REQUEST));
-
-	public static final boolean MONITORING_SHOW_PER_REQUEST_DATA_SAMPLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MONITORING_SHOW_PER_REQUEST_DATA_SAMPLE));
 
 	public static final String[] MY_SITES_DIRECTORY_SITE_EXCLUDES = PropsUtil.getArray(PropsKeys.MY_SITES_DIRECTORY_SITE_EXCLUDES);
 
@@ -1263,12 +1070,6 @@ public class PropsValues {
 	public static boolean MY_SITES_SHOW_USER_PRIVATE_SITES_WITH_NO_LAYOUTS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MY_SITES_SHOW_USER_PRIVATE_SITES_WITH_NO_LAYOUTS));
 
 	public static boolean MY_SITES_SHOW_USER_PUBLIC_SITES_WITH_NO_LAYOUTS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.MY_SITES_SHOW_USER_PUBLIC_SITES_WITH_NO_LAYOUTS));
-
-	public static final String NAVIGATION_DISPLAY_STYLE_DEFAULT = PropsUtil.get(PropsKeys.NAVIGATION_DISPLAY_STYLE_DEFAULT);
-
-	public static final String[] NAVIGATION_DISPLAY_STYLE_OPTIONS = PropsUtil.getArray(PropsKeys.NAVIGATION_DISPLAY_STYLE_OPTIONS);
-
-	public static final String NET_SF_EHCACHE_CONFIGURATION_RESOURCE_NAME = PropsUtil.get(PropsKeys.NET_SF_EHCACHE_CONFIGURATION_RESOURCE_NAME);
 
 	public static final String NETVIBES_SERVLET_MAPPING = PropsUtil.get(PropsKeys.NETVIBES_SERVLET_MAPPING);
 
@@ -1314,23 +1115,31 @@ public class PropsValues {
 
 	public static final String OPEN_SSO_SERVICE_URL = PropsUtil.get(PropsKeys.OPEN_SSO_SERVICE_URL);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean OPENOFFICE_CACHE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.OPENOFFICE_CACHE_ENABLED));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean OPENOFFICE_SERVER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.OPENOFFICE_SERVER_ENABLED));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String OPENOFFICE_SERVER_HOST = PropsUtil.get(PropsKeys.OPENOFFICE_SERVER_HOST);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final int OPENOFFICE_SERVER_PORT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.OPENOFFICE_SERVER_PORT));
 
 	public static final boolean ORGANIZATIONS_ASSIGNMENT_STRICT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ORGANIZATIONS_ASSIGNMENT_STRICT));
-
-	public static String[] ORGANIZATIONS_FORM_ADD_IDENTIFICATION = PropsUtil.getArray(PropsKeys.ORGANIZATIONS_FORM_ADD_IDENTIFICATION);
-
-	public static String[] ORGANIZATIONS_FORM_ADD_MAIN = PropsUtil.getArray(PropsKeys.ORGANIZATIONS_FORM_ADD_MAIN);
-
-	public static String[] ORGANIZATIONS_FORM_ADD_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.ORGANIZATIONS_FORM_ADD_MISCELLANEOUS);
-
-	public static final boolean ORGANIZATIONS_INDEXER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ORGANIZATIONS_INDEXER_ENABLED));
 
 	public static final boolean ORGANIZATIONS_MEMBERSHIP_STRICT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ORGANIZATIONS_MEMBERSHIP_STRICT));
 
@@ -1390,17 +1199,25 @@ public class PropsValues {
 
 	public static String PASSWORDS_ENCRYPTION_ALGORITHM_LEGACY = GetterUtil.getString(PropsUtil.get(PropsKeys.PASSWORDS_ENCRYPTION_ALGORITHM_LEGACY));
 
-	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_LOWERCASE = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_LOWERCASE);
-
-	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_NUMBERS = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_NUMBERS);
-
-	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_SYMBOLS = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_SYMBOLS);
-
-	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_UPPERCASE = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_CHARSET_UPPERCASE);
-
 	public static String PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR);
 
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_LOWERCASE = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_LOWERCASE);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_NUMBERS = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_NUMBERS);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_SYMBOLS = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_SYMBOLS);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_UPPERCASE = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_GENERATOR_CHARSET_UPPERCASE);
+
 	public static String PASSWORDS_PASSWORDPOLICYTOOLKIT_STATIC = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_STATIC);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_LOWERCASE = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_LOWERCASE);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_NUMBERS = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_NUMBERS);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_SYMBOLS = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_SYMBOLS);
+
+	public static final String PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_UPPERCASE = PropsUtil.get(PropsKeys.PASSWORDS_PASSWORDPOLICYTOOLKIT_VALIDATOR_CHARSET_UPPERCASE);
 
 	public static final boolean PERMISSIONS_CHECK_GUEST_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_CHECK_GUEST_ENABLED));
 
@@ -1412,7 +1229,7 @@ public class PropsValues {
 
 	public static final boolean PERMISSIONS_INLINE_SQL_CHECK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_INLINE_SQL_CHECK_ENABLED));
 
-	public static final int PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD));
+	public static final int PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD));
 
 	public static final boolean PERMISSIONS_OBJECT_BLOCKING_CACHE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_OBJECT_BLOCKING_CACHE));
 
@@ -1453,7 +1270,7 @@ public class PropsValues {
 	public static final int PORTAL_FABRIC_SERVER_BOSS_GROUP_THREAD_COUNT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PORTAL_FABRIC_SERVER_BOSS_GROUP_THREAD_COUNT));
 
 	public static final int PORTAL_FABRIC_SERVER_FILE_SERVER_FOLDER_COMPRESSION_LEVEL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PORTAL_FABRIC_SERVER_FILE_SERVER_FOLDER_COMPRESSION_LEVEL));
-	
+
 	public static final int PORTAL_FABRIC_SERVER_FILE_SERVER_GROUP_THREAD_COUNT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PORTAL_FABRIC_SERVER_FILE_SERVER_GROUP_THREAD_COUNT));
 
 	public static final String PORTAL_FABRIC_SERVER_HOST = PropsUtil.get(PropsKeys.PORTAL_FABRIC_SERVER_HOST);
@@ -1476,11 +1293,15 @@ public class PropsValues {
 
 	public static final long PORTAL_FABRIC_SERVER_WORKER_STARTUP_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.PORTAL_FABRIC_SERVER_WORKER_STARTUP_TIMEOUT));
 
+	public static final long PORTAL_FABRIC_SHUTDOWN_QUIET_PERIOD = GetterUtil.getLong(PropsUtil.get(PropsKeys.PORTAL_FABRIC_SHUTDOWN_QUIET_PERIOD));
+
+	public static final long PORTAL_FABRIC_SHUTDOWN_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.PORTAL_FABRIC_SHUTDOWN_TIMEOUT));
+
 	public static final boolean PORTAL_IMPERSONATION_ENABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTAL_IMPERSONATION_ENABLE));
 
-	public static final String PORTAL_INSTANCE_HTTP_INET_SOCKET_ADDRESS = PropsUtil.get(PropsKeys.PORTAL_INSTANCE_HTTP_INET_SOCKET_ADDRESS);
+	public static final String PORTAL_INSTANCE_INET_SOCKET_ADDRESS = PropsUtil.get(PropsKeys.PORTAL_INSTANCE_INET_SOCKET_ADDRESS);
 
-	public static final String PORTAL_INSTANCE_HTTPS_INET_SOCKET_ADDRESS = PropsUtil.get(PropsKeys.PORTAL_INSTANCE_HTTPS_INET_SOCKET_ADDRESS);
+	public static final String PORTAL_INSTANCE_PROTOCOL = PropsUtil.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL);
 
 	public static final String PORTAL_JAAS_AUTH_TYPE = GetterUtil.getString(PropsUtil.get(PropsKeys.PORTAL_JAAS_AUTH_TYPE));
 
@@ -1510,6 +1331,8 @@ public class PropsValues {
 
 	public static String[] PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS = PropsUtil.getArray(PropsKeys.PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS);
 
+	public static final boolean PORTLET_CONFIG_SHOW_PORTLET_ID = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTLET_CONFIG_SHOW_PORTLET_ID));
+
 	public static final String[] PORTLET_CONFIGS = PropsUtil.getArray(PropsKeys.PORTLET_CONFIGS);
 
 	public static final boolean PORTLET_CONTAINER_RESTRICT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTLET_CONTAINER_RESTRICT));
@@ -1530,6 +1353,10 @@ public class PropsValues {
 
 	public static String[] PORTLET_INTERRUPTED_REQUEST_WHITELIST_ACTIONS = PropsUtil.getArray(PropsKeys.PORTLET_INTERRUPTED_REQUEST_WHITELIST_ACTIONS);
 
+	public static final int PORTLET_PREFERENCES_CACHE_KEY_THRESHOLD_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PORTLET_PREFERENCES_CACHE_KEY_THRESHOLD_SIZE));
+
+	public static final boolean PORTLET_PREFERENCES_STRICT_STORE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTLET_PREFERENCES_STRICT_STORE));
+
 	public static final String PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION = PropsUtil.get(PropsKeys.PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION);
 
 	public static final boolean PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION_LAYOUT = StringUtil.equalsIgnoreCase(PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION, "layout");
@@ -1537,6 +1364,8 @@ public class PropsValues {
 	public static final boolean PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION_LAYOUT_SET = !PORTLET_PUBLIC_RENDER_PARAMETER_DISTRIBUTION_LAYOUT;
 
 	public static final String PORTLET_RESOURCE_ID_BANNED_PATHS_REGEXP = PropsUtil.get(PropsKeys.PORTLET_RESOURCE_ID_BANNED_PATHS_REGEXP);
+
+	public static final boolean PORTLET_SESSION_REPLICATE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTLET_SESSION_REPLICATE_ENABLED));
 
 	public static final boolean PORTLET_URL_ANCHOR_ENABLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTLET_URL_ANCHOR_ENABLE));
 
@@ -1570,6 +1399,8 @@ public class PropsValues {
 
 	public static final String[] REQUEST_SHARED_ATTRIBUTES = PropsUtil.getArray(PropsKeys.REQUEST_SHARED_ATTRIBUTES);
 
+	public static final String[] REQUEST_UNWRAP_PACKAGES = PropsUtil.getArray(PropsKeys.REQUEST_UNWRAP_PACKAGES);
+
 	public static String[] RESOURCE_ACTIONS_CONFIGS = PropsUtil.getArray(PropsKeys.RESOURCE_ACTIONS_CONFIGS);
 
 	public static final boolean RESOURCE_ACTIONS_READ_PORTLET_RESOURCES = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES));
@@ -1577,6 +1408,10 @@ public class PropsValues {
 	public static final String RESOURCE_REPOSITORIES_ROOT = PropsUtil.get(PropsKeys.RESOURCE_REPOSITORIES_ROOT);
 
 	public static final String[] REST_PROXY_URL_PREFIXES_ALLOWED = PropsUtil.getArray(PropsKeys.REST_PROXY_URL_PREFIXES_ALLOWED);
+
+	public static final int RETRY_ADVICE_MAX_RETRIES = GetterUtil.getInteger(PropsUtil.get(PropsKeys.RETRY_ADVICE_MAX_RETRIES));
+
+	public static final int RETRY_DATA_SOURCE_MAX_RETRIES = GetterUtil.getInteger(PropsUtil.get(PropsKeys.RETRY_DATA_SOURCE_MAX_RETRIES));
 
 	public static final String ROBOTS_TXT_WITH_SITEMAP = PropsUtil.get(PropsKeys.ROBOTS_TXT_WITH_SITEMAP);
 
@@ -1600,23 +1435,11 @@ public class PropsValues {
 
 	public static String[] RTL_CSS_EXCLUDED_PATHS_REGEXP = PropsUtil.getArray(PropsKeys.RTL_CSS_EXCLUDED_PATHS_REGEXP);
 
-	public static final String SANDBOX_DEPLOY_DIR = PropsUtil.get(PropsKeys.SANDBOX_DEPLOY_DIR);
-
-	public static final boolean SANDBOX_DEPLOY_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SANDBOX_DEPLOY_ENABLED));
-
-	public static final long SANDBOX_DEPLOY_INTERVAL = GetterUtil.getLong(PropsUtil.get(PropsKeys.SANDBOX_DEPLOY_INTERVAL));
-
-	public static final boolean SC_PRODUCT_COMMENTS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SC_PRODUCT_COMMENTS_ENABLED));
-
 	public static final boolean SCHEDULER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SCHEDULER_ENABLED));
-
-	public static final String[] SCRIPTING_FORBIDDEN_CLASSES = PropsUtil.getArray(PropsKeys.SCRIPTING_FORBIDDEN_CLASSES);
 
 	public static final String SCRIPTING_JRUBY_COMPILE_MODE = PropsUtil.get(PropsKeys.SCRIPTING_JRUBY_COMPILE_MODE);
 
 	public static final int SCRIPTING_JRUBY_COMPILE_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SCRIPTING_JRUBY_COMPILE_THRESHOLD), 50);
-
-	public static final String[] SCRIPTING_JRUBY_LOAD_PATHS = PropsUtil.getArray(PropsKeys.SCRIPTING_JRUBY_LOAD_PATHS);
 
 	public static final int SEARCH_CONTAINER_PAGE_DEFAULT_DELTA = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SEARCH_CONTAINER_PAGE_DEFAULT_DELTA), 20);
 
@@ -1629,10 +1452,6 @@ public class PropsValues {
 	public static final boolean SEARCH_CONTAINER_SHOW_PAGINATION_TOP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SEARCH_CONTAINER_SHOW_PAGINATION_TOP));
 
 	public static final int SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA), 10);
-
-	public static final String SEARCH_FACET_CONFIGURATION = PropsUtil.get(PropsKeys.SEARCH_FACET_CONFIGURATION);
-
-	public static final String[] SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES = PropsUtil.getArray(PropsKeys.SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES);
 
 	public static final String[] SERVLET_SERVICE_EVENTS_POST = PropsUtil.getArray(PropsKeys.SERVLET_SERVICE_EVENTS_POST);
 
@@ -1672,6 +1491,8 @@ public class PropsValues {
 
 	public static final boolean SESSION_TIMEOUT_AUTO_EXTEND = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SESSION_TIMEOUT_AUTO_EXTEND));
 
+	public static final int SESSION_TIMEOUT_AUTO_EXTEND_OFFSET = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SESSION_TIMEOUT_AUTO_EXTEND_OFFSET));
+
 	public static final boolean SESSION_TIMEOUT_REDIRECT_ON_EXPIRE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SESSION_TIMEOUT_REDIRECT_ON_EXPIRE));
 
 	public static final int SESSION_TIMEOUT_WARNING = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SESSION_TIMEOUT_WARNING));
@@ -1686,11 +1507,9 @@ public class PropsValues {
 
 	public static final String[] SETUP_DATABASE_TYPES = PropsUtil.getArray(PropsKeys.SETUP_DATABASE_TYPES);
 
-	public static final boolean SETUP_WIZARD_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SETUP_WIZARD_ENABLED));
+	public static final boolean SETUP_WIZARD_ADD_SAMPLE_DATA = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SETUP_WIZARD_ADD_SAMPLE_DATA));
 
-	public static final String SHARD_DEFAULT_NAME = PropsUtil.get(PropsKeys.SHARD_DEFAULT_NAME);
-
-	public static final String SHARD_SELECTOR = PropsUtil.get(PropsKeys.SHARD_SELECTOR);
+	public static boolean SETUP_WIZARD_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SETUP_WIZARD_ENABLED));
 
 	public static final boolean SHOPPING_ORDER_COMMENTS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SHOPPING_ORDER_COMMENTS_ENABLED));
 
@@ -1704,22 +1523,6 @@ public class PropsValues {
 
 	public static final boolean SITES_CONTROL_PANEL_MEMBERS_VISIBLE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SITES_CONTROL_PANEL_MEMBERS_VISIBLE));
 
-	public static String[] SITES_FORM_ADD_ADVANCED = PropsUtil.getArray(PropsKeys.SITES_FORM_ADD_ADVANCED);
-
-	public static String[] SITES_FORM_ADD_MAIN = PropsUtil.getArray(PropsKeys.SITES_FORM_ADD_MAIN);
-
-	public static String[] SITES_FORM_ADD_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.SITES_FORM_ADD_MISCELLANEOUS);
-
-	public static String[] SITES_FORM_ADD_SEO = PropsUtil.getArray(PropsKeys.SITES_FORM_ADD_SEO);
-
-	public static String[] SITES_FORM_UPDATE_ADVANCED = PropsUtil.getArray(PropsKeys.SITES_FORM_UPDATE_ADVANCED);
-
-	public static String[] SITES_FORM_UPDATE_MAIN = PropsUtil.getArray(PropsKeys.SITES_FORM_UPDATE_MAIN);
-
-	public static String[] SITES_FORM_UPDATE_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.SITES_FORM_UPDATE_MISCELLANEOUS);
-
-	public static String[] SITES_FORM_UPDATE_SEO = PropsUtil.getArray(PropsKeys.SITES_FORM_UPDATE_SEO);
-
 	public static final String SITES_FRIENDLY_URL_PAGE_NOT_FOUND = PropsUtil.get(PropsKeys.SITES_FRIENDLY_URL_PAGE_NOT_FOUND);
 
 	public static final boolean SITES_SHOW_INHERIT_CONTENT_SCOPE_FROM_PARENT_SITE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SITES_SHOW_INHERIT_CONTENT_SCOPE_FROM_PARENT_SITE));
@@ -1728,10 +1531,6 @@ public class PropsValues {
 
 	public static String SITES_SITEMAP_DEFAULT_PRIORITY = PropsUtil.get(PropsKeys.SITES_SITEMAP_DEFAULT_PRIORITY);
 
-	public static final int[] SOCIAL_ACTIVITY_CONTRIBUTION_INCREMENTS = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.SOCIAL_ACTIVITY_CONTRIBUTION_INCREMENTS));
-
-	public static final int[] SOCIAL_ACTIVITY_CONTRIBUTION_LIMIT_VALUES = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.SOCIAL_ACTIVITY_CONTRIBUTION_LIMIT_VALUES));
-
 	public static final String SOCIAL_ACTIVITY_COUNTER_PERIOD_LENGTH = PropsUtil.get(PropsKeys.SOCIAL_ACTIVITY_COUNTER_PERIOD_LENGTH);
 
 	public static final int SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT));
@@ -1739,10 +1538,6 @@ public class PropsValues {
 	public static final long SOCIAL_ACTIVITY_LOCK_RETRY_DELAY = GetterUtil.getLong(PropsUtil.get(PropsKeys.SOCIAL_ACTIVITY_LOCK_RETRY_DELAY));
 
 	public static final long SOCIAL_ACTIVITY_LOCK_TIMEOUT = GetterUtil.getLong(PropsUtil.get(PropsKeys.SOCIAL_ACTIVITY_LOCK_TIMEOUT));
-
-	public static final int[] SOCIAL_ACTIVITY_PARTICIPATION_INCREMENTS = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.SOCIAL_ACTIVITY_PARTICIPATION_INCREMENTS));
-
-	public static final int[] SOCIAL_ACTIVITY_PARTICIPATION_LIMIT_VALUES = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.SOCIAL_ACTIVITY_PARTICIPATION_LIMIT_VALUES));
 
 	public static boolean SOCIAL_ACTIVITY_SETS_BUNDLING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SOCIAL_ACTIVITY_SETS_BUNDLING_ENABLED));
 
@@ -1754,9 +1549,13 @@ public class PropsValues {
 
 	public static final String[] SPRING_HIBERNATE_CONFIGURATION_PROXY_FACTORY_PRELOAD_CLASSLOADER_CLASSES = PropsUtil.getArray(PropsKeys.SPRING_HIBERNATE_CONFIGURATION_PROXY_FACTORY_PRELOAD_CLASSLOADER_CLASSES);
 
-	public static boolean SPRING_HIBERNATE_SESSION_DELEGATED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SPRING_HIBERNATE_SESSION_DELEGATED));
+	public static volatile boolean SPRING_HIBERNATE_SESSION_DELEGATED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SPRING_HIBERNATE_SESSION_DELEGATED));
 
 	public static final String[] SPRING_HIBERNATE_SESSION_FACTORY_PRELOAD_CLASSLOADER_CLASSES = PropsUtil.getArray(PropsKeys.SPRING_HIBERNATE_SESSION_FACTORY_PRELOAD_CLASSLOADER_CLASSES);
+
+	public static final boolean SPRING_HIBERNATE_SESSION_FACTORY_VERIFY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SPRING_HIBERNATE_SESSION_FACTORY_VERIFY));
+
+	public static final String[] SPRING_INFRASTRUCTURE_CONFIGS = PropsUtil.getArray(PropsKeys.SPRING_INFRASTRUCTURE_CONFIGS);
 
 	public static final String[] SPRING_PORTLET_CONFIGS = PropsUtil.getArray(PropsKeys.SPRING_PORTLET_CONFIGS);
 
@@ -1768,9 +1567,17 @@ public class PropsValues {
 
 	public static final int SQL_DATA_MAX_PARAMETERS = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SQL_DATA_MAX_PARAMETERS));
 
-	public static boolean STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED));
+	public static boolean STAGING_DELETE_TEMP_LAR_ON_FAILURE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_DELETE_TEMP_LAR_ON_FAILURE));
 
-	public static boolean STAGING_LOCK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_LOCK_ENABLED));
+	public static boolean STAGING_DELETE_TEMP_LAR_ON_SUCCESS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_DELETE_TEMP_LAR_ON_SUCCESS));
+
+	public static int STAGING_DRAFT_EXPORT_IMPORT_CONFIGURATION_CHECK_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.STAGING_DRAFT_EXPORT_IMPORT_CONFIGURATION_CHECK_INTERVAL));
+
+	public static int STAGING_DRAFT_EXPORT_IMPORT_CONFIGURATION_CLEAN_UP_COUNT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.STAGING_DRAFT_EXPORT_IMPORT_CONFIGURATION_CLEAN_UP_COUNT));
+
+	public static final boolean STAGING_LIVE_GROUP_LOCKING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_LIVE_GROUP_LOCKING_ENABLED));
+
+	public static boolean STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED));
 
 	public static final int STAGING_REMOTE_TRANSFER_BUFFER_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.STAGING_REMOTE_TRANSFER_BUFFER_SIZE));
 
@@ -1785,14 +1592,6 @@ public class PropsValues {
 	public static final String STRUTS_PORTLET_IGNORED_PARAMETERS_REGEXP = PropsUtil.get(PropsKeys.STRUTS_PORTLET_IGNORED_PARAMETERS_REGEXP);
 
 	public static final String STRUTS_PORTLET_REQUEST_PROCESSOR = PropsUtil.get(PropsKeys.STRUTS_PORTLET_REQUEST_PROCESSOR);
-
-	public static final boolean TAGS_COMPILER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TAGS_COMPILER_ENABLED));
-
-	public static final boolean TCK_URL = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TCK_URL));
-
-	public static final long TERMS_OF_USE_JOURNAL_ARTICLE_GROUP_ID = GetterUtil.getLong(PropsUtil.get(PropsKeys.TERMS_OF_USE_JOURNAL_ARTICLE_GROUP_ID));
-
-	public static final String TERMS_OF_USE_JOURNAL_ARTICLE_ID = PropsUtil.get(PropsKeys.TERMS_OF_USE_JOURNAL_ARTICLE_ID);
 
 	public static boolean TERMS_OF_USE_REQUIRED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TERMS_OF_USE_REQUIRED));
 
@@ -1832,10 +1631,6 @@ public class PropsValues {
 
 	public static final String TRANSACTION_MANAGER_IMPL = PropsUtil.get(PropsKeys.TRANSACTION_MANAGER_IMPL);
 
-	public static boolean TRANSACTIONAL_CACHE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TRANSACTIONAL_CACHE_ENABLED));
-
-	public static final String[] TRANSACTIONAL_CACHE_NAMES = PropsUtil.getArray(PropsKeys.TRANSACTIONAL_CACHE_NAMES);
-
 	public static final boolean TRANSLATIONS_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TRANSLATIONS_DISABLED));
 
 	public static final boolean TRASH_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TRASH_ENABLED));
@@ -1854,9 +1649,13 @@ public class PropsValues {
 
 	public static final boolean UPGRADE_DATABASE_TRANSACTIONS_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.UPGRADE_DATABASE_TRANSACTIONS_DISABLED));
 
-	public static boolean USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE));
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
+	public static final long UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE = GetterUtil.getLong(PropsUtil.get(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE));
 
-	public static final boolean USER_GROUPS_INDEXER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USER_GROUPS_INDEXER_ENABLED));
+	public static boolean USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE));
 
 	public static boolean USER_GROUPS_NAME_ALLOW_NUMERIC = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USER_GROUPS_NAME_ALLOW_NUMERIC));
 
@@ -1878,33 +1677,29 @@ public class PropsValues {
 
 	public static final String[] USERS_EXPORT_CSV_FIELDS = PropsUtil.getArray(PropsKeys.USERS_EXPORT_CSV_FIELDS);
 
-	public static String[] USERS_FORM_ADD_IDENTIFICATION = PropsUtil.getArray(PropsKeys.USERS_FORM_ADD_IDENTIFICATION);
-
-	public static String[] USERS_FORM_ADD_MAIN = PropsUtil.getArray(PropsKeys.USERS_FORM_ADD_MAIN);
-
-	public static String[] USERS_FORM_ADD_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.USERS_FORM_ADD_MISCELLANEOUS);
-
-	public static String[] USERS_FORM_MY_ACCOUNT_IDENTIFICATION = PropsUtil.getArray(PropsKeys.USERS_FORM_MY_ACCOUNT_IDENTIFICATION);
-
-	public static String[] USERS_FORM_MY_ACCOUNT_MAIN = PropsUtil.getArray(PropsKeys.USERS_FORM_MY_ACCOUNT_MAIN);
-
-	public static String[] USERS_FORM_MY_ACCOUNT_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.USERS_FORM_MY_ACCOUNT_MISCELLANEOUS);
-
-	public static String[] USERS_FORM_UPDATE_IDENTIFICATION = PropsUtil.getArray(PropsKeys.USERS_FORM_UPDATE_IDENTIFICATION);
-
-	public static String[] USERS_FORM_UPDATE_MAIN = PropsUtil.getArray(PropsKeys.USERS_FORM_UPDATE_MAIN);
-
-	public static String[] USERS_FORM_UPDATE_MISCELLANEOUS = PropsUtil.getArray(PropsKeys.USERS_FORM_UPDATE_MISCELLANEOUS);
-
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final boolean USERS_IMAGE_CHECK_TOKEN = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USERS_IMAGE_CHECK_TOKEN));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean USERS_IMAGE_DEFAULT_USE_INITIALS = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USERS_IMAGE_DEFAULT_USE_INITIALS));
+
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static int USERS_IMAGE_MAX_HEIGHT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.USERS_IMAGE_MAX_HEIGHT));
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static int USERS_IMAGE_MAX_WIDTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.USERS_IMAGE_MAX_WIDTH));
-
-	public static final boolean USERS_INDEXER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USERS_INDEXER_ENABLED));
-
-	public static boolean USERS_LAST_NAME_REQUIRED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.USERS_LAST_NAME_REQUIRED));
 
 	public static final String[] USERS_LIST_VIEWS = PropsUtil.getArray(PropsKeys.USERS_LIST_VIEWS);
 
@@ -1940,19 +1735,9 @@ public class PropsValues {
 
 	public static final boolean VALUE_OBJECT_MVCC_ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.VALUE_OBJECT_MVCC_ENTITY_CACHE_ENABLED));
 
-	public static final boolean VELOCITY_ENGINE_DIRECTIVE_IF_TO_STRING_NULL_CHECK = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.VELOCITY_ENGINE_DIRECTIVE_IF_TO_STRING_NULL_CHECK));
-
-	public static final int VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL));
-
-	public static final String[] VELOCITY_ENGINE_RESOURCE_PARSERS = PropsUtil.getArray(PropsKeys.VELOCITY_ENGINE_RESOURCE_PARSERS);
-
-	public static final String[] VELOCITY_ENGINE_RESTRICTED_CLASSES = PropsUtil.getArray(PropsKeys.VELOCITY_ENGINE_RESTRICTED_CLASSES);
-
-	public static final String[] VELOCITY_ENGINE_RESTRICTED_PACKAGES = PropsUtil.getArray(PropsKeys.VELOCITY_ENGINE_RESTRICTED_PACKAGES);
-
-	public static final String[] VELOCITY_ENGINE_RESTRICTED_VARIABLES = PropsUtil.getArray(PropsKeys.VELOCITY_ENGINE_RESTRICTED_VARIABLES);
-
 	public static final boolean VERIFY_DATABASE_TRANSACTIONS_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.VERIFY_DATABASE_TRANSACTIONS_DISABLED));
+
+	public static final boolean VERIFY_PATCH_LEVELS_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.VERIFY_PATCH_LEVELS_DISABLED));
 
 	public static final int VERIFY_PROCESS_CONCURRENCY_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.VERIFY_PROCESS_CONCURRENCY_THRESHOLD));
 
@@ -1963,6 +1748,18 @@ public class PropsValues {
 	public static final String[] VIRTUAL_HOSTS_VALID_HOSTS = PropsUtil.getArray(PropsKeys.VIRTUAL_HOSTS_VALID_HOSTS);
 
 	public static final boolean WEB_SERVER_DISPLAY_NODE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WEB_SERVER_DISPLAY_NODE));
+
+	public static final boolean WEB_SERVER_FORWARDED_HOST_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WEB_SERVER_FORWARDED_HOST_ENABLED));
+
+	public static final String WEB_SERVER_FORWARDED_HOST_HEADER = PropsUtil.get(PropsKeys.WEB_SERVER_FORWARDED_HOST_HEADER);
+
+	public static final boolean WEB_SERVER_FORWARDED_PORT_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WEB_SERVER_FORWARDED_PORT_ENABLED));
+
+	public static final String WEB_SERVER_FORWARDED_PORT_HEADER = PropsUtil.get(PropsKeys.WEB_SERVER_FORWARDED_PORT_HEADER);
+
+	public static final boolean WEB_SERVER_FORWARDED_PROTOCOL_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WEB_SERVER_FORWARDED_PROTOCOL_ENABLED));
+
+	public static final String WEB_SERVER_FORWARDED_PROTOCOL_HEADER = PropsUtil.get(PropsKeys.WEB_SERVER_FORWARDED_PROTOCOL_HEADER);
 
 	public static final String WEB_SERVER_HOST = PropsUtil.get(PropsKeys.WEB_SERVER_HOST);
 
@@ -1990,31 +1787,9 @@ public class PropsValues {
 
 	public static final String WIDGET_SERVLET_MAPPING = PropsUtil.get(PropsKeys.WIDGET_SERVLET_MAPPING);
 
-	public static final String WIKI_DISPLAY_TEMPLATES_CONFIG = PropsUtil.get(PropsKeys.WIKI_DISPLAY_TEMPLATES_CONFIG);
-
-	public static final String[] WIKI_IMPORTERS = PropsUtil.getArray(PropsKeys.WIKI_IMPORTERS);
-
-	public static final String WIKI_INITIAL_NODE_NAME = PropsUtil.get(PropsKeys.WIKI_INITIAL_NODE_NAME);
-
-	public static final boolean WIKI_PAGE_COMMENTS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WIKI_PAGE_COMMENTS_ENABLED));
-
-	public static final boolean WIKI_PAGE_MINOR_EDIT_ADD_SOCIAL_ACTIVITY = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WIKI_PAGE_MINOR_EDIT_ADD_SOCIAL_ACTIVITY));
-
-	public static final boolean WIKI_PAGE_MINOR_EDIT_SEND_EMAIL = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WIKI_PAGE_MINOR_EDIT_SEND_EMAIL));
-
-	public static final boolean WIKI_PAGE_RATINGS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.WIKI_PAGE_RATINGS_ENABLED));
-
-	public static final String WIKI_PAGE_TITLES_REGEXP = PropsUtil.get(PropsKeys.WIKI_PAGE_TITLES_REGEXP);
-
-	public static final String WIKI_PAGE_TITLES_REMOVE_REGEXP = PropsUtil.get(PropsKeys.WIKI_PAGE_TITLES_REMOVE_REGEXP);
-
-	public static final String[] WIKI_PARSERS_CREOLE_SUPPORTED_PROTOCOLS = PropsUtil.getArray(PropsKeys.WIKI_PARSERS_CREOLE_SUPPORTED_PROTOCOLS);
-
-	public static final int WIKI_RSS_ABSTRACT_LENGTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.WIKI_RSS_ABSTRACT_LENGTH));
+	public static final boolean XML_SECURITY_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.XML_SECURITY_ENABLED));
 
 	public static final boolean XML_VALIDATION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.XML_VALIDATION_ENABLED));
-
-	public static final boolean XSL_TEMPLATE_SECURE_PROCESSING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.XSL_TEMPLATE_SECURE_PROCESSING_ENABLED));
 
 	public static final boolean XUGGLER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.XUGGLER_ENABLED));
 
@@ -2039,6 +1814,16 @@ public class PropsValues {
 
 		if (!LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED) {
 			LAYOUT_USER_PUBLIC_LAYOUTS_AUTO_CREATE = false;
+		}
+
+		for (int i = 0; i < LOGIN_FORM_NAVIGATION_POST.length; i++) {
+			LOGIN_FORM_NAVIGATION_POST[i] = TextFormatter.format(
+				LOGIN_FORM_NAVIGATION_POST[i], TextFormatter.N);
+		}
+
+		for (int i = 0; i < LOGIN_FORM_NAVIGATION_PRE.length; i++) {
+			LOGIN_FORM_NAVIGATION_PRE[i] = TextFormatter.format(
+				LOGIN_FORM_NAVIGATION_PRE[i], TextFormatter.N);
 		}
 	}
 

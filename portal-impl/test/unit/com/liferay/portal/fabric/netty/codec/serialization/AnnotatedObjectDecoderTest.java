@@ -17,8 +17,8 @@ package com.liferay.portal.fabric.netty.codec.serialization;
 import com.liferay.portal.fabric.netty.util.NettyUtil;
 import com.liferay.portal.kernel.io.AnnotatedObjectOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -255,7 +255,7 @@ public class AnnotatedObjectDecoderTest {
 	private void _assertChannelPipeline(ChannelHandler... channelHandlers) {
 		Map<String, ChannelHandler> map = _innerChannelPipeline.toMap();
 
-		Assert.assertEquals(channelHandlers.length, map.size());
+		Assert.assertEquals(map.toString(), channelHandlers.length, map.size());
 		Assert.assertEquals(
 			Arrays.asList(channelHandlers),
 			new ArrayList<ChannelHandler>(map.values()));

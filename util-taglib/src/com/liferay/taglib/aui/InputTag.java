@@ -14,22 +14,23 @@
 
 package com.liferay.taglib.aui;
 
+import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.servlet.taglib.aui.ValidatorTag;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.ModelHintsUtil;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.aui.base.BaseInputTag;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -70,11 +71,16 @@ public class InputTag extends BaseInputTag {
 			baseType = ModelHintsUtil.getType(model.getName(), getField());
 		}
 		else if (Validator.isNotNull(type)) {
-			if (Validator.equals(type, "checkbox") ||
-				Validator.equals(type, "radio") ||
-				Validator.equals(type, "resource")) {
+			if (Objects.equals(type, "checkbox") ||
+				Objects.equals(type, "radio") ||
+				Objects.equals(type, "resource")) {
 
 				baseType = type;
+			}
+			else if (Objects.equals(type, "toggle-card") ||
+					 Objects.equals(type, "toggle-switch")) {
+
+				baseType = "checkbox";
 			}
 		}
 
@@ -233,8 +239,8 @@ public class InputTag extends BaseInputTag {
 
 				id = AUIUtil.normalizeId(fieldParam);
 			}
-			else if (!Validator.equals(type, "assetTags") &&
-					 !Validator.equals(type, "radio")) {
+			else if (!Objects.equals(type, "assetTags") &&
+					 !Objects.equals(type, "radio")) {
 
 				id = AUIUtil.normalizeId(name);
 			}
@@ -246,7 +252,7 @@ public class InputTag extends BaseInputTag {
 
 		String forLabel = id;
 
-		if (Validator.equals(type,"assetTags")) {
+		if (Objects.equals(type, "assetTags")) {
 			forLabel = forLabel.concat("assetTagNames");
 		}
 
@@ -259,15 +265,15 @@ public class InputTag extends BaseInputTag {
 		String label = getLabel();
 
 		if (label == null) {
-			label = TextFormatter.format(name, TextFormatter.P);
+			label = TextFormatter.format(name, TextFormatter.K);
 		}
 
 		String title = getTitle();
 
-		if ((title == null) && (Validator.isNull(label) ||
-			 Validator.equals(type, "image"))) {
+		if ((title == null) &&
+			(Validator.isNull(label) || Objects.equals(type, "image"))) {
 
-			title = TextFormatter.format(name, TextFormatter.P);
+			title = TextFormatter.format(name, TextFormatter.K);
 		}
 
 		boolean wrappedField = getWrappedField();
@@ -304,12 +310,12 @@ public class InputTag extends BaseInputTag {
 	}
 
 	protected void updateFormCheckboxNames() {
-		if (!Validator.equals(getType(), "checkbox")) {
+		if (!Objects.equals(getBaseType(), "checkbox")) {
 			return;
 		}
 
 		List<String> checkboxNames = (List<String>)request.getAttribute(
-			"aui:form:checkboxNames");
+			"LIFERAY_SHARED_aui:form:checkboxNames");
 
 		if (checkboxNames != null) {
 			String inputName = getInputName();

@@ -14,18 +14,22 @@
 
 package com.liferay.portlet.social.service;
 
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.social.model.SocialActivity;
-import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.social.util.SocialActivityHierarchyEntryThreadLocal;
 import com.liferay.portlet.social.util.test.SocialActivityTestUtil;
+import com.liferay.social.kernel.model.SocialActivity;
+import com.liferay.social.kernel.model.SocialActivityConstants;
+import com.liferay.social.kernel.service.SocialActivityLocalServiceUtil;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -43,41 +47,64 @@ public class SocialActivityLocalServiceTest extends BaseSocialActivityTestCase {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+			new LiferayIntegrationTestRule(),
 			SynchronousDestinationTestRule.INSTANCE);
 
 	@Test
 	public void testActivityHierarchy() throws Exception {
-		AssetEntry parentAssetEntry = SocialActivityTestUtil.addAssetEntry(
-			_creatorUser, _group);
+		_parentAssetEntry = SocialActivityTestUtil.addAssetEntry(
+			creatorUser, group);
 
 		SocialActivityHierarchyEntryThreadLocal.push(
-			parentAssetEntry.getClassNameId(), parentAssetEntry.getClassPK());
+			_parentAssetEntry.getClassNameId(), _parentAssetEntry.getClassPK());
 
-		SocialActivityTestUtil.addActivity(
-			_creatorUser, _group, _assetEntry, 1);
+		SocialActivityTestUtil.addActivity(creatorUser, group, assetEntry, 1);
 
 		List<SocialActivity> activities =
 			SocialActivityLocalServiceUtil.getGroupActivities(
-				_group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-		Assert.assertEquals(1, activities.size());
+		Assert.assertEquals(activities.toString(), 1, activities.size());
 
 		SocialActivity activity = activities.get(0);
 
 		Assert.assertEquals(
-			parentAssetEntry.getClassNameId(), activity.getParentClassNameId());
+			_parentAssetEntry.getClassNameId(),
+			activity.getParentClassNameId());
 		Assert.assertEquals(
-			parentAssetEntry.getClassPK(), activity.getParentClassPK());
+			_parentAssetEntry.getClassPK(), activity.getParentClassPK());
 
 		SocialActivityTestUtil.addActivity(
-			_creatorUser, _group, _assetEntry,
+			creatorUser, group, assetEntry,
 			SocialActivityConstants.TYPE_DELETE);
 
 		Assert.assertEquals(
 			1,
 			SocialActivityLocalServiceUtil.getGroupActivitiesCount(
-				_group.getGroupId()));
+				group.getGroupId()));
 	}
+
+	@Test
+	public void testAddActivityTimeDoesNotRound() throws PortalException {
+		long time = (System.currentTimeMillis() % 1000) + 1;
+
+		SocialActivityLocalServiceUtil.addActivity(
+			creatorUser.getUserId(), group.getGroupId(), new Date(time),
+			assetEntry.getClassName(), assetEntry.getClassPK(), 1,
+			StringPool.BLANK, creatorUser.getUserId());
+
+		List<SocialActivity> activities =
+			SocialActivityLocalServiceUtil.getGroupActivities(
+				group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Assert.assertEquals(activities.toString(), 1, activities.size());
+
+		SocialActivity activity = activities.get(0);
+
+		Assert.assertEquals(time, activity.getCreateDate());
+	}
+
+	@DeleteAfterTestRun
+	private AssetEntry _parentAssetEntry;
 
 }

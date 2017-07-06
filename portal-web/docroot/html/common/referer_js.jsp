@@ -16,6 +16,10 @@
 
 <%@ page session="false" %>
 
+<%
+pageContext.setAttribute(WebKeys.THEME_DEFINE_OBJECTS, Boolean.FALSE);
+%>
+
 <%@ include file="/html/common/referer_common.jsp" %>
 
 <script type="text/javascript">
@@ -29,7 +33,7 @@
 	%>
 
 	<c:if test="<%= logout && BrowserSnifferUtil.isIe(request) && PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), PropsKeys.NTLM_AUTH_ENABLED, PropsValues.NTLM_AUTH_ENABLED) %>">
-		document.execCommand("ClearAuthenticationCache");
+		document.execCommand('ClearAuthenticationCache');
 	</c:if>
 
 	location.href = '<%= HtmlUtil.escapeJS(referer) %>';

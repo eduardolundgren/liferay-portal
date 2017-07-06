@@ -1,0 +1,38 @@
+<definition component-name="portal-performance-and-fault-tolerance-ce">
+	<property name="cluster.enabled" value="true" />
+	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
+	<property name="test.run.environment" value="CE" />
+	<property name="testray.main.component.name" value="Clustering" />
+
+	<set-up>
+		<execute macro="TestCase#setUpPortalInstance" />
+
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="Page#tearDownPG" />
+
+				<execute macro="BlogsEntry#tearDownCP" />
+			</else>
+		</if>
+	</tear-down>
+
+	<command name="ClusteringSmoke" priority="5">
+		<property name="app.server.bundles.size" value="1" />
+		<property name="custom.properties" value="dl.store.impl=com.liferay.portal.store.db.DBStore" />
+		<property name="test.name.skip.portal.instance" value="ClusteringCE#ClusteringSmoke" />
+
+		<execute function="AssertConsoleTextNotPresent" value1="cluster=liferay-channel-control" />
+		<execute function="AssertConsoleTextNotPresent" value1="com.liferay.portal.cluster.multiple" />
+	</command>
+</definition>

@@ -125,10 +125,6 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 		return _label;
 	}
 
-	public boolean getLocalizeLabel() {
-		return _localizeLabel;
-	}
-
 	public java.lang.String getLanguageId() {
 		return _languageId;
 	}
@@ -141,16 +137,20 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 		return _localized;
 	}
 
+	public boolean getLocalizeLabel() {
+		return _localizeLabel;
+	}
+
 	public java.lang.Object getMax() {
 		return _max;
 	}
 
-	public java.lang.Class<?> getModel() {
-		return _model;
-	}
-
 	public java.lang.Object getMin() {
 		return _min;
+	}
+
+	public java.lang.Class<?> getModel() {
+		return _model;
 	}
 
 	public boolean getMultiple() {
@@ -219,282 +219,192 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 
 	public void setAutoFocus(boolean autoFocus) {
 		_autoFocus = autoFocus;
-
-		setScopedAttribute("autoFocus", autoFocus);
 	}
 
 	public void setAutoSize(boolean autoSize) {
 		_autoSize = autoSize;
-
-		setScopedAttribute("autoSize", autoSize);
 	}
 
 	public void setBean(java.lang.Object bean) {
 		_bean = bean;
-
-		setScopedAttribute("bean", bean);
 	}
 
 	public void setChangesContext(boolean changesContext) {
 		_changesContext = changesContext;
-
-		setScopedAttribute("changesContext", changesContext);
 	}
 
 	public void setChecked(boolean checked) {
 		_checked = checked;
-
-		setScopedAttribute("checked", checked);
 	}
 
 	public void setClassPK(long classPK) {
 		_classPK = classPK;
-
-		setScopedAttribute("classPK", classPK);
 	}
 
 	public void setClassTypePK(long classTypePK) {
 		_classTypePK = classTypePK;
-
-		setScopedAttribute("classTypePK", classTypePK);
 	}
 
 	public void setCssClass(java.lang.String cssClass) {
 		_cssClass = cssClass;
-
-		setScopedAttribute("cssClass", cssClass);
 	}
 
 	public void setData(java.lang.Object data) {
 		_data = data;
-
-		setScopedAttribute("data", data);
 	}
 
 	public void setDateTogglerCheckboxLabel(java.lang.String dateTogglerCheckboxLabel) {
 		_dateTogglerCheckboxLabel = dateTogglerCheckboxLabel;
-
-		setScopedAttribute("dateTogglerCheckboxLabel", dateTogglerCheckboxLabel);
 	}
 
 	public void setDefaultLanguageId(java.lang.String defaultLanguageId) {
 		_defaultLanguageId = defaultLanguageId;
-
-		setScopedAttribute("defaultLanguageId", defaultLanguageId);
 	}
 
 	public void setDisabled(boolean disabled) {
 		_disabled = disabled;
-
-		setScopedAttribute("disabled", disabled);
 	}
 
 	public void setField(java.lang.String field) {
 		_field = field;
-
-		setScopedAttribute("field", field);
 	}
 
 	public void setFieldParam(java.lang.String fieldParam) {
 		_fieldParam = fieldParam;
-
-		setScopedAttribute("fieldParam", fieldParam);
 	}
 
 	public void setFirst(boolean first) {
 		_first = first;
-
-		setScopedAttribute("first", first);
 	}
 
 	public void setFormName(java.lang.String formName) {
 		_formName = formName;
-
-		setScopedAttribute("formName", formName);
 	}
 
 	public void setHelpMessage(java.lang.String helpMessage) {
 		_helpMessage = helpMessage;
-
-		setScopedAttribute("helpMessage", helpMessage);
 	}
 
 	public void setHelpTextCssClass(java.lang.String helpTextCssClass) {
 		_helpTextCssClass = helpTextCssClass;
-
-		setScopedAttribute("helpTextCssClass", helpTextCssClass);
 	}
 
 	public void setId(java.lang.String id) {
 		_id = id;
-
-		setScopedAttribute("id", id);
 	}
 
 	public void setIgnoreRequestValue(boolean ignoreRequestValue) {
 		_ignoreRequestValue = ignoreRequestValue;
-
-		setScopedAttribute("ignoreRequestValue", ignoreRequestValue);
 	}
 
 	public void setInlineField(boolean inlineField) {
 		_inlineField = inlineField;
-
-		setScopedAttribute("inlineField", inlineField);
 	}
 
 	public void setInlineLabel(java.lang.String inlineLabel) {
 		_inlineLabel = inlineLabel;
-
-		setScopedAttribute("inlineLabel", inlineLabel);
 	}
 
 	public void setLabel(java.lang.String label) {
 		_label = label;
-
-		setScopedAttribute("label", label);
-	}
-
-	public void setLocalizeLabel(boolean localizeLabel) {
-		_localizeLabel = localizeLabel;
-
-		setScopedAttribute("localizeLabel", localizeLabel);
 	}
 
 	public void setLanguageId(java.lang.String languageId) {
 		_languageId = languageId;
-
-		setScopedAttribute("languageId", languageId);
 	}
 
 	public void setLast(boolean last) {
 		_last = last;
-
-		setScopedAttribute("last", last);
 	}
 
 	public void setLocalized(boolean localized) {
 		_localized = localized;
+	}
 
-		setScopedAttribute("localized", localized);
+	public void setLocalizeLabel(boolean localizeLabel) {
+		_localizeLabel = localizeLabel;
 	}
 
 	public void setMax(java.lang.Object max) {
 		_max = max;
-
-		setScopedAttribute("max", max);
-	}
-
-	public void setModel(java.lang.Class<?> model) {
-		_model = model;
-
-		setScopedAttribute("model", model);
 	}
 
 	public void setMin(java.lang.Object min) {
 		_min = min;
+	}
 
-		setScopedAttribute("min", min);
+	public void setModel(java.lang.Class<?> model) {
+		_model = model;
 	}
 
 	public void setMultiple(boolean multiple) {
 		_multiple = multiple;
-
-		setScopedAttribute("multiple", multiple);
 	}
 
 	public void setName(java.lang.String name) {
 		_name = name;
-
-		setScopedAttribute("name", name);
 	}
 
 	public void setOnChange(java.lang.String onChange) {
 		_onChange = onChange;
-
-		setScopedAttribute("onChange", onChange);
 	}
 
 	public void setOnClick(java.lang.String onClick) {
 		_onClick = onClick;
-
-		setScopedAttribute("onClick", onClick);
 	}
 
 	public void setPlaceholder(java.lang.String placeholder) {
 		_placeholder = placeholder;
-
-		setScopedAttribute("placeholder", placeholder);
 	}
 
 	public void setPrefix(java.lang.String prefix) {
 		_prefix = prefix;
-
-		setScopedAttribute("prefix", prefix);
 	}
 
 	public void setRequired(boolean required) {
 		_required = required;
-
-		setScopedAttribute("required", required);
 	}
 
 	public void setResizable(boolean resizable) {
 		_resizable = resizable;
-
-		setScopedAttribute("resizable", resizable);
 	}
 
 	public void setShowRequiredLabel(boolean showRequiredLabel) {
 		_showRequiredLabel = showRequiredLabel;
-
-		setScopedAttribute("showRequiredLabel", showRequiredLabel);
 	}
 
 	public void setSuffix(java.lang.String suffix) {
 		_suffix = suffix;
-
-		setScopedAttribute("suffix", suffix);
 	}
 
 	public void setTitle(java.lang.String title) {
 		_title = title;
-
-		setScopedAttribute("title", title);
 	}
 
 	public void setType(java.lang.String type) {
 		_type = type;
-
-		setScopedAttribute("type", type);
 	}
 
 	public void setUseNamespace(boolean useNamespace) {
 		_useNamespace = useNamespace;
-
-		setScopedAttribute("useNamespace", useNamespace);
 	}
 
 	public void setValue(java.lang.Object value) {
 		_value = value;
-
-		setScopedAttribute("value", value);
 	}
 
 	public void setWrappedField(boolean wrappedField) {
 		_wrappedField = wrappedField;
-
-		setScopedAttribute("wrappedField", wrappedField);
 	}
 
 	public void setWrapperCssClass(java.lang.String wrapperCssClass) {
 		_wrapperCssClass = wrapperCssClass;
-
-		setScopedAttribute("wrapperCssClass", wrapperCssClass);
 	}
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_autoFocus = false;
 		_autoSize = false;
 		_bean = null;
@@ -518,13 +428,13 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 		_inlineField = false;
 		_inlineLabel = null;
 		_label = null;
-		_localizeLabel = true;
 		_languageId = null;
 		_last = false;
 		_localized = false;
+		_localizeLabel = true;
 		_max = null;
-		_model = null;
 		_min = null;
+		_model = null;
 		_multiple = false;
 		_name = null;
 		_onChange = null;
@@ -550,52 +460,52 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		setNamespacedAttribute(request, "autoFocus", _autoFocus);
-		setNamespacedAttribute(request, "autoSize", _autoSize);
-		setNamespacedAttribute(request, "bean", _bean);
-		setNamespacedAttribute(request, "changesContext", _changesContext);
-		setNamespacedAttribute(request, "checked", _checked);
-		setNamespacedAttribute(request, "classPK", _classPK);
-		setNamespacedAttribute(request, "classTypePK", _classTypePK);
-		setNamespacedAttribute(request, "cssClass", _cssClass);
-		setNamespacedAttribute(request, "data", _data);
-		setNamespacedAttribute(request, "dateTogglerCheckboxLabel", _dateTogglerCheckboxLabel);
-		setNamespacedAttribute(request, "defaultLanguageId", _defaultLanguageId);
-		setNamespacedAttribute(request, "disabled", _disabled);
-		setNamespacedAttribute(request, "field", _field);
-		setNamespacedAttribute(request, "fieldParam", _fieldParam);
-		setNamespacedAttribute(request, "first", _first);
-		setNamespacedAttribute(request, "formName", _formName);
-		setNamespacedAttribute(request, "helpMessage", _helpMessage);
-		setNamespacedAttribute(request, "helpTextCssClass", _helpTextCssClass);
-		setNamespacedAttribute(request, "id", _id);
-		setNamespacedAttribute(request, "ignoreRequestValue", _ignoreRequestValue);
-		setNamespacedAttribute(request, "inlineField", _inlineField);
-		setNamespacedAttribute(request, "inlineLabel", _inlineLabel);
-		setNamespacedAttribute(request, "label", _label);
-		setNamespacedAttribute(request, "localizeLabel", _localizeLabel);
-		setNamespacedAttribute(request, "languageId", _languageId);
-		setNamespacedAttribute(request, "last", _last);
-		setNamespacedAttribute(request, "localized", _localized);
-		setNamespacedAttribute(request, "max", _max);
-		setNamespacedAttribute(request, "model", _model);
-		setNamespacedAttribute(request, "min", _min);
-		setNamespacedAttribute(request, "multiple", _multiple);
-		setNamespacedAttribute(request, "name", _name);
-		setNamespacedAttribute(request, "onChange", _onChange);
-		setNamespacedAttribute(request, "onClick", _onClick);
-		setNamespacedAttribute(request, "placeholder", _placeholder);
-		setNamespacedAttribute(request, "prefix", _prefix);
-		setNamespacedAttribute(request, "required", _required);
-		setNamespacedAttribute(request, "resizable", _resizable);
-		setNamespacedAttribute(request, "showRequiredLabel", _showRequiredLabel);
-		setNamespacedAttribute(request, "suffix", _suffix);
-		setNamespacedAttribute(request, "title", _title);
-		setNamespacedAttribute(request, "type", _type);
-		setNamespacedAttribute(request, "useNamespace", _useNamespace);
-		setNamespacedAttribute(request, "value", _value);
-		setNamespacedAttribute(request, "wrappedField", _wrappedField);
-		setNamespacedAttribute(request, "wrapperCssClass", _wrapperCssClass);
+		request.setAttribute("aui:input:autoFocus", String.valueOf(_autoFocus));
+		request.setAttribute("aui:input:autoSize", String.valueOf(_autoSize));
+		request.setAttribute("aui:input:bean", _bean);
+		request.setAttribute("aui:input:changesContext", String.valueOf(_changesContext));
+		request.setAttribute("aui:input:checked", String.valueOf(_checked));
+		request.setAttribute("aui:input:classPK", String.valueOf(_classPK));
+		request.setAttribute("aui:input:classTypePK", String.valueOf(_classTypePK));
+		request.setAttribute("aui:input:cssClass", _cssClass);
+		request.setAttribute("aui:input:data", _data);
+		request.setAttribute("aui:input:dateTogglerCheckboxLabel", _dateTogglerCheckboxLabel);
+		request.setAttribute("aui:input:defaultLanguageId", _defaultLanguageId);
+		request.setAttribute("aui:input:disabled", String.valueOf(_disabled));
+		request.setAttribute("aui:input:field", _field);
+		request.setAttribute("aui:input:fieldParam", _fieldParam);
+		request.setAttribute("aui:input:first", String.valueOf(_first));
+		request.setAttribute("aui:input:formName", _formName);
+		request.setAttribute("aui:input:helpMessage", _helpMessage);
+		request.setAttribute("aui:input:helpTextCssClass", _helpTextCssClass);
+		request.setAttribute("aui:input:id", _id);
+		request.setAttribute("aui:input:ignoreRequestValue", String.valueOf(_ignoreRequestValue));
+		request.setAttribute("aui:input:inlineField", String.valueOf(_inlineField));
+		request.setAttribute("aui:input:inlineLabel", _inlineLabel);
+		request.setAttribute("aui:input:label", _label);
+		request.setAttribute("aui:input:languageId", _languageId);
+		request.setAttribute("aui:input:last", String.valueOf(_last));
+		request.setAttribute("aui:input:localized", String.valueOf(_localized));
+		request.setAttribute("aui:input:localizeLabel", String.valueOf(_localizeLabel));
+		request.setAttribute("aui:input:max", _max);
+		request.setAttribute("aui:input:min", _min);
+		request.setAttribute("aui:input:model", _model);
+		request.setAttribute("aui:input:multiple", String.valueOf(_multiple));
+		request.setAttribute("aui:input:name", _name);
+		request.setAttribute("aui:input:onChange", _onChange);
+		request.setAttribute("aui:input:onClick", _onClick);
+		request.setAttribute("aui:input:placeholder", _placeholder);
+		request.setAttribute("aui:input:prefix", _prefix);
+		request.setAttribute("aui:input:required", String.valueOf(_required));
+		request.setAttribute("aui:input:resizable", String.valueOf(_resizable));
+		request.setAttribute("aui:input:showRequiredLabel", String.valueOf(_showRequiredLabel));
+		request.setAttribute("aui:input:suffix", _suffix);
+		request.setAttribute("aui:input:title", _title);
+		request.setAttribute("aui:input:type", _type);
+		request.setAttribute("aui:input:useNamespace", String.valueOf(_useNamespace));
+		request.setAttribute("aui:input:value", _value);
+		request.setAttribute("aui:input:wrappedField", String.valueOf(_wrappedField));
+		request.setAttribute("aui:input:wrapperCssClass", _wrapperCssClass);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:input:";
@@ -626,13 +536,13 @@ public abstract class BaseInputTag extends com.liferay.taglib.BaseValidatorTagSu
 	private boolean _inlineField = false;
 	private java.lang.String _inlineLabel = null;
 	private java.lang.String _label = null;
-	private boolean _localizeLabel = true;
 	private java.lang.String _languageId = null;
 	private boolean _last = false;
 	private boolean _localized = false;
+	private boolean _localizeLabel = true;
 	private java.lang.Object _max = null;
-	private java.lang.Class<?> _model = null;
 	private java.lang.Object _min = null;
+	private java.lang.Class<?> _model = null;
 	private boolean _multiple = false;
 	private java.lang.String _name = null;
 	private java.lang.String _onChange = null;

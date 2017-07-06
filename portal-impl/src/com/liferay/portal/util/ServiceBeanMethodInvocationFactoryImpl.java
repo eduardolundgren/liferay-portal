@@ -49,8 +49,8 @@ public class ServiceBeanMethodInvocationFactoryImpl
 				"Method interceptor bean IDs array is empty");
 		}
 
-		ServiceBeanMethodInvocation serviceBeanMethodInvocation = create(
-			target, targetClass, method, arguments);
+		ServiceBeanMethodInvocation serviceBeanMethodInvocation =
+			new ServiceBeanMethodInvocation(target, method, arguments);
 
 		List<MethodInterceptor> methodInterceptors = getMethodInterceptors(
 			methodInterceptorBeanIds);
@@ -69,12 +69,15 @@ public class ServiceBeanMethodInvocationFactoryImpl
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	protected ServiceBeanMethodInvocation create(
 		Object target, Class<?> targetClass, Method method,
 		Object[] arguments) {
 
-		return new ServiceBeanMethodInvocation(
-			target, targetClass, method, arguments);
+		return new ServiceBeanMethodInvocation(target, method, arguments);
 	}
 
 	protected List<MethodInterceptor> getMethodInterceptors(
@@ -90,7 +93,7 @@ public class ServiceBeanMethodInvocationFactoryImpl
 			return methodInterceptors;
 		}
 
-		methodInterceptors = new ArrayList<MethodInterceptor>();
+		methodInterceptors = new ArrayList<>();
 
 		for (String methodInterceptorBeanId : methodInterceptorBeanIds) {
 			MethodInterceptor methodInterceptor =
@@ -106,6 +109,6 @@ public class ServiceBeanMethodInvocationFactoryImpl
 	}
 
 	private final Map<String, List<MethodInterceptor>> _methodInterceptors =
-		new HashMap<String, List<MethodInterceptor>>();
+		new HashMap<>();
 
 }

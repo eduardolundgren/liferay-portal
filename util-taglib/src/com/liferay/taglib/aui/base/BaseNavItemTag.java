@@ -123,138 +123,96 @@ public abstract class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag 
 
 	public void setAnchorCssClass(java.lang.String anchorCssClass) {
 		_anchorCssClass = anchorCssClass;
-
-		setScopedAttribute("anchorCssClass", anchorCssClass);
 	}
 
 	public void setAnchorData(java.lang.Object anchorData) {
 		_anchorData = anchorData;
-
-		setScopedAttribute("anchorData", anchorData);
 	}
 
 	public void setAnchorId(java.lang.String anchorId) {
 		_anchorId = anchorId;
-
-		setScopedAttribute("anchorId", anchorId);
 	}
 
 	public void setAriaLabel(java.lang.String ariaLabel) {
 		_ariaLabel = ariaLabel;
-
-		setScopedAttribute("ariaLabel", ariaLabel);
 	}
 
 	public void setAriaRole(java.lang.String ariaRole) {
 		_ariaRole = ariaRole;
-
-		setScopedAttribute("ariaRole", ariaRole);
 	}
 
 	public void setCssClass(java.lang.String cssClass) {
 		_cssClass = cssClass;
-
-		setScopedAttribute("cssClass", cssClass);
 	}
 
 	public void setData(java.lang.Object data) {
 		_data = data;
-
-		setScopedAttribute("data", data);
 	}
 
 	public void setDropdown(boolean dropdown) {
 		_dropdown = dropdown;
-
-		setScopedAttribute("dropdown", dropdown);
 	}
 
 	public void setHref(java.lang.Object href) {
 		_href = href;
-
-		setScopedAttribute("href", href);
 	}
 
 	public void setIconCssClass(java.lang.String iconCssClass) {
 		_iconCssClass = iconCssClass;
-
-		setScopedAttribute("iconCssClass", iconCssClass);
 	}
 
 	public void setIconSrc(java.lang.String iconSrc) {
 		_iconSrc = iconSrc;
-
-		setScopedAttribute("iconSrc", iconSrc);
 	}
 
 	public void setId(java.lang.String id) {
 		_id = id;
-
-		setScopedAttribute("id", id);
 	}
 
 	public void setLabel(java.lang.String label) {
 		_label = label;
-
-		setScopedAttribute("label", label);
 	}
 
 	public void setLocalizeLabel(boolean localizeLabel) {
 		_localizeLabel = localizeLabel;
-
-		setScopedAttribute("localizeLabel", localizeLabel);
 	}
 
 	public void setSelected(boolean selected) {
 		_selected = selected;
-
-		setScopedAttribute("selected", selected);
 	}
 
 	public void setState(java.lang.String state) {
 		_state = state;
-
-		setScopedAttribute("state", state);
 	}
 
 	public void setTarget(java.lang.String target) {
 		_target = target;
-
-		setScopedAttribute("target", target);
 	}
 
 	public void setTitle(java.lang.String title) {
 		_title = title;
-
-		setScopedAttribute("title", title);
 	}
 
 	public void setToggle(boolean toggle) {
 		_toggle = toggle;
-
-		setScopedAttribute("toggle", toggle);
 	}
 
 	public void setToggleTouch(boolean toggleTouch) {
 		_toggleTouch = toggleTouch;
-
-		setScopedAttribute("toggleTouch", toggleTouch);
 	}
 
 	public void setUseDialog(boolean useDialog) {
 		_useDialog = useDialog;
-
-		setScopedAttribute("useDialog", useDialog);
 	}
 
 	public void setWrapDropDownMenu(boolean wrapDropDownMenu) {
 		_wrapDropDownMenu = wrapDropDownMenu;
-
-		setScopedAttribute("wrapDropDownMenu", wrapDropDownMenu);
 	}
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_anchorCssClass = null;
 		_anchorData = null;
 		_anchorId = null;
@@ -285,43 +243,35 @@ public abstract class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag 
 	}
 
 	@Override
-	protected String getStartPage() {
-		return _START_PAGE;
-	}
-
-	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		setNamespacedAttribute(request, "anchorCssClass", _anchorCssClass);
-		setNamespacedAttribute(request, "anchorData", _anchorData);
-		setNamespacedAttribute(request, "anchorId", _anchorId);
-		setNamespacedAttribute(request, "ariaLabel", _ariaLabel);
-		setNamespacedAttribute(request, "ariaRole", _ariaRole);
-		setNamespacedAttribute(request, "cssClass", _cssClass);
-		setNamespacedAttribute(request, "data", _data);
-		setNamespacedAttribute(request, "dropdown", _dropdown);
-		setNamespacedAttribute(request, "href", _href);
-		setNamespacedAttribute(request, "iconCssClass", _iconCssClass);
-		setNamespacedAttribute(request, "iconSrc", _iconSrc);
-		setNamespacedAttribute(request, "id", _id);
-		setNamespacedAttribute(request, "label", _label);
-		setNamespacedAttribute(request, "localizeLabel", _localizeLabel);
-		setNamespacedAttribute(request, "selected", _selected);
-		setNamespacedAttribute(request, "state", _state);
-		setNamespacedAttribute(request, "target", _target);
-		setNamespacedAttribute(request, "title", _title);
-		setNamespacedAttribute(request, "toggle", _toggle);
-		setNamespacedAttribute(request, "toggleTouch", _toggleTouch);
-		setNamespacedAttribute(request, "useDialog", _useDialog);
-		setNamespacedAttribute(request, "wrapDropDownMenu", _wrapDropDownMenu);
+		request.setAttribute("aui:nav-item:anchorCssClass", _anchorCssClass);
+		request.setAttribute("aui:nav-item:anchorData", _anchorData);
+		request.setAttribute("aui:nav-item:anchorId", _anchorId);
+		request.setAttribute("aui:nav-item:ariaLabel", _ariaLabel);
+		request.setAttribute("aui:nav-item:ariaRole", _ariaRole);
+		request.setAttribute("aui:nav-item:cssClass", _cssClass);
+		request.setAttribute("aui:nav-item:data", _data);
+		request.setAttribute("aui:nav-item:dropdown", String.valueOf(_dropdown));
+		request.setAttribute("aui:nav-item:href", _href);
+		request.setAttribute("aui:nav-item:iconCssClass", _iconCssClass);
+		request.setAttribute("aui:nav-item:iconSrc", _iconSrc);
+		request.setAttribute("aui:nav-item:id", _id);
+		request.setAttribute("aui:nav-item:label", _label);
+		request.setAttribute("aui:nav-item:localizeLabel", String.valueOf(_localizeLabel));
+		request.setAttribute("aui:nav-item:selected", String.valueOf(_selected));
+		request.setAttribute("aui:nav-item:state", _state);
+		request.setAttribute("aui:nav-item:target", _target);
+		request.setAttribute("aui:nav-item:title", _title);
+		request.setAttribute("aui:nav-item:toggle", String.valueOf(_toggle));
+		request.setAttribute("aui:nav-item:toggleTouch", String.valueOf(_toggleTouch));
+		request.setAttribute("aui:nav-item:useDialog", String.valueOf(_useDialog));
+		request.setAttribute("aui:nav-item:wrapDropDownMenu", String.valueOf(_wrapDropDownMenu));
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:nav-item:";
 
 	private static final String _END_PAGE =
 		"/html/taglib/aui/nav_item/end.jsp";
-
-	private static final String _START_PAGE =
-		"/html/taglib/aui/nav_item/start.jsp";
 
 	private java.lang.String _anchorCssClass = null;
 	private java.lang.Object _anchorData = null;

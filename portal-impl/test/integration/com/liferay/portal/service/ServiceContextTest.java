@@ -15,9 +15,9 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +39,7 @@ public class ServiceContextTest extends PowerMockito {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testJSONSerialization() {
@@ -48,7 +47,7 @@ public class ServiceContextTest extends PowerMockito {
 
 		serviceContext.setAttribute("TestName", "TestValue");
 
-		Map<String, String> headers = new HashMap<String, String>();
+		Map<String, String> headers = new HashMap<>();
 
 		headers.put("TestHeaderName", "TestHeaderValue");
 

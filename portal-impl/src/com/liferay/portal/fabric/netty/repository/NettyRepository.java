@@ -39,7 +39,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -65,11 +67,17 @@ public class NettyRepository implements Repository<Channel> {
 
 	@Override
 	public void dispose(boolean delete) {
-		for (Path path : pathMap.values()) {
-			FileHelperUtil.delete(true, path);
-		}
+		Set<Map.Entry<Path, Path>> entrySet = pathMap.entrySet();
 
-		pathMap.clear();
+		Iterator<Map.Entry<Path, Path>> iterator = entrySet.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<Path, Path> entry = iterator.next();
+
+			iterator.remove();
+
+			FileHelperUtil.delete(true, entry.getValue());
+		}
 
 		if (delete) {
 			FileHelperUtil.delete(true, repositoryPath);
@@ -103,7 +111,7 @@ public class NettyRepository implements Repository<Channel> {
 		Channel channel, Map<Path, Path> pathMap, boolean deleteAfterFetch) {
 
 		final DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>();
+			new DefaultNoticeableFuture<>();
 
 		if (pathMap.isEmpty()) {
 			defaultNoticeableFuture.set(pathMap);
@@ -111,8 +119,7 @@ public class NettyRepository implements Repository<Channel> {
 			return defaultNoticeableFuture;
 		}
 
-		final Map<Path, Path> resultPathMap =
-			new ConcurrentHashMap<Path, Path>();
+		final Map<Path, Path> resultPathMap = new ConcurrentHashMap<>();
 
 		final AtomicInteger counter = new AtomicInteger(pathMap.size());
 
@@ -187,7 +194,7 @@ public class NettyRepository implements Repository<Channel> {
 		final Path cachedLocalFilePath = pathMap.get(remoteFilePath);
 
 		final DefaultNoticeableFuture<FileResponse> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<FileResponse>();
+			new DefaultNoticeableFuture<>();
 
 		NoticeableFuture<FileResponse> noticeableFuture = asyncBroker.post(
 			remoteFilePath, defaultNoticeableFuture);
@@ -238,80 +245,76 @@ public class NettyRepository implements Repository<Channel> {
 		return new NoticeableFutureConverter<Path, FileResponse>(
 			noticeableFuture) {
 
-				@Override
-				protected Path convert(FileResponse fileResponse)
-					throws IOException {
+			@Override
+			protected Path convert(FileResponse fileResponse)
+				throws IOException {
 
-					if (fileResponse.isFileNotFound()) {
-						if (_log.isWarnEnabled()) {
-							_log.warn(
-								"Remote file " + remoteFilePath +
-									" is not found");
-						}
-
-						return null;
+				if (fileResponse.isFileNotFound()) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Remote file " + remoteFilePath + " is not found");
 					}
 
-					if (fileResponse.isFileNotModified()) {
-						if (_log.isDebugEnabled()) {
-							_log.debug(
-								"Remote file " + remoteFilePath +
-									" is not modified, use cached local file " +
-										cachedLocalFilePath);
-						}
-
-						return cachedLocalFilePath;
-					}
-
-					Path targetLocalFilePath = localFilePath;
-
-					synchronized (fileResponse) {
-						Path recheckCacheLocalFilePath = pathMap.get(
-							remoteFilePath);
-
-						if (recheckCacheLocalFilePath != null) {
-							targetLocalFilePath = recheckCacheLocalFilePath;
-						}
-
-						Path tempLocalFilePath = fileResponse.getLocalFile();
-
-						if (tempLocalFilePath.startsWith(repositoryPath)) {
-							Files.copy(
-								fileResponse.getLocalFile(),
-								targetLocalFilePath,
-								StandardCopyOption.REPLACE_EXISTING);
-						}
-						else {
-							Files.move(
-								fileResponse.getLocalFile(),
-								targetLocalFilePath,
-								StandardCopyOption.REPLACE_EXISTING);
-						}
-
-						if (populateCache) {
-							pathMap.put(remoteFilePath, targetLocalFilePath);
-						}
-
-						fileResponse.setLocalFile(targetLocalFilePath);
-					}
-
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"Fetched remote file " + remoteFilePath + " to " +
-								targetLocalFilePath);
-					}
-
-					return targetLocalFilePath;
+					return null;
 				}
 
-			};
+				if (fileResponse.isFileNotModified()) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Remote file " + remoteFilePath +
+								" is not modified, use cached local file " +
+									cachedLocalFilePath);
+					}
+
+					return cachedLocalFilePath;
+				}
+
+				Path targetLocalFilePath = localFilePath;
+
+				synchronized (fileResponse) {
+					Path recheckCacheLocalFilePath = pathMap.get(
+						remoteFilePath);
+
+					if (recheckCacheLocalFilePath != null) {
+						targetLocalFilePath = recheckCacheLocalFilePath;
+					}
+
+					Path tempLocalFilePath = fileResponse.getLocalFile();
+
+					if (tempLocalFilePath.startsWith(repositoryPath)) {
+						Files.copy(
+							fileResponse.getLocalFile(), targetLocalFilePath,
+							StandardCopyOption.REPLACE_EXISTING);
+					}
+					else {
+						Files.move(
+							fileResponse.getLocalFile(), targetLocalFilePath,
+							StandardCopyOption.REPLACE_EXISTING);
+					}
+
+					if (populateCache) {
+						pathMap.put(remoteFilePath, targetLocalFilePath);
+					}
+
+					fileResponse.setLocalFile(targetLocalFilePath);
+				}
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Fetched remote file " + remoteFilePath + " to " +
+							targetLocalFilePath);
+				}
+
+				return targetLocalFilePath;
+			}
+
+		};
 	}
 
 	protected final AsyncBroker<Path, FileResponse> asyncBroker =
-		new AsyncBroker<Path, FileResponse>();
+		new AsyncBroker<>();
 	protected final long getFileTimeout;
-	protected final Map<Path, Path> pathMap =
-		new ConcurrentHashMap<Path, Path>();
+	protected final Map<Path, Path> pathMap = new ConcurrentHashMap<>();
 	protected final Path repositoryPath;
 
 	private static final Log _log = LogFactoryUtil.getLog(

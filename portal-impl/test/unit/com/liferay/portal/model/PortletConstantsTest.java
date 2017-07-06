@@ -14,7 +14,8 @@
 
 package com.liferay.portal.model;
 
-import com.liferay.portlet.util.PortletKeys;
+import com.liferay.portal.kernel.model.PortletConstants;
+import com.liferay.portlet.util.test.PortletKeys;
 
 import org.junit.Assert;
 import org.junit.Test;

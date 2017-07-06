@@ -14,31 +14,41 @@
 
 package com.liferay.portal.repository.capabilities;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.capabilities.BulkOperationCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
+import com.liferay.portal.repository.capabilities.util.DLFileEntryServiceAdapter;
+import com.liferay.portal.repository.capabilities.util.DLFolderServiceAdapter;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Adolfo Pérez
+ * @deprecated As of 7.0.0, @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.document.library.internal.capabilities.LiferayBulkOperationCapability}
  */
+@Deprecated
 public class LiferayBulkOperationCapability implements BulkOperationCapability {
 
-	public LiferayBulkOperationCapability(long repositoryId) {
-		_repositoryId = repositoryId;
+	public LiferayBulkOperationCapability(
+		DocumentRepository documentRepository,
+		DLFileEntryServiceAdapter dlFileEntryServiceAdapter,
+		DLFolderServiceAdapter dlFolderServiceAdapter) {
+
+		_documentRepository = documentRepository;
+		_dlFileEntryServiceAdapter = dlFileEntryServiceAdapter;
+		_dlFolderServiceAdapter = dlFolderServiceAdapter;
 	}
 
 	@Override
@@ -63,7 +73,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
-			DLFileEntryLocalServiceUtil.getActionableDynamicQuery();
+			_dlFileEntryServiceAdapter.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setAddCriteriaMethod(
 			new RepositoryModelAddCriteriaMethod(filter));
@@ -78,7 +88,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
-			DLFolderLocalServiceUtil.getActionableDynamicQuery();
+			_dlFolderServiceAdapter.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setAddCriteriaMethod(
 			new RepositoryModelAddCriteriaMethod(filter));
@@ -95,10 +105,12 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		_fieldNames.put(Field.CreateDate.class, "createDate");
 	}
 
-	private final long _repositoryId;
+	private final DLFileEntryServiceAdapter _dlFileEntryServiceAdapter;
+	private final DLFolderServiceAdapter _dlFolderServiceAdapter;
+	private final DocumentRepository _documentRepository;
 
 	private static class FileEntryPerformActionMethod
-		implements ActionableDynamicQuery.PerformActionMethod {
+		implements ActionableDynamicQuery.PerformActionMethod<DLFileEntry> {
 
 		public FileEntryPerformActionMethod(
 			RepositoryModelOperation repositoryModelOperation) {
@@ -107,8 +119,8 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		}
 
 		@Override
-		public void performAction(Object object) throws PortalException {
-			DLFileEntry dlFileEntry = (DLFileEntry)object;
+		public void performAction(DLFileEntry dlFileEntry)
+			throws PortalException {
 
 			FileEntry fileEntry = new LiferayFileEntry(dlFileEntry);
 
@@ -120,7 +132,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 	}
 
 	private static class FolderPerformActionMethod
-		implements ActionableDynamicQuery.PerformActionMethod {
+		implements ActionableDynamicQuery.PerformActionMethod<DLFolder> {
 
 		public FolderPerformActionMethod(
 			RepositoryModelOperation repositoryModelOperation) {
@@ -129,9 +141,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		}
 
 		@Override
-		public void performAction(Object object) throws PortalException {
-			DLFolder dlFolder = (DLFolder)object;
-
+		public void performAction(DLFolder dlFolder) throws PortalException {
 			if (dlFolder.isMountPoint()) {
 				return;
 			}
@@ -155,7 +165,8 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		@Override
 		public void addCriteria(DynamicQuery dynamicQuery) {
 			dynamicQuery.add(
-				RestrictionsFactoryUtil.eq("repositoryId", _repositoryId));
+				RestrictionsFactoryUtil.eq(
+					"repositoryId", _documentRepository.getRepositoryId()));
 
 			if (_filter != null) {
 				addFilterCriteria(dynamicQuery);

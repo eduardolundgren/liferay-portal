@@ -17,23 +17,23 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ColorScheme;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.VirtualHost;
+import com.liferay.portal.kernel.model.cache.CacheField;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
+import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.CacheField;
-import com.liferay.portal.model.ColorScheme;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.model.LayoutSetPrototype;
-import com.liferay.portal.model.Theme;
-import com.liferay.portal.model.VirtualHost;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
-import com.liferay.portal.service.ThemeLocalServiceUtil;
-import com.liferay.portal.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -67,7 +67,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	@Override
 	public ColorScheme getColorScheme() {
 		return ThemeLocalServiceUtil.getColorScheme(
-			getCompanyId(), getTheme().getThemeId(), getColorSchemeId(), false);
+			getCompanyId(), getThemeId(), getColorSchemeId());
 	}
 
 	@Override
@@ -78,8 +78,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 
 		_companyFallbackVirtualHostname = StringPool.BLANK;
 
-		if (Validator.isNotNull(
-				PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME) &&
+		if (Validator.isNotNull(PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME) &&
 			!isPrivateLayout()) {
 
 			Group group = GroupLocalServiceUtil.fetchGroup(
@@ -103,8 +102,6 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	 * Returns the layout set's group.
 	 *
 	 * @return the layout set's group
-	 * @throws PortalException if a group with the primary key could not be
-	 *         found
 	 */
 	@Override
 	public Group getGroup() throws PortalException {
@@ -121,8 +118,6 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	 *
 	 * @return the layout set prototype's ID, or <code>0</code> if it has no
 	 *         layout set prototype
-	 * @throws PortalException if a matching layout set prototype could not be
-	 *         found
 	 */
 	@Override
 	public long getLayoutSetPrototypeId() throws PortalException {
@@ -215,26 +210,27 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 
 	@Override
 	public Theme getTheme() {
-		return ThemeLocalServiceUtil.getTheme(
-			getCompanyId(), getThemeId(), false);
+		return ThemeLocalServiceUtil.getTheme(getCompanyId(), getThemeId());
 	}
 
 	@Override
 	public String getThemeSetting(String key, String device) {
-		UnicodeProperties settingsProperties = getSettingsProperties();
+		String settings = super.getSettings();
 
-		String value = settingsProperties.getProperty(
-			ThemeSettingImpl.namespaceProperty(device, key));
+		if (!Validator.isBlank(settings)) {
+			UnicodeProperties settingsProperties = getSettingsProperties();
 
-		if (value != null) {
-			return value;
+			String value = settingsProperties.getProperty(
+				ThemeSettingImpl.namespaceProperty(device, key));
+
+			if (value != null) {
+				return value;
+			}
 		}
 
 		Theme theme = getTheme(device);
 
-		value = theme.getSetting(key);
-
-		return value;
+		return theme.getSetting(key);
 	}
 
 	/**
@@ -268,16 +264,8 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	}
 
 	@Override
-	public ColorScheme getWapColorScheme() {
-		return ThemeLocalServiceUtil.getColorScheme(
-			getCompanyId(), getWapTheme().getThemeId(), getWapColorSchemeId(),
-			true);
-	}
-
-	@Override
-	public Theme getWapTheme() {
-		return ThemeLocalServiceUtil.getTheme(
-			getCompanyId(), getWapThemeId(), true);
+	public boolean hasSetModifiedDate() {
+		return true;
 	}
 
 	@Override
@@ -344,25 +332,21 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 				getCompanyId(),
 				PropsKeys.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID);
 
-			return ThemeLocalServiceUtil.getTheme(
-				getCompanyId(), themeId, !device.equals("regular"));
-		}
-		else if (device.equals("regular")) {
-			return getTheme();
+			return ThemeLocalServiceUtil.getTheme(getCompanyId(), themeId);
 		}
 		else {
-			return getWapTheme();
+			return getTheme();
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(LayoutSetImpl.class);
 
-	@CacheField
+	@CacheField(propagateToInterface = true)
 	private String _companyFallbackVirtualHostname;
 
 	private UnicodeProperties _settingsProperties;
 
-	@CacheField
+	@CacheField(propagateToInterface = true)
 	private String _virtualHostname;
 
 }

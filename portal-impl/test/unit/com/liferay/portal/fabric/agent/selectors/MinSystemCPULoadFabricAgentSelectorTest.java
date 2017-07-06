@@ -17,7 +17,7 @@ package com.liferay.portal.fabric.agent.selectors;
 import com.liferay.portal.fabric.agent.FabricAgent;
 import com.liferay.portal.fabric.status.AdvancedOperatingSystemMXBean;
 import com.liferay.portal.fabric.status.FabricStatus;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.lang.reflect.InvocationHandler;
@@ -62,9 +62,10 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		Collection<FabricAgent> fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
-		Assert.assertEquals(1, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 1, fabricAgents.size());
 
 		Iterator<FabricAgent> iterator = fabricAgents.iterator();
 
@@ -77,9 +78,10 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
-		Assert.assertEquals(1, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 1, fabricAgents.size());
 
 		iterator = fabricAgents.iterator();
 
@@ -92,9 +94,10 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
-		Assert.assertEquals(1, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 1, fabricAgents.size());
 
 		iterator = fabricAgents.iterator();
 
@@ -107,9 +110,10 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 
 		fabricAgents = fabricAgentSelector.select(
 			new ArrayList<FabricAgent>(
-				Arrays.asList(fabricAgent1, fabricAgent2)), null);
+				Arrays.asList(fabricAgent1, fabricAgent2)),
+			null);
 
-		Assert.assertEquals(1, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 1, fabricAgents.size());
 
 		iterator = fabricAgents.iterator();
 
@@ -136,11 +140,15 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 		public Object invoke(Object proxy, Method method, Object[] args) {
 			String methodName = method.getName();
 
-			if (!methodName.equals("getSystemCpuLoad")) {
-				throw new UnsupportedOperationException();
+			if (methodName.equals("getSystemCpuLoad")) {
+				return _systemCpuLoad;
 			}
 
-			return _systemCpuLoad;
+			if (methodName.equals("toString")) {
+				return String.valueOf(_systemCpuLoad);
+			}
+
+			throw new UnsupportedOperationException();
 		}
 
 		private final Double _systemCpuLoad;
@@ -158,14 +166,18 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 		public Object invoke(Object proxy, Method method, Object[] args) {
 			String methodName = method.getName();
 
-			if (!methodName.equals("getFabricStatus")) {
-				throw new UnsupportedOperationException();
+			if (methodName.equals("getFabricStatus")) {
+				return ProxyUtil.newProxyInstance(
+					FabricStatus.class.getClassLoader(),
+					new Class<?>[] {FabricStatus.class},
+					new FabricStatusInvocationHandler(_systemCpuLoad));
 			}
 
-			return ProxyUtil.newProxyInstance(
-				FabricStatus.class.getClassLoader(),
-				new Class<?>[] {FabricStatus.class},
-				new FabricStatusInvocationHandler(_systemCpuLoad));
+			if (methodName.equals("toString")) {
+				return String.valueOf(_systemCpuLoad);
+			}
+
+			throw new UnsupportedOperationException();
 		}
 
 		private final Double _systemCpuLoad;
@@ -183,15 +195,19 @@ public class MinSystemCPULoadFabricAgentSelectorTest {
 		public Object invoke(Object proxy, Method method, Object[] args) {
 			String methodName = method.getName();
 
-			if (!methodName.equals("getAdvancedOperatingSystemMXBean")) {
-				throw new UnsupportedOperationException();
+			if (methodName.equals("getAdvancedOperatingSystemMXBean")) {
+				return ProxyUtil.newProxyInstance(
+					AdvancedOperatingSystemMXBean.class.getClassLoader(),
+					new Class<?>[] {AdvancedOperatingSystemMXBean.class},
+					new AdvancedOperatingSystemMXBeanInvocationHandler(
+						_systemCpuLoad));
 			}
 
-			return ProxyUtil.newProxyInstance(
-				AdvancedOperatingSystemMXBean.class.getClassLoader(),
-				new Class<?>[] {AdvancedOperatingSystemMXBean.class},
-				new AdvancedOperatingSystemMXBeanInvocationHandler(
-					_systemCpuLoad));
+			if (methodName.equals("toString")) {
+				return String.valueOf(_systemCpuLoad);
+			}
+
+			throw new UnsupportedOperationException();
 		}
 
 		private final Double _systemCpuLoad;

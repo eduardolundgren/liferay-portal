@@ -19,11 +19,11 @@ import com.liferay.portal.kernel.resiliency.spi.MockSPI;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PortalUtil;
 
 import java.io.IOException;
 
@@ -73,8 +73,7 @@ public class AcceptorServletTest {
 					return _pathContext;
 				}
 
-			}
-		);
+			});
 
 		ConcurrentMap<String, Object> attributes =
 			LocalProcessLauncher.ProcessContext.getAttributes();
@@ -100,7 +99,7 @@ public class AcceptorServletTest {
 
 		final AtomicBoolean failOnForward = new AtomicBoolean();
 		final AtomicReference<String> forwardPathReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final IOException ioException = new IOException("Unable to forward");
 
 		MockServletContext mockServletContext = new MockServletContext() {
@@ -177,10 +176,9 @@ public class AcceptorServletTest {
 		Assert.assertNull(_recordSPIAgent._exception);
 		Assert.assertTrue(_mockHttpSession.isInvalid());
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			AcceptorServlet.class.getName(), Level.SEVERE);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					AcceptorServlet.class.getName(), Level.SEVERE)) {
 
 			// IOException on prepare request
 
@@ -199,7 +197,7 @@ public class AcceptorServletTest {
 					"IOException on prepare request", ioe.getMessage());
 			}
 
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
 
 			LogRecord logRecord = logRecords.get(0);
 
@@ -227,7 +225,7 @@ public class AcceptorServletTest {
 					"RuntimeException on prepare request", re.getMessage());
 			}
 
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
 
 			logRecord = logRecords.get(0);
 
@@ -236,9 +234,6 @@ public class AcceptorServletTest {
 			Assert.assertSame(RuntimeException.class, throwable.getClass());
 			Assert.assertEquals(
 				"RuntimeException on prepare request", throwable.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Unable to forward

@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.messageboards.util;
 
+import com.liferay.message.boards.kernel.model.MBMessageConstants;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -21,9 +24,12 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.mail.internet.MimeUtility;
 
 /**
  * @author Jorge Ferrer
@@ -31,19 +37,43 @@ import java.util.List;
 public class MBMailMessage {
 
 	public void addBytes(String fileName, byte[] bytes) {
+		try {
+			fileName = MimeUtility.decodeText(fileName);
+		}
+		catch (UnsupportedEncodingException uee) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to decode file name " + fileName, uee);
+			}
+		}
+
 		_bytesOVPs.add(new ObjectValuePair<String, byte[]>(fileName, bytes));
 	}
 
 	public String getBody() {
-		if (Validator.isNotNull(_plainBody)) {
-			return GetterUtil.getString(_plainBody);
+		String body = null;
+
+		if (MBMessageConstants.DEFAULT_FORMAT.equals("bbcode")) {
+			if (Validator.isNotNull(_plainBody)) {
+				body = GetterUtil.getString(_plainBody);
+			}
+			else if (Validator.isNotNull(_htmlBody)) {
+				body = HtmlUtil.extractText(_htmlBody);
+			}
 		}
-		else if (Validator.isNotNull(_htmlBody)) {
-			return HtmlUtil.extractText(_htmlBody);
+		else if (MBMessageConstants.DEFAULT_FORMAT.equals("html")) {
+			if (Validator.isNotNull(_htmlBody)) {
+				body = GetterUtil.getString(_htmlBody);
+			}
+			else if (Validator.isNotNull(_plainBody)) {
+				body = GetterUtil.getString(_plainBody);
+			}
 		}
-		else {
-			return "-";
+
+		if (Validator.isNull(body)) {
+			body = "-";
 		}
+
+		return body;
 	}
 
 	public String getHtmlBody() {
@@ -52,15 +82,14 @@ public class MBMailMessage {
 
 	public List<ObjectValuePair<String, InputStream>> getInputStreamOVPs() {
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
-			new ArrayList<ObjectValuePair<String, InputStream>>(
-				_bytesOVPs.size());
+			new ArrayList<>(_bytesOVPs.size());
 
 		for (ObjectValuePair<String, byte[]> bytesOVP : _bytesOVPs) {
 			String key = bytesOVP.getKey();
 			byte[] bytes = bytesOVP.getValue();
 
 			ByteArrayInputStream byteArrayInputStream =
-							new ByteArrayInputStream(bytes);
+				new ByteArrayInputStream(bytes);
 
 			ObjectValuePair<String, InputStream> inputStreamOVP =
 				new ObjectValuePair<String, InputStream>(
@@ -84,8 +113,11 @@ public class MBMailMessage {
 		_plainBody = plainBody;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		MBMailMessage.class.getName());
+
 	private final List<ObjectValuePair<String, byte[]>> _bytesOVPs =
-		new ArrayList<ObjectValuePair<String, byte[]>>();
+		new ArrayList<>();
 	private String _htmlBody;
 	private String _plainBody;
 

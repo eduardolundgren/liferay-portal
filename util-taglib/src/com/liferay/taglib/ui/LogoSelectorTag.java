@@ -15,8 +15,9 @@
 package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +55,10 @@ public class LogoSelectorTag extends IncludeTag {
 		_showBackground = showBackground;
 	}
 
+	public void setShowButtons(boolean showButtons) {
+		_showButtons = showButtons;
+	}
+
 	public void setTempImageFileName(String tempImageFileName) {
 		_tempImageFileName = tempImageFileName;
 	}
@@ -67,6 +72,7 @@ public class LogoSelectorTag extends IncludeTag {
 		_logoDisplaySelector = null;
 		_maxFileSize = 0;
 		_showBackground = true;
+		_showButtons = true;
 		_tempImageFileName = null;
 	}
 
@@ -92,10 +98,16 @@ public class LogoSelectorTag extends IncludeTag {
 
 		if (_maxFileSize == 0) {
 			try {
-				_maxFileSize = PrefsPropsUtil.getLong(
-					PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+				_maxFileSize =
+					UploadServletRequestConfigurationHelperUtil.getMaxSize();
 			}
 			catch (SystemException se) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
 			}
 		}
 
@@ -107,11 +119,17 @@ public class LogoSelectorTag extends IncludeTag {
 			"liferay-ui:logo-selector:showBackground",
 			String.valueOf(_showBackground));
 		request.setAttribute(
+			"liferay-ui:logo-selector:showButtons",
+			String.valueOf(_showButtons));
+		request.setAttribute(
 			"liferay-ui:logo-selector:tempImageFileName", _tempImageFileName);
 	}
 
 	private static final String _PAGE =
 		"/html/taglib/ui/logo_selector/page.jsp";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LogoSelectorTag.class);
 
 	private String _currentLogoURL;
 	private boolean _defaultLogo;
@@ -120,6 +138,7 @@ public class LogoSelectorTag extends IncludeTag {
 	private String _logoDisplaySelector;
 	private long _maxFileSize;
 	private boolean _showBackground = true;
+	private boolean _showButtons = true;
 	private String _tempImageFileName;
 
 }

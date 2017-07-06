@@ -14,13 +14,13 @@
 
 package com.liferay.portal.repository.liferayrepository;
 
+import com.liferay.document.library.kernel.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.LocalRepository;
-import com.liferay.portal.kernel.repository.capabilities.WorkflowCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.repository.capabilities.WorkflowSupport;
 import com.liferay.portal.repository.util.LocalRepositoryWrapper;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -32,12 +32,11 @@ public class LiferayWorkflowLocalRepositoryWrapper
 	extends LocalRepositoryWrapper {
 
 	public LiferayWorkflowLocalRepositoryWrapper(
-		LocalRepository localRepository,
-		WorkflowCapability workflowCapability) {
+		LocalRepository localRepository, WorkflowSupport workflowSupport) {
 
 		super(localRepository);
 
-		_workflowCapability = workflowCapability;
+		_workflowSupport = workflowSupport;
 	}
 
 	@Override
@@ -57,7 +56,7 @@ public class LiferayWorkflowLocalRepositoryWrapper
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
-		_workflowCapability.addFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.addFileEntry(userId, fileEntry, serviceContext);
 
 		return fileEntry;
 	}
@@ -79,23 +78,24 @@ public class LiferayWorkflowLocalRepositoryWrapper
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
-		_workflowCapability.addFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.addFileEntry(userId, fileEntry, serviceContext);
 
 		return fileEntry;
 	}
 
 	@Override
 	public void checkInFileEntry(
-			long userId, long fileEntryId, boolean major, String changeLog,
-			ServiceContext serviceContext)
+			long userId, long fileEntryId, boolean majorVersion,
+			String changeLog, ServiceContext serviceContext)
 		throws PortalException {
 
 		super.checkInFileEntry(
-			userId, fileEntryId, major, changeLog, serviceContext);
+			userId, fileEntryId, majorVersion, changeLog, serviceContext);
 
 		FileEntry fileEntry = super.getFileEntry(fileEntryId);
 
-		_workflowCapability.checkInFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.checkInFileEntry(
+			userId, fileEntry, majorVersion, serviceContext);
 	}
 
 	@Override
@@ -108,7 +108,8 @@ public class LiferayWorkflowLocalRepositoryWrapper
 
 		FileEntry fileEntry = super.getFileEntry(fileEntryId);
 
-		_workflowCapability.checkInFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.checkInFileEntry(
+			userId, fileEntry, false, serviceContext);
 	}
 
 	@Override
@@ -126,21 +127,22 @@ public class LiferayWorkflowLocalRepositoryWrapper
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
-		_workflowCapability.addFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.addFileEntry(userId, fileEntry, serviceContext);
 
 		return fileEntry;
 	}
 
 	@Override
 	public void revertFileEntry(
-		long userId, long fileEntryId, String version,
-		ServiceContext serviceContext) throws PortalException {
+			long userId, long fileEntryId, String version,
+			ServiceContext serviceContext)
+		throws PortalException {
 
 		super.revertFileEntry(userId, fileEntryId, version, serviceContext);
 
 		FileEntry fileEntry = super.getFileEntry(fileEntryId);
 
-		_workflowCapability.revertFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.revertFileEntry(userId, fileEntry, serviceContext);
 	}
 
 	@Override
@@ -154,7 +156,8 @@ public class LiferayWorkflowLocalRepositoryWrapper
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, file, serviceContext);
 
-		_workflowCapability.updateFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.updateFileEntry(
+			userId, fileEntry, majorVersion, serviceContext);
 
 		return super.getFileEntry(fileEntryId);
 	}
@@ -171,11 +174,12 @@ public class LiferayWorkflowLocalRepositoryWrapper
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
 
-		_workflowCapability.updateFileEntry(userId, fileEntry, serviceContext);
+		_workflowSupport.updateFileEntry(
+			userId, fileEntry, majorVersion, serviceContext);
 
 		return super.getFileEntry(fileEntryId);
 	}
 
-	private final WorkflowCapability _workflowCapability;
+	private final WorkflowSupport _workflowSupport;
 
 }

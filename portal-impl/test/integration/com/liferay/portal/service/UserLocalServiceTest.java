@@ -14,13 +14,15 @@
 
 package com.liferay.portal.service;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.User;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.UserTestUtil;
-import com.liferay.portlet.announcements.service.AnnouncementsDeliveryLocalServiceUtil;
+import com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalServiceUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ContactLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +40,7 @@ public class UserLocalServiceTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testGetNoAnnouncementsDeliveries() throws Exception {
@@ -88,6 +89,6 @@ public class UserLocalServiceTest {
 	}
 
 	@DeleteAfterTestRun
-	private final List<User> _users = new ArrayList<User>();
+	private final List<User> _users = new ArrayList<>();
 
 }

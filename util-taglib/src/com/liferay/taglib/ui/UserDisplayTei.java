@@ -14,7 +14,7 @@
 
 package com.liferay.taglib.ui;
 
-import com.liferay.portal.model.User;
+import com.liferay.portal.kernel.model.User;
 
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
@@ -27,12 +27,17 @@ public class UserDisplayTei extends TagExtraInfo {
 
 	@Override
 	public VariableInfo[] getVariableInfo(TagData tagData) {
-		return _variableInfo;
+		return Concealer._variableInfo;
 	}
 
-	private static final VariableInfo[] _variableInfo = new VariableInfo[] {
-		new VariableInfo(
-			"userDisplay", User.class.getName(), true, VariableInfo.AT_BEGIN)
-	};
+	private static class Concealer {
+
+		private static final VariableInfo[] _variableInfo = new VariableInfo[] {
+			new VariableInfo(
+				"userDisplay", User.class.getName(), true,
+				VariableInfo.AT_BEGIN)
+		};
+
+	}
 
 }

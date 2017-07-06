@@ -18,105 +18,102 @@
 
 <%
 long assetEntryId = GetterUtil.getLong((String)request.getAttribute("liferay-ui:asset-links:assetEntryId"));
-
-List<AssetLink> assetLinks = null;
-
-if (assetEntryId > 0) {
-	assetLinks = AssetLinkLocalServiceUtil.getDirectLinks(assetEntryId);
-}
+List<AssetLink> assetLinks = (List<AssetLink>)request.getAttribute("liferay-ui:asset-links:assetLinks");
+PortletURL portletURL = (PortletURL)request.getAttribute("liferay-ui:asset-links:portletURL");
 %>
 
-<c:if test="<%= (assetLinks != null) && !assetLinks.isEmpty() %>">
-	<div class="taglib-asset-links">
-		<h2 class="asset-links-title icon-link"><liferay-ui:message key="related-assets" />:</h2>
+<div class="taglib-asset-links">
+	<h2 class="asset-links-title">
+		<aui:icon image="link" />
 
-		<ul class="asset-links-list">
+		<liferay-ui:message key="related-assets" />:
+	</h2>
 
-			<%
-			for (AssetLink assetLink : assetLinks) {
-				AssetEntry assetLinkEntry = null;
+	<ul class="asset-links-list">
 
-				if (assetLink.getEntryId1() == assetEntryId) {
-					assetLinkEntry = AssetEntryLocalServiceUtil.getEntry(assetLink.getEntryId2());
+		<%
+		for (AssetLink assetLink : assetLinks) {
+			AssetEntry assetLinkEntry = null;
+
+			if (assetLink.getEntryId1() == assetEntryId) {
+				assetLinkEntry = AssetEntryLocalServiceUtil.getEntry(assetLink.getEntryId2());
+			}
+			else {
+				assetLinkEntry = AssetEntryLocalServiceUtil.getEntry(assetLink.getEntryId1());
+			}
+
+			if (!assetLinkEntry.isVisible()) {
+				continue;
+			}
+
+			assetLinkEntry = assetLinkEntry.toEscapedModel();
+
+			AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetLinkEntry.getClassNameId());
+
+			if (Validator.isNull(assetRendererFactory)) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("No asset renderer factory found for class " + PortalUtil.getClassName(assetLinkEntry.getClassNameId()));
+				}
+
+				continue;
+			}
+
+			if (!assetRendererFactory.isActive(company.getCompanyId())) {
+				continue;
+			}
+
+			AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(assetLinkEntry.getClassPK());
+
+			if (assetRenderer.hasViewPermission(permissionChecker)) {
+				String asseLinktEntryTitle = assetLinkEntry.getTitle(locale);
+
+				PortletURL viewAssetURL = null;
+
+				if (portletURL != null) {
+					viewAssetURL = PortletURLUtil.clone(portletURL, PortalUtil.getLiferayPortletResponse(portletResponse));
 				}
 				else {
-					assetLinkEntry = AssetEntryLocalServiceUtil.getEntry(assetLink.getEntryId1());
+					viewAssetURL = PortletProviderUtil.getPortletURL(request, assetRenderer.getClassName(), PortletProvider.Action.VIEW);
+
+					viewAssetURL.setParameter("redirect", currentURL);
+					viewAssetURL.setWindowState(WindowState.MAXIMIZED);
 				}
 
-				if (!assetLinkEntry.isVisible()) {
-					continue;
-				}
+				viewAssetURL.setParameter("assetEntryId", String.valueOf(assetLinkEntry.getEntryId()));
+				viewAssetURL.setParameter("type", assetRendererFactory.getType());
 
-				assetLinkEntry = assetLinkEntry.toEscapedModel();
-
-				AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetLinkEntry.getClassNameId());
-
-				if (Validator.isNull(assetRendererFactory)) {
-					if (_log.isWarnEnabled()) {
-						_log.warn("No asset renderer factory found for class " + PortalUtil.getClassName(assetLinkEntry.getClassNameId()));
+				if (Validator.isNotNull(assetRenderer.getUrlTitle())) {
+					if (assetRenderer.getGroupId() != themeDisplay.getSiteGroupId()) {
+						viewAssetURL.setParameter("groupId", String.valueOf(assetRenderer.getGroupId()));
 					}
 
-					continue;
+					viewAssetURL.setParameter("urlTitle", assetRenderer.getUrlTitle());
 				}
 
-				if (!assetRendererFactory.isActive(company.getCompanyId())) {
-					continue;
+				String noSuchEntryRedirect = viewAssetURL.toString();
+
+				String urlViewInContext = assetRenderer.getURLViewInContext((LiferayPortletRequest)portletRequest, (LiferayPortletResponse)portletResponse, noSuchEntryRedirect);
+
+				if (Validator.isNotNull(urlViewInContext) && !Objects.equals(urlViewInContext, noSuchEntryRedirect)) {
+					urlViewInContext = HttpUtil.setParameter(urlViewInContext, "inheritRedirect", Boolean.TRUE);
+					urlViewInContext = HttpUtil.setParameter(urlViewInContext, "redirect", currentURL);
 				}
+		%>
 
-				AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(assetLinkEntry.getClassPK());
+				<li class="asset-links-list-item">
+					<aui:a href="<%= urlViewInContext %>" target='<%= themeDisplay.isStatePopUp() ? "_blank" : "_self" %>'>
+						<%= asseLinktEntryTitle %>
+					</aui:a>
+				</li>
 
-				if (assetRenderer.hasViewPermission(permissionChecker)) {
-					String asseLinktEntryTitle = assetLinkEntry.getTitle(locale);
-
-					LiferayPortletURL assetPublisherURL = new PortletURLImpl(request, PortletKeys.ASSET_PUBLISHER, plid, PortletRequest.RENDER_PHASE);
-
-					assetPublisherURL.setParameter("struts_action", "/asset_publisher/view_content");
-					assetPublisherURL.setParameter("redirect", currentURL);
-					assetPublisherURL.setParameter("assetEntryId", String.valueOf(assetLinkEntry.getEntryId()));
-					assetPublisherURL.setParameter("type", assetRendererFactory.getType());
-
-					if (Validator.isNotNull(assetRenderer.getUrlTitle())) {
-						if (assetRenderer.getGroupId() != themeDisplay.getSiteGroupId()) {
-							assetPublisherURL.setParameter("groupId", String.valueOf(assetRenderer.getGroupId()));
-						}
-
-						assetPublisherURL.setParameter("urlTitle", assetRenderer.getUrlTitle());
-					}
-
-					if (themeDisplay.isStatePopUp()) {
-						assetPublisherURL.setWindowState(LiferayWindowState.POP_UP);
-					}
-					else {
-						assetPublisherURL.setWindowState(WindowState.MAXIMIZED);
-					}
-
-					String viewFullContentURLString = assetPublisherURL.toString();
-
-					viewFullContentURLString = HttpUtil.setParameter(viewFullContentURLString, "redirect", currentURL);
-
-					String urlViewInContext = assetRenderer.getURLViewInContext((LiferayPortletRequest)portletRequest, (LiferayPortletResponse)portletResponse, viewFullContentURLString);
-
-					urlViewInContext = HttpUtil.setParameter(urlViewInContext, "inheritRedirect", true);
-			%>
-
-					<li class="asset-links-list-item">
-						<liferay-ui:icon
-							iconCssClass="<%= assetRenderer.getIconCssClass() %>"
-							label="<%= true %>"
-							message="<%= asseLinktEntryTitle %>"
-							url="<%= urlViewInContext %>"
-						/>
-					</li>
-
-			<%
-				}
+		<%
 			}
-			%>
+		}
+		%>
 
-		</ul>
-	</div>
-</c:if>
+	</ul>
+</div>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.taglib.ui.asset_links.page_jsp");
+private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.taglib.ui.asset_links.page_jsp");
 %>

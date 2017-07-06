@@ -14,12 +14,13 @@
 
 package com.liferay.portal.security.pwd;
 
-import com.liferay.portal.PwdEncryptorException;
+import com.liferay.portal.kernel.exception.PwdEncryptorException;
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.DigesterImpl;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
@@ -28,18 +29,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Michael C. Han
  */
-@PowerMockIgnore({"javax.crypto.*" })
-@PrepareForTest(PropsUtil.class)
-@RunWith(PowerMockRunner.class)
 public class LegacyAlgorithmAwarePasswordEncryptorTest {
 
 	@Before
@@ -48,21 +41,12 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 
 		digesterUtil.setDigester(new DigesterImpl());
 
-		PasswordEncryptorUtil passwordEncryptorUtil =
-			new PasswordEncryptorUtil();
+		_compositePasswordEncryptor = new CompositePasswordEncryptor();
 
-		LegacyAlgorithmAwarePasswordEncryptor
-			legacyAlgorithmAwarePasswordEncryptor =
-				new LegacyAlgorithmAwarePasswordEncryptor();
-
-		CompositePasswordEncryptor compositePasswordEncryptor =
-			new CompositePasswordEncryptor();
-
-		compositePasswordEncryptor.setDefaultPasswordEncryptor(
+		_compositePasswordEncryptor.setDefaultPasswordEncryptor(
 			new DefaultPasswordEncryptor());
 
-		List<PasswordEncryptor> passwordEncryptors =
-			new ArrayList<PasswordEncryptor>();
+		List<PasswordEncryptor> passwordEncryptors = new ArrayList<>();
 
 		passwordEncryptors.add(new BCryptPasswordEncryptor());
 		passwordEncryptors.add(new CryptPasswordEncryptor());
@@ -70,13 +54,9 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 		passwordEncryptors.add(new PBKDF2PasswordEncryptor());
 		passwordEncryptors.add(new SSHAPasswordEncryptor());
 
-		compositePasswordEncryptor.setPasswordEncryptors(passwordEncryptors);
+		_compositePasswordEncryptor.setPasswordEncryptors(passwordEncryptors);
 
-		legacyAlgorithmAwarePasswordEncryptor.setParentPasswordEncryptor(
-			compositePasswordEncryptor);
-
-		passwordEncryptorUtil.setPasswordEncryptor(
-			legacyAlgorithmAwarePasswordEncryptor);
+		_compositePasswordEncryptor.afterPropertiesSet();
 	}
 
 	@Test
@@ -106,12 +86,11 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 		testEncryptDisabled(PasswordEncryptorUtil.TYPE_BCRYPT + "/12");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testEncryptCrypt() throws Exception {
-		testEncrypt(PasswordEncryptorUtil.TYPE_CRYPT, "SNbUMVY9kKQpY");
+		testEncrypt(PasswordEncryptorUtil.TYPE_UFC_CRYPT, "SNbUMVY9kKQpY");
 
-		testEncryptDisabled(PasswordEncryptorUtil.TYPE_CRYPT);
+		testEncryptDisabled(PasswordEncryptorUtil.TYPE_UFC_CRYPT);
 	}
 
 	@Test
@@ -157,11 +136,11 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 	@Test
 	public void testEncryptPBKDF2With50000RoundsAnd128Key() throws Exception {
 		testEncrypt(
-			PasswordEncryptorUtil.TYPE_PBKDF2+ "WithHmacSHA1/128/50000",
+			PasswordEncryptorUtil.TYPE_PBKDF2 + "WithHmacSHA1/128/50000",
 			"AAAAoAAAw1AbW1e1Str9wSLWIX5X9swLn+j5/5+m6auSPdva");
 
 		testEncryptDisabled(
-			PasswordEncryptorUtil.TYPE_PBKDF2+ "WithHmacSHA1/128/50000");
+			PasswordEncryptorUtil.TYPE_PBKDF2 + "WithHmacSHA1/128/50000");
 	}
 
 	@Test
@@ -232,6 +211,13 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 		try {
 			PropsValues.PASSWORDS_ENCRYPTION_ALGORITHM_LEGACY = algorithm;
 
+			PasswordEncryptorUtil passwordEncryptorUtil =
+				new PasswordEncryptorUtil();
+
+			passwordEncryptorUtil.setPasswordEncryptor(
+				LegacyAlgorithmAwarePasswordEncryptor.create(
+					_compositePasswordEncryptor));
+
 			Assert.assertEquals(
 				encryptedPassword,
 				PasswordEncryptorUtil.encrypt("password", encryptedPassword));
@@ -269,6 +255,13 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 		try {
 			PropsValues.PASSWORDS_ENCRYPTION_ALGORITHM_LEGACY = null;
 
+			PasswordEncryptorUtil passwordEncryptorUtil =
+				new PasswordEncryptorUtil();
+
+			passwordEncryptorUtil.setPasswordEncryptor(
+				LegacyAlgorithmAwarePasswordEncryptor.create(
+					_compositePasswordEncryptor));
+
 			String encryptedPassword = PasswordEncryptorUtil.encrypt(
 				algorithm, "password", null);
 
@@ -287,5 +280,7 @@ public class LegacyAlgorithmAwarePasswordEncryptorTest {
 				legacyEncryptionAlgorithm;
 		}
 	}
+
+	private CompositePasswordEncryptor _compositePasswordEncryptor;
 
 }

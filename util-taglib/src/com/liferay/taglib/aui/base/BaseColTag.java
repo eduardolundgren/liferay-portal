@@ -67,54 +67,40 @@ public abstract class BaseColTag extends com.liferay.taglib.util.IncludeTag {
 
 	public void setCssClass(java.lang.String cssClass) {
 		_cssClass = cssClass;
-
-		setScopedAttribute("cssClass", cssClass);
 	}
 
 	public void setId(java.lang.String id) {
 		_id = id;
-
-		setScopedAttribute("id", id);
 	}
 
 	public void setLg(java.lang.String lg) {
 		_lg = lg;
-
-		setScopedAttribute("lg", lg);
 	}
 
 	public void setMd(java.lang.String md) {
 		_md = md;
-
-		setScopedAttribute("md", md);
 	}
 
 	public void setSm(java.lang.String sm) {
 		_sm = sm;
-
-		setScopedAttribute("sm", sm);
 	}
 
 	public void setSpan(int span) {
 		_span = span;
-
-		setScopedAttribute("span", span);
 	}
 
 	public void setWidth(int width) {
 		_width = width;
-
-		setScopedAttribute("width", width);
 	}
 
 	public void setXs(java.lang.String xs) {
 		_xs = xs;
-
-		setScopedAttribute("xs", xs);
 	}
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_cssClass = null;
 		_id = null;
 		_lg = null;
@@ -137,14 +123,14 @@ public abstract class BaseColTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		setNamespacedAttribute(request, "cssClass", _cssClass);
-		setNamespacedAttribute(request, "id", _id);
-		setNamespacedAttribute(request, "lg", _lg);
-		setNamespacedAttribute(request, "md", _md);
-		setNamespacedAttribute(request, "sm", _sm);
-		setNamespacedAttribute(request, "span", _span);
-		setNamespacedAttribute(request, "width", _width);
-		setNamespacedAttribute(request, "xs", _xs);
+		request.setAttribute("aui:col:cssClass", _cssClass);
+		request.setAttribute("aui:col:id", _id);
+		request.setAttribute("aui:col:lg", _lg);
+		request.setAttribute("aui:col:md", _md);
+		request.setAttribute("aui:col:sm", _sm);
+		request.setAttribute("aui:col:span", String.valueOf(_span));
+		request.setAttribute("aui:col:width", String.valueOf(_width));
+		request.setAttribute("aui:col:xs", _xs);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:col:";

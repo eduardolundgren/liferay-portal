@@ -14,20 +14,20 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.UserGroupRole;
+import com.liferay.portal.kernel.security.membershippolicy.MembershipPolicyException;
+import com.liferay.portal.kernel.service.UserGroupServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.membershippolicy.util.test.MembershipPolicyTestUtil;
-import com.liferay.portal.service.UserGroupServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.UserServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,8 +47,7 @@ public class UserGroupMembershipPolicyMembershipsTest
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@After
 	@Override
@@ -103,6 +102,7 @@ public class UserGroupMembershipPolicyMembershipsTest
 			initialUserGroupUsersCount + 2,
 			UserLocalServiceUtil.getUserGroupUsersCount(
 				requiredUserGroupIds[0]));
+
 		Assert.assertTrue(isPropagateMembership());
 	}
 
@@ -183,9 +183,9 @@ public class UserGroupMembershipPolicyMembershipsTest
 
 		User user = UserLocalServiceUtil.getUser(userIds[0]);
 
-		List<UserGroup> userGroups =  user.getUserGroups();
+		List<UserGroup> userGroups = user.getUserGroups();
 
-		Assert.assertEquals(0, userGroups.size());
+		Assert.assertEquals(userGroups.toString(), 0, userGroups.size());
 
 		long[] userUserGroupIds = ArrayUtil.append(
 			standardUserGroupIds, requiredUserGroupIds);
@@ -196,7 +196,8 @@ public class UserGroupMembershipPolicyMembershipsTest
 
 		userGroups = user.getUserGroups();
 
-		Assert.assertEquals(userUserGroupIds.length, userGroups.size());
+		Assert.assertEquals(
+			userGroups.toString(), userUserGroupIds.length, userGroups.size());
 
 		MembershipPolicyTestUtil.updateUser(
 			user, null, null, null, requiredUserGroupIds,
@@ -204,7 +205,9 @@ public class UserGroupMembershipPolicyMembershipsTest
 
 		userGroups = user.getUserGroups();
 
-		Assert.assertEquals(requiredUserGroupIds.length, userGroups.size());
+		Assert.assertEquals(
+			userGroups.toString(), requiredUserGroupIds.length,
+			userGroups.size());
 	}
 
 	@Test
@@ -217,7 +220,7 @@ public class UserGroupMembershipPolicyMembershipsTest
 
 		List<UserGroup> userGroups = user.getUserGroups();
 
-		Assert.assertEquals(0, userGroups.size());
+		Assert.assertEquals(userGroups.toString(), 0, userGroups.size());
 
 		long[] userUserGroupIds = ArrayUtil.append(
 			standardUserGroupIds, requiredUserGroupIds);
@@ -228,7 +231,8 @@ public class UserGroupMembershipPolicyMembershipsTest
 
 		userGroups = user.getUserGroups();
 
-		Assert.assertEquals(userUserGroupIds.length, userGroups.size());
+		Assert.assertEquals(
+			userGroups.toString(), userUserGroupIds.length, userGroups.size());
 
 		MembershipPolicyTestUtil.updateUser(
 			user, null, null, null, standardUserGroupIds,
@@ -236,7 +240,8 @@ public class UserGroupMembershipPolicyMembershipsTest
 
 		userGroups = user.getUserGroups();
 
-		Assert.assertEquals(userUserGroupIds.length, userGroups.size());
+		Assert.assertEquals(
+			userGroups.toString(), userUserGroupIds.length, userGroups.size());
 	}
 
 	@Test(expected = MembershipPolicyException.class)
@@ -268,6 +273,7 @@ public class UserGroupMembershipPolicyMembershipsTest
 			initialUserUserGroupCount - 1,
 			UserLocalServiceUtil.getUserGroupUsersCount(
 				standardUserGroupIds[0]));
+
 		Assert.assertTrue(isPropagateMembership());
 	}
 

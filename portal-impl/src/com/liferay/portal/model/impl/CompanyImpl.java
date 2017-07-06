@@ -15,37 +15,43 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.model.Account;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.VirtualHost;
+import com.liferay.portal.kernel.model.cache.CacheField;
+import com.liferay.portal.kernel.service.AccountLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Account;
-import com.liferay.portal.model.CacheField;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.CompanyConstants;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.model.Shard;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.VirtualHost;
-import com.liferay.portal.service.AccountLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.service.ShardLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.VirtualHostLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.util.Encryptor;
+
+import java.io.Serializable;
 
 import java.security.Key;
 
 import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.portlet.PortletPreferences;
 
 /**
  * @author Brian Wing Shun Chan
@@ -70,8 +76,12 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public Account getAccount() throws PortalException {
-		return AccountLocalServiceUtil.getAccount(
-			getCompanyId(), getAccountId());
+		if (_account == null) {
+			_account = AccountLocalServiceUtil.getAccount(
+				getCompanyId(), getAccountId());
+		}
+
+		return _account;
 	}
 
 	@Override
@@ -81,9 +91,18 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public String getAuthType() {
-		return PrefsPropsUtil.getString(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_AUTH_TYPE,
-			PropsValues.COMPANY_SECURITY_AUTH_TYPE);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._authType;
+	}
+
+	@Override
+	public CompanySecurityBag getCompanySecurityBag() {
+		if (_companySecurityBag == null) {
+			_companySecurityBag = new CompanySecurityBag(this);
+		}
+
+		return _companySecurityBag;
 	}
 
 	@Override
@@ -107,7 +126,22 @@ public class CompanyImpl extends CompanyBaseImpl {
 	@Override
 	public Group getGroup() throws PortalException {
 		if (getCompanyId() > CompanyConstants.SYSTEM) {
-			return GroupLocalServiceUtil.getCompanyGroup(getCompanyId());
+			ThreadLocalCache<Group> threadLocalCache =
+				ThreadLocalCacheManager.getThreadLocalCache(
+					Lifecycle.REQUEST, Company.class.getName());
+
+			String cacheKey = StringUtil.toHexString(getCompanyId());
+
+			Group companyGroup = threadLocalCache.get(cacheKey);
+
+			if (companyGroup == null) {
+				companyGroup = GroupLocalServiceUtil.getCompanyGroup(
+					getCompanyId());
+
+				threadLocalCache.put(cacheKey, companyGroup);
+			}
+
+			return companyGroup;
 		}
 
 		return new GroupImpl();
@@ -126,7 +160,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 			String key = getKey();
 
 			if (Validator.isNotNull(key)) {
-				_keyObj = (Key)Base64.stringToObjectSilent(key);
+				_keyObj = Encryptor.deserializeKey(key);
 			}
 		}
 
@@ -146,8 +180,10 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public String getPortalURL(long groupId) throws PortalException {
+		int portalPort = PortalUtil.getPortalServerPort(false);
+
 		String portalURL = PortalUtil.getPortalURL(
-			getVirtualHostname(), Http.HTTP_PORT, false);
+			getVirtualHostname(), portalPort, false);
 
 		if (groupId <= 0) {
 			return portalURL;
@@ -161,7 +197,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 			if (Validator.isNotNull(layoutSet.getVirtualHostname())) {
 				portalURL = PortalUtil.getPortalURL(
-					layoutSet.getVirtualHostname(), Http.HTTP_PORT, false);
+					layoutSet.getVirtualHostname(), portalPort, false);
 			}
 		}
 		else if (group.hasPrivateLayouts()) {
@@ -170,19 +206,11 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 			if (Validator.isNotNull(layoutSet.getVirtualHostname())) {
 				portalURL = PortalUtil.getPortalURL(
-					layoutSet.getVirtualHostname(), Http.HTTP_PORT, false);
+					layoutSet.getVirtualHostname(), portalPort, false);
 			}
 		}
 
 		return portalURL;
-	}
-
-	@Override
-	public String getShardName() throws PortalException {
-		Shard shard = ShardLocalServiceUtil.getShard(
-			Company.class.getName(), getCompanyId());
-
-		return shard.getName();
 	}
 
 	@Override
@@ -250,16 +278,16 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public boolean isAutoLogin() {
-		return PrefsPropsUtil.getBoolean(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_AUTO_LOGIN,
-			PropsValues.COMPANY_SECURITY_AUTO_LOGIN);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._autoLogin;
 	}
 
 	@Override
 	public boolean isSendPassword() {
-		return PrefsPropsUtil.getBoolean(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_SEND_PASSWORD,
-			PropsValues.COMPANY_SECURITY_SEND_PASSWORD);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._sendPassword;
 	}
 
 	@Override
@@ -271,30 +299,34 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public boolean isSiteLogo() {
-		return PrefsPropsUtil.getBoolean(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_SITE_LOGO,
-			PropsValues.COMPANY_SECURITY_SITE_LOGO);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._siteLogo;
 	}
 
 	@Override
 	public boolean isStrangers() {
-		return PrefsPropsUtil.getBoolean(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_STRANGERS,
-			PropsValues.COMPANY_SECURITY_STRANGERS);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._strangers;
 	}
 
 	@Override
 	public boolean isStrangersVerify() {
-		return PrefsPropsUtil.getBoolean(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_STRANGERS_VERIFY,
-			PropsValues.COMPANY_SECURITY_STRANGERS_VERIFY);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._strangersVerify;
 	}
 
 	@Override
 	public boolean isStrangersWithMx() {
-		return PrefsPropsUtil.getBoolean(
-			getCompanyId(), PropsKeys.COMPANY_SECURITY_STRANGERS_WITH_MX,
-			PropsValues.COMPANY_SECURITY_STRANGERS_WITH_MX);
+		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
+
+		return companySecurityBag._strangersWithMx;
+	}
+
+	public void setCompanySecurityBag(Object companySecurityBag) {
+		_companySecurityBag = (CompanySecurityBag)companySecurityBag;
 	}
 
 	@Override
@@ -314,10 +346,84 @@ public class CompanyImpl extends CompanyBaseImpl {
 		_virtualHostname = virtualHostname;
 	}
 
-	@CacheField
-	private Key _keyObj;
+	public static class CompanySecurityBag implements Serializable {
+
+		private CompanySecurityBag(Company company) {
+			PortletPreferences preferences = PrefsPropsUtil.getPreferences(
+				company.getCompanyId(), true);
+
+			_authType = _getPrefsPropsString(
+				preferences, company, PropsKeys.COMPANY_SECURITY_AUTH_TYPE,
+				PropsValues.COMPANY_SECURITY_AUTH_TYPE);
+			_autoLogin = _getPrefsPropsBoolean(
+				preferences, company, PropsKeys.COMPANY_SECURITY_AUTO_LOGIN,
+				PropsValues.COMPANY_SECURITY_AUTO_LOGIN);
+			_sendPassword = _getPrefsPropsBoolean(
+				preferences, company, PropsKeys.COMPANY_SECURITY_SEND_PASSWORD,
+				PropsValues.COMPANY_SECURITY_SEND_PASSWORD);
+			_siteLogo = _getPrefsPropsBoolean(
+				preferences, company, PropsKeys.COMPANY_SECURITY_SITE_LOGO,
+				PropsValues.COMPANY_SECURITY_SITE_LOGO);
+			_strangers = _getPrefsPropsBoolean(
+				preferences, company, PropsKeys.COMPANY_SECURITY_STRANGERS,
+				PropsValues.COMPANY_SECURITY_STRANGERS);
+			_strangersVerify = _getPrefsPropsBoolean(
+				preferences, company,
+				PropsKeys.COMPANY_SECURITY_STRANGERS_VERIFY,
+				PropsValues.COMPANY_SECURITY_STRANGERS_VERIFY);
+			_strangersWithMx = _getPrefsPropsBoolean(
+				preferences, company,
+				PropsKeys.COMPANY_SECURITY_STRANGERS_WITH_MX,
+				PropsValues.COMPANY_SECURITY_STRANGERS_WITH_MX);
+		}
+
+		private final String _authType;
+		private final boolean _autoLogin;
+		private final boolean _sendPassword;
+		private final boolean _siteLogo;
+		private final boolean _strangers;
+		private final boolean _strangersVerify;
+		private final boolean _strangersWithMx;
+
+	}
+
+	private static boolean _getPrefsPropsBoolean(
+		PortletPreferences portletPreferences, Company company, String name,
+		boolean defaultValue) {
+
+		String value = portletPreferences.getValue(
+			name, PropsUtil.get(company, name));
+
+		if (value != null) {
+			return GetterUtil.getBoolean(value);
+		}
+
+		return defaultValue;
+	}
+
+	private static String _getPrefsPropsString(
+		PortletPreferences portletPreferences, Company company, String name,
+		String defaultValue) {
+
+		String value = portletPreferences.getValue(
+			name, PropsUtil.get(company, name));
+
+		if (value != null) {
+			return value;
+		}
+
+		return defaultValue;
+	}
+
+	private Account _account;
 
 	@CacheField
+	private CompanySecurityBag _companySecurityBag;
+
+	@CacheField(propagateToInterface = true)
+	private Key _keyObj;
+
+	@CacheField(propagateToInterface = true)
 	private String _virtualHostname;
 
 }

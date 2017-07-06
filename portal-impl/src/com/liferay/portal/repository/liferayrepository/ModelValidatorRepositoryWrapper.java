@@ -19,8 +19,8 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.FileContentReference;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.ModelValidator;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.repository.util.RepositoryWrapper;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 
 import java.io.File;
@@ -87,8 +87,8 @@ public class ModelValidatorRepositoryWrapper extends RepositoryWrapper {
 
 		FileContentReference fileContentReference =
 			FileContentReference.fromFile(
-				sourceFileName, DLAppUtil.getExtension(title, sourceFileName),
-				mimeType, file);
+				fileEntryId, sourceFileName,
+				DLAppUtil.getExtension(title, sourceFileName), mimeType, file);
 
 		_modelValidator.validate(fileContentReference);
 
@@ -107,8 +107,9 @@ public class ModelValidatorRepositoryWrapper extends RepositoryWrapper {
 
 		FileContentReference fileContentReference =
 			FileContentReference.fromInputStream(
-				sourceFileName, DLAppUtil.getExtension(title, sourceFileName),
-				mimeType, is, size);
+				fileEntryId, sourceFileName,
+				DLAppUtil.getExtension(title, sourceFileName), mimeType, is,
+				size);
 
 		_modelValidator.validate(fileContentReference);
 

@@ -14,8 +14,9 @@
 
 package com.liferay.portal.security.sso;
 
+import com.liferay.portal.kernel.security.sso.SSO;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.Registry;
@@ -26,10 +27,7 @@ import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Raymond Augé
@@ -39,117 +37,58 @@ public class SSOUtil {
 	public static String getSessionExpirationRedirectURL(
 		long companyId, String sessionExpirationRedirectURL) {
 
-		if (PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.CAS_AUTH_ENABLED,
-				PropsValues.CAS_AUTH_ENABLED) &&
-			PropsValues.CAS_LOGOUT_ON_SESSION_EXPIRATION) {
+		String ssoSessionExpirationRedirectURL =
+			_instance._getSessionExpirationRedirectURL(companyId);
 
-			return PrefsPropsUtil.getString(
-				companyId, PropsKeys.CAS_LOGOUT_URL,
-				PropsValues.CAS_LOGOUT_URL);
-		}
-		else if (PrefsPropsUtil.getBoolean(
-					companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
-					PropsValues.OPEN_SSO_AUTH_ENABLED) &&
-				 PropsValues.OPEN_SSO_LOGOUT_ON_SESSION_EXPIRATION) {
+		if (_instance._ssoMap.isEmpty() ||
+			Validator.isNull(ssoSessionExpirationRedirectURL)) {
 
-			return PrefsPropsUtil.getString(
-				companyId, PropsKeys.OPEN_SSO_LOGOUT_URL,
-				PropsValues.OPEN_SSO_LOGOUT_URL);
+			return sessionExpirationRedirectURL;
 		}
 
-		return sessionExpirationRedirectURL;
+		return ssoSessionExpirationRedirectURL;
 	}
 
 	public static String getSignInURL(long companyId, String signInURL) {
-		if (PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.CAS_AUTH_ENABLED,
-				PropsValues.CAS_AUTH_ENABLED) ||
-			PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
-				PropsValues.OPEN_SSO_AUTH_ENABLED)) {
-
-			return signInURL;
+		if (_instance._ssoMap.isEmpty()) {
+			return null;
 		}
 
-		return null;
-	}
-
-	public static boolean isAccessAllowed(
-		HttpServletRequest request, Set<String> hostsAllowed) {
-
-		if (hostsAllowed.isEmpty()) {
-			return true;
-		}
-
-		String remoteAddr = request.getRemoteAddr();
-
-		if (hostsAllowed.contains(remoteAddr)) {
-			return true;
-		}
-
-		String computerAddress = PortalUtil.getComputerAddress();
-
-		if (computerAddress.equals(remoteAddr) &&
-			hostsAllowed.contains(_SERVER_IP)) {
-
-			return true;
-		}
-
-		return false;
+		return _instance._getSignInURL(companyId, signInURL);
 	}
 
 	public static boolean isLoginRedirectRequired(long companyId) {
 		if (PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.CAS_AUTH_ENABLED,
-				PropsValues.CAS_AUTH_ENABLED) ||
-			PrefsPropsUtil.getBoolean(
 				companyId, PropsKeys.LOGIN_DIALOG_DISABLED,
-				PropsValues.LOGIN_DIALOG_DISABLED) ||
-			PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.NTLM_AUTH_ENABLED,
-				PropsValues.NTLM_AUTH_ENABLED) ||
-			PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
-				PropsValues.OPEN_SSO_AUTH_ENABLED)) {
+				PropsValues.LOGIN_DIALOG_DISABLED)) {
 
 			return true;
 		}
 
-		return false;
+		if (_instance._ssoMap.isEmpty()) {
+			return false;
+		}
+
+		return _instance._isLoginRedirectRequired(companyId);
 	}
 
 	public static boolean isRedirectRequired(long companyId) {
-		if (PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.CAS_AUTH_ENABLED,
-				PropsValues.CAS_AUTH_ENABLED)) {
-
-			return true;
+		if (_instance._ssoMap.isEmpty()) {
+			return false;
 		}
 
-		return false;
+		return _instance._isRedirectRequired(companyId);
 	}
 
 	public static boolean isSessionRedirectOnExpire(long companyId) {
 		boolean sessionRedirectOnExpire =
 			PropsValues.SESSION_TIMEOUT_REDIRECT_ON_EXPIRE;
 
-		if (PrefsPropsUtil.getBoolean(
-				companyId, PropsKeys.CAS_AUTH_ENABLED,
-				PropsValues.CAS_AUTH_ENABLED) &&
-			PropsValues.CAS_LOGOUT_ON_SESSION_EXPIRATION) {
-
-			sessionRedirectOnExpire = true;
-		}
-		else if (PrefsPropsUtil.getBoolean(
-					companyId, PropsKeys.OPEN_SSO_AUTH_ENABLED,
-					PropsValues.OPEN_SSO_AUTH_ENABLED) &&
-				 PropsValues.OPEN_SSO_LOGOUT_ON_SESSION_EXPIRATION) {
-
-			sessionRedirectOnExpire = true;
+		if (_instance._ssoMap.isEmpty() || sessionRedirectOnExpire) {
+			return sessionRedirectOnExpire;
 		}
 
-		return sessionRedirectOnExpire;
+		return _instance._isSessionRedirectOnExpire(companyId);
 	}
 
 	private SSOUtil() {
@@ -161,22 +100,22 @@ public class SSOUtil {
 		_serviceTracker.open();
 	}
 
-	private String _getSessionExpirationRedirectUrl() {
+	private String _getSessionExpirationRedirectURL(long companyId) {
 		for (SSO sso : _ssoMap.values()) {
-			String sessionExpirationRedirectUrl =
-				sso.getSessionExpirationRedirectUrl();
+			String sessionExpirationRedirectURL =
+				sso.getSessionExpirationRedirectUrl(companyId);
 
-			if (sessionExpirationRedirectUrl != null) {
-				return sessionExpirationRedirectUrl;
+			if (sessionExpirationRedirectURL != null) {
+				return sessionExpirationRedirectURL;
 			}
 		}
 
 		return null;
 	}
 
-	private String _getSignInUrl() {
+	private String _getSignInURL(long companyId, String defaultSignInURL) {
 		for (SSO sso : _ssoMap.values()) {
-			String signInURL = sso.getSignInURL();
+			String signInURL = sso.getSignInURL(companyId, defaultSignInURL);
 
 			if (signInURL != null) {
 				return signInURL;
@@ -186,9 +125,9 @@ public class SSOUtil {
 		return null;
 	}
 
-	private boolean _isLoginRedirectRequired() {
+	private boolean _isLoginRedirectRequired(long companyId) {
 		for (SSO sso : _ssoMap.values()) {
-			if (sso.isLoginRedirectRequired()) {
+			if (sso.isLoginRedirectRequired(companyId)) {
 				return true;
 			}
 		}
@@ -196,9 +135,9 @@ public class SSOUtil {
 		return false;
 	}
 
-	private boolean _isRedirectRequired() {
+	private boolean _isRedirectRequired(long companyId) {
 		for (SSO sso : _ssoMap.values()) {
-			if (sso.isRedirectRequired()) {
+			if (sso.isRedirectRequired(companyId)) {
 				return true;
 			}
 		}
@@ -206,17 +145,15 @@ public class SSOUtil {
 		return false;
 	}
 
-	private boolean _isSessionRedirectOnExpire() {
+	private boolean _isSessionRedirectOnExpire(long companyId) {
 		for (SSO sso : _ssoMap.values()) {
-			if (sso.isSessionRedirectOnExpire()) {
+			if (sso.isSessionRedirectOnExpire(companyId)) {
 				return true;
 			}
 		}
 
 		return false;
 	}
-
-	private static final String _SERVER_IP = "SERVER_IP";
 
 	private static final SSOUtil _instance = new SSOUtil();
 

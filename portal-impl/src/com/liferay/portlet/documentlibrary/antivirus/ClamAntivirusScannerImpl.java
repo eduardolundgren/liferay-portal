@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.documentlibrary.antivirus;
 
+import com.liferay.document.library.kernel.antivirus.AntivirusScannerException;
+import com.liferay.document.library.kernel.antivirus.BaseFileAntivirusScanner;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -50,7 +53,7 @@ public class ClamAntivirusScannerImpl extends BaseFileAntivirusScanner {
 		}
 		catch (InterruptedException | IOException e) {
 			throw new AntivirusScannerException(
-				AntivirusScannerException.PROCESS_FAILURE);
+				AntivirusScannerException.PROCESS_FAILURE, e);
 		}
 		finally {
 			if (process != null) {

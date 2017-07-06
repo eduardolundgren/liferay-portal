@@ -14,22 +14,22 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroupRole;
+import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroupRole;
+import com.liferay.portal.kernel.security.membershippolicy.MembershipPolicyException;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.RoleServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.security.membershippolicy.util.test.MembershipPolicyTestUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.service.RoleServiceUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.UserServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,8 +49,7 @@ public class RoleMembershipPolicyRolesTest
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@After
 	@Override
@@ -185,7 +184,9 @@ public class RoleMembershipPolicyRolesTest
 		List<Role> currentUserRoles = RoleLocalServiceUtil.getUserRoles(
 			user.getUserId());
 
-		Assert.assertEquals(initialUserRoles.size(), currentUserRoles.size());
+		Assert.assertEquals(
+			currentUserRoles.toString(), initialUserRoles.size(),
+			currentUserRoles.size());
 	}
 
 	@Test(expected = MembershipPolicyException.class)

@@ -14,8 +14,8 @@
 
 package com.liferay.portlet;
 
+import com.liferay.portal.kernel.model.PortletInfo;
 import com.liferay.portal.kernel.util.JavaConstants;
-import com.liferay.portal.model.PortletInfo;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -33,40 +33,67 @@ import java.util.Set;
  */
 public class PortletResourceBundle extends ResourceBundle {
 
-	public PortletResourceBundle(PortletInfo portletInfo) {
-		this(null, portletInfo);
-	}
+	public static Map<String, String> getPortletInfos(PortletInfo portletInfo) {
+		if (portletInfo == null) {
+			return Collections.emptyMap();
+		}
 
-	public PortletResourceBundle(
-		ResourceBundle parentResourceBundle, PortletInfo portletInfo) {
-
-		parent = parentResourceBundle;
+		Map<String, String> portletInfos = new HashMap<>();
 
 		String description = portletInfo.getDescription();
 
 		if (description != null) {
-			_portletInfos.put(
+			portletInfos.put(
 				JavaConstants.JAVAX_PORTLET_DESCRIPTION, description);
 		}
 
 		String keywords = portletInfo.getKeywords();
 
 		if (keywords != null) {
-			_portletInfos.put(JavaConstants.JAVAX_PORTLET_KEYWORDS, keywords);
+			portletInfos.put(JavaConstants.JAVAX_PORTLET_KEYWORDS, keywords);
 		}
 
 		String shortTitle = portletInfo.getShortTitle();
 
 		if (shortTitle != null) {
-			_portletInfos.put(
+			portletInfos.put(
 				JavaConstants.JAVAX_PORTLET_SHORT_TITLE, shortTitle);
 		}
 
 		String title = portletInfo.getTitle();
 
 		if (title != null) {
-			_portletInfos.put(JavaConstants.JAVAX_PORTLET_TITLE, title);
+			portletInfos.put(JavaConstants.JAVAX_PORTLET_TITLE, title);
 		}
+
+		return portletInfos;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link PortletResourceBundle(
+	 *             ResourceBundle, Map)}
+	 */
+	@Deprecated
+	public PortletResourceBundle(PortletInfo portletInfo) {
+		this(null, getPortletInfos(portletInfo));
+	}
+
+	public PortletResourceBundle(
+		ResourceBundle parentResourceBundle, Map<String, String> portletInfos) {
+
+		parent = parentResourceBundle;
+		_portletInfos = portletInfos;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link PortletResourceBundle(
+	 *             ResourceBundle, Map)}
+	 */
+	@Deprecated
+	public PortletResourceBundle(
+		ResourceBundle parentResourceBundle, PortletInfo portletInfo) {
+
+		this(parentResourceBundle, getPortletInfos(portletInfo));
 	}
 
 	@Override
@@ -75,7 +102,7 @@ public class PortletResourceBundle extends ResourceBundle {
 			return Collections.enumeration(_portletInfos.keySet());
 		}
 
-		Set<String> keys = new HashSet<String>(parent.keySet());
+		Set<String> keys = new HashSet<>(parent.keySet());
 
 		keys.addAll(_portletInfos.keySet());
 
@@ -109,7 +136,6 @@ public class PortletResourceBundle extends ResourceBundle {
 		return _portletInfos.keySet();
 	}
 
-	private final Map<String, String> _portletInfos =
-		new HashMap<String, String>();
+	private final Map<String, String> _portletInfos;
 
 }

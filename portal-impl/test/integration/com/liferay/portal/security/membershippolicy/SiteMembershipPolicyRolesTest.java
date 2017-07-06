@@ -14,23 +14,23 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroupRole;
+import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroupRole;
+import com.liferay.portal.kernel.security.membershippolicy.MembershipPolicyException;
+import com.liferay.portal.kernel.service.RoleServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserGroupRoleServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.UserGroupRolePK;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.security.membershippolicy.util.test.MembershipPolicyTestUtil;
-import com.liferay.portal.service.RoleServiceUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
-import com.liferay.portal.service.UserGroupRoleServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.persistence.UserGroupRolePK;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,8 +51,7 @@ public class SiteMembershipPolicyRolesTest
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@After
 	@Override
@@ -73,7 +72,7 @@ public class SiteMembershipPolicyRolesTest
 
 	@Test(expected = MembershipPolicyException.class)
 	public void testAssignUserToForbiddenRole() throws Exception {
-		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+		List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
 		long[] userIds = addUsers();
 		long[] forbiddenRoleIds = addForbiddenRoles();
@@ -102,7 +101,7 @@ public class SiteMembershipPolicyRolesTest
 
 	@Test
 	public void testPropagateWhenAssigningRolesToUser() throws Exception {
-		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+		List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
 		long[] userIds = addUsers();
 		long[] standardRoleIds = addStandardRoles();
@@ -181,8 +180,7 @@ public class SiteMembershipPolicyRolesTest
 		List<UserGroupRole> initialUserGroupRoles =
 			UserGroupRoleLocalServiceUtil.getUserGroupRoles(user.getUserId());
 
-		List<UserGroupRole> emptyNonAbstractList =
-			new ArrayList<UserGroupRole>();
+		List<UserGroupRole> emptyNonAbstractList = new ArrayList<>();
 
 		MembershipPolicyTestUtil.updateUser(
 			user, null, null, null, null, emptyNonAbstractList);
@@ -191,7 +189,8 @@ public class SiteMembershipPolicyRolesTest
 			UserGroupRoleLocalServiceUtil.getUserGroupRoles(user.getUserId());
 
 		Assert.assertEquals(
-			initialUserGroupRoles.size(), currentUserGroupRoles.size());
+			currentUserGroupRoles.toString(), initialUserGroupRoles.size(),
+			currentUserGroupRoles.size());
 	}
 
 	@Test(expected = MembershipPolicyException.class)

@@ -14,14 +14,12 @@
 
 package com.liferay.portal.servlet;
 
-import com.liferay.portal.kernel.cache.Lifecycle;
-import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdHttpSession;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdSplitterUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.WebKeys;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,11 +42,9 @@ public class PortalSessionListener implements HttpSessionListener {
 				compoundSessionIdHttpSession);
 		}
 
-		new PortalSessionCreator(httpSessionEvent);
-
 		HttpSession session = httpSessionEvent.getSession();
 
-		PortalSessionActivationListener.setInstance(session);
+		new PortalSessionCreator(session);
 
 		if (PropsValues.SESSION_MAX_ALLOWED > 0) {
 			if (_counter.incrementAndGet() > PropsValues.SESSION_MAX_ALLOWED) {
@@ -72,9 +68,7 @@ public class PortalSessionListener implements HttpSessionListener {
 				compoundSessionIdHttpSession);
 		}
 
-		new PortalSessionDestroyer(httpSessionEvent);
-
-		ThreadLocalCacheManager.clearAll(Lifecycle.SESSION);
+		new PortalSessionDestroyer(httpSessionEvent.getSession());
 
 		if (PropsValues.SESSION_MAX_ALLOWED > 0) {
 			_counter.decrementAndGet();

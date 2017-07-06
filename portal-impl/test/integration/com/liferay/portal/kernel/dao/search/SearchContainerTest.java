@@ -14,9 +14,8 @@
 
 package com.liferay.portal.kernel.dao.search;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -37,8 +36,7 @@ public class SearchContainerTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@After
 	public void tearDown() {
@@ -145,7 +143,7 @@ public class SearchContainerTest {
 
 		PortletURL portletURL = PowerMockito.mock(PortletURL.class);
 
-		_searchContainer = new SearchContainer<Object>(
+		_searchContainer = new SearchContainer<>(
 			portletRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, cur,
 			_DEFAULT_DELTA, portletURL, null, null);
 	}

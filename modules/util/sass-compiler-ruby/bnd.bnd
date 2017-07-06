@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Sass Compiler Ruby
+Bundle-SymbolicName: com.liferay.sass.compiler.ruby
+Bundle-Version: 2.0.4
+Main-Class: com.liferay.sass.compiler.ruby.internal.RubySassCompiler

@@ -41,9 +41,11 @@ public class RouterImplTest {
 
 		_routerImpl = new RouterImpl();
 
-		Route route = _routerImpl.addRoute("instance/{instanceId}/{topLink}");
+		Route route = _routerImpl.addRoute(
+			"instance/{userIdAndInstanceId}/{topLink}");
 
-		route.addGeneratedParameter("p_p_id", "15_INSTANCE_{instanceId}");
+		route.addGeneratedParameter(
+			"p_p_id", "15_INSTANCE_{userIdAndInstanceId}");
 
 		route = _routerImpl.addRoute("GET/{controller}");
 
@@ -173,7 +175,7 @@ public class RouterImplTest {
 	protected void assertParameterInUrlEquals(
 		String name, String value, String url) {
 
-		Map<String, String> parameters = new HashMap<String, String>();
+		Map<String, String> parameters = new HashMap<>();
 
 		_routerImpl.urlToParameters(url, parameters);
 
@@ -186,7 +188,7 @@ public class RouterImplTest {
 		Map<String, String[]> parameters = HttpUtil.parameterMapFromString(
 			queryString);
 
-		Map<String, String> generatedParameters = new HashMap<String, String>();
+		Map<String, String> generatedParameters = new HashMap<>();
 
 		_routerImpl.urlToParameters(url, generatedParameters);
 
@@ -198,7 +200,7 @@ public class RouterImplTest {
 	}
 
 	protected void assertUrlRegeneratesUrl(String url, String expectedUrl) {
-		Map<String, String> parameters = new HashMap<String, String>();
+		Map<String, String> parameters = new HashMap<>();
 
 		_routerImpl.urlToParameters(url, parameters);
 

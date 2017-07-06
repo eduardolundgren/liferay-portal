@@ -14,7 +14,24 @@
  */
 --%>
 
-<%@ include file="/html/taglib/init.jsp" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
+taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
+
+<%@ page contentType="text/html; charset=UTF-8" %>
+
+<%@ page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.IntegerWrapper" %><%@
+page import="com.liferay.portal.kernel.util.StringPool" %><%@
+page import="com.liferay.portal.kernel.util.Validator" %>
+
+<%@ page import="java.util.HashMap" %><%@
+page import="java.util.Map" %>
 
 <%
 IntegerWrapper iconListIconCount = (IntegerWrapper)request.getAttribute("liferay-ui:icon-list:icon-count");
@@ -40,10 +57,12 @@ boolean auiImage = GetterUtil.getBoolean((String)request.getAttribute("liferay-u
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:cssClass"));
 Map<String, Object> data = (Map<String, Object>)request.getAttribute("liferay-ui:icon:data");
 String details = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:details"));
+String icon = (String)request.getAttribute("liferay-ui:icon:icon");
 String iconCssClass = (String)request.getAttribute("liferay-ui:icon:iconCssClass");
 String id = (String)request.getAttribute("liferay-ui:icon:id");
 String image = (String)request.getAttribute("liferay-ui:icon:image");
 boolean forcePost = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:forcePost"));
+String markupView = (String)request.getAttribute("liferay-ui:icon:markupView");
 String message = (String)request.getAttribute("liferay-ui:icon:message");
 boolean label = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:label"));
 String lang = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:lang"));
@@ -53,8 +72,23 @@ String onClick = GetterUtil.getString((String)request.getAttribute("liferay-ui:i
 String src = (String)request.getAttribute("liferay-ui:icon:src");
 String srcHover = (String)request.getAttribute("liferay-ui:icon:srcHover");
 String target = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:target"));
+boolean toolTip = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:toolTip"));
 String url = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:url"));
 boolean useDialog = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:useDialog"));
+
+if (forcePost || useDialog) {
+	if (data == null) {
+		data = new HashMap<String, Object>();
+	}
+
+	data.put("senna-off", "true");
+}
+
+if (toolTip) {
+	cssClass += " lfr-portal-tooltip";
+}
+
+linkCssClass += " lfr-icon-item";
 %>
 
 <%!

@@ -15,7 +15,7 @@
 package com.liferay.portlet.social.util;
 
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Stack;
 
@@ -74,10 +74,9 @@ public class SocialActivityHierarchyEntryThreadLocal {
 	}
 
 	private static final ThreadLocal<Stack<SocialActivityHierarchyEntry>>
-		_activityHierarchyEntries =
-			new AutoResetThreadLocal<Stack<SocialActivityHierarchyEntry>>(
-				SocialActivityHierarchyEntryThreadLocal.class +
-					"._activityHierarchyEntries",
-				new Stack<SocialActivityHierarchyEntry>());
+		_activityHierarchyEntries = new AutoResetThreadLocal<>(
+			SocialActivityHierarchyEntryThreadLocal.class +
+				"._activityHierarchyEntries",
+			Stack::new);
 
 }

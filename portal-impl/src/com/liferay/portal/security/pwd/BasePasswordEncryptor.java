@@ -14,8 +14,12 @@
 
 package com.liferay.portal.security.pwd;
 
-import com.liferay.portal.PwdEncryptorException;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.exception.PwdEncryptorException;
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.util.PropsUtil;
 
 /**
  * @author Michael C. Han
@@ -23,21 +27,22 @@ import com.liferay.portal.kernel.util.Validator;
 public abstract class BasePasswordEncryptor implements PasswordEncryptor {
 
 	@Override
-	public String encrypt(
-			String algorithm, String plainTextPassword,
-			String encryptedPassword)
+	public String encrypt(String plainTextPassword, String encryptedPassword)
 		throws PwdEncryptorException {
 
-		if (Validator.isNull(plainTextPassword)) {
-			throw new PwdEncryptorException("Unable to encrypt blank password");
-		}
-
-		return doEncrypt(algorithm, plainTextPassword, encryptedPassword);
+		return encrypt(
+			getDefaultPasswordAlgorithmType(), plainTextPassword,
+			encryptedPassword);
 	}
 
-	protected abstract String doEncrypt(
-			String algorithm, String plainTextPassword,
-			String encryptedPassword)
-		throws PwdEncryptorException;
+	@Override
+	public String getDefaultPasswordAlgorithmType() {
+		return _PASSWORDS_ENCRYPTION_ALGORITHM;
+	}
+
+	private static final String _PASSWORDS_ENCRYPTION_ALGORITHM =
+		StringUtil.toUpperCase(
+			GetterUtil.getString(
+				PropsUtil.get(PropsKeys.PASSWORDS_ENCRYPTION_ALGORITHM)));
 
 }

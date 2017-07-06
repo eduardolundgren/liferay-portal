@@ -16,17 +16,17 @@ package com.liferay.portal.spring.context;
 
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
-import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.security.lang.DoPrivilegedFactory;
 import com.liferay.portal.spring.util.FilterClassLoader;
-import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.FileNotFoundException;
 
@@ -52,6 +52,10 @@ public class PortletApplicationContext extends XmlWebApplicationContext {
 
 	public static ClassLoader getBeanClassLoader() {
 		return _pacl.getBeanClassLoader();
+	}
+
+	public PortletApplicationContext() {
+		setClassLoader(getBeanClassLoader());
 	}
 
 	public interface PACL {
@@ -101,13 +105,8 @@ public class PortletApplicationContext extends XmlWebApplicationContext {
 		serviceBuilderPropertiesConfigLocations.remove(
 			"WEB-INF/classes/META-INF/infrastructure-spring.xml");
 
-		if (ShardUtil.isEnabled()) {
-			serviceBuilderPropertiesConfigLocations.remove(
-				"WEB-INF/classes/META-INF/shard-data-source-spring.xml");
-		}
-
 		return ArrayUtil.append(
-			configLocations,
+			PropsValues.SPRING_PORTLET_CONFIGS, configLocations,
 			serviceBuilderPropertiesConfigLocations.toArray(
 				new String[serviceBuilderPropertiesConfigLocations.size()]));
 	}

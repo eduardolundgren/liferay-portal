@@ -14,19 +14,28 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.portal.NoSuchLayoutFriendlyURLException;
+import com.liferay.portal.kernel.exception.NoSuchLayoutFriendlyURLException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutFriendlyURL;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.LayoutFriendlyURL;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutFriendlyURLLocalServiceBaseImpl;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,7 +47,7 @@ import java.util.Map;
  * <p>
  * All custom service methods should be put in this class. Whenever methods are
  * added, rerun ServiceBuilder to copy their definitions into the {@link
- * com.liferay.portal.service.LayoutFriendlyURLLocalService} interface.
+ * com.liferay.portal.kernel.service.LayoutFriendlyURLLocalService} interface.
  * </p>
  *
  * <p>
@@ -60,7 +69,6 @@ public class LayoutFriendlyURLLocalServiceImpl
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		long layoutFriendlyURLId = counterLocalService.increment();
 
@@ -72,8 +80,6 @@ public class LayoutFriendlyURLLocalServiceImpl
 		layoutFriendlyURL.setCompanyId(companyId);
 		layoutFriendlyURL.setUserId(user.getUserId());
 		layoutFriendlyURL.setUserName(user.getFullName());
-		layoutFriendlyURL.setCreateDate(serviceContext.getCreateDate(now));
-		layoutFriendlyURL.setModifiedDate(serviceContext.getModifiedDate(now));
 		layoutFriendlyURL.setPlid(plid);
 		layoutFriendlyURL.setPrivateLayout(privateLayout);
 		layoutFriendlyURL.setFriendlyURL(friendlyURL);
@@ -89,12 +95,9 @@ public class LayoutFriendlyURLLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		List<LayoutFriendlyURL> layoutFriendlyURLs =
-			new ArrayList<LayoutFriendlyURL>();
+		List<LayoutFriendlyURL> layoutFriendlyURLs = new ArrayList<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 			String friendlyURL = friendlyURLMap.get(locale);
 
 			if (Validator.isNull(friendlyURL)) {
@@ -227,6 +230,46 @@ public class LayoutFriendlyURLLocalServiceImpl
 	}
 
 	@Override
+	public Map<Long, String> getLayoutFriendlyURLs(
+		Group siteGroup, List<Layout> layouts, String languageId) {
+
+		Map<Long, String> layoutFriendlyURLMap = new HashMap<>();
+
+		UnicodeProperties typeSettingsProperties =
+			siteGroup.getTypeSettingsProperties();
+
+		if (!GetterUtil.getBoolean(
+				typeSettingsProperties.getProperty(
+					GroupConstants.TYPE_SETTINGS_KEY_INHERIT_LOCALES),
+				true)) {
+
+			String[] locales = StringUtil.split(
+				typeSettingsProperties.getProperty(PropsKeys.LOCALES));
+
+			if (!ArrayUtil.contains(locales, languageId)) {
+				for (Layout layout : layouts) {
+					layoutFriendlyURLMap.put(
+						layout.getPlid(), layout.getFriendlyURL());
+				}
+			}
+		}
+		else {
+			List<LayoutFriendlyURL> layoutFriendlyURLs =
+				layoutFriendlyURLPersistence.findByP_L(
+					ListUtil.toLongArray(layouts, Layout.PLID_ACCESSOR),
+					languageId);
+
+			for (LayoutFriendlyURL layoutFriendlyURL : layoutFriendlyURLs) {
+				layoutFriendlyURLMap.put(
+					layoutFriendlyURL.getPlid(),
+					layoutFriendlyURL.getFriendlyURL());
+			}
+		}
+
+		return layoutFriendlyURLMap;
+	}
+
+	@Override
 	public List<LayoutFriendlyURL> getLayoutFriendlyURLs(long plid) {
 		return layoutFriendlyURLPersistence.findByPlid(plid);
 	}
@@ -267,12 +310,9 @@ public class LayoutFriendlyURLLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		List<LayoutFriendlyURL> layoutFriendlyURLs =
-			new ArrayList<LayoutFriendlyURL>();
+		List<LayoutFriendlyURL> layoutFriendlyURLs = new ArrayList<>();
 
-		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
-
-		for (Locale locale : locales) {
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 			String friendlyURL = friendlyURLMap.get(locale);
 			String languageId = LocaleUtil.toLanguageId(locale);
 

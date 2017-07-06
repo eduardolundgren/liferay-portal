@@ -14,11 +14,11 @@
 
 package com.liferay.portal.security.pacl.test;
 
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.test.PACLTestRule;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.test.rule.PACLTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -52,12 +52,7 @@ public class PortalServicesTest {
 
 	@Test
 	public void test2() throws Exception {
-		try {
-			GroupLocalServiceUtil.getGroup(TestPropsValues.getGroupId());
-		}
-		catch (SecurityException se) {
-			Assert.fail();
-		}
+		GroupLocalServiceUtil.getGroup(TestPropsValues.getGroupId());
 	}
 
 	@Test

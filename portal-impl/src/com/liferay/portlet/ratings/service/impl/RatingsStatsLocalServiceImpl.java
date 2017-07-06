@@ -18,11 +18,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portlet.ratings.NoSuchStatsException;
-import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.base.RatingsStatsLocalServiceBaseImpl;
+import com.liferay.ratings.kernel.exception.NoSuchStatsException;
+import com.liferay.ratings.kernel.model.RatingsStats;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -80,10 +82,21 @@ public class RatingsStatsLocalServiceImpl
 	}
 
 	@Override
+	public RatingsStats fetchStats(String className, long classPK) {
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		return ratingsStatsPersistence.fetchByC_C(classNameId, classPK);
+	}
+
+	@Override
 	public RatingsStats getStats(long statsId) throws PortalException {
 		return ratingsStatsPersistence.findByPrimaryKey(statsId);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public List<RatingsStats> getStats(String className, List<Long> classPKs) {
 		long classNameId = classNameLocalService.getClassNameId(className);
@@ -92,17 +105,27 @@ public class RatingsStatsLocalServiceImpl
 	}
 
 	@Override
-	public RatingsStats getStats(String className, long classPK) {
+	public RatingsStats getStats(String className, long classPK)
+		throws PortalException {
+
 		long classNameId = classNameLocalService.getClassNameId(className);
 
-		RatingsStats stats = ratingsStatsPersistence.fetchByC_C(
-			classNameId, classPK);
+		return ratingsStatsPersistence.findByC_C(classNameId, classPK);
+	}
 
-		if (stats == null) {
-			stats = ratingsStatsLocalService.addStats(classNameId, classPK);
+	@Override
+	public Map<Long, RatingsStats> getStats(String className, long[] classPKs) {
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		Map<Long, RatingsStats> ratingsStats = new HashMap<>();
+
+		for (RatingsStats stats : ratingsStatsPersistence.findByC_C(
+				classNameId, classPKs)) {
+
+			ratingsStats.put(stats.getClassPK(), stats);
 		}
 
-		return stats;
+		return ratingsStats;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

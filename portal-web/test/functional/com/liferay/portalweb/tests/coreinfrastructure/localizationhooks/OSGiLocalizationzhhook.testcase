@@ -1,0 +1,25 @@
+<definition component-name="portal-plugins-osgi">
+	<property name="portal.release" value="false" />
+	<property name="portal.upstream" value="true" />
+	<property name="plugins.deployment.type" value="osgi" />
+	<property name="test.run.environment" value="CE" />
+	<property name="testray.main.component.name" value="Localization Hooks" />
+
+	<set-up>
+		<execute macro="User#firstLoginPG">
+			<var name="localization" value="ZH" />
+		</execute>
+	</set-up>
+
+	<command name="LocalizationZHHookSmoke" priority="4">
+		<property name="hook.plugins.includes" value="localization-zh-hook" />
+
+		<var name="appName" value="Chinese Localization" />
+		<var name="portletName" value="localization-zh-hook" />
+
+		<execute macro="OSGiSmoke#Smoke">
+			<var name="appName" value="${portletName}" />
+			<var name="portletName" value="${portletName}" />
+		</execute>
+	</command>
+</definition>

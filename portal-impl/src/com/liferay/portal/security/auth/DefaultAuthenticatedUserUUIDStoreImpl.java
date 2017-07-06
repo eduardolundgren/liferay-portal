@@ -15,13 +15,16 @@
 package com.liferay.portal.security.auth;
 
 import com.liferay.portal.kernel.concurrent.ConcurrentHashSet;
+import com.liferay.portal.kernel.security.auth.AuthenticatedUserUUIDStore;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 
 import java.util.Set;
 
 /**
  * @author Michael C. Han
+ * @deprecated As of 7.0.0, with no direct replacement
  */
+@Deprecated
 @DoPrivileged
 public class DefaultAuthenticatedUserUUIDStoreImpl
 	implements AuthenticatedUserUUIDStore {
@@ -41,6 +44,6 @@ public class DefaultAuthenticatedUserUUIDStoreImpl
 		return _userUUIDStore.remove(userUUID);
 	}
 
-	private final Set<String> _userUUIDStore = new ConcurrentHashSet<String>();
+	private final Set<String> _userUUIDStore = new ConcurrentHashSet<>();
 
 }

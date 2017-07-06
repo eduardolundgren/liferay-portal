@@ -14,15 +14,16 @@
 
 package com.liferay.portal.kernel.search;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.message.boards.kernel.model.MBMessage;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portal.search.test.TestIndexerRegistry;
 import com.liferay.portlet.documentlibrary.util.DLFileEntryIndexer;
-import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.util.MBMessageIndexer;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.Registry;
@@ -33,7 +34,6 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,19 +49,17 @@ import org.powermock.modules.junit4.PowerMockRunner;
 /**
  * @author André de Oliveira
  */
-@PrepareOnlyThisForTest( {
-	BooleanQueryFactoryUtil.class, SearchEngineUtil.class
-})
+@PrepareOnlyThisForTest(SearchEngineHelperUtil.class)
 @RunWith(PowerMockRunner.class)
 public class BaseIndexerGetFullQueryTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		setUpBooleanQueryFactoryUtil();
 		setUpJSONFactoryUtil();
 		setUpPropsUtil();
 		setUpRegistryUtil();
-		setUpSearchEngineUtil();
+		setUpIndexerRegistry();
+		setUpSearchEngineHelperUtil();
 
 		_indexer = new TestIndexer();
 	}
@@ -139,16 +137,11 @@ public class BaseIndexerGetFullQueryTest extends PowerMockito {
 			expectedEntryClassNames, actualEntryClassNames);
 	}
 
-	protected void setUpBooleanQueryFactoryUtil() {
-		mockStatic(BooleanQueryFactoryUtil.class, Mockito.CALLS_REAL_METHODS);
+	protected void setUpIndexerRegistry() {
+		Registry registry = RegistryUtil.getRegistry();
 
-		stub(
-			method(
-				BooleanQueryFactoryUtil.class, "create", SearchContext.class
-			)
-		).toReturn(
-			mock(BooleanQuery.class)
-		);
+		registry.registerService(
+			IndexerRegistry.class, new TestIndexerRegistry());
 	}
 
 	protected void setUpJSONFactoryUtil() {
@@ -180,55 +173,61 @@ public class BaseIndexerGetFullQueryTest extends PowerMockito {
 		registry.registerService(Indexer.class, new MBMessageIndexer());
 	}
 
-	protected void setUpSearchEngineUtil() {
-		mockStatic(SearchEngineUtil.class, Mockito.CALLS_REAL_METHODS);
+	protected void setUpSearchEngineHelperUtil() {
+		mockStatic(SearchEngineHelperUtil.class, Mockito.CALLS_REAL_METHODS);
+
+		stub(
+			method(SearchEngineHelperUtil.class, "getDefaultSearchEngineId")
+		).toReturn(
+			SearchEngineHelper.SYSTEM_ENGINE_ID
+		);
+
+		stub(
+			method(SearchEngineHelperUtil.class, "getEntryClassNames")
+		).toReturn(
+			new String[0]
+		);
 
 		stub(
 			method(
-				SearchEngineUtil.class, "getEntryClassNames"
-			)
+				SearchEngineHelperUtil.class, "getSearchEngine", String.class)
 		).toReturn(
-			new String[0]
+			new BaseSearchEngine()
 		);
 	}
 
 	private static final String _CLASS_NAME = RandomTestUtil.randomString();
 
-	private Indexer _indexer;
+	private Indexer<Object> _indexer;
 	private final SearchContext _searchContext = new SearchContext();
 
-	private class TestIndexer extends BaseIndexer {
+	private static class TestIndexer extends BaseIndexer<Object> {
 
 		@Override
-		public String[] getClassNames() {
-			return new String[] {_CLASS_NAME};
+		public String getClassName() {
+			return _CLASS_NAME;
 		}
 
 		@Override
-		public String getPortletId() {
-			return null;
+		protected void doDelete(Object object) throws Exception {
 		}
 
 		@Override
-		protected void doDelete(Object obj) throws Exception {
-		}
-
-		@Override
-		protected Document doGetDocument(Object obj) throws Exception {
+		protected Document doGetDocument(Object object) throws Exception {
 			return null;
 		}
 
 		@Override
 		protected Summary doGetSummary(
-			Document document, Locale locale, String snippet,
-			PortletURL portletURL, PortletRequest portletRequest,
-			PortletResponse portletResponse) throws Exception {
+				Document document, Locale locale, String snippet,
+				PortletRequest portletRequest, PortletResponse portletResponse)
+			throws Exception {
 
 			return null;
 		}
 
 		@Override
-		protected void doReindex(Object obj) throws Exception {
+		protected void doReindex(Object object) throws Exception {
 		}
 
 		@Override
@@ -238,11 +237,6 @@ public class BaseIndexerGetFullQueryTest extends PowerMockito {
 
 		@Override
 		protected void doReindex(String[] ids) throws Exception {
-		}
-
-		@Override
-		protected String getPortletId(SearchContext searchContext) {
-			return null;
 		}
 
 	}

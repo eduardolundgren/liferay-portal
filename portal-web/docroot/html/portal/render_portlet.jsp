@@ -46,11 +46,14 @@ boolean modeHelp = layoutTypePortlet.hasModeHelpPortletId(portletId);
 boolean modePreview = layoutTypePortlet.hasModePreviewPortletId(portletId);
 boolean modePrint = layoutTypePortlet.hasModePrintPortletId(portletId);
 
+boolean columnDisabled = layoutTypePortlet.isColumnDisabled(columnId);
+boolean customizable = layoutTypePortlet.isCustomizable();
+
 PortletPreferencesIds portletPreferencesIds = PortletPreferencesFactoryUtil.getPortletPreferencesIds(request, portletId);
 
 PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getStrictPreferences(portletPreferencesIds);
 
-PortletPreferences portletSetup = PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(layout, portletId);
+PortletPreferences portletSetup = themeDisplay.getStrictLayoutPortletSetup(layout, portletId);
 
 Group group = null;
 boolean privateLayout = false;
@@ -137,13 +140,11 @@ catch (RuntimeException re) {
 	re.printStackTrace();
 }
 
-HttpServletRequest originalRequest = PortalUtil.getOriginalServletRequest(request);
-
-RenderRequestImpl renderRequestImpl = RenderRequestFactory.create(originalRequest, portlet, invokerPortlet, portletCtx, windowState, portletMode, portletPreferences, plid);
+RenderRequestImpl renderRequestImpl = RenderRequestFactory.create(request, portlet, invokerPortlet, portletCtx, windowState, portletMode, portletPreferences, plid);
 
 BufferCacheServletResponse bufferCacheServletResponse = new BufferCacheServletResponse(response);
 
-RenderResponseImpl renderResponseImpl = RenderResponseFactory.create(renderRequestImpl, bufferCacheServletResponse, portletId, company.getCompanyId(), plid);
+RenderResponseImpl renderResponseImpl = RenderResponseFactory.create(renderRequestImpl, bufferCacheServletResponse);
 
 if (stateMin) {
 	renderResponseImpl.setUseDefaultTemplate(true);
@@ -155,19 +156,16 @@ String responseContentType = renderRequestImpl.getResponseContentType();
 
 String currentURL = PortalUtil.getCurrentURL(request);
 
-String portletResource = StringPool.BLANK;
+String portletResource = ParamUtil.getString(request, "portletResource");
+
+if (Validator.isNull(portletResource)) {
+	portletResource = ParamUtil.getString(renderRequestImpl, "portletResource");
+}
+
 Portlet portletResourcePortlet = null;
 
-if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
-	portletResource = ParamUtil.getString(request, "portletResource");
-
-	if (Validator.isNull(portletResource)) {
-		portletResource = ParamUtil.getString(renderRequestImpl, "portletResource");
-	}
-
-	if (Validator.isNotNull(portletResource)) {
-		portletResourcePortlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletResource);
-	}
+if (Validator.isNotNull(portletResource)) {
+	portletResourcePortlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletResource);
 }
 
 boolean showCloseIcon = true;
@@ -177,8 +175,6 @@ boolean showEditDefaultsIcon = false;
 boolean showEditGuestIcon = false;
 boolean showExportImportIcon = false;
 boolean showHelpIcon = false;
-boolean showMaxIcon = portlet.hasWindowState(responseContentType, WindowState.MAXIMIZED);
-boolean showMinIcon = portlet.hasWindowState(responseContentType, WindowState.MINIMIZED);
 boolean showMoveIcon = !stateMax && !themeDisplay.isStateExclusive();
 boolean showPortletCssIcon = false;
 boolean showPortletIcon = (portletResourcePortlet != null) ? Validator.isNotNull(portletResourcePortlet.getIcon()) : Validator.isNotNull(portlet.getIcon());
@@ -192,57 +188,56 @@ if ((portletParallelRender != null) && (portletParallelRender.booleanValue() == 
 	showRefreshIcon = false;
 }
 
-if (!portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
-	Layout curLayout = PortletConfigurationLayoutUtil.getLayout(themeDisplay);
+Layout curLayout = PortletConfigurationLayoutUtil.getLayout(themeDisplay);
 
-	if ((!group.hasStagingGroup() || group.isStagingGroup()) &&
-		(PortletPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroupId(), curLayout, portlet, ActionKeys.CONFIGURATION))) {
+if ((!group.hasStagingGroup() || !PropsValues.STAGING_LIVE_GROUP_LOCKING_ENABLED) &&
+	(PortletPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroupId(), curLayout, portlet, ActionKeys.CONFIGURATION))) {
 
-		showConfigurationIcon = true;
+	showConfigurationIcon = true;
 
-		boolean supportsConfigurationLAR = portlet.getConfigurationActionInstance() != null;
-		boolean supportsDataLAR = !(portlet.getPortletDataHandlerInstance() instanceof DefaultConfigurationPortletDataHandler);
+	boolean supportsConfigurationLAR = portlet.getConfigurationActionInstance() != null;
+	boolean supportsDataLAR = !(portlet.getPortletDataHandlerInstance() instanceof DefaultConfigurationPortletDataHandler);
 
-		if (supportsConfigurationLAR || supportsDataLAR || !group.isControlPanel()) {
-			showExportImportIcon = true;
-		}
-
-		if (PropsValues.PORTLET_CSS_ENABLED) {
-			showPortletCssIcon = true;
-		}
+	if (supportsConfigurationLAR || supportsDataLAR || !group.isControlPanel()) {
+		showExportImportIcon = true;
 	}
 
-	if (layoutTypePortlet.isCustomizable() && !layoutTypePortlet.isColumnDisabled(columnId) && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE)) {
-		showConfigurationIcon = true;
+	if (PropsValues.PORTLET_CSS_ENABLED) {
+		showPortletCssIcon = true;
+	}
 
-		if (PropsValues.PORTLET_CSS_ENABLED) {
-			showPortletCssIcon = true;
-		}
+	Group checkingStagingGroup = group;
+
+	if (checkingStagingGroup.isControlPanel()) {
+		checkingStagingGroup = themeDisplay.getSiteGroup();
+	}
+
+	if ((checkingStagingGroup.isStaged() || checkingStagingGroup.isStagedRemotely()) && !checkingStagingGroup.hasLocalOrRemoteStagingGroup() && checkingStagingGroup.isStagedPortlet(portletId)) {
+		showStagingIcon = true;
+	}
+}
+
+if (!columnDisabled && customizable && !portlet.isPreferencesCompanyWide() && portlet.isPreferencesUniquePerLayout() && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE)) {
+	showConfigurationIcon = true;
+
+	if (PropsValues.PORTLET_CSS_ENABLED) {
+		showPortletCssIcon = true;
 	}
 }
 
 if (group.isLayoutPrototype()) {
 	showExportImportIcon = false;
+	showStagingIcon = false;
 }
 
-if ((group.isStaged() || group.isStagedRemotely()) && !group.hasLocalOrRemoteStagingGroup()) {
-	showStagingIcon = true;
-}
+if (portlet.hasPortletMode(responseContentType, PortletMode.EDIT) && PortletPermissionUtil.contains(permissionChecker, layout, portletId, ActionKeys.PREFERENCES)) {
+	showEditIcon = true;
 
-if (portlet.hasPortletMode(responseContentType, PortletMode.EDIT)) {
-	if (PortletPermissionUtil.contains(permissionChecker, layout, portletId, ActionKeys.PREFERENCES)) {
-		showEditIcon = true;
-	}
-}
-
-if (portlet.hasPortletMode(responseContentType, LiferayPortletMode.EDIT_DEFAULTS)) {
-	if (showEditIcon && themeDisplay.isShowAddContentIcon()) {
+	if (portlet.hasPortletMode(responseContentType, LiferayPortletMode.EDIT_DEFAULTS)) {
 		showEditDefaultsIcon = true;
 	}
-}
 
-if (portlet.hasPortletMode(responseContentType, LiferayPortletMode.EDIT_GUEST)) {
-	if (showEditIcon && !layout.isPrivateLayout() && themeDisplay.isShowAddContentIcon()) {
+	if (portlet.hasPortletMode(responseContentType, LiferayPortletMode.EDIT_GUEST) && !layout.isPrivateLayout()) {
 		showEditGuestIcon = true;
 	}
 }
@@ -263,13 +258,10 @@ if (responseContentType.equals(ContentTypes.XHTML_MP) && portlet.hasMultipleMime
 // staging is activated, only staging layouts can be updated.
 
 if ((!themeDisplay.isSignedIn()) ||
-	(group.hasStagingGroup() && !group.isStagingGroup()) ||
+	(group.hasStagingGroup() && PropsValues.STAGING_LIVE_GROUP_LOCKING_ENABLED) ||
 	(!LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE))) {
 
-	showMaxIcon = PropsValues.LAYOUT_GUEST_SHOW_MAX_ICON;
-	showMinIcon = PropsValues.LAYOUT_GUEST_SHOW_MIN_ICON;
-
-	if (!(layoutTypePortlet.isCustomizable() && !layoutTypePortlet.isColumnDisabled(columnId) && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE))) {
+	if (!(!columnDisabled && customizable && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE))) {
 		showCloseIcon = false;
 		showMoveIcon = false;
 	}
@@ -277,7 +269,7 @@ if ((!themeDisplay.isSignedIn()) ||
 
 // Portlets cannot be moved if the column is not customizable
 
-if (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isColumnDisabled(columnId)) {
+if (columnDisabled && customizable) {
 	showCloseIcon = false;
 	showMoveIcon = false;
 }
@@ -312,9 +304,17 @@ if (layout.isLayoutPrototypeLinkActive()) {
 	showPortletCssIcon = false;
 }
 
+// Portlets in a full page cannot be moved
+
+LayoutTypeController layoutTypeController = layoutTypePortlet.getLayoutTypeController();
+
+if (layoutTypeController.isFullPageDisplayable()) {
+	showCloseIcon = false;
+}
+
 long previousScopeGroupId = themeDisplay.getScopeGroupId();
 
-if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION) && (portletResourcePortlet != null)) {
+if (Validator.isNotNull(portletResource)) {
 	themeDisplay.setScopeGroupId(PortalUtil.getScopeGroupId(request, portletResourcePortlet.getPortletId()));
 }
 else {
@@ -323,14 +323,28 @@ else {
 
 long previousSiteGroupId = themeDisplay.getSiteGroupId();
 
-Group siteGroup = GroupLocalServiceUtil.getGroup(themeDisplay.getSiteGroupId());
+Group siteGroup = themeDisplay.getSiteGroup();
 
 if (siteGroup.isStagingGroup()) {
 	siteGroup = siteGroup.getLiveGroup();
 }
 
 if (siteGroup.isStaged() && !siteGroup.isStagedRemotely() && !siteGroup.isStagedPortlet(portletId)) {
-	themeDisplay.setParentGroupId(siteGroup.getGroupId());
+	themeDisplay.setSiteGroupId(siteGroup.getGroupId());
+}
+
+// Portlet decorate
+
+boolean tilesPortletDecorate = GetterUtil.getBoolean(TilesAttributeUtil.getTilesAttribute(pageContext, "portlet_decorate"), true);
+
+boolean portletDecorate = tilesPortletDecorate;
+
+Boolean portletDecorateObj = (Boolean)request.getAttribute(WebKeys.PORTLET_DECORATE);
+
+if (portletDecorateObj != null) {
+	portletDecorate = portletDecorateObj.booleanValue();
+
+	request.removeAttribute(WebKeys.PORTLET_DECORATE);
 }
 
 portletDisplay.recycle();
@@ -339,7 +353,6 @@ portletDisplay.setActive(portlet.isActive());
 portletDisplay.setColumnCount(columnCount);
 portletDisplay.setColumnId(columnId);
 portletDisplay.setColumnPos(columnPos);
-portletDisplay.setControlPanelCategory(portlet.getControlPanelEntryCategory());
 portletDisplay.setId(portletId);
 portletDisplay.setInstanceId(instanceId);
 portletDisplay.setModeAbout(modeAbout);
@@ -352,6 +365,8 @@ portletDisplay.setModePreview(modePreview);
 portletDisplay.setModePrint(modePrint);
 portletDisplay.setModeView(portletMode.equals(PortletMode.VIEW));
 portletDisplay.setNamespace(PortalUtil.getPortletNamespace(portletId));
+portletDisplay.setPortletDecorate(portletDecorate);
+portletDisplay.setPortletDisplayName(PortalUtil.getPortletTitle(renderRequestImpl));
 portletDisplay.setPortletName(portletConfig.getPortletName());
 portletDisplay.setPortletResource(portletResource);
 portletDisplay.setResourcePK(portletPrimaryKey);
@@ -364,8 +379,6 @@ portletDisplay.setShowEditDefaultsIcon(showEditDefaultsIcon);
 portletDisplay.setShowEditGuestIcon(showEditGuestIcon);
 portletDisplay.setShowExportImportIcon(showExportImportIcon);
 portletDisplay.setShowHelpIcon(showHelpIcon);
-portletDisplay.setShowMaxIcon(showMaxIcon);
-portletDisplay.setShowMinIcon(showMinIcon);
 portletDisplay.setShowMoveIcon(showMoveIcon);
 portletDisplay.setShowPortletCssIcon(showPortletCssIcon);
 portletDisplay.setShowPortletIcon(showPortletIcon);
@@ -401,7 +414,52 @@ portletDisplay.setURLPortlet(themeDisplay.getCDNHost() + portletIcon);
 
 // URL close
 
-String urlClose = themeDisplay.getPathMain() + "/portal/update_layout?p_auth=" + AuthTokenUtil.getToken(request) + "&p_l_id=" + plid + "&p_p_id=" + portletDisplay.getId() + "&p_v_l_s_g_id=" + themeDisplay.getSiteGroupId() + "&doAsUserId=" + HttpUtil.encodeURL(themeDisplay.getDoAsUserId()) + "&" + Constants.CMD + "=" + Constants.DELETE + "&referer=" + HttpUtil.encodeURL(themeDisplay.getPathMain() + "/portal/layout?p_l_id=" + plid + "&doAsUserId=" + themeDisplay.getDoAsUserId()) + "&refresh=1";
+StringBundler sb = new StringBundler(18);
+
+sb.append(themeDisplay.getPathMain());
+sb.append("/portal/update_layout?p_auth=");
+sb.append(AuthTokenUtil.getToken(request));
+sb.append("&p_l_id=");
+sb.append(plid);
+sb.append("&p_p_id=");
+sb.append(portletDisplay.getId());
+sb.append("&p_v_l_s_g_id=");
+sb.append(themeDisplay.getSiteGroupId());
+
+String doAsUserId = themeDisplay.getDoAsUserId();
+
+if (doAsUserId.isEmpty()) {
+	doAsUserId = null;
+}
+else {
+	doAsUserId = URLCodec.encodeURL(doAsUserId);
+
+	sb.append("&doAsUserId=");
+	sb.append(doAsUserId);
+}
+
+sb.append("&");
+sb.append(Constants.CMD);
+sb.append("=");
+sb.append(Constants.DELETE);
+sb.append("&referer=");
+
+StringBundler innerSB = new StringBundler(5);
+
+innerSB.append(themeDisplay.getPathMain());
+innerSB.append("/portal/layout?p_l_id=");
+innerSB.append(plid);
+
+if (doAsUserId != null) {
+	innerSB.append("&doAsUserId=");
+	innerSB.append(doAsUserId);
+}
+
+sb.append(URLCodec.encodeURL(innerSB.toString()));
+
+sb.append("&refresh=1");
+
+String urlClose = sb.toString();
 
 if (themeDisplay.isAddSessionIdToURL()) {
 	urlClose = PortalUtil.getURLWithSessionId(urlClose, themeDisplay.getSessionId());
@@ -411,32 +469,62 @@ portletDisplay.setURLClose(urlClose);
 
 // URL configuration
 
-PortletURLImpl urlConfiguration = new PortletURLImpl(request, PortletKeys.PORTLET_CONFIGURATION, plid, PortletRequest.RENDER_PHASE);
+PortletURL urlConfiguration = PortletProviderUtil.getPortletURL(request, PortletConfigurationApplicationType.PortletConfiguration.CLASS_NAME, PortletProvider.Action.VIEW);
 
-urlConfiguration.setWindowState(LiferayWindowState.POP_UP);
+if (urlConfiguration != null) {
+	urlConfiguration.setWindowState(LiferayWindowState.POP_UP);
 
-urlConfiguration.setEscapeXml(false);
+	if (portlet.getConfigurationActionInstance() != null) {
+		urlConfiguration.setParameter("mvcPath", "/edit_configuration.jsp");
 
-if (portlet.getConfigurationActionInstance() != null) {
-	urlConfiguration.setParameter("struts_action", "/portlet_configuration/edit_configuration");
+		String settingsScope = (String)request.getAttribute(WebKeys.SETTINGS_SCOPE);
+
+		settingsScope = ParamUtil.get(request, "settingsScope", settingsScope);
+
+		if (Validator.isNotNull(settingsScope)) {
+			urlConfiguration.setParameter("settingsScope", settingsScope);
+		}
+	}
+	else {
+		urlConfiguration.setParameter("mvcPath", "/edit_sharing.jsp");
+	}
+
+	urlConfiguration.setParameter("redirect", currentURL);
+	urlConfiguration.setParameter("returnToFullPageURL", currentURL);
+	urlConfiguration.setParameter("portletConfiguration", Boolean.TRUE.toString());
+	urlConfiguration.setParameter("portletResource", portletDisplay.getId());
+	urlConfiguration.setParameter("resourcePrimKey", portletPrimaryKey);
+
+	portletDisplay.setURLConfiguration(urlConfiguration.toString());
+
+	StringBundler urlConfigurationJSSB = new StringBundler(15);
+
+	urlConfigurationJSSB.append("Liferay.Portlet.openWindow({bodyCssClass: 'dialog-with-footer', ");
+	urlConfigurationJSSB.append("destroyOnHide: true, ");
+	urlConfigurationJSSB.append("namespace: '");
+	urlConfigurationJSSB.append(portletDisplay.getNamespace());
+	urlConfigurationJSSB.append("', portlet: '#p_p_id_");
+	urlConfigurationJSSB.append(portletDisplay.getId());
+	urlConfigurationJSSB.append("_', portletId: '");
+	urlConfigurationJSSB.append(portletDisplay.getId());
+
+	if (PropsValues.PORTLET_CONFIG_SHOW_PORTLET_ID) {
+		urlConfigurationJSSB.append("', subTitle: '");
+		urlConfigurationJSSB.append(portletDisplay.getId());
+	}
+
+	urlConfigurationJSSB.append("', title: '");
+	urlConfigurationJSSB.append(UnicodeLanguageUtil.get(request, "configuration"));
+	urlConfigurationJSSB.append("', uri: '");
+	urlConfigurationJSSB.append(HtmlUtil.escapeJS(portletDisplay.getURLConfiguration()));
+	urlConfigurationJSSB.append("'}); return false;");
+
+	portletDisplay.setURLConfigurationJS(urlConfigurationJSSB.toString());
 }
-else if (PortletPermissionUtil.contains(permissionChecker, layout, portletDisplay.getId(), ActionKeys.PERMISSIONS)) {
-	urlConfiguration.setParameter("struts_action", "/portlet_configuration/edit_permissions");
-}
-else {
-	urlConfiguration.setParameter("struts_action", "/portlet_configuration/edit_sharing");
-}
-
-urlConfiguration.setParameter("redirect", currentURL);
-urlConfiguration.setParameter("returnToFullPageURL", currentURL);
-urlConfiguration.setParameter("portletResource", portletDisplay.getId());
-urlConfiguration.setParameter("resourcePrimKey", PortletPermissionUtil.getPrimaryKey(plid, portlet.getPortletId()));
-
-portletDisplay.setURLConfiguration(urlConfiguration.toString() + "&" + PortalUtil.getPortletNamespace(PortletKeys.PORTLET_CONFIGURATION));
 
 // URL edit
 
-PortletURLImpl urlEdit = new PortletURLImpl(request, portletDisplay.getId(), plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlEdit = PortletURLFactoryUtil.create(request, portlet, PortletRequest.RENDER_PHASE);
 
 if (portletDisplay.isModeEdit()) {
 	urlEdit.setWindowState(WindowState.NORMAL);
@@ -459,7 +547,7 @@ portletDisplay.setURLEdit(urlEdit.toString());
 
 // URL edit defaults
 
-PortletURLImpl urlEditDefaults = new PortletURLImpl(request, portletDisplay.getId(), plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlEditDefaults = PortletURLFactoryUtil.create(request, portlet, PortletRequest.RENDER_PHASE);
 
 if (portletDisplay.isModeEditDefaults()) {
 	urlEditDefaults.setWindowState(WindowState.NORMAL);
@@ -482,7 +570,7 @@ portletDisplay.setURLEditDefaults(urlEditDefaults.toString());
 
 // URL edit guest
 
-PortletURLImpl urlEditGuest = new PortletURLImpl(request, portletDisplay.getId(), plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlEditGuest = PortletURLFactoryUtil.create(request, portlet, PortletRequest.RENDER_PHASE);
 
 if (portletDisplay.isModeEditGuest()) {
 	urlEditGuest.setWindowState(WindowState.NORMAL);
@@ -505,22 +593,22 @@ portletDisplay.setURLEditGuest(urlEditGuest.toString());
 
 // URL export / import
 
-PortletURLImpl urlExportImport = new PortletURLImpl(request, PortletKeys.PORTLET_CONFIGURATION, plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlExportImport = PortletURLFactoryUtil.create(request, PortletKeys.EXPORT_IMPORT, PortletRequest.RENDER_PHASE);
 
 urlExportImport.setWindowState(LiferayWindowState.POP_UP);
 
-urlExportImport.setParameter("struts_action", "/portlet_configuration/export_import");
+urlExportImport.setParameter("mvcRenderCommandName", "exportImport");
 urlExportImport.setParameter("redirect", currentURL);
 urlExportImport.setParameter("returnToFullPageURL", currentURL);
 urlExportImport.setParameter("portletResource", portletDisplay.getId());
 
 urlExportImport.setEscapeXml(false);
 
-portletDisplay.setURLExportImport(urlExportImport.toString() + "&" + PortalUtil.getPortletNamespace(PortletKeys.PORTLET_CONFIGURATION));
+portletDisplay.setURLExportImport(urlExportImport.toString() + "&" + PortalUtil.getPortletNamespace(PortletKeys.EXPORT_IMPORT));
 
 // URL help
 
-PortletURLImpl urlHelp = new PortletURLImpl(request, portletDisplay.getId(), plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlHelp = PortletURLFactoryUtil.create(request, portlet, PortletRequest.RENDER_PHASE);
 
 if (portletDisplay.isModeHelp()) {
 	urlHelp.setWindowState(WindowState.NORMAL);
@@ -549,7 +637,7 @@ if (!portletDisplay.isRestoreCurrentView()) {
 	lifecycle = PortletRequest.ACTION_PHASE;
 }
 
-PortletURLImpl urlMax = new PortletURLImpl(request, portletDisplay.getId(), plid, lifecycle);
+LiferayPortletURL urlMax = PortletURLFactoryUtil.create(request, portlet, lifecycle);
 
 if (portletDisplay.isStateMax()) {
 	urlMax.setWindowState(WindowState.NORMAL);
@@ -558,7 +646,19 @@ else {
 	urlMax.setWindowState(WindowState.MAXIMIZED);
 }
 
-urlMax.setWindowStateRestoreCurrentView(true);
+if (urlMax instanceof PortletURLImpl) {
+	PortletURLImpl portletURLImpl = (PortletURLImpl)urlMax;
+
+	portletURLImpl.setWindowStateRestoreCurrentView(true);
+}
+else {
+	try {
+		BeanPropertiesUtil.setProperty(urlMax, "windowStateRestoreCurrentView", true);
+	}
+	catch (Exception e) {
+		_log.error(ClassUtil.getClassName(urlMax) + " must implement the method setWindowStateRestoreCurrentView(boolean)", e);
+	}
+}
 
 urlMax.setEscapeXml(false);
 
@@ -569,17 +669,19 @@ if (lifecycle.equals(PortletRequest.RENDER_PHASE)) {
 
 	Map<String, String[]> renderParameters = RenderParametersPool.get(request, plid, portletDisplay.getId());
 
-	for (Map.Entry<String, String[]> entry : renderParameters.entrySet()) {
-		String key = entry.getKey();
+	if (renderParameters != null) {
+		for (Map.Entry<String, String[]> entry : renderParameters.entrySet()) {
+			String key = entry.getKey();
 
-		if (key.startsWith(portletNamespace) || publicRenderParameterNames.contains(key)) {
-			if (key.startsWith(portletNamespace)) {
-				key = key.substring(portletNamespace.length());
+			if (key.startsWith(portletNamespace) || publicRenderParameterNames.contains(key)) {
+				if (key.startsWith(portletNamespace)) {
+					key = key.substring(portletNamespace.length());
+				}
+
+				String[] values = entry.getValue();
+
+				urlMax.setParameter(key, values);
 			}
-
-			String[] values = entry.getValue();
-
-			urlMax.setParameter(key, values);
 		}
 	}
 }
@@ -588,19 +690,49 @@ portletDisplay.setURLMax(urlMax.toString());
 
 // URL min
 
-String urlMin = themeDisplay.getPathMain() + "/portal/update_layout?p_l_id=" + plid + "&p_p_id=" + portletDisplay.getId() + "&p_p_restore=" + portletDisplay.isStateMin() + "&p_v_l_s_g_id=" + themeDisplay.getSiteGroupId() + "&doAsUserId=" + HttpUtil.encodeURL(themeDisplay.getDoAsUserId()) + "&" + Constants.CMD + "=minimize&referer=" + HttpUtil.encodeURL(themeDisplay.getPathMain() + "/portal/layout?p_auth=" + AuthTokenUtil.getToken(request) + "&p_l_id=" + plid + "&doAsUserId=" + themeDisplay.getDoAsUserId()) + "&refresh=1";
+sb = new StringBundler(16);
 
-portletDisplay.setURLMin(urlMin);
+sb.append(themeDisplay.getPathMain());
+sb.append("/portal/update_layout?p_l_id=");
+sb.append(plid);
+sb.append("&p_p_id=");
+sb.append(portletDisplay.getId());
+sb.append("&p_p_restore=");
+sb.append(portletDisplay.isStateMin());
+sb.append("&p_v_l_s_g_id=");
+sb.append(themeDisplay.getSiteGroupId());
 
-// URL portlet css
+if (doAsUserId != null) {
+	sb.append("&doAsUserId=");
+	sb.append(URLCodec.encodeURL(doAsUserId));
+}
 
-String urlPortletCss = "javascript:;";
+sb.append("&");
+sb.append(Constants.CMD);
+sb.append("=minimize&referer=");
 
-portletDisplay.setURLPortletCss(urlPortletCss.toString());
+innerSB = new StringBundler(7);
+
+innerSB.append(themeDisplay.getPathMain());
+innerSB.append("/portal/layout?p_auth=");
+innerSB.append(AuthTokenUtil.getToken(request));
+innerSB.append("&p_l_id=");
+innerSB.append(plid);
+
+if (doAsUserId != null) {
+	innerSB.append("&doAsUserId=");
+	innerSB.append(doAsUserId);
+}
+
+sb.append(URLCodec.encodeURL(innerSB.toString()));
+
+sb.append("&refresh=1");
+
+portletDisplay.setURLMin(sb.toString());
 
 // URL print
 
-PortletURLImpl urlPrint = new PortletURLImpl(request, portletDisplay.getId(), plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlPrint = PortletURLFactoryUtil.create(request, portlet, PortletRequest.RENDER_PHASE);
 
 if (portletDisplay.isModePrint()) {
 	urlPrint.setWindowState(WindowState.NORMAL);
@@ -629,11 +761,11 @@ portletDisplay.setURLRefresh(urlRefresh);
 
 // URL staging
 
-PortletURLImpl urlStaging = new PortletURLImpl(request, PortletKeys.PORTLET_CONFIGURATION, plid, PortletRequest.RENDER_PHASE);
+LiferayPortletURL urlStaging = PortletURLFactoryUtil.create(request, PortletKeys.EXPORT_IMPORT, PortletRequest.RENDER_PHASE);
 
 urlStaging.setWindowState(LiferayWindowState.POP_UP);
 
-urlStaging.setParameter("struts_action", "/portlet_configuration/staging");
+urlStaging.setParameter("mvcRenderCommandName", "publishPortlet");
 urlStaging.setParameter("cmd", Constants.PUBLISH_TO_LIVE);
 urlStaging.setParameter("redirect", currentURL);
 urlStaging.setParameter("returnToFullPageURL", currentURL);
@@ -641,7 +773,7 @@ urlStaging.setParameter("portletResource", portletDisplay.getId());
 
 urlStaging.setEscapeXml(false);
 
-portletDisplay.setURLStaging(urlStaging.toString() + "&" + PortalUtil.getPortletNamespace(PortletKeys.PORTLET_CONFIGURATION));
+portletDisplay.setURLStaging(urlStaging.toString() + "&" + PortalUtil.getPortletNamespace(PortletKeys.EXPORT_IMPORT));
 
 // URL back
 
@@ -663,19 +795,6 @@ else if (portletDisplay.isModePrint()) {
 	urlBack = urlPrint.toString();
 }
 else if (portletDisplay.isStateMax()) {
-	//if (portletDisplay.getId().equals(PortletKeys.PORTLET_CONFIGURATION)) {
-		/*String portletResource = ParamUtil.getString(request, "portletResource");
-
-		urlMax.setAnchor(false);
-
-		urlBack = urlMax.toString() + "#p_" + portletResource;*/
-
-		//urlBack = ParamUtil.getString(renderRequestImpl, "returnToFullPageURL");
-	//}
-	//else {
-	//	urlBack = urlMax.toString();
-	//}
-
 	if (portletDisplay.getId().startsWith("WSRP_")) {
 		urlBack = portletDisplay.getURLBack();
 	}
@@ -701,26 +820,12 @@ if (themeDisplay.isWidget()) {
 if (group.isControlPanel()) {
 	portletDisplay.setShowBackIcon(false);
 	portletDisplay.setShowConfigurationIcon(false);
-	portletDisplay.setShowMaxIcon(false);
-	portletDisplay.setShowMinIcon(false);
 	portletDisplay.setShowMoveIcon(false);
 	portletDisplay.setShowPortletCssIcon(false);
 
-	if (!portlet.isPreferencesUniquePerLayout() && (portlet.getConfigurationActionInstance() != null)) {
+	if (!portlet.isPreferencesUniquePerLayout() && (portlet.getConfigurationActionInstance() != null) && PortletPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroupId(), curLayout, portlet, ActionKeys.CONFIGURATION)) {
 		portletDisplay.setShowConfigurationIcon(true);
 	}
-}
-
-// Portlet decorate
-
-boolean portletDecorateDefault = GetterUtil.getBoolean(themeDisplay.getThemeSetting("portlet-setup-show-borders-default"), PropsValues.THEME_PORTLET_DECORATE_DEFAULT);
-
-boolean portletDecorate = GetterUtil.getBoolean(portletSetup.getValue("portletSetupShowBorders", String.valueOf(portletDecorateDefault)));
-
-Boolean portletDecorateObj = (Boolean)renderRequestImpl.getAttribute(WebKeys.PORTLET_DECORATE);
-
-if (portletDecorateObj != null) {
-	portletDecorate = portletDecorateObj.booleanValue();
 }
 
 // Make sure the Tiles context is reset for the next portlet
@@ -741,7 +846,9 @@ Boolean portletVisibility = null;
 
 if (portlet.isActive() && portlet.isReady() && supportsMimeType && (invokerPortlet != null)) {
 	try {
-		invokerPortlet.render(renderRequestImpl, renderResponseImpl);
+		if (!PortalUtil.isSkipPortletContentProcesssing(group, request, layoutTypePortlet, portletDisplay, portletDisplay.getPortletName())) {
+			invokerPortlet.render(renderRequestImpl, renderResponseImpl);
+		}
 
 		portletVisibility = (Boolean)renderRequestImpl.getAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY);
 
@@ -780,11 +887,13 @@ if ((invokerPortlet != null) && (invokerPortlet.isStrutsPortlet() || invokerPort
 	request.removeAttribute(ComponentConstants.COMPONENT_CONTEXT);
 }
 
-if ((layout.isTypePanel() || layout.isTypeControlPanel()) && !portletDisplay.getId().equals(PortletKeys.CONTROL_PANEL_MENU) && !portlet.isStatic()) {
+String portalProductMenuApplicationTypePortletId = PortletProviderUtil.getPortletId(PortalProductMenuApplicationType.ProductMenu.CLASS_NAME, PortletProvider.Action.VIEW);
+
+if ((layout.isTypePanel() || layout.isTypeControlPanel()) && !portletDisplay.getId().equals(portalProductMenuApplicationTypePortletId) && !portlet.isStatic()) {
 	PortalUtil.setPageTitle(portletDisplay.getTitle(), request);
 }
 
-Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKeys.RENDER_PORTLET_BOUNDARY), true) && !themeDisplay.isFacebook() && !themeDisplay.isStateExclusive() && !themeDisplay.isWapTheme();
+Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKeys.RENDER_PORTLET_BOUNDARY), true) && !themeDisplay.isStateExclusive();
 %>
 
 <c:if test="<%= renderPortletBoundary %>">
@@ -798,7 +907,7 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 	String cssClasses = StringPool.BLANK;
 
 	if (themeDisplay.isFreeformLayout() && !themeDisplay.isStatePopUp() && !runtimePortlet && !layoutTypePortlet.hasStateMax()) {
-		StringBundler sb = new StringBundler(7);
+		sb = new StringBundler(7);
 
 		Properties freeformStyleProps = PropertiesUtil.load(portletSetup.getValue("portlet-freeform-styles", StringPool.BLANK));
 
@@ -813,16 +922,12 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 		freeformStyles = sb.toString();
 	}
 
-	if ((portletVisibility != null) && !layout.isTypeControlPanel()) {
-		cssClasses += " lfr-configurator-visibility";
-	}
-
 	if (portletDisplay.isStateMin()) {
 		cssClasses += " portlet-minimized";
 	}
 
 	if (!portletDisplay.isShowMoveIcon()) {
-		if (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isColumnDisabled(columnId)) {
+		if (columnDisabled && customizable) {
 			cssClasses += " portlet-static";
 		}
 		else if (portlet.isStaticStart()) {
@@ -833,8 +938,16 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 		}
 	}
 
-	if (!portletDecorate) {
-		cssClasses += " portlet-borderless";
+	// Portlet decorator
+
+	String portletDecoratorId = portletSetup.getValue("portletSetupPortletDecoratorId", StringPool.BLANK);
+
+	PortletDecorator portletDecorator = ThemeLocalServiceUtil.getPortletDecorator(company.getCompanyId(), theme.getThemeId(), portletDecoratorId);
+
+	if ((portletDecorator != null) && portletDisplay.isPortletDecorate()) {
+		portletDisplay.setPortletDecoratorId(portletDecorator.getPortletDecoratorId());
+
+		cssClasses += StringPool.SPACE + portletDecorator.getCssClass();
 	}
 
 	cssClasses = "portlet-boundary portlet-boundary" + HtmlUtil.escapeAttribute(PortalUtil.getPortletNamespace(rootPortletId)) + StringPool.SPACE + cssClasses + StringPool.SPACE + portlet.getCssClassWrapper() + StringPool.SPACE + HtmlUtil.escapeAttribute(customCSSClassName);
@@ -842,10 +955,13 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 	if (portletResourcePortlet != null) {
 		cssClasses += StringPool.SPACE + portletResourcePortlet.getCssClassWrapper();
 	}
+
+	if ((portletVisibility != null) && !layout.isTypeControlPanel()) {
+		cssClasses += " lfr-configurator-visibility";
+	}
 	%>
 
 	<div class="<%= cssClasses %>" id="p_p_id<%= HtmlUtil.escapeAttribute(renderResponseImpl.getNamespace()) %>" <%= freeformStyles %>>
-		<div id="p_p_id<%= HtmlUtil.escapeAttribute(renderResponseImpl.getNamespace()) %>-defaultScreen">
 </c:if>
 
 <c:choose>
@@ -907,23 +1023,21 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 					templatePath = StrutsUtil.TEXT_HTML_DIR + definition.getPath();
 				}
 
-				String portletContent = "/portal/portlet_error.jsp";
+				request.setAttribute(WebKeys.PORTLET_CONTENT_JSP, "/portal/portlet_error.jsp");
 		%>
 
-				<liferay-util:include page="<%= templatePath %>">
-					<liferay-util:param name="portlet_content" value="<%= portletContent %>" />
-				</liferay-util:include>
+				<liferay-util:include page="<%= templatePath %>" />
 
-		<%
+			<%
 			}
 			else {
 				if (useDefaultTemplate || !portlet.isActive()) {
 					renderRequestImpl.setAttribute(WebKeys.PORTLET_CONTENT, bufferCacheServletResponse.getString());
-		%>
 
-					<liferay-util:include page='<%= StrutsUtil.TEXT_HTML_DIR + "/common/themes/portlet.jsp" %>'>
-						<liferay-util:param name="portlet_content" value="<%= StringPool.BLANK %>" />
-					</liferay-util:include>
+					request.setAttribute(WebKeys.PORTLET_CONTENT_JSP, StringPool.BLANK);
+			%>
+
+					<liferay-util:include page='<%= StrutsUtil.TEXT_HTML_DIR + "/common/themes/portlet.jsp" %>' />
 
 		<%
 				}
@@ -935,26 +1049,26 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 		else {
 			renderRequestImpl.setAttribute(WebKeys.PORTLET_CONTENT, bufferCacheServletResponse.getString());
 
-			String portletContent = StringPool.BLANK;
+			String portletContentJSP = StringPool.BLANK;
 
 			if (!portlet.isReady()) {
-				portletContent = "/portal/portlet_not_ready.jsp";
+				portletContentJSP = "/portal/portlet_not_ready.jsp";
 			}
 
 			if (portletException) {
-				portletContent = "/portal/portlet_error.jsp";
+				portletContentJSP = "/portal/portlet_error.jsp";
 			}
 
 			if (addNotAjaxablePortlet) {
-				portletContent = "/portal/portlet_not_ajaxable.jsp";
+				portletContentJSP = "/portal/portlet_not_ajaxable.jsp";
 			}
+
+			request.setAttribute(WebKeys.PORTLET_CONTENT_JSP, portletContentJSP);
 		%>
 
 			<c:choose>
 				<c:when test="<%= useDefaultTemplate || portletException || addNotAjaxablePortlet %>">
-					<liferay-util:include page='<%= StrutsUtil.TEXT_HTML_DIR + "/common/themes/portlet.jsp" %>'>
-						<liferay-util:param name="portlet_content" value="<%= portletContent %>" />
-					</liferay-util:include>
+					<liferay-util:include page='<%= StrutsUtil.TEXT_HTML_DIR + "/common/themes/portlet.jsp" %>' />
 				</c:when>
 				<c:otherwise>
 					<%= renderRequestImpl.getAttribute(WebKeys.PORTLET_CONTENT) %>
@@ -985,20 +1099,20 @@ else {
 }
 %>
 
+<aui:script position='<%= themeDisplay.isIsolated() ? "inline" : "auto" %>'>
+	Liferay.Portlet.onLoad(
+		{
+			canEditTitle: <%= showConfigurationIcon %>,
+			columnPos: <%= columnPos %>,
+			isStatic: '<%= staticVar %>',
+			namespacedId: 'p_p_id<%= HtmlUtil.escapeJS(renderResponseImpl.getNamespace()) %>',
+			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>',
+			refreshURL: '<%= HtmlUtil.escapeJS(PortletURLUtil.getRefreshURL(request, themeDisplay)) %>'
+		}
+	);
+</aui:script>
+
 <c:if test="<%= renderPortletBoundary %>">
-		<aui:script position='<%= themeDisplay.isIsolated() ? "inline" : "auto" %>'>
-			Liferay.Portlet.onLoad(
-				{
-					canEditTitle: <%= showConfigurationIcon && portletDecorate %>,
-					columnPos: <%= columnPos %>,
-					isStatic: '<%= staticVar %>',
-					namespacedId: 'p_p_id<%= HtmlUtil.escapeJS(renderResponseImpl.getNamespace()) %>',
-					portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>',
-					refreshURL: '<%= HtmlUtil.escapeJS(PortletURLUtil.getRefreshURL(request, themeDisplay)) %>'
-				}
-			);
-		</aui:script>
-		</div>
 	</div>
 </c:if>
 
@@ -1039,13 +1153,13 @@ if (themeDisplay.isStatePopUp()) {
 			}
 		</aui:script>
 
-<%
+	<%
 	}
 
 	String closeRedirect = null;
 
 	if ((closeRedirect = (String)SessionMessages.get(renderRequestImpl, portletId + SessionMessages.KEY_SUFFIX_CLOSE_REDIRECT)) != null) {
-%>
+	%>
 
 		<aui:script use="aui-base">
 			var dialog = Liferay.Util.getWindow();
@@ -1082,14 +1196,14 @@ if (themeDisplay.isStatePopUp()) {
 			);
 		</aui:script>
 
-<%
+	<%
 	}
 
 	String closeRefreshPortletId = null;
 
 	if ((closeRefreshPortletId = (String)SessionMessages.get(renderRequestImpl, portletId + SessionMessages.KEY_SUFFIX_CLOSE_REFRESH_PORTLET)) != null) {
 		Map<String, String> refreshPortletData = (Map<String, String>)SessionMessages.get(renderRequestImpl, portletId + SessionMessages.KEY_SUFFIX_REFRESH_PORTLET_DATA);
-%>
+	%>
 
 		<aui:script use="aui-base">
 			var dialog = Liferay.Util.getWindow();
@@ -1152,5 +1266,5 @@ renderRequestImpl.cleanUp();
 %>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.portal.render_portlet_jsp");
+private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.portal.render_portlet_jsp");
 %>

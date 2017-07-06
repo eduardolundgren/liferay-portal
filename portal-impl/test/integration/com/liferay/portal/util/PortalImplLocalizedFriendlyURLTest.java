@@ -15,32 +15,34 @@
 package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.VirtualLayoutConstants;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.model.VirtualLayoutConstants;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserGroupLocalServiceUtil;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.CompanyTestUtil;
-import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserGroupTestUtil;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -60,8 +62,7 @@ public class PortalImplLocalizedFriendlyURLTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -70,19 +71,17 @@ public class PortalImplLocalizedFriendlyURLTest {
 
 		CompanyTestUtil.resetCompanyLocales(
 			PortalUtil.getDefaultCompanyId(),
-			new Locale[] {
-				LocaleUtil.CANADA_FRENCH, LocaleUtil.SPAIN, LocaleUtil.US
-			},
-			LocaleUtil.US
-		);
+			Arrays.asList(
+				LocaleUtil.CANADA_FRENCH, LocaleUtil.SPAIN, LocaleUtil.US),
+			LocaleUtil.US);
 
-		_nameMap = new HashMap<Locale, String>();
+		_nameMap = new HashMap<>();
 
 		_nameMap.put(LocaleUtil.CANADA_FRENCH, "Accueil");
 		_nameMap.put(LocaleUtil.SPAIN, "Inicio");
 		_nameMap.put(LocaleUtil.US, "Home");
 
-		_friendlyURLMap = new HashMap<Locale, String>();
+		_friendlyURLMap = new HashMap<>();
 
 		_friendlyURLMap.put(LocaleUtil.CANADA_FRENCH, "/accueil");
 		_friendlyURLMap.put(LocaleUtil.SPAIN, "/inicio");
@@ -832,7 +831,7 @@ public class PortalImplLocalizedFriendlyURLTest {
 	private static final String _PUBLIC_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING;
 
-	private static Locale[] _availableLocales;
+	private static Set<Locale> _availableLocales;
 	private static Locale _defaultLocale;
 	private static Map<Locale, String> _friendlyURLMap;
 	private static Map<Locale, String> _nameMap;

@@ -25,25 +25,31 @@ portletCategories = ListUtil.sort(portletCategories, new PortletCategoryComparat
 
 List<Portlet> portlets = new ArrayList<Portlet>();
 
-Set<String> portletIds = portletCategory.getPortletIds();
-
-String externalPortletCategory = null;
-
-for (String portletId : portletIds) {
+for (String portletId : portletCategory.getPortletIds()) {
 	Portlet portlet = PortletLocalServiceUtil.getPortletById(user.getCompanyId(), portletId);
 
 	if ((portlet != null) && PortletPermissionUtil.contains(permissionChecker, layout, portlet, ActionKeys.ADD_TO_PAGE)) {
 		portlets.add(portlet);
+	}
+}
 
-		PortletApp portletApp = portlet.getPortletApp();
+String externalPortletCategory = null;
 
-		if (portletApp.isWARFile() && Validator.isNull(externalPortletCategory)) {
-			PortletConfig curPortletConfig = PortletConfigFactoryUtil.create(portlet, application);
+for (String portletId : PortletCategoryUtil.getFirstChildPortletIds(portletCategory)) {
+	Portlet portlet = PortletLocalServiceUtil.getPortletById(user.getCompanyId(), portletId);
 
-			ResourceBundle resourceBundle = curPortletConfig.getResourceBundle(locale);
+	if (portlet != null) {
+		continue;
+	}
 
-			externalPortletCategory = ResourceBundleUtil.getString(resourceBundle, portletCategory.getName());
-		}
+	PortletApp portletApp = portlet.getPortletApp();
+
+	if (portletApp.isWARFile() && Validator.isNull(externalPortletCategory)) {
+		PortletConfig curPortletConfig = PortletConfigFactoryUtil.create(portlet, application);
+
+		ResourceBundle portletResourceBundle = curPortletConfig.getResourceBundle(locale);
+
+		externalPortletCategory = ResourceBundleUtil.getString(portletResourceBundle, portletCategory.getName());
 	}
 }
 
@@ -72,7 +78,7 @@ if (!portletCategories.isEmpty() || !portlets.isEmpty()) {
 				<c:if test="<%= !portlet.isInstanceable() %>">
 
 					<%
-					PortletURL portletURL = new PortletURLImpl(request, portlet.getRootPortletId(), plid, PortletRequest.ACTION_PHASE);
+					PortletURL portletURL = PortletURLFactoryUtil.create(request, portlet.getRootPortlet(), PortletRequest.ACTION_PHASE);
 
 					portletURL.setPortletMode(PortletMode.VIEW);
 					portletURL.setWindowState(WindowState.MAXIMIZED);

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<web-app id="Liferay_Portal" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<web-app id="Liferay_Portal" version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 	<context-param>
 		<param-name>axis.servicesPath</param-name>
 		<param-value>/api/axis/</param-value>
@@ -17,9 +17,27 @@
 		<param-name>com.ibm.websphere.portletcontainer.PortletDeploymentEnabled</param-name>
 		<param-value>false</param-value>
 	</context-param>
+	<context-param>
+		<param-name>osgi.http.endpoint</param-name>
+		<param-value>/o/</param-value>
+	</context-param>
+	<filter>
+		<filter-name>Invoker Filter - ASYNC</filter-name>
+		<filter-class>com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter</filter-class>
+		<async-supported>true</async-supported>
+		<init-param>
+			<param-name>dispatcher</param-name>
+			<param-value>ASYNC</param-value>
+		</init-param>
+		<init-param>
+			<param-name>register-portal-lifecycle</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</filter>
 	<filter>
 		<filter-name>Invoker Filter - ERROR</filter-name>
 		<filter-class>com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>dispatcher</param-name>
 			<param-value>ERROR</param-value>
@@ -32,6 +50,7 @@
 	<filter>
 		<filter-name>Invoker Filter - FORWARD</filter-name>
 		<filter-class>com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>dispatcher</param-name>
 			<param-value>FORWARD</param-value>
@@ -44,6 +63,7 @@
 	<filter>
 		<filter-name>Invoker Filter - INCLUDE</filter-name>
 		<filter-class>com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>dispatcher</param-name>
 			<param-value>INCLUDE</param-value>
@@ -56,6 +76,7 @@
 	<filter>
 		<filter-name>Invoker Filter - REQUEST</filter-name>
 		<filter-class>com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>dispatcher</param-name>
 			<param-value>REQUEST</param-value>
@@ -87,12 +108,6 @@
 	</filter-mapping>
 	<listener>
 		<listener-class>com.liferay.portal.spring.context.PortalContextLoaderListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>com.liferay.portal.servlet.PortalSessionListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>com.liferay.portal.kernel.servlet.PortletSessionListenerManager</listener-class>
 	</listener>
 	<servlet>
 		<servlet-name>Main Servlet</servlet-name>
@@ -137,42 +152,29 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>Facebook Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.facebook.FacebookServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
 		<servlet-name>Friendly URL Servlet - Private Group</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.FriendlyURLServlet</servlet-class>
+		<servlet-class>com.liferay.portal.servlet.ServletAdapter</servlet-class>
 		<init-param>
-			<param-name>private</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
-			<param-name>user</param-name>
-			<param-value>false</param-value>
+			<param-name>filter</param-name>
+			<param-value>(servlet.init.private=true)(servlet.init.user=false)(servlet.type=friendly-url)</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Friendly URL Servlet - Private User</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.FriendlyURLServlet</servlet-class>
+		<servlet-class>com.liferay.portal.servlet.ServletAdapter</servlet-class>
 		<init-param>
-			<param-name>private</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
-			<param-name>user</param-name>
-			<param-value>true</param-value>
+			<param-name>filter</param-name>
+			<param-value>(servlet.init.private=true)(servlet.init.user=true)(servlet.type=friendly-url)</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Friendly URL Servlet - Public</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.FriendlyURLServlet</servlet-class>
+		<servlet-class>com.liferay.portal.servlet.ServletAdapter</servlet-class>
 		<init-param>
-			<param-name>private</param-name>
-			<param-value>false</param-value>
+			<param-name>filter</param-name>
+			<param-value>(servlet.init.private=false)(servlet.type=friendly-url)</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
@@ -202,14 +204,10 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>Lucene Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.LuceneServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
 		<servlet-name>Module Framework Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.module.framework.ModuleFrameworkServletAdapter</servlet-class>
 		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
 		<servlet-name>Netvibes Servlet</servlet-name>
@@ -254,11 +252,6 @@
 	<servlet>
 		<servlet-name>Sitemap Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.SitemapServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
-		<servlet-name>Software Catalog Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.SoftwareCatalogServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
@@ -314,10 +307,6 @@
 	<servlet-mapping>
 		<servlet-name>Dynamic Resource Servlet</servlet-name>
 		<url-pattern>/sprite/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Facebook Servlet</servlet-name>
-		<url-pattern>/facebook/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Friendly URL Servlet - Private Group</servlet-name>
@@ -645,6 +634,14 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/th/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/th_TH/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/tr/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
@@ -682,10 +679,6 @@
 	<servlet-mapping>
 		<servlet-name>Language Servlet</servlet-name>
 		<url-pattern>/language/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Lucene Servlet</servlet-name>
-		<url-pattern>/lucene/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Netvibes Servlet</servlet-name>
@@ -730,10 +723,6 @@
 	<servlet-mapping>
 		<servlet-name>Sharepoint Web Services Servlet</servlet-name>
 		<url-pattern>/_vti_bin/webs.asmx</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Software Catalog Servlet</servlet-name>
-		<url-pattern>/software_catalog/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Web Server Servlet</servlet-name>
@@ -781,6 +770,9 @@
 	</servlet-mapping>
 	<session-config>
 		<session-timeout>30</session-timeout>
+		<cookie-config>
+			<http-only>true</http-only>
+		</cookie-config>
 	</session-config>
 	<mime-mapping>
 		<extension>js</extension>
@@ -837,11 +829,7 @@
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/aui</taglib-uri>
-			<taglib-location>/WEB-INF/tld/aui.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://liferay.com/tld/ddm</taglib-uri>
-			<taglib-location>/WEB-INF/tld/liferay-ddm.tld</taglib-location>
+			<taglib-location>/WEB-INF/tld/liferay-aui.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/portlet</taglib-uri>
@@ -850,10 +838,6 @@
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/security</taglib-uri>
 			<taglib-location>/WEB-INF/tld/liferay-security.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://liferay.com/tld/staging</taglib-uri>
-			<taglib-location>/WEB-INF/tld/liferay-staging.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/theme</taglib-uri>
@@ -977,6 +961,8 @@
 			<url-pattern>/sr_RS_latin/c/portal/protected</url-pattern>
 			<url-pattern>/sv/c/portal/protected</url-pattern>
 			<url-pattern>/sv_SE/c/portal/protected</url-pattern>
+			<url-pattern>/th/c/portal/protected</url-pattern>
+			<url-pattern>/th_TH/c/portal/protected</url-pattern>
 			<url-pattern>/tr/c/portal/protected</url-pattern>
 			<url-pattern>/tr_TR/c/portal/protected</url-pattern>
 			<url-pattern>/uk/c/portal/protected</url-pattern>
@@ -986,8 +972,6 @@
 			<url-pattern>/zh/c/portal/protected</url-pattern>
 			<url-pattern>/zh_CN/c/portal/protected</url-pattern>
 			<url-pattern>/zh_TW/c/portal/protected</url-pattern>
-			<http-method>GET</http-method>
-			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>users</role-name>

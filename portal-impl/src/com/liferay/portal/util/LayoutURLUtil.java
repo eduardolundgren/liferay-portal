@@ -15,12 +15,13 @@
 package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.LayoutUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutConstants;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.persistence.LayoutUtil;
-import com.liferay.portal.theme.ThemeDisplay;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,7 +43,7 @@ public class LayoutURLUtil {
 			com.liferay.portal.kernel.util.WebKeys.THEME_DISPLAY);
 
 		try {
-			return PortalUtil.getLayoutURL(layout, themeDisplay);
+			return PortalUtil.getLayoutURL(layout, themeDisplay, false);
 		}
 		catch (Exception e) {
 			return StringPool.BLANK;

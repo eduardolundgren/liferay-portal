@@ -30,7 +30,7 @@ public class PwdToolkitUtilThreadLocal {
 	}
 
 	private static final ThreadLocal<Boolean> _validate =
-		new InitialThreadLocal<Boolean>(
-			PwdToolkitUtilThreadLocal.class + "._validate", true);
+		new InitialThreadLocal<>(
+			PwdToolkitUtilThreadLocal.class + "._validate", () -> Boolean.TRUE);
 
 }

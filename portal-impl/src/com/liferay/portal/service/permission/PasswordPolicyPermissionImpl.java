@@ -14,9 +14,10 @@
 
 package com.liferay.portal.service.permission;
 
-import com.liferay.portal.model.PasswordPolicy;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.model.PasswordPolicy;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.permission.PasswordPolicyPermission;
 
 /**
  * @author Brian Wing Shun Chan
@@ -30,7 +31,9 @@ public class PasswordPolicyPermissionImpl implements PasswordPolicyPermission {
 		throws PrincipalException {
 
 		if (!contains(permissionChecker, passwordPolicyId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, PasswordPolicy.class.getName(),
+				passwordPolicyId, actionId);
 		}
 	}
 
@@ -40,7 +43,7 @@ public class PasswordPolicyPermissionImpl implements PasswordPolicyPermission {
 		String actionId) {
 
 		return permissionChecker.hasPermission(
-			0, PasswordPolicy.class.getName(), passwordPolicyId, actionId);
+			null, PasswordPolicy.class.getName(), passwordPolicyId, actionId);
 	}
 
 }

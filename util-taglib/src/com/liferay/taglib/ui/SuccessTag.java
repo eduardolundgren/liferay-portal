@@ -14,18 +14,98 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
+import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
+import com.liferay.taglib.util.TagResourceBundleUtil;
+
+import java.util.ResourceBundle;
+
+import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.tagext.BodyTag;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class SuccessTag extends IncludeTag {
+public class SuccessTag extends IncludeTag implements BodyTag {
 
 	@Override
-	public int doStartTag() {
-		return EVAL_BODY_INCLUDE;
+	public int doEndTag() throws JspException {
+		if (_hasMessage) {
+			return super.doEndTag();
+		}
+
+		return EVAL_PAGE;
+	}
+
+	@Override
+	public int doStartTag() throws JspException {
+		setAttributeNamespace(_ATTRIBUTE_NAMESPACE);
+
+		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
+			JavaConstants.JAVAX_PORTLET_REQUEST);
+
+		if (portletRequest == null) {
+			if (SessionMessages.contains(request, _key)) {
+				_hasMessage = true;
+
+				return super.doStartTag();
+			}
+		}
+		else if (MultiSessionMessages.contains(portletRequest, _key)) {
+			_hasMessage = true;
+
+			return super.doStartTag();
+		}
+
+		return SKIP_BODY;
+	}
+
+	@Override
+	public int processEndTag() throws Exception {
+		String message = _message;
+
+		String bodyContentString = null;
+
+		Object bodyContent = getBodyContentWrapper();
+
+		if (bodyContent != null) {
+			bodyContentString = bodyContent.toString();
+		}
+
+		if (Validator.isNotNull(bodyContentString)) {
+			message = bodyContentString;
+		}
+		else if (_translateMessage) {
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+			ResourceBundle resourceBundle =
+				TagResourceBundleUtil.getResourceBundle(
+					request, themeDisplay.getLocale());
+
+			message = LanguageUtil.get(resourceBundle, message);
+		}
+
+		AlertTag alertTag = new AlertTag();
+
+		alertTag.setIcon("check");
+		alertTag.setMessage(message);
+		alertTag.setTargetNode(_targetNode);
+		alertTag.setTimeout(_timeout);
+		alertTag.setType("success");
+
+		alertTag.doTag(pageContext);
+
+		return EVAL_PAGE;
 	}
 
 	public void setKey(String key) {
@@ -36,8 +116,26 @@ public class SuccessTag extends IncludeTag {
 		_message = message;
 	}
 
+	public void setTargetNode(String targetNode) {
+		_targetNode = targetNode;
+	}
+
+	public void setTimeout(int timeout) {
+		_timeout = timeout;
+	}
+
 	public void setTranslateMessage(boolean translateMessage) {
 		_translateMessage = translateMessage;
+	}
+
+	@Override
+	protected void cleanUp() {
+		_hasMessage = false;
+		_key = null;
+		_message = null;
+		_targetNode = null;
+		_timeout = 5000;
+		_translateMessage = true;
 	}
 
 	@Override
@@ -51,20 +149,25 @@ public class SuccessTag extends IncludeTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute("liferay-ui:success:key", _key);
-		request.setAttribute("liferay-ui:success:message", _message);
-		request.setAttribute(
-			"liferay-ui:success:translateMessage",
-			String.valueOf(_translateMessage));
+	protected int processStartTag() throws Exception {
+		return EVAL_BODY_BUFFERED;
 	}
+
+	@Override
+	protected void setAttributes(HttpServletRequest request) {
+	}
+
+	private static final String _ATTRIBUTE_NAMESPACE = "liferay-ui:success:";
 
 	private static final boolean _CLEAN_UP_SET_ATTRIBUTES = true;
 
 	private static final String _PAGE = "/html/taglib/ui/success/page.jsp";
 
+	private boolean _hasMessage;
 	private String _key;
 	private String _message;
+	private String _targetNode;
+	private int _timeout = 5000;
 	private boolean _translateMessage = true;
 
 }

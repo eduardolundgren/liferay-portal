@@ -14,34 +14,32 @@
 
 package com.liferay.portal.repository;
 
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLAppServiceUtil;
+import com.liferay.document.library.kernel.service.DLFolderServiceUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.repository.LocalRepository;
+import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.service.RepositoryLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Repository;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
-import com.liferay.portal.service.RepositoryLocalServiceUtil;
-import com.liferay.portal.service.RepositoryServiceUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFolderServiceUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.InputStream;
 
@@ -59,8 +57,7 @@ public class RepositoryTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -75,7 +72,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		long[] primaryKeys = populateRepository(repository.getRepositoryId());
@@ -108,7 +105,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		repositoryIds[0] = repository.getRepositoryId();
@@ -122,7 +119,7 @@ public class RepositoryTest {
 		repository = RepositoryLocalServiceUtil.addRepository(
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			dlFolder.getFolderId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), PortletKeys.DOCUMENT_LIBRARY,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			new UnicodeProperties(), true, new ServiceContext());
 
 		repositoryIds[1] = repository.getRepositoryId();
@@ -131,7 +128,7 @@ public class RepositoryTest {
 
 		for (long repositoryId : repositoryIds) {
 			try {
-				RepositoryServiceUtil.getLocalRepositoryImpl(repositoryId);
+				RepositoryProviderUtil.getLocalRepository(repositoryId);
 
 				Assert.fail(
 					"Should not be able to access repository " + repositoryId);
@@ -151,7 +148,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		long[] fileEntryIds = new long[2];
@@ -166,7 +163,7 @@ public class RepositoryTest {
 		for (int i = 0; i < fileEntryIds.length; i++) {
 			try {
 				LocalRepository localRepository =
-					RepositoryServiceUtil.getLocalRepositoryImpl(
+					RepositoryProviderUtil.getLocalRepository(
 						dlRepository.getRepositoryId());
 
 				localRepository.getFileEntry(fileEntryIds[i]);
@@ -190,7 +187,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		Assert.assertEquals(
@@ -210,7 +207,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), false,
+			RandomTestUtil.randomString(), new UnicodeProperties(), false,
 			new ServiceContext());
 
 		Assert.assertEquals(
@@ -221,8 +218,7 @@ public class RepositoryTest {
 	}
 
 	@Test
-	public void
-			testRepositoryFileEntriesAreDeletedWhenDeletingLiferayRepository()
+	public void testRepositoryFileEntriesAreDeletedWhenDeletingLiferayRepository()
 		throws Exception {
 
 		long[] fileEntryIds = new long[4];
@@ -237,7 +233,7 @@ public class RepositoryTest {
 			PortalUtil.getClassNameId(LiferayRepository.class),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		primaryKeys = populateRepository(repository.getRepositoryId());
@@ -249,8 +245,7 @@ public class RepositoryTest {
 
 		try {
 			LocalRepository localRepository =
-				RepositoryServiceUtil.getLocalRepositoryImpl(
-					_group.getGroupId());
+				RepositoryProviderUtil.getLocalRepository(_group.getGroupId());
 
 			localRepository.getFileEntry(fileEntryIds[0]);
 			localRepository.getFileEntry(fileEntryIds[1]);
@@ -262,19 +257,12 @@ public class RepositoryTest {
 		catch (Exception e) {
 		}
 
-		try {
-			LocalRepository localRepository =
-				RepositoryServiceUtil.getLocalRepositoryImpl(
-					repository.getRepositoryId());
+		LocalRepository localRepository =
+			RepositoryProviderUtil.getLocalRepository(
+				repository.getRepositoryId());
 
-			localRepository.getFileEntry(fileEntryIds[2]);
-			localRepository.getFileEntry(fileEntryIds[3]);
-		}
-		catch (Exception e) {
-			Assert.fail(
-				"Should not be able to get file entry from repository " +
-					repository.getRepositoryId());
-		}
+		localRepository.getFileEntry(fileEntryIds[2]);
+		localRepository.getFileEntry(fileEntryIds[3]);
 	}
 
 	@Test
@@ -287,7 +275,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		long[] fileEntryIds = new long[4];
@@ -301,7 +289,7 @@ public class RepositoryTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			PortletKeys.DOCUMENT_LIBRARY, new UnicodeProperties(), true,
+			RandomTestUtil.randomString(), new UnicodeProperties(), true,
 			new ServiceContext());
 
 		primaryKeys = populateRepository(repository2.getRepositoryId());
@@ -313,7 +301,7 @@ public class RepositoryTest {
 
 		try {
 			LocalRepository localRepository =
-				RepositoryServiceUtil.getLocalRepositoryImpl(
+				RepositoryProviderUtil.getLocalRepository(
 					repository2.getRepositoryId());
 
 			localRepository.getFileEntry(fileEntryIds[0]);
@@ -326,19 +314,12 @@ public class RepositoryTest {
 		catch (Exception e) {
 		}
 
-		try {
-			LocalRepository localRepository =
-				RepositoryServiceUtil.getLocalRepositoryImpl(
-					repository2.getRepositoryId());
+		LocalRepository localRepository =
+			RepositoryProviderUtil.getLocalRepository(
+				repository2.getRepositoryId());
 
-			localRepository.getFileEntry(fileEntryIds[2]);
-			localRepository.getFileEntry(fileEntryIds[3]);
-		}
-		catch (Exception e) {
-			Assert.fail(
-				"Should not be able to get file entry from repository " +
-					repository2.getRepositoryId());
-		}
+		localRepository.getFileEntry(fileEntryIds[2]);
+		localRepository.getFileEntry(fileEntryIds[3]);
 	}
 
 	protected long[] populateRepository(long repositoryId) throws Exception {
@@ -346,7 +327,7 @@ public class RepositoryTest {
 			_TEST_CONTENT.getBytes());
 
 		LocalRepository localRepository =
-			RepositoryServiceUtil.getLocalRepositoryImpl(repositoryId);
+			RepositoryProviderUtil.getLocalRepository(repositoryId);
 
 		FileEntry fileEntry = localRepository.addFileEntry(
 			TestPropsValues.getUserId(),

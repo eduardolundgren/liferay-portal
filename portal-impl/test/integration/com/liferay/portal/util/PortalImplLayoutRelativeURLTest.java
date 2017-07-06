@@ -14,14 +14,14 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.NoSuchLayoutException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.service.VirtualHostLocalServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.kernel.exception.NoSuchLayoutException;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
 
 import org.junit.Assert;
@@ -34,13 +34,12 @@ import org.junit.Test;
  * @author Akos Thurzo
  * @author Manuel de la Peña
  */
-public class PortalImplLayoutRelativeURLTest extends PortalImplBaseURLTestCase {
+public class PortalImplLayoutRelativeURLTest extends BasePortalImplURLTestCase {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	@Override

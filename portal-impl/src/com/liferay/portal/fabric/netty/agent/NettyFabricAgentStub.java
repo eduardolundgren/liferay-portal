@@ -109,12 +109,12 @@ public class NettyFabricAgentStub implements FabricAgent {
 			processCallable, fabricPathMappingVisitor);
 
 		NettyFabricWorkerStub<T> nettyFabricWorkerStub =
-			new NettyFabricWorkerStub<T>(
+			new NettyFabricWorkerStub<>(
 				id, _channel, _repository,
 				fabricPathMappingVisitor.getPathMap(), _rpcRelayTimeout);
 
 		final DefaultNoticeableFuture<Object> startupNoticeableFuture =
-			new DefaultNoticeableFuture<Object>();
+			new DefaultNoticeableFuture<>();
 
 		_startupNoticeableFutures.put(id, startupNoticeableFuture);
 
@@ -162,12 +162,12 @@ public class NettyFabricAgentStub implements FabricAgent {
 		final ChannelFutureListener channelFutureListener =
 			new ChannelFutureListener() {
 
-			@Override
-			public void operationComplete(ChannelFuture channelFuture) {
-				startupNoticeableFuture.cancel(true);
-			}
+				@Override
+				public void operationComplete(ChannelFuture channelFuture) {
+					startupNoticeableFuture.cancel(true);
+				}
 
-		};
+			};
 
 		final ChannelFuture closeChannelFuture = _channel.closeFuture();
 
@@ -202,7 +202,7 @@ public class NettyFabricAgentStub implements FabricAgent {
 		return nettyFabricWorkerStub;
 	}
 
-	public void finsihStartup(long id) {
+	public void finishStartup(long id) {
 		DefaultNoticeableFuture<?> startupNoticeabeFuture =
 			_startupNoticeableFutures.remove(id);
 
@@ -234,15 +234,13 @@ public class NettyFabricAgentStub implements FabricAgent {
 
 	private final Channel _channel;
 	private final AtomicLong _idGenerator = new AtomicLong();
-	private final Map<Long, NettyFabricWorkerStub<?>>
-		_nettyFabricWorkerStubs =
-			new ConcurrentHashMap<Long, NettyFabricWorkerStub<?>>();
+	private final Map<Long, NettyFabricWorkerStub<?>> _nettyFabricWorkerStubs =
+		new ConcurrentHashMap<>();
 	private final Path _remoteRepositoryPath;
 	private final Repository<Channel> _repository;
 	private final long _rpcRelayTimeout;
 	private final Map<Long, DefaultNoticeableFuture<?>>
-		_startupNoticeableFutures =
-			new ConcurrentHashMap<Long, DefaultNoticeableFuture<?>>();
+		_startupNoticeableFutures = new ConcurrentHashMap<>();
 	private final long _startupTimeout;
 
 }

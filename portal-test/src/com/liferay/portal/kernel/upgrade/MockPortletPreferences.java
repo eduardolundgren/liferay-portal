@@ -72,7 +72,7 @@ public class MockPortletPreferences implements PortletPreferences {
 
 	@Override
 	public void setValue(String key, String value) {
-		_map.put(key, new String[] { value });
+		_map.put(key, new String[] {value});
 	}
 
 	@Override
@@ -84,6 +84,6 @@ public class MockPortletPreferences implements PortletPreferences {
 	public void store() {
 	}
 
-	private final Map<String, String[]> _map = new HashMap<String, String[]>();
+	private final Map<String, String[]> _map = new HashMap<>();
 
 }

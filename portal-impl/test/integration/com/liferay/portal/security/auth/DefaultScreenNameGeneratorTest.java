@@ -14,12 +14,13 @@
 
 package com.liferay.portal.security.auth;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.model.User;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.DefaultScreenNameGenerator;
+import com.liferay.portal.kernel.security.auth.ScreenNameGenerator;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.TestPropsValues;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -35,8 +36,7 @@ public class DefaultScreenNameGeneratorTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void testGenerate() throws Exception {

@@ -17,10 +17,10 @@ package com.liferay.portal.util;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Html;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
@@ -60,6 +60,35 @@ public class HtmlImpl implements Html {
 	public static final int ESCAPE_MODE_URL = 5;
 
 	/**
+	 * Generates a string with the data-* attributes generated from the keys and
+	 * values of a map. For example, a map containing
+	 * <code>{key1=value1;key2=value2}</code> is returned as the string
+	 * <code>data-key1=value1 data-key2=value2</code>.
+	 *
+	 * @param  data the map of values to convert to data-* attributes
+	 * @return a string with the data attributes, or <code>null</code> if the
+	 *         map is <code>null</code>
+	 */
+	@Override
+	public String buildData(Map<String, Object> data) {
+		if ((data == null) || data.isEmpty()) {
+			return StringPool.BLANK;
+		}
+
+		StringBundler sb = new StringBundler(data.size() * 5);
+
+		for (Map.Entry<String, Object> entry : data.entrySet()) {
+			sb.append("data-");
+			sb.append(entry.getKey());
+			sb.append("=\"");
+			sb.append(escapeAttribute(String.valueOf(entry.getValue())));
+			sb.append("\" ");
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * Escapes the text so that it is safe to use in an HTML context.
 	 *
 	 * @param  text the text to escape
@@ -89,61 +118,57 @@ public class HtmlImpl implements Html {
 
 			String replacement = null;
 
-			switch (c) {
-				case '<':
-					replacement = "&lt;";
-
-					break;
-
-				case '>':
-					replacement = "&gt;";
-
-					break;
-
-				case '&':
-					replacement = "&amp;";
-
-					break;
-
-				case '"':
-					replacement = "&#034;";
-
-					break;
-
-				case '\'':
-					replacement = "&#039;";
-
-					break;
-
-				case '\u00bb': // '�'
-					replacement = "&#187;";
-
-					break;
-
-				case '\u2013':
-					replacement = "&#x2013;";
-
-					break;
-
-				case '\u2014':
-					replacement = "&#x2014;";
-
-					break;
+			if ((c < 256) && ((c >= 128) || _VALID_CHARS[c])) {
+				continue;
 			}
 
-			if (replacement != null) {
-				if (sb == null) {
-					sb = new StringBundler();
-				}
-
-				if (i > lastReplacementIndex) {
-					sb.append(text.substring(lastReplacementIndex, i));
-				}
-
-				sb.append(replacement);
-
-				lastReplacementIndex = i + 1;
+			if (c == '<') {
+				replacement = "&lt;";
 			}
+			else if (c == '>') {
+				replacement = "&gt;";
+			}
+			else if (c == '&') {
+				replacement = "&amp;";
+			}
+			else if (c == '"') {
+				replacement = "&#34;";
+			}
+			else if (c == '\'') {
+				replacement = "&#39;";
+			}
+			else if (c == '\u00bb') {
+				replacement = "&#187;";
+			}
+			else if (c == '\u2013') {
+				replacement = "&#8211;";
+			}
+			else if (c == '\u2014') {
+				replacement = "&#8212;";
+			}
+			else if (c == '\u2028') {
+				replacement = "&#8232;";
+			}
+			else if (!_isValidXmlCharacter(c) ||
+					 _isUnicodeCompatibilityCharacter(c)) {
+
+				replacement = StringPool.SPACE;
+			}
+			else {
+				continue;
+			}
+
+			if (sb == null) {
+				sb = new StringBundler();
+			}
+
+			if (i > lastReplacementIndex) {
+				sb.append(text.substring(lastReplacementIndex, i));
+			}
+
+			sb.append(replacement);
+
+			lastReplacementIndex = i + 1;
 		}
 
 		if (sb == null) {
@@ -197,47 +222,101 @@ public class HtmlImpl implements Html {
 			prefix = "\\x";
 		}
 		else if (mode == ESCAPE_MODE_URL) {
-			return HttpUtil.encodeURL(text, true);
+			return URLCodec.encodeURL(text, true);
 		}
 		else {
 			return escape(text);
 		}
 
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = null;
+		char[] hexBuffer = new char[4];
+		int lastReplacementIndex = 0;
 
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 
-			if ((c > 255) || Character.isLetterOrDigit(c) ||
-				(c == CharPool.DASH) || (c == CharPool.UNDERLINE)) {
+			if (c < _VALID_CHARS.length) {
+				if (!_VALID_CHARS[c]) {
+					if (sb == null) {
+						sb = new StringBuilder(text.length() + 64);
+					}
 
-				sb.append(c);
+					if (i > lastReplacementIndex) {
+						sb.append(text, lastReplacementIndex, i);
+					}
+
+					sb.append(prefix);
+
+					_appendHexChars(sb, hexBuffer, c);
+
+					sb.append(postfix);
+
+					if ((mode == ESCAPE_MODE_CSS) &&
+						(i < (text.length() - 1))) {
+
+						char nextChar = text.charAt(i + 1);
+
+						if ((nextChar >= CharPool.NUMBER_0) &&
+							(nextChar <= CharPool.NUMBER_9)) {
+
+							sb.append(CharPool.SPACE);
+						}
+					}
+
+					lastReplacementIndex = i + 1;
+				}
 			}
-			else {
-				sb.append(prefix);
+			else if ((mode == ESCAPE_MODE_ATTRIBUTE) &&
+					 (!_isValidXmlCharacter(c) ||
+					  _isUnicodeCompatibilityCharacter(c))) {
 
-				String hexString = StringUtil.toHexString(c);
-
-				if (hexString.length() == 1) {
-					sb.append(StringPool.ASCII_TABLE[48]);
+				if (sb == null) {
+					sb = new StringBuilder(text.length() + 64);
 				}
 
-				sb.append(hexString);
+				if (i > lastReplacementIndex) {
+					sb.append(text, lastReplacementIndex, i);
+				}
+
+				sb.append(CharPool.SPACE);
+
+				lastReplacementIndex = i + 1;
+			}
+			else if ((mode == ESCAPE_MODE_JS) &&
+					 ((c == '\u2028') || (c == '\u2029'))) {
+
+				if (sb == null) {
+					sb = new StringBuilder(text.length() + 64);
+				}
+
+				if (i > lastReplacementIndex) {
+					sb.append(text, lastReplacementIndex, i);
+				}
+
+				sb.append("\\u");
+
+				_appendHexChars(sb, hexBuffer, c);
+
 				sb.append(postfix);
+
+				lastReplacementIndex = i + 1;
 			}
 		}
 
-		if (sb.length() == text.length()) {
+		if (sb == null) {
 			return text;
 		}
-		else {
-			return sb.toString();
+
+		if (lastReplacementIndex < text.length()) {
+			sb.append(text, lastReplacementIndex, text.length());
 		}
+
+		return sb.toString();
 	}
 
 	/**
-	 * Escapes the attribute value so that it is safe to use as an attribute
-	 * value.
+	 * Escapes the attribute value so that it is safe to use within a quoted
+	 * attribute.
 	 *
 	 * @param  attribute the attribute to escape
 	 * @return the escaped attribute value, or <code>null</code> if the
@@ -278,12 +357,25 @@ public class HtmlImpl implements Html {
 			return StringPool.BLANK;
 		}
 
-		if (href.indexOf(StringPool.COLON) == 10) {
-			String protocol = StringUtil.toLowerCase(href.substring(0, 10));
+		char c = href.charAt(0);
 
-			if (protocol.equals("javascript")) {
-				href = StringUtil.replaceFirst(href, StringPool.COLON, "%3a");
-			}
+		if ((c == CharPool.BACK_SLASH) || (c == CharPool.SLASH)) {
+			return escapeAttribute(href);
+		}
+
+		c = Character.toLowerCase(c);
+
+		if ((c >= CharPool.LOWER_CASE_A) && (c <= CharPool.LOWER_CASE_Z) &&
+			(c != CharPool.LOWER_CASE_D) && (c != CharPool.LOWER_CASE_J)) {
+
+			return escapeAttribute(href);
+		}
+
+		int index = href.indexOf(StringPool.COLON);
+
+		if (index > -1) {
+			href = StringUtil.replaceFirst(
+				href, StringPool.COLON, "%3a", index);
 		}
 
 		return escapeAttribute(href);
@@ -312,7 +404,7 @@ public class HtmlImpl implements Html {
 			String protocol = StringUtil.toLowerCase(link.substring(0, 10));
 
 			if (protocol.equals("javascript")) {
-				link = StringUtil.replaceFirst(link, StringPool.COLON, "%3a");
+				link = StringUtil.replaceFirst(link, CharPool.COLON, "%3a");
 			}
 		}
 
@@ -353,7 +445,7 @@ public class HtmlImpl implements Html {
 			}
 
 			if (hasToken) {
-				sb.append(StringPool.UNDERLINE);
+				sb.append(CharPool.UNDERLINE);
 			}
 			else {
 				sb.append(c);
@@ -411,7 +503,8 @@ public class HtmlImpl implements Html {
 
 	@Override
 	public String fromInputSafe(String text) {
-		return StringUtil.replace(text, "&amp;", "&");
+		return StringUtil.replace(
+			text, new String[] {"&amp;", "&quot;"}, new String[] {"&", "\""});
 	}
 
 	@Override
@@ -443,13 +536,13 @@ public class HtmlImpl implements Html {
 				sb.append(text.substring(lastReplacementIndex, i));
 			}
 
-			sb.append(CharPool.UNDERLINE);
+			sb.append(StringPool.UNDERLINE);
 
 			if (c != CharPool.UNDERLINE) {
 				sb.append(StringUtil.toHexString(c));
 			}
 
-			sb.append(CharPool.UNDERLINE);
+			sb.append(StringPool.UNDERLINE);
 
 			lastReplacementIndex = i + 1;
 		}
@@ -525,7 +618,7 @@ public class HtmlImpl implements Html {
 
 		html = StringUtil.replace(html, StringPool.RETURN_NEW_LINE, "<br />");
 
-		return StringUtil.replace(html, StringPool.NEW_LINE, "<br />");
+		return StringUtil.replace(html, CharPool.NEW_LINE, "<br />");
 	}
 
 	/**
@@ -576,7 +669,6 @@ public class HtmlImpl implements Html {
 
 		while (y != -1) {
 			sb.append(text.substring(x, y));
-			sb.append(StringPool.SPACE);
 
 			// Look for text enclosed by <abc></abc>
 
@@ -627,9 +719,7 @@ public class HtmlImpl implements Html {
 	@Override
 	public String toInputSafe(String text) {
 		return StringUtil.replace(
-			text,
-			new String[] {"&", "\""},
-			new String[] {"&amp;", "&quot;"});
+			text, new char[] {'&', '\"'}, new String[] {"&amp;", "&quot;"});
 	}
 
 	@Override
@@ -718,7 +808,7 @@ public class HtmlImpl implements Html {
 
 	protected boolean isTag(char[] tag, String text, int pos) {
 		if ((pos + tag.length + 1) <= text.length()) {
-			char item;
+			char item = '\0';
 
 			for (int i = 0; i < tag.length; i++) {
 				item = text.charAt(pos++);
@@ -740,7 +830,7 @@ public class HtmlImpl implements Html {
 	}
 
 	protected int stripTag(char[] tag, String text, int pos) {
-		int x = pos + _TAG_SCRIPT.length;
+		int x = pos + tag.length;
 
 		// Find end of the tag
 
@@ -752,7 +842,7 @@ public class HtmlImpl implements Html {
 
 		// Check if preceding character is / (i.e. is this instance of <abc/>)
 
-		if (text.charAt(x-1) == '/') {
+		if (text.charAt(x - 1) == '/') {
 			return pos;
 		}
 
@@ -782,45 +872,105 @@ public class HtmlImpl implements Html {
 		return pos;
 	}
 
+	private static void _appendHexChars(
+		StringBuilder sb, char[] buffer, char c) {
+
+		int index = buffer.length;
+
+		do {
+			buffer[--index] = _HEX_DIGITS[c & 15];
+
+			c >>>= 4;
+		}
+		while (c != 0);
+
+		if (index == (buffer.length - 1)) {
+			sb.append(CharPool.NUMBER_0);
+			sb.append(buffer[index]);
+
+			return;
+		}
+
+		sb.append(buffer, index, buffer.length - index);
+	}
+
+	private boolean _isUnicodeCompatibilityCharacter(char c) {
+		if (((c >= '\u007f') && (c <= '\u0084')) ||
+			((c >= '\u0086') && (c <= '\u009f')) ||
+			((c >= '\ufdd0') && (c <= '\ufdef'))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isValidXmlCharacter(char c) {
+		if (((c >= CharPool.SPACE) && (c <= '\ud7ff')) ||
+			((c >= '\ue000') && (c <= '\ufffd')) || Character.isSurrogate(c) ||
+			(c == CharPool.TAB) || (c == CharPool.NEW_LINE) ||
+			(c == CharPool.RETURN)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private static final char[] _HEX_DIGITS = {
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
+		'e', 'f'
+	};
+
 	private static final String[] _MS_WORD_HTML = new String[] {
 		"&reg;", StringPool.APOSTROPHE, StringPool.QUOTE, StringPool.QUOTE
 	};
 
-	private static final String[] _MS_WORD_UNICODE = new String[] {
-		"\u00ae", "\u2019", "\u201c", "\u201d"
-	};
+	private static final String[] _MS_WORD_UNICODE =
+		new String[] {"\u00ae", "\u2019", "\u201c", "\u201d"};
 
 	private static final char[] _TAG_SCRIPT = {'s', 'c', 'r', 'i', 'p', 't'};
 
 	private static final char[] _TAG_STYLE = {'s', 't', 'y', 'l', 'e'};
 
+	private static final boolean[] _VALID_CHARS = new boolean[256];
+
 	// See http://www.w3.org/TR/xpath20/#lexical-structure
 
 	private static final char[] _XPATH_TOKENS = {
 		'(', ')', '[', ']', '.', '@', ',', ':', '/', '|', '+', '-', '=', '!',
-		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232};
+		'<', '>', '*', '$', '"', '"', ' ', 9, 10, 13, 133, 8232
+	};
 
-	private static final Map<String, String> _unescapeMap =
-		new HashMap<String, String>();
+	private static final Map<String, String> _unescapeMap = new HashMap<>();
 
 	static {
-		_unescapeMap.put("lt", "<");
-		_unescapeMap.put("gt", ">");
+		_unescapeMap.put("#34", "\"");
+		_unescapeMap.put("#35", "#");
+		_unescapeMap.put("#37", "%");
+		_unescapeMap.put("#39", "'");
+		_unescapeMap.put("#40", "(");
+		_unescapeMap.put("#41", ")");
+		_unescapeMap.put("#43", "+");
+		_unescapeMap.put("#44", ",");
+		_unescapeMap.put("#45", "-");
+		_unescapeMap.put("#59", ";");
+		_unescapeMap.put("#61", "=");
 		_unescapeMap.put("amp", "&");
+		_unescapeMap.put("gt", ">");
+		_unescapeMap.put("lt", "<");
 		_unescapeMap.put("rsquo", "\u2019");
-		_unescapeMap.put("#034", "\"");
-		_unescapeMap.put("#039", "'");
-		_unescapeMap.put("#040", "(");
-		_unescapeMap.put("#041", ")");
-		_unescapeMap.put("#044", ",");
-		_unescapeMap.put("#035", "#");
-		_unescapeMap.put("#037", "%");
-		_unescapeMap.put("#059", ";");
-		_unescapeMap.put("#061", "=");
-		_unescapeMap.put("#043", "+");
-		_unescapeMap.put("#045", "-");
+
+		for (int i = 0; i < _VALID_CHARS.length; i++) {
+			if (Character.isLetterOrDigit(i)) {
+				_VALID_CHARS[i] = true;
+			}
+		}
+
+		_VALID_CHARS['-'] = true;
+		_VALID_CHARS['_'] = true;
 	}
 
-	private Pattern _pattern = Pattern.compile("([\\s<&]|$)");
+	private final Pattern _pattern = Pattern.compile("([\\s<&]|$)");
 
 }

@@ -15,10 +15,11 @@
 package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.model.Account;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.AccountLocalServiceUtil;
+import com.liferay.portal.kernel.model.Account;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.AccountLocalServiceUtil;
+import com.liferay.portal.kernel.service.permission.AccountPermission;
 
 /**
  * @author Brian Wing Shun Chan
@@ -32,7 +33,9 @@ public class AccountPermissionImpl implements AccountPermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, account, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Account.class.getName(),
+				account.getAccountId(), actionId);
 		}
 	}
 
@@ -43,7 +46,9 @@ public class AccountPermissionImpl implements AccountPermission {
 		throws PortalException {
 
 		if (!contains(permissionChecker, accountId, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Account.class.getName(), accountId,
+				actionId);
 		}
 	}
 
@@ -51,11 +56,8 @@ public class AccountPermissionImpl implements AccountPermission {
 	public boolean contains(
 		PermissionChecker permissionChecker, Account account, String actionId) {
 
-		//long groupId = account.getGroupId();
-		long groupId = 0;
-
 		return permissionChecker.hasPermission(
-			groupId, Account.class.getName(), account.getAccountId(), actionId);
+			null, Account.class.getName(), account.getAccountId(), actionId);
 	}
 
 	@Override

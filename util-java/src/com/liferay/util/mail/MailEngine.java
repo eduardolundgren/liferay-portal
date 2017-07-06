@@ -14,22 +14,24 @@
 
 package com.liferay.util.mail;
 
-import com.liferay.mail.model.FileAttachment;
-import com.liferay.mail.service.MailServiceUtil;
+import com.liferay.mail.kernel.model.Account;
+import com.liferay.mail.kernel.model.FileAttachment;
+import com.liferay.mail.kernel.model.MailMessage;
+import com.liferay.mail.kernel.model.SMTPAccount;
+import com.liferay.mail.kernel.service.MailServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.LogUtil;
-import com.liferay.portal.kernel.mail.Account;
-import com.liferay.portal.kernel.mail.MailMessage;
-import com.liferay.portal.kernel.mail.SMTPAccount;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
@@ -38,6 +40,7 @@ import java.net.SocketException;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,6 +49,7 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
 import javax.mail.Address;
+import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
@@ -54,6 +58,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -65,6 +70,7 @@ import javax.mail.internet.MimeMultipart;
  * @author Neil Griffin
  * @author Thiago Moreira
  * @author Brett Swaim
+ * @see    com.liferay.petra.mail.MailEngine
  */
 public class MailEngine {
 
@@ -176,6 +182,20 @@ public class MailEngine {
 			List<FileAttachment> fileAttachments, SMTPAccount smtpAccount)
 		throws MailEngineException {
 
+		send(
+			from, to, cc, bcc, bulkAddresses, subject, body, htmlFormat,
+			replyTo, messageId, inReplyTo, fileAttachments, smtpAccount, null);
+	}
+
+	public static void send(
+			InternetAddress from, InternetAddress[] to, InternetAddress[] cc,
+			InternetAddress[] bcc, InternetAddress[] bulkAddresses,
+			String subject, String body, boolean htmlFormat,
+			InternetAddress[] replyTo, String messageId, String inReplyTo,
+			List<FileAttachment> fileAttachments, SMTPAccount smtpAccount,
+			InternetHeaders internetHeaders)
+		throws MailEngineException {
+
 		long startTime = System.currentTimeMillis();
 
 		if (_log.isDebugEnabled()) {
@@ -261,7 +281,7 @@ public class MailEngine {
 
 			subject = GetterUtil.getString(subject);
 
-			message.setSubject(subject);
+			message.setSubject(_sanitizeCRLF(subject));
 
 			if (ListUtil.isNotEmpty(fileAttachments)) {
 				MimeMultipart rootMultipart = new MimeMultipart(
@@ -305,6 +325,7 @@ public class MailEngine {
 					DataSource dataSource = new FileDataSource(file);
 
 					mimeBodyPart.setDataHandler(new DataHandler(dataSource));
+
 					mimeBodyPart.setDisposition(Part.ATTACHMENT);
 
 					if (fileAttachment.getFileName() != null) {
@@ -337,12 +358,22 @@ public class MailEngine {
 			}
 
 			if (messageId != null) {
-				message.setHeader("Message-ID", messageId);
+				message.setHeader("Message-ID", _sanitizeCRLF(messageId));
 			}
 
 			if (inReplyTo != null) {
-				message.setHeader("In-Reply-To", inReplyTo);
-				message.setHeader("References", inReplyTo);
+				message.setHeader("In-Reply-To", _sanitizeCRLF(inReplyTo));
+				message.setHeader("References", _sanitizeCRLF(inReplyTo));
+			}
+
+			if (internetHeaders != null) {
+				Enumeration enumeration = internetHeaders.getAllHeaders();
+
+				while (enumeration.hasMoreElements()) {
+					Header header = (Header)enumeration.nextElement();
+
+					message.setHeader(header.getName(), header.getValue());
+				}
 			}
 
 			int batchSize = GetterUtil.getInteger(
@@ -429,7 +460,8 @@ public class MailEngine {
 			mailMessage.getSubject(), mailMessage.getBody(),
 			mailMessage.isHTMLFormat(), mailMessage.getReplyTo(),
 			mailMessage.getMessageId(), mailMessage.getInReplyTo(),
-			mailMessage.getFileAttachments(), mailMessage.getSMTPAccount());
+			mailMessage.getFileAttachments(), mailMessage.getSMTPAccount(),
+			mailMessage.getInternetHeaders());
 	}
 
 	public static void send(String from, String to, String subject, String body)
@@ -461,7 +493,7 @@ public class MailEngine {
 			return null;
 		}
 
-		int end = ((index + 1) * batchSize);
+		int end = (index + 1) * batchSize;
 
 		if (end > addresses.length) {
 			end = addresses.length;
@@ -519,6 +551,12 @@ public class MailEngine {
 			PropsUtil.get(PropsKeys.MAIL_THROWS_EXCEPTION_ON_FAILURE));
 	}
 
+	private static String _sanitizeCRLF(String text) {
+		return StringUtil.replace(
+			text, new char[] {CharPool.NEW_LINE, CharPool.RETURN},
+			new char[] {CharPool.SPACE, CharPool.SPACE});
+	}
+
 	private static void _send(
 			Session session, Message message, InternetAddress[] bulkAddresses,
 			int batchSize)
@@ -526,7 +564,7 @@ public class MailEngine {
 
 		try {
 			boolean smtpAuth = GetterUtil.getBoolean(
-				_getSMTPProperty(session, "auth"), false);
+				_getSMTPProperty(session, "auth"));
 			String smtpHost = _getSMTPProperty(session, "host");
 			int smtpPort = GetterUtil.getInteger(
 				_getSMTPProperty(session, "port"), Account.PORT_SMTP);
@@ -591,13 +629,14 @@ public class MailEngine {
 			if (me.getNextException() instanceof SocketException) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Failed to connect to a valid mail server. Please " +
-							"make sure one is properly configured. " +
+						"Unable to connect to a valid mail server. Please " +
+							"make sure one is properly configured: " +
 								me.getMessage());
 				}
 			}
 			else {
-				LogUtil.log(_log, me);
+				LogUtil.log(
+					_log, me, "Unable to send message: " + me.getMessage());
 			}
 
 			if (_isThrowsExceptionOnFailure()) {
@@ -616,6 +655,6 @@ public class MailEngine {
 
 	private static final String _TEXT_PLAIN = "text/plain;charset=\"UTF-8\"";
 
-	private static Log _log = LogFactoryUtil.getLog(MailEngine.class);
+	private static final Log _log = LogFactoryUtil.getLog(MailEngine.class);
 
 }

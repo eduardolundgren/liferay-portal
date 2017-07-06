@@ -16,7 +16,7 @@ package com.liferay.portal.struts;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
+import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 
 import java.io.IOException;
 
@@ -45,8 +45,6 @@ public class StrutsUtil {
 
 	public static final String TEXT_HTML_DIR = "/html";
 
-	public static final String TEXT_WAP_DIR = "/wap";
-
 	public static void forward(
 			String uri, ServletContext servletContext,
 			HttpServletRequest request, HttpServletResponse response)
@@ -61,25 +59,22 @@ public class StrutsUtil {
 		}
 
 		if (!response.isCommitted()) {
-			String path = TEXT_HTML_DIR + uri;
-
-			if (BrowserSnifferUtil.isWap(request)) {
-				path = TEXT_WAP_DIR + uri;
-			}
+			String path = TEXT_HTML_DIR.concat(uri);
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Forward path " + path);
 			}
 
 			RequestDispatcher requestDispatcher =
-				servletContext.getRequestDispatcher(path);
+				DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+					servletContext, path);
 
 			try {
 				requestDispatcher.forward(request, response);
 			}
-			catch (IOException ioe1) {
+			catch (IOException ioe) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(ioe1, ioe1);
+					_log.warn(ioe, ioe);
 				}
 			}
 			catch (ServletException se1) {
@@ -87,12 +82,9 @@ public class StrutsUtil {
 
 				String errorPath = TEXT_HTML_DIR + "/common/error.jsp";
 
-				if (BrowserSnifferUtil.isWap(request)) {
-					path = TEXT_WAP_DIR + "/common/error.jsp";
-				}
-
-				requestDispatcher = servletContext.getRequestDispatcher(
-					errorPath);
+				requestDispatcher =
+					DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+						servletContext, errorPath);
 
 				try {
 					requestDispatcher.forward(request, response);
@@ -121,18 +113,15 @@ public class StrutsUtil {
 			_log.debug("Include URI " + uri);
 		}
 
-		String path = TEXT_HTML_DIR + uri;
-
-		if (BrowserSnifferUtil.isWap(request)) {
-			path = TEXT_WAP_DIR + uri;
-		}
+		String path = TEXT_HTML_DIR.concat(uri);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Include path " + path);
 		}
 
 		RequestDispatcher requestDispatcher =
-			servletContext.getRequestDispatcher(path);
+			DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
+				servletContext, path);
 
 		try {
 			requestDispatcher.include(request, response);
@@ -147,7 +136,7 @@ public class StrutsUtil {
 	public static Map<String, Object> removeStrutsAttributes(
 		PortletContext portletContext, PortletRequest portletRequest) {
 
-		Map<String, Object> strutsAttributes = new HashMap<String, Object>();
+		Map<String, Object> strutsAttributes = new HashMap<>();
 
 		Enumeration<String> enu = portletRequest.getAttributeNames();
 

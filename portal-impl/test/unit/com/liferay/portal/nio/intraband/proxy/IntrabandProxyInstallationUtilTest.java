@@ -28,14 +28,16 @@ import com.liferay.portal.kernel.nio.intraband.rpc.RPCResponse;
 import com.liferay.portal.kernel.nio.intraband.test.MockIntraband;
 import com.liferay.portal.kernel.nio.intraband.test.MockRegistrationReference;
 import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 import com.liferay.portal.util.FileImpl;
+import com.liferay.registry.BasicRegistryImpl;
+import com.liferay.registry.RegistryUtil;
 
 import java.io.Serializable;
 
@@ -58,7 +60,7 @@ public class IntrabandProxyInstallationUtilTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
+			AspectJNewEnvTestRule.INSTANCE, CodeCoverageAssertor.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -101,6 +103,8 @@ public class IntrabandProxyInstallationUtilTest {
 		_stubProxyMethodSignatures =
 			IntrabandProxyUtil.getProxyMethodSignatures(
 				IntrabandProxyUtil.getStubClass(TestClass.class, "skeletonId"));
+
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
 	}
 
 	@NewEnv(type = NewEnv.Type.NONE)
@@ -264,6 +268,11 @@ public class IntrabandProxyInstallationUtilTest {
 		@Override
 		public Object getTarget(String id) {
 			return null;
+		}
+
+		@Override
+		public int hashCode() {
+			return super.hashCode();
 		}
 
 		private final Class<?> _clazz;

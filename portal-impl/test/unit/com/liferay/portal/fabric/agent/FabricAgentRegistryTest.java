@@ -16,7 +16,7 @@ package com.liferay.portal.fabric.agent;
 
 import com.liferay.portal.fabric.local.agent.EmbeddedProcessExecutor;
 import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class FabricAgentRegistryTest {
 
 		List<FabricAgent> fabricAgents = fabricAgentRegistry.getFabricAgents();
 
-		Assert.assertEquals(1, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 1, fabricAgents.size());
 		Assert.assertTrue(fabricAgents.contains(fabricAgent1));
 
 		FabricAgent fabricAgent2 = new LocalFabricAgent(
@@ -98,9 +98,10 @@ public class FabricAgentRegistryTest {
 
 		fabricAgents = fabricAgentRegistry.getFabricAgents();
 
-		Assert.assertEquals(2, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 2, fabricAgents.size());
 		Assert.assertTrue(fabricAgents.contains(fabricAgent1));
 		Assert.assertTrue(fabricAgents.contains(fabricAgent2));
+
 		Assert.assertTrue(
 			fabricAgentRegistry.unregisterFabricAgent(fabricAgent1, recorder));
 
@@ -113,8 +114,9 @@ public class FabricAgentRegistryTest {
 
 		fabricAgents = fabricAgentRegistry.getFabricAgents();
 
-		Assert.assertEquals(1, fabricAgents.size());
+		Assert.assertEquals(fabricAgents.toString(), 1, fabricAgents.size());
 		Assert.assertTrue(fabricAgents.contains(fabricAgent2));
+
 		Assert.assertTrue(
 			fabricAgentRegistry.unregisterFabricAgent(fabricAgent2, null));
 
@@ -145,7 +147,8 @@ public class FabricAgentRegistryTest {
 		List<FabricAgentListener> fabricAgentListeners =
 			fabricAgentRegistry.getFabricAgentListeners();
 
-		Assert.assertEquals(1, fabricAgentListeners.size());
+		Assert.assertEquals(
+			fabricAgentListeners.toString(), 1, fabricAgentListeners.size());
 		Assert.assertTrue(fabricAgentListeners.contains(recorder1));
 
 		Recorder recorder2 = new Recorder();
@@ -157,9 +160,11 @@ public class FabricAgentRegistryTest {
 
 		fabricAgentListeners = fabricAgentRegistry.getFabricAgentListeners();
 
-		Assert.assertEquals(2, fabricAgentListeners.size());
+		Assert.assertEquals(
+			fabricAgentListeners.toString(), 2, fabricAgentListeners.size());
 		Assert.assertTrue(fabricAgentListeners.contains(recorder1));
 		Assert.assertTrue(fabricAgentListeners.contains(recorder2));
+
 		Assert.assertTrue(
 			fabricAgentRegistry.unregisterFabricAgentListener(recorder1));
 		Assert.assertFalse(
@@ -167,8 +172,10 @@ public class FabricAgentRegistryTest {
 
 		fabricAgentListeners = fabricAgentRegistry.getFabricAgentListeners();
 
-		Assert.assertEquals(1, fabricAgentListeners.size());
+		Assert.assertEquals(
+			fabricAgentListeners.toString(), 1, fabricAgentListeners.size());
 		Assert.assertTrue(fabricAgentListeners.contains(recorder2));
+
 		Assert.assertTrue(
 			fabricAgentRegistry.unregisterFabricAgentListener(recorder2));
 		Assert.assertFalse(
@@ -205,7 +212,7 @@ public class FabricAgentRegistryTest {
 			_objects.clear();
 		}
 
-		private final List<Object> _objects = new ArrayList<Object>();
+		private final List<Object> _objects = new ArrayList<>();
 
 	}
 

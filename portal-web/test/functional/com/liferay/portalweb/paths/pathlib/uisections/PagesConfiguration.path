@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>PagesConfiguration</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">PagesConfiguration</td></tr>
+</thead>
+<tbody>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_LINK</td>
+	<td>//li[contains(@class,'treeview-node')]//div/span[contains(.,'${key_pageName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_NODE_EXPANDED</td>
+	<td>//div[contains(@class,'treeview-node-main') and @aria-expanded='true']/div[contains(@class,'toggler')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_NODE_COLLAPSED</td>
+	<td>//div[contains(@class,'treeview-node-main') and @aria-expanded='false']/div[contains(@class,'toggler')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_ALL_PUBLIC_PAGES_CHECKBOX</td>
+	<td>//div[contains(.,'Public Pages')]//span[contains(@class,'icon-check')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_SPECIFIC_PAGE_NAME</td>
+	<td>//li/div[contains(.,'${key_pageName}')]//span[contains(@class,'icon-check')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_SPECIFIC_PAGE_CHECKED</td>
+	<td>//li/div[contains(@class,'checked') and contains(.,'${key_pageName}')]//span[contains(@class,'icon-check')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_DELETE_MISSING_PAGES_CHECKBOX</td>
+	<td>//input[contains(@id,'DELETE_MISSING_LAYOUTS')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_LOGO_CHECKBOX</td>
+	<td>//input[contains(@id,'LOGO')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>APPLICATION_CONFIGURATION_APPLICATION_CHANGE_LINK</td>
+	<td>//a[@data-portlettitle='${key_applicationName}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>APPLICATION_CONFIGURATION_CHOOSE_APPLICATION_SUBAPPLICATION_CHECKBOX</td>
+	<td>//div[contains(@class,'widget-content-expanded') and contains(.,'${key_applicationName}')]//div[contains(@class,'modal-body')]//input[@data-name='${key_subApplication}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>APPLICATION_CONFIGURATION_CHOOSE_APPLICATION_SUBAPPLICATION_OK_BUTTON</td>
+	<td>//div[contains(@class,'widget-content-expanded') and contains(.,'${key_applicationName}')]//button[contains(.,'OK')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHANGE_TO_PRIVATE_PAGES</td>
+	<td>//button[contains(@id,'changeToPrivateLayoutsButton')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX</td>
+	<td>//label[contains(.,'${key_contentName}')]/input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_ALL_PUBLIC_PAGES_CHECKBOX</td>
+	<td>xpath=(//div[contains(.,'Public Pages')]//span[contains(@class,'icon-check')])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_SITE_PAGES_SETTINGS_CHECKBOX</td>
+	<td>//input[contains(@id,'LAYOUT_SET_SETTINGS')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_SITE_TEMPLATE_SETTINGS_CHECKBOX</td>
+	<td>//input[contains(@id,'LAYOUT_SET_PROTOTYPE_SETTINGS')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_THEME_SETTINGS_CHECKBOX</td>
+	<td>//input[contains(@id,'THEME_REFERENCE')]</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

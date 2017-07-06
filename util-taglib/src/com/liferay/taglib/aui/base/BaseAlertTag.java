@@ -63,48 +63,36 @@ public abstract class BaseAlertTag extends com.liferay.taglib.util.IncludeTag {
 
 	public void setAnimated(boolean animated) {
 		_animated = animated;
-
-		setScopedAttribute("animated", animated);
 	}
 
 	public void setCloseable(boolean closeable) {
 		_closeable = closeable;
-
-		setScopedAttribute("closeable", closeable);
 	}
 
 	public void setCssClass(java.lang.String cssClass) {
 		_cssClass = cssClass;
-
-		setScopedAttribute("cssClass", cssClass);
 	}
 
 	public void setDestroyOnHide(boolean destroyOnHide) {
 		_destroyOnHide = destroyOnHide;
-
-		setScopedAttribute("destroyOnHide", destroyOnHide);
 	}
 
 	public void setDuration(java.lang.Object duration) {
 		_duration = duration;
-
-		setScopedAttribute("duration", duration);
 	}
 
 	public void setId(java.lang.String id) {
 		_id = id;
-
-		setScopedAttribute("id", id);
 	}
 
 	public void setType(java.lang.String type) {
 		_type = type;
-
-		setScopedAttribute("type", type);
 	}
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_animated = false;
 		_closeable = true;
 		_cssClass = null;
@@ -126,13 +114,13 @@ public abstract class BaseAlertTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		setNamespacedAttribute(request, "animated", _animated);
-		setNamespacedAttribute(request, "closeable", _closeable);
-		setNamespacedAttribute(request, "cssClass", _cssClass);
-		setNamespacedAttribute(request, "destroyOnHide", _destroyOnHide);
-		setNamespacedAttribute(request, "duration", _duration);
-		setNamespacedAttribute(request, "id", _id);
-		setNamespacedAttribute(request, "type", _type);
+		request.setAttribute("aui:alert:animated", String.valueOf(_animated));
+		request.setAttribute("aui:alert:closeable", String.valueOf(_closeable));
+		request.setAttribute("aui:alert:cssClass", _cssClass);
+		request.setAttribute("aui:alert:destroyOnHide", String.valueOf(_destroyOnHide));
+		request.setAttribute("aui:alert:duration", _duration);
+		request.setAttribute("aui:alert:id", _id);
+		request.setAttribute("aui:alert:type", _type);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:alert:";

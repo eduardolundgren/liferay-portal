@@ -14,9 +14,13 @@
 
 package com.liferay.portal.service.permission;
 
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.permission.PortalPermission;
+import com.liferay.portal.kernel.util.PortletKeys;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Charles May
@@ -28,7 +32,9 @@ public class PortalPermissionImpl implements PortalPermission {
 		throws PrincipalException {
 
 		if (!contains(permissionChecker, actionId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, PortletKeys.PORTAL, PortletKeys.PORTAL,
+				actionId);
 		}
 	}
 
@@ -36,8 +42,51 @@ public class PortalPermissionImpl implements PortalPermission {
 	public boolean contains(
 		PermissionChecker permissionChecker, String actionId) {
 
-		return permissionChecker.hasPermission(
-			0, PortletKeys.PORTAL, PortletKeys.PORTAL, actionId);
+		Map<Object, Object> permissionChecksMap =
+			permissionChecker.getPermissionChecksMap();
+
+		CacheKey cacheKey = new CacheKey(actionId);
+
+		Boolean contains = (Boolean)permissionChecksMap.get(cacheKey);
+
+		if (contains == null) {
+			contains = permissionChecker.hasPermission(
+				null, PortletKeys.PORTAL, PortletKeys.PORTAL, actionId);
+
+			permissionChecksMap.put(cacheKey, contains);
+		}
+
+		return contains;
+	}
+
+	private static class CacheKey {
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+
+			if (!(obj instanceof CacheKey)) {
+				return false;
+			}
+
+			CacheKey cacheKey = (CacheKey)obj;
+
+			return Objects.equals(_actionId, cacheKey._actionId);
+		}
+
+		@Override
+		public int hashCode() {
+			return _actionId.hashCode();
+		}
+
+		private CacheKey(String actionId) {
+			_actionId = actionId;
+		}
+
+		private final String _actionId;
+
 	}
 
 }

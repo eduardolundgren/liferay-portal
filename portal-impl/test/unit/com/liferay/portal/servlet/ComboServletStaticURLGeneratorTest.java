@@ -14,21 +14,23 @@
 
 package com.liferay.portal.servlet;
 
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.impl.PortletAppImpl;
 import com.liferay.portal.model.impl.PortletImpl;
 import com.liferay.portal.util.HtmlImpl;
 import com.liferay.portal.util.HttpImpl;
 import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletResourceAccessor;
+import com.liferay.registry.BasicRegistryImpl;
+import com.liferay.registry.RegistryUtil;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,6 +52,8 @@ public class ComboServletStaticURLGeneratorTest {
 
 	@Before
 	public void setUp() {
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
+
 		HtmlUtil htmlUtil = new HtmlUtil();
 
 		htmlUtil.setHtml(new HtmlImpl());
@@ -84,12 +88,12 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet2", 0);
 
 		List<String> urls1 = comboServletStaticURLGenerator.generate(
-			toList(portlet1));
+			_toList(portlet1));
 
 		comboServletStaticURLGenerator.setVisitedURLs(new HashSet<String>());
 
 		List<String> urls2 = comboServletStaticURLGenerator.generate(
-			toList(portlet2));
+			_toList(portlet2));
 
 		assertURLs(
 			urls1, _URL_PREFIX + "&%2Fcss%2Fmain.css&%2Fcss%2Fmore.css&t=0");
@@ -118,7 +122,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("/portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(
 			urls, "http://www.test.com/test2.css",
@@ -142,7 +146,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(urls, _URL_PREFIX + "&%2Fcss%2Fmore.css&t=0");
 	}
@@ -168,12 +172,12 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet2", 0);
 
 		List<String> urls1 = comboServletStaticURLGenerator.generate(
-			toList(portlet1, portlet2));
+			_toList(portlet1, portlet2));
 
 		comboServletStaticURLGenerator.setVisitedURLs(new HashSet<String>());
 
 		List<String> urls2 = comboServletStaticURLGenerator.generate(
-			toList(portlet2, portlet1));
+			_toList(portlet2, portlet1));
 
 		Assert.assertEquals(urls1, urls2);
 	}
@@ -188,7 +192,7 @@ public class ComboServletStaticURLGeneratorTest {
 
 		comboServletStaticURLGenerator.setURLPrefix(_URL_PREFIX);
 
-		Set<String> visitedURLs = new HashSet<String>();
+		Set<String> visitedURLs = new HashSet<>();
 
 		comboServletStaticURLGenerator.setVisitedURLs(visitedURLs);
 
@@ -196,7 +200,7 @@ public class ComboServletStaticURLGeneratorTest {
 
 		setPortletTimestamp("portlet", 0);
 
-		comboServletStaticURLGenerator.generate(toList(portlet));
+		comboServletStaticURLGenerator.generate(_toList(portlet));
 
 		Assert.assertTrue(visitedURLs.contains("/css/main.css"));
 	}
@@ -216,7 +220,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 10000);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(urls, _URL_PREFIX + "&%2Fcss%2Fmain.css&t=10000");
 	}
@@ -237,7 +241,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 2000);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(urls, _URL_PREFIX + "&%2Fcss%2Fmain.css&t=20000");
 	}
@@ -258,7 +262,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(
 			urls, "http://www.test.com/test.css",
@@ -281,7 +285,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(urls, "http://www.test.com/test.css");
 	}
@@ -302,7 +306,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		Assert.assertTrue(urls.isEmpty());
 	}
@@ -323,13 +327,12 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(
 			urls,
-			_URL_PREFIX + "&" + PortletKeys.PORTAL +
-				":%2Fcss%2Fmain.css&" + PortletKeys.PORTAL +
-				":%2Fcss%2Fmore.css&t=0");
+			_URL_PREFIX + "&" + PortletKeys.PORTAL + ":%2Fcss%2Fmain.css&" +
+				PortletKeys.PORTAL + ":%2Fcss%2Fmore.css&t=0");
 	}
 
 	@Test
@@ -348,7 +351,7 @@ public class ComboServletStaticURLGeneratorTest {
 		setPortletTimestamp("portlet", 0);
 
 		List<String> urls = comboServletStaticURLGenerator.generate(
-			toList(portlet));
+			_toList(portlet));
 
 		assertURLs(
 			urls, _URL_PREFIX + "&%2Fcss%2Fmain.css&%2Fcss%2Fmore.css&t=0");
@@ -373,6 +376,7 @@ public class ComboServletStaticURLGeneratorTest {
 		portlet.setHeaderPortalJavaScript(portletResourcesList);
 		portlet.setHeaderPortletCss(portletResourcesList);
 		portlet.setHeaderPortletJavaScript(portletResourcesList);
+
 		portlet.setPortletId(PortletKeys.PORTAL);
 		portlet.setPortletName(contextName);
 
@@ -399,7 +403,7 @@ public class ComboServletStaticURLGeneratorTest {
 			ServletContextUtil.class.getName() + "./", timestamp);
 	}
 
-	private <T> List<T> toList(T... t) {
+	private <T> List<T> _toList(T... t) {
 		return Arrays.asList(t);
 	}
 

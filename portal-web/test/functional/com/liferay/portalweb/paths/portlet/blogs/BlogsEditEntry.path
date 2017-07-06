@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>BlogsEditEntry</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">BlogsEditEntry</td></tr>
+</thead>
+<tbody>
+<tr>
+	<td>COVER_IMAGE</td>
+	<td>//div[contains(@class,'cover-image-selector')]//div[contains(@class,'image-wrapper')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DELETE_COVER_IMAGE_BUTTON</td>
+	<td>//button/i[contains(@class,'icon-trash')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HEADER_CAPTION</td>
+	<td>//div[contains(@id,'CaptionEditor')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

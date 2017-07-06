@@ -14,9 +14,14 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLProcessorConstants;
+import com.liferay.document.library.kernel.util.AudioProcessor;
+import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
+import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.fabric.InputResource;
 import com.liferay.portal.fabric.OutputResource;
-import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -41,7 +46,6 @@ import com.liferay.portal.log.Log4jLogFactoryImpl;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.File;
@@ -123,6 +127,11 @@ public class AudioProcessorImpl
 		throws Exception {
 
 		return doGetPreviewFileSize(fileVersion, type);
+	}
+
+	@Override
+	public String getType() {
+		return DLProcessorConstants.AUDIO_PROCESSOR;
 	}
 
 	@Override
@@ -320,6 +329,9 @@ public class AudioProcessorImpl
 			}
 		}
 		catch (NoSuchFileEntryException nsfee) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfee, nsfee);
+			}
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
@@ -449,11 +461,12 @@ public class AudioProcessorImpl
 	private static final String[] _PREVIEW_TYPES =
 		PropsValues.DL_FILE_ENTRY_PREVIEW_AUDIO_CONTAINERS;
 
-	private static Log _log = LogFactoryUtil.getLog(AudioProcessorImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		AudioProcessorImpl.class);
 
-	private Set<String> _audioMimeTypes = SetUtil.fromArray(
+	private final Set<String> _audioMimeTypes = SetUtil.fromArray(
 		PropsValues.DL_FILE_ENTRY_PREVIEW_AUDIO_MIME_TYPES);
-	private List<Long> _fileVersionIds = new Vector<Long>();
+	private final List<Long> _fileVersionIds = new Vector<>();
 
 	private static class LiferayAudioProcessCallable
 		implements ProcessCallable<String> {
@@ -506,19 +519,19 @@ public class AudioProcessorImpl
 
 		private static final long serialVersionUID = 1L;
 
-		private String _audioContainer;
-		private Properties _audioProperties;
-		private Map<String, String> _customLogSettings;
+		private final String _audioContainer;
+		private final Properties _audioProperties;
+		private final Map<String, String> _customLogSettings;
 
 		@InputResource
-		private File _inputFile;
+		private final File _inputFile;
 
-		private String _liferayHome;
+		private final String _liferayHome;
 
 		@OutputResource
-		private File _outputFile;
+		private final File _outputFile;
 
-		private String _serverId;
+		private final String _serverId;
 
 	}
 

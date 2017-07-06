@@ -17,16 +17,17 @@ package com.liferay.taglib.aui;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.aui.base.BaseNavBarSearchTag;
 
 import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
 
 /**
  * @author Eduardo Lundgren
@@ -66,6 +67,48 @@ public class NavBarSearchTag extends BaseNavBarSearchTag {
 		super.cleanUp();
 
 		_namespacedId = null;
+	}
+
+	@Override
+	protected String getEndPage() {
+		if (Validator.isNotNull(getMarkupView())) {
+			return "/html/taglib/aui/nav_bar_search/" + getMarkupView() +
+				"/end.jsp";
+		}
+
+		return "/html/taglib/aui/nav_bar_search/end.jsp";
+	}
+
+	protected String getMarkupView() {
+		String markupView = StringPool.BLANK;
+
+		NavBarTag navBarTag = (NavBarTag)findAncestorWithClass(
+			this, NavBarTag.class);
+
+		if (navBarTag != null) {
+			markupView = navBarTag.getMarkupView();
+		}
+
+		return markupView;
+	}
+
+	@Override
+	protected String getStartPage() {
+		if (Validator.isNotNull(getMarkupView())) {
+			return "/html/taglib/aui/nav_bar_search/" + getMarkupView() +
+				"/start.jsp";
+		}
+
+		return "/html/taglib/aui/nav_bar_search/start.jsp";
+	}
+
+	@Override
+	protected int processEndTag() throws Exception {
+		JspWriter jspWriter = pageContext.getOut();
+
+		jspWriter.write("</div></div>");
+
+		return EVAL_PAGE;
 	}
 
 	@Override

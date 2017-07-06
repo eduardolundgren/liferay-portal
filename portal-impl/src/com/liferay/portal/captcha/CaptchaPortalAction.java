@@ -15,7 +15,7 @@
 package com.liferay.portal.captcha;
 
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +27,9 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * @author Brian Wing Shun Chan
+ * @deprecated As of 7.0.0, with no direct replacement
  */
+@Deprecated
 public class CaptchaPortalAction extends Action {
 
 	@Override

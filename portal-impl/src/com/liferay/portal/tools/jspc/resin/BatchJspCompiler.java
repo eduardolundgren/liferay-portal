@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.tools.ant.DirectoryScanner;
@@ -67,13 +68,14 @@ public class BatchJspCompiler {
 			return;
 		}
 
-		List<String> arguments = new ArrayList<String>();
+		List<String> arguments = new ArrayList<>();
 
 		arguments.add("-app-dir");
 		arguments.add(_appDir);
 		arguments.add("-class-dir");
 		arguments.add(_classDir);
-		arguments.addAll(Arrays.asList(fileNames));
+
+		Collections.addAll(arguments, fileNames);
 
 		Class<?> clazz = Class.forName("com.caucho.jsp.JspCompiler");
 

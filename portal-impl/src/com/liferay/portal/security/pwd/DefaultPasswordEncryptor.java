@@ -14,6 +14,7 @@
 
 package com.liferay.portal.security.pwd;
 
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
 import com.liferay.portal.kernel.util.DigesterUtil;
 
 /**
@@ -24,15 +25,15 @@ public class DefaultPasswordEncryptor
 	extends BasePasswordEncryptor implements PasswordEncryptor {
 
 	@Override
-	public String[] getSupportedAlgorithmTypes() {
-		return new String[0];
-	}
-
-	@Override
-	protected String doEncrypt(
+	public String encrypt(
 		String algorithm, String plainTextPassword, String encryptedPassword) {
 
 		return DigesterUtil.digest(algorithm, plainTextPassword);
+	}
+
+	@Override
+	public String[] getSupportedAlgorithmTypes() {
+		return new String[0];
 	}
 
 }

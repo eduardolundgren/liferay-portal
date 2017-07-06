@@ -14,12 +14,14 @@
 
 package com.liferay.portal.servlet;
 
-import com.liferay.portal.cache.SingleVMPoolImpl;
-import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
-import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.tools.ToolDependencies;
+import com.liferay.portal.util.HttpImpl;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,15 +34,16 @@ public class ModulePathContainerTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		SingleVMPoolImpl singleVMPoolImpl = new SingleVMPoolImpl();
+		ToolDependencies.wireCaches();
 
-		singleVMPoolImpl.setPortalCacheManager(
-			MemoryPortalCacheManager.createMemoryPortalCacheManager(
-				ModulePathContainerTest.class.getName()));
+		_http = HttpUtil.getHttp();
 
-		SingleVMPoolUtil singleVMPoolUtil = new SingleVMPoolUtil();
+		_httpUtil.setHttp(new HttpImpl());
+	}
 
-		singleVMPoolUtil.setSingleVMPool(singleVMPoolImpl);
+	@AfterClass
+	public static void tearDownClass() {
+		_httpUtil.setHttp(_http);
 	}
 
 	@Test
@@ -72,5 +75,8 @@ public class ModulePathContainerTest {
 		Assert.assertEquals(
 			StringPool.BLANK, ComboServlet.getResourcePath(modulePath));
 	}
+
+	private static Http _http;
+	private static final HttpUtil _httpUtil = new HttpUtil();
 
 }

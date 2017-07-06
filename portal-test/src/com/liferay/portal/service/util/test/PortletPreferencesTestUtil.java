@@ -14,13 +14,13 @@
 
 package com.liferay.portal.service.util.test;
 
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.PortletPreferences;
-import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.test.TestPropsValues;
 
 /**
  * @author Cristina González
@@ -62,8 +62,7 @@ public class PortletPreferencesTestUtil {
 	}
 
 	public static javax.portlet.PortletPreferences
-			fetchLayoutJxPortletPreferences(
-				Layout layout, Portlet portlet)
+			fetchLayoutJxPortletPreferences(Layout layout, Portlet portlet)
 		throws Exception {
 
 		return PortletPreferencesLocalServiceUtil.fetchPreferences(
